@@ -102,6 +102,14 @@ const updateTaskByID = (data) => {
 	});
 };
 
+const getAllUser = () => {
+	// lấy danh sách nhân viên
+	return axiosClient({
+		method: 'GET',
+		url: `/users`,
+	});
+};
+
 export {
 	getAll,
 	getLatestTasks,
@@ -115,4 +123,5 @@ export {
 	getTaskById,
 	addNewTask,
 	updateTaskByID,
+	getAllUser,
 };
