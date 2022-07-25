@@ -20,7 +20,7 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Option from '../../../components/bootstrap/Option';
 import Icon from '../../../components/icon/Icon';
 import { PRIORITIES } from '../../../utils/constants';
-import { getAllDepartments, getTaskById } from './services';
+import { getAllDepartments, getAllUser, getTaskById } from './services';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -33,16 +33,24 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	const [task, setTask] = useState({});
 	const [keysState, setKeysState] = useState([]);
 	const [departments, setDepartments] = useState([]);
-	const [departmentOption, setDepartmentOption] = useState({});
+	const [users, setUsers] = useState([]);
+	const [departmentOption, setDepartmentOption] = useState({ label: '', value: '' });
+	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
+	const [userOption, setUserOption] = useState({ label: '', value: '' });
+	const [userReplatedOption, setUserRelatedOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
 		kpi_value: { errorMsg: '' },
+		priority: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
+		userOption: { errorMsg: '' },
 	});
 
 	const nameRef = useRef(null);
 	const kpiValueRef = useRef(null);
+	const priorityRef = useRef(null);
 	const departmentRef = useRef(null);
+	const userRef = useRef(null);
 
 	const onValidate = (value, name) => {
 		setErrors((prev) => ({
@@ -61,11 +69,13 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		validateFieldForm('name', task?.name);
 		validateFieldForm('kpi_value', task?.kpi_value);
 		validateFieldForm('kpi_value', parseInt(task?.kpi_value, 10) > 0);
-		validateFieldForm('departmentOption', departmentOption.length);
+		validateFieldForm('priority', task?.priority);
+		validateFieldForm('departmentOption', departmentOption?.value);
+		validateFieldForm('userOption', userOption?.value);
 	};
 
 	const handleClearErrorMsgAfterChange = (name) => {
-		if (task?.[name] || departmentOption?.length > 0) {
+		if (task?.[name] || departmentOption?.value || userOption?.value) {
 			setErrors((prev) => ({
 				...prev,
 				[name]: { ...prev[name], errorMsg: '' },
@@ -76,21 +86,44 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	useEffect(() => {
 		handleClearErrorMsgAfterChange('name');
 		handleClearErrorMsgAfterChange('kpi_value');
+		handleClearErrorMsgAfterChange('priority');
 		handleClearErrorMsgAfterChange('departmentOption');
+		handleClearErrorMsgAfterChange('userOption');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [task?.name, task?.kpi_value, departmentOption?.length]);
+	}, [task?.name, task?.kpi_value, task?.priority, departmentOption?.value, userOption?.value]);
 
 	useEffect(() => {
 		if (item?.id) {
 			getTaskById(item?.id).then((res) => {
 				setTask(res.data);
 				setKeysState(res.data?.keys || []);
-				setDepartmentOption(
-					res.data?.departments?.map((department) => {
+				setDepartmentOption({
+					...res.data.department,
+					id: res.data.department.id,
+					label: res.data.department.name,
+					value: res.data.department.slug,
+				});
+				setUserOption({
+					...res.data.user,
+					id: res.data.user.id,
+					label: res.data.user.name,
+					value: res.data.user.id,
+				});
+				setDepartmentRelatedOption(
+					res.data?.departments_related?.map((department) => {
 						return {
 							id: department.id,
 							label: department.name,
 							value: department.slug,
+						};
+					}),
+				);
+				setUserRelatedOption(
+					res.data?.users_related?.map((user) => {
+						return {
+							id: user.id,
+							label: user.name,
+							value: user.id,
 						};
 					}),
 				);
@@ -104,11 +137,14 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
 				estimate_time: '08:00',
 				deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
-				deadline_time: '08:00',
+				deadline_time: '17:00',
 				status: 0,
 			});
 			setKeysState([]);
-			setDepartmentOption([]);
+			setDepartmentOption({ label: '', value: '' });
+			setUserOption({ label: '', value: '' });
+			setDepartmentRelatedOption([]);
+			setUserRelatedOption([]);
 		}
 	}, [item?.id]);
 
@@ -131,6 +167,27 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 			}
 		}
 		getDepartments();
+	}, []);
+
+	useEffect(() => {
+		async function getUsers() {
+			try {
+				const response = await getAllUser();
+				const data = await response.data;
+				setUsers(
+					data.map((user) => {
+						return {
+							id: user.id,
+							label: user.name,
+							value: user.id,
+						};
+					}),
+				);
+			} catch (error) {
+				setUsers([]);
+			}
+		}
+		getUsers();
 	}, []);
 
 	// hàm validate cho dynamic field form
@@ -207,40 +264,8 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		setKeysState((prev) => prev.filter((state) => state !== prev[index]));
 	};
 
-	const handleSubmit = () => {
-		const data = { ...task };
-		data.mission_id = parseInt(params?.id, 10);
-		data.kpi_value = parseInt(task?.kpi_value, 10);
-		data.priority = parseInt(task?.priority, 10);
-		data.keys = keysState.map((key) => {
-			return {
-				key_name: key.key_name,
-				key_value: key.key_value,
-			};
-		});
-		data.subtasks = _.isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
-		const departmentClone = [...departmentOption];
-		data.departments = departmentClone.map((department) => {
-			return {
-				id: department.id,
-				name: department.label,
-				slug: department.value,
-			};
-		});
-		validateForm();
-		if (!task?.name) {
-			nameRef.current.focus();
-			return;
-		}
-		if (parseInt(task?.kpi_value, 10) <= 0) {
-			kpiValueRef.current.focus();
-			return;
-		}
-		if (!prevIsValid()) {
-			return;
-		}
-		onSubmit(data);
-		// console.log(data);
+	// clear form
+	const handleClearForm = () => {
 		setTask({
 			id: null,
 			name: '',
@@ -253,7 +278,72 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 			status: 0,
 		});
 		setKeysState([]);
-		setDepartmentOption([]);
+		setDepartmentOption({});
+		setDepartmentRelatedOption([]);
+		setUserOption({});
+		setUserRelatedOption([]);
+	};
+
+	const handleSubmit = () => {
+		const data = { ...task };
+		data.mission_id = parseInt(params?.id, 10);
+		data.kpi_value = parseInt(task?.kpi_value, 10);
+		data.priority = parseInt(task?.priority, 10);
+		data.keys = keysState.map((key) => {
+			return {
+				key_name: key.key_name,
+				key_value: key.key_value,
+			};
+		});
+		data.subtasks = _.isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
+		data.department = {
+			id: departmentOption.id,
+			name: departmentOption.label,
+			slug: departmentOption.value,
+		};
+		data.departments_related = departmentReplatedOption.map((department) => {
+			return {
+				id: department.id,
+				name: department.label,
+				slug: department.value,
+			};
+		});
+		data.user = {
+			id: userOption.value,
+			name: userOption.label,
+		};
+		data.users_related = userReplatedOption.map((user) => {
+			return {
+				id: user.id,
+				name: user.label,
+			};
+		});
+		validateForm();
+		if (!task?.name) {
+			nameRef.current.focus();
+			return;
+		}
+		if (parseInt(task?.kpi_value, 10) <= 0) {
+			kpiValueRef.current.focus();
+			return;
+		}
+		if (!task?.priority) {
+			priorityRef.current.focus();
+			return;
+		}
+		if (!departmentOption?.value) {
+			departmentRef.current.focus();
+			return;
+		}
+		if (!userOption?.value) {
+			userRef.current.focus();
+			return;
+		}
+		if (!prevIsValid()) {
+			return;
+		}
+		onSubmit(data);
+		handleClearForm();
 	};
 
 	return (
@@ -328,6 +418,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											id='priority'
 											label='Độ ưu tiên'>
 											<Select
+												ref={priorityRef}
 												name='priority'
 												ariaLabel='Board select'
 												className='border border-2'
@@ -341,24 +432,82 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												))}
 											</Select>
 										</FormGroup>
+										{errors?.priority?.errorMsg && (
+											<ErrorText>
+												Vui lòng chọn độ ưu tiên cho công việc
+											</ErrorText>
+										)}
+										{/* phòng ban phụ trách */}
 										<FormGroup
 											className='col-12'
 											id='departmentOption'
 											label='Phòng ban phụ trách'>
 											<SelectComponent
+												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
 												onChange={setDepartmentOption}
 												options={departments}
-												isMulti
 												ref={departmentRef}
 											/>
 										</FormGroup>
 										{errors?.departmentOption?.errorMsg && (
 											<ErrorText>
-												Vui lòng chọn phòng ban cho công việc
+												Vui lòng chọn phòng ban phụ trách cho công việc
 											</ErrorText>
 										)}
+										{/* nhân viên phụ trách chính */}
+										<FormGroup
+											className='col-12'
+											id='userOption'
+											label='Nhân viên phụ trách'>
+											<SelectComponent
+												placeholder='Chọn nhân viên phụ trách'
+												defaultValue={userOption}
+												value={userOption}
+												onChange={setUserOption}
+												options={users}
+												ref={userRef}
+											/>
+										</FormGroup>
+										{errors?.userOption?.errorMsg && (
+											<ErrorText>
+												Vui lòng chọn nhân viên phụ trách cho công việc
+											</ErrorText>
+										)}
+										{/* phòng ban liên quan */}
+										<FormGroup
+											className='col-12'
+											id='departmentReplatedOption'
+											label='Phòng ban liên quan'>
+											<SelectComponent
+												placeholder='Chọn phòng ban liên quan'
+												defaultValue={departmentReplatedOption}
+												value={departmentReplatedOption}
+												onChange={setDepartmentRelatedOption}
+												options={departments.filter(
+													(department) =>
+														department.id !== departmentOption?.id,
+												)}
+												isMulti
+											/>
+										</FormGroup>
+										{/* Nhân viên liên quan */}
+										<FormGroup
+											className='col-12'
+											id='userReplatedOption'
+											label='Nhân viên liên quan'>
+											<SelectComponent
+												placeholder='Chọn nhân viên liên quan'
+												defaultValue={userReplatedOption}
+												value={userReplatedOption}
+												onChange={setUserRelatedOption}
+												options={users.filter(
+													(user) => user.id !== userOption?.id,
+												)}
+												isMulti
+											/>
+										</FormGroup>
 										<div className='d-flex align-items-center justify-content-between'>
 											<FormGroup
 												className='w-50 mr-2'

@@ -81,7 +81,7 @@ const MissionDetailPage = () => {
 			id: null,
 			name: '',
 			description: '',
-			kpi_value: 0,
+			kpi_value: '',
 			estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
 			estimate_time: '08:00',
 			deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
