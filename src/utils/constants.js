@@ -12,10 +12,10 @@ export const FORMAT_TASK_STATUS = (status) => {
 			result = 'Đã hoàn thành';
 			break;
 		case 2:
-			result = 'Bế tắc';
+			result = 'Chờ xét duyệt';
 			break;
 		case 3:
-			result = 'Huỷ/Xem xét';
+			result = 'Quá hạn/Thất bại';
 			break;
 		default:
 			result = 'Đang thực hiện';
@@ -27,8 +27,8 @@ export const FORMAT_TASK_STATUS = (status) => {
 export const STATUS = {
 	PENDING: { value: 0, name: 'Đang thực hiện', color: COLORS.PRIMARY.name },
 	APPROVED: { value: 1, name: 'Đã hoàn thành', color: COLORS.SUCCESS.name },
-	CANCELED: { value: 2, name: 'Bế tắc', color: COLORS.DANGER.name },
-	REJECTED: { value: 3, name: 'Xem xét/Từ chối', color: COLORS.DARK.name },
+	CANCELED: { value: 2, name: 'Chờ xét duyệt', color: COLORS.DANGER.name },
+	REJECTED: { value: 3, name: 'Quá hạn/Thất bại', color: COLORS.DARK.name },
 };
 
 export const formatColorStatus = (status) => {

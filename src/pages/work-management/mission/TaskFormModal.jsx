@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useState } from 'react';
-import _ from 'lodash';
+import { isArray } from 'lodash';
 import moment from 'moment';
 import { Button, Modal } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
@@ -28,6 +28,15 @@ const ErrorText = styled.span`
 	margin-top: 5px;
 `;
 
+const customStyles = {
+	control: (provided) => ({
+		...provided,
+		padding: '4px',
+		fontSize: '18px',
+		borderRadius: '1.25rem',
+	}),
+};
+
 const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	const params = useParams();
 	const [task, setTask] = useState({});
@@ -39,11 +48,11 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	const [userOption, setUserOption] = useState({ label: '', value: '' });
 	const [userReplatedOption, setUserRelatedOption] = useState([]);
 	const [errors, setErrors] = useState({
-		name: { errorMsg: '' },
-		kpi_value: { errorMsg: '' },
-		priority: { errorMsg: '' },
-		departmentOption: { errorMsg: '' },
-		userOption: { errorMsg: '' },
+		name: { error: false, errorMsg: '' },
+		kpi_value: { error: false, errorMsg: '' },
+		priority: { error: false, errorMsg: '' },
+		departmentOption: { error: false, errorMsg: '' },
+		userOption: { error: false, errorMsg: '' },
 	});
 
 	const nameRef = useRef(null);
@@ -52,10 +61,10 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	const departmentRef = useRef(null);
 	const userRef = useRef(null);
 
-	const onValidate = (value, name) => {
+	const onValidate = (message, value, name) => {
 		setErrors((prev) => ({
 			...prev,
-			[name]: { ...prev[name], errorMsg: value },
+			[name]: { ...prev[name], error: value, errorMsg: value },
 		}));
 	};
 
@@ -284,6 +293,28 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		setUserRelatedOption([]);
 	};
 
+	// close form
+	const handleCloseForm = () => {
+		onClose();
+		setTask({
+			id: null,
+			name: '',
+			description: '',
+			kpi_value: '',
+			estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
+			estimate_time: '08:00',
+			deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
+			deadline_time: '17:00',
+			status: 0,
+		});
+		setKeysState([]);
+		setDepartmentOption({ label: '', value: '' });
+		setUserOption({ label: '', value: '' });
+		setDepartmentRelatedOption([]);
+		setUserRelatedOption([]);
+		setErrors({});
+	};
+
 	const handleSubmit = () => {
 		const data = { ...task };
 		data.mission_id = parseInt(params?.id, 10);
@@ -295,7 +326,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				key_value: key.key_value,
 			};
 		});
-		data.subtasks = _.isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
+		data.subtasks = isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
 		data.department = {
 			id: departmentOption.id,
 			name: departmentOption.label,
@@ -347,7 +378,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	};
 
 	return (
-		<Modal show={show} onHide={onClose} size='lg' scrollable centered>
+		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
 				<Modal.Title>{item?.id ? 'Cập nhật công việc' : 'Thêm mới công việc'}</Modal.Title>
 			</Modal.Header>
@@ -443,6 +474,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											id='departmentOption'
 											label='Phòng ban phụ trách'>
 											<SelectComponent
+												style={customStyles}
 												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
@@ -462,6 +494,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											id='userOption'
 											label='Nhân viên phụ trách'>
 											<SelectComponent
+												style={customStyles}
 												placeholder='Chọn nhân viên phụ trách'
 												defaultValue={userOption}
 												value={userOption}
@@ -481,6 +514,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											id='departmentReplatedOption'
 											label='Phòng ban liên quan'>
 											<SelectComponent
+												style={customStyles}
 												placeholder='Chọn phòng ban liên quan'
 												defaultValue={departmentReplatedOption}
 												value={departmentReplatedOption}
@@ -498,6 +532,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											id='userReplatedOption'
 											label='Nhân viên liên quan'>
 											<SelectComponent
+												style={customStyles}
 												placeholder='Chọn nhân viên liên quan'
 												defaultValue={userReplatedOption}
 												value={userReplatedOption}
@@ -671,7 +706,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant='secondary' onClick={onClose}>
+				<Button variant='secondary' onClick={handleCloseForm}>
 					Đóng
 				</Button>
 				<Button variant='primary' type='submit' onClick={handleSubmit}>

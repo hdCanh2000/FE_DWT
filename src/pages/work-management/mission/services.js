@@ -1,6 +1,6 @@
 import axiosClient from '../../../utils/axiosClient';
 
-const getAll = () => {
+const getAllMission = () => {
 	// lấy toàn bộ danh sách mục tiêu
 	return axiosClient({
 		method: 'GET',
@@ -16,7 +16,15 @@ const getLatestTasks = () => {
 	});
 };
 
-const getItemById = (id) => {
+const getAllTasks = () => {
+	// lấy danh sách các task mới nhất
+	return axiosClient({
+		method: 'GET',
+		url: '/tasks?_sort=id&_order=desc',
+	});
+};
+
+const getMissionById = (id) => {
 	// lấy thông tin mục tiêu theo id
 	return axiosClient({
 		method: 'GET',
@@ -24,7 +32,7 @@ const getItemById = (id) => {
 	});
 };
 
-const addNewItem = (data) => {
+const addNewMission = (data) => {
 	// thêm mục tiêu mới
 	return axiosClient({
 		method: 'POST',
@@ -33,7 +41,7 @@ const addNewItem = (data) => {
 	});
 };
 
-const updateItemById = (data) => {
+const updateMissionById = (data) => {
 	// cập nhật mục tiêu
 	return axiosClient({
 		method: 'PUT',
@@ -42,7 +50,7 @@ const updateItemById = (data) => {
 	});
 };
 
-const deleteItemById = (id) => {
+const deleteMissionById = (id) => {
 	// xoá mục tiêu
 	return axiosClient({
 		method: 'DELETE',
@@ -111,17 +119,18 @@ const getAllUser = () => {
 };
 
 export {
-	getAll,
+	getAllMission,
 	getLatestTasks,
 	getAllDepartments,
-	getItemById,
-	addNewItem,
-	updateItemById,
-	deleteItemById,
+	getMissionById,
+	addNewMission,
+	updateMissionById,
+	deleteMissionById,
 	deleteTaskById,
 	getAllTaksByMissionID,
 	getTaskById,
 	addNewTask,
 	updateTaskByID,
 	getAllUser,
+	getAllTasks,
 };
