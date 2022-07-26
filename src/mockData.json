@@ -892,6 +892,32 @@
         "name": "Nhân viên 1 - Phòng Marketing"
       },
       "users_related": []
+    },
+    {
+      "id": 8,
+      "name": "BBB",
+      "description": "bbb",
+      "kpi_value": 10,
+      "estimate_date": "2022-07-26",
+      "estimate_time": "08:00",
+      "deadline_date": "2022-07-26",
+      "deadline_time": "08:00",
+      "status": 0,
+      "priority": 4,
+      "mission_id": 1,
+      "keys": [],
+      "subtasks": [],
+      "department": {
+        "id": 1,
+        "name": "Phòng Marketing",
+        "slug": "mkt"
+      },
+      "departments_related": [],
+      "user": {
+        "id": 2,
+        "name": "Nhân viên 2 - Phòng Marketing"
+      },
+      "users_related": []
     }
   ]
 }
