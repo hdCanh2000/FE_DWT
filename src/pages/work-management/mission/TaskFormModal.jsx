@@ -1,10 +1,11 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-
-import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
+import _ from 'lodash';
+import moment from 'moment';
 import { Button, Modal } from 'react-bootstrap';
-import Select from 'react-select';
+import { useParams } from 'react-router-dom';
+import SelectComponent from 'react-select';
 import styled from 'styled-components';
 import Card, {
 	CardBody,
@@ -14,9 +15,12 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
+import Select from '../../../components/bootstrap/forms/Select';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
+import Option from '../../../components/bootstrap/Option';
 import Icon from '../../../components/icon/Icon';
-import { getAllDepartments, getItemById } from './services';
+import { PRIORITIES } from '../../../utils/constants';
+import { getAllDepartments, getAllUser, getTaskById } from './services';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -24,20 +28,29 @@ const ErrorText = styled.span`
 	margin-top: 5px;
 `;
 
-const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
-	const [mission, setMission] = useState({});
+const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
+	const params = useParams();
+	const [task, setTask] = useState({});
 	const [keysState, setKeysState] = useState([]);
 	const [departments, setDepartments] = useState([]);
-	const [departmentOption, setDepartmentOption] = useState([]);
+	const [users, setUsers] = useState([]);
+	const [departmentOption, setDepartmentOption] = useState({ label: '', value: '' });
+	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
+	const [userOption, setUserOption] = useState({ label: '', value: '' });
+	const [userReplatedOption, setUserRelatedOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
 		kpi_value: { errorMsg: '' },
+		priority: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
+		userOption: { errorMsg: '' },
 	});
 
 	const nameRef = useRef(null);
 	const kpiValueRef = useRef(null);
+	const priorityRef = useRef(null);
 	const departmentRef = useRef(null);
+	const userRef = useRef(null);
 
 	const onValidate = (value, name) => {
 		setErrors((prev) => ({
@@ -53,14 +66,16 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	};
 
 	const validateForm = () => {
-		validateFieldForm('name', mission?.name);
-		validateFieldForm('kpi_value', mission?.kpi_value);
-		validateFieldForm('kpi_value', parseInt(mission?.kpi_value, 10) > 0);
-		validateFieldForm('departmentOption', departmentOption.length);
+		validateFieldForm('name', task?.name);
+		validateFieldForm('kpi_value', task?.kpi_value);
+		validateFieldForm('kpi_value', parseInt(task?.kpi_value, 10) > 0);
+		validateFieldForm('priority', task?.priority);
+		validateFieldForm('departmentOption', departmentOption?.value);
+		validateFieldForm('userOption', userOption?.value);
 	};
 
 	const handleClearErrorMsgAfterChange = (name) => {
-		if (mission?.[name] || departmentOption.length > 0) {
+		if (task?.[name] || departmentOption?.value || userOption?.value) {
 			setErrors((prev) => ({
 				...prev,
 				[name]: { ...prev[name], errorMsg: '' },
@@ -71,17 +86,31 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	useEffect(() => {
 		handleClearErrorMsgAfterChange('name');
 		handleClearErrorMsgAfterChange('kpi_value');
+		handleClearErrorMsgAfterChange('priority');
 		handleClearErrorMsgAfterChange('departmentOption');
+		handleClearErrorMsgAfterChange('userOption');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mission?.name, mission?.kpi_value, departmentOption.length]);
+	}, [task?.name, task?.kpi_value, task?.priority, departmentOption?.value, userOption?.value]);
 
 	useEffect(() => {
 		if (item?.id) {
-			getItemById(item?.id).then((res) => {
-				setMission(res.data);
-				setKeysState(res.data.keys);
-				setDepartmentOption(
-					res.data?.departments?.map((department) => {
+			getTaskById(item?.id).then((res) => {
+				setTask(res.data);
+				setKeysState(res.data?.keys || []);
+				setDepartmentOption({
+					...res.data.department,
+					id: res.data.department.id,
+					label: res.data.department.name,
+					value: res.data.department.slug,
+				});
+				setUserOption({
+					...res.data.user,
+					id: res.data.user.id,
+					label: res.data.user.name,
+					value: res.data.user.id,
+				});
+				setDepartmentRelatedOption(
+					res.data?.departments_related?.map((department) => {
 						return {
 							id: department.id,
 							label: department.name,
@@ -89,19 +118,33 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 						};
 					}),
 				);
+				setUserRelatedOption(
+					res.data?.users_related?.map((user) => {
+						return {
+							id: user.id,
+							label: user.name,
+							value: user.id,
+						};
+					}),
+				);
 			});
 		} else {
-			setMission({
+			setTask({
 				id: null,
 				name: '',
 				description: '',
-				kpi_value: 0,
-				start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-				end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-				status: 1,
+				kpi_value: '',
+				estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
+				estimate_time: '08:00',
+				deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
+				deadline_time: '17:00',
+				status: 0,
 			});
 			setKeysState([]);
-			setDepartmentOption([]);
+			setDepartmentOption({ label: '', value: '' });
+			setUserOption({ label: '', value: '' });
+			setDepartmentRelatedOption([]);
+			setUserRelatedOption([]);
 		}
 	}, [item?.id]);
 
@@ -126,16 +169,37 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		getDepartments();
 	}, []);
 
+	useEffect(() => {
+		async function getUsers() {
+			try {
+				const response = await getAllUser();
+				const data = await response.data;
+				setUsers(
+					data.map((user) => {
+						return {
+							id: user.id,
+							label: user.name,
+							value: user.id,
+						};
+					}),
+				);
+			} catch (error) {
+				setUsers([]);
+			}
+		}
+		getUsers();
+	}, []);
+
 	// hàm validate cho dynamic field form
 	const prevIsValid = () => {
-		if (keysState.length === 0) {
+		if (keysState?.length === 0 || keysState === null) {
 			return true;
 		}
-		const someEmpty = keysState.some((key) => key.key_name === '' || key.key_value === '');
+		const someEmpty = keysState?.some((key) => key.key_name === '' || key.key_value === '');
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
-			keysState.map((key, index) => {
+			keysState?.map((key, index) => {
 				const allPrev = [...keysState];
 				if (keysState[index].key_name === '') {
 					allPrev[index].error.key_name = 'Nhập tên chỉ số key!';
@@ -167,8 +231,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	const handleChange = (e) => {
 		const { value } = e.target;
-		setMission({
-			...mission,
+		setTask({
+			...task,
 			[e.target.name]: value,
 		});
 	};
@@ -200,47 +264,92 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		setKeysState((prev) => prev.filter((state) => state !== prev[index]));
 	};
 
+	// clear form
+	const handleClearForm = () => {
+		setTask({
+			id: null,
+			name: '',
+			description: '',
+			kpi_value: '',
+			estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
+			estimate_time: '08:00',
+			deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
+			deadline_time: '08:00',
+			status: 0,
+		});
+		setKeysState([]);
+		setDepartmentOption({});
+		setDepartmentRelatedOption([]);
+		setUserOption({});
+		setUserRelatedOption([]);
+	};
+
 	const handleSubmit = () => {
-		const data = { ...mission };
-		data.keys = keysState;
-		const departmentClone = [...departmentOption];
-		data.departments = departmentClone.map((department) => {
+		const data = { ...task };
+		data.mission_id = parseInt(params?.id, 10);
+		data.kpi_value = parseInt(task?.kpi_value, 10);
+		data.priority = parseInt(task?.priority, 10);
+		data.keys = keysState.map((key) => {
+			return {
+				key_name: key.key_name,
+				key_value: key.key_value,
+			};
+		});
+		data.subtasks = _.isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
+		data.department = {
+			id: departmentOption.id,
+			name: departmentOption.label,
+			slug: departmentOption.value,
+		};
+		data.departments_related = departmentReplatedOption.map((department) => {
 			return {
 				id: department.id,
 				name: department.label,
 				slug: department.value,
 			};
 		});
+		data.user = {
+			id: userOption.value,
+			name: userOption.label,
+		};
+		data.users_related = userReplatedOption.map((user) => {
+			return {
+				id: user.id,
+				name: user.label,
+			};
+		});
 		validateForm();
-		if (!mission?.name) {
+		if (!task?.name) {
 			nameRef.current.focus();
 			return;
 		}
-		if (parseInt(mission?.kpi_value, 10) <= 0) {
+		if (parseInt(task?.kpi_value, 10) <= 0) {
 			kpiValueRef.current.focus();
+			return;
+		}
+		if (!task?.priority) {
+			priorityRef.current.focus();
+			return;
+		}
+		if (!departmentOption?.value) {
+			departmentRef.current.focus();
+			return;
+		}
+		if (!userOption?.value) {
+			userRef.current.focus();
 			return;
 		}
 		if (!prevIsValid()) {
 			return;
 		}
 		onSubmit(data);
-		setMission({
-			id: null,
-			name: '',
-			description: '',
-			kpi_value: 0,
-			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			status: 1,
-		});
-		setKeysState([]);
-		setDepartmentOption([]);
+		handleClearForm();
 	};
 
 	return (
 		<Modal show={show} onHide={onClose} size='lg' scrollable centered>
 			<Modal.Header closeButton>
-				<Modal.Title>{item?.id ? 'Cập nhật mục tiêu' : 'Thêm mới mục tiêu'}</Modal.Title>
+				<Modal.Title>{item?.id ? 'Cập nhật công việc' : 'Thêm mới công việc'}</Modal.Title>
 			</Modal.Header>
 			<Modal.Body className='px-4'>
 				<div className='row'>
@@ -249,7 +358,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 							<Card shadow='sm'>
 								<CardHeader>
 									<CardLabel icon='Info' iconColor='success'>
-										<CardTitle>Thông tin mục tiêu</CardTitle>
+										<CardTitle>Thông tin công việc</CardTitle>
 									</CardLabel>
 								</CardHeader>
 								<CardBody>
@@ -257,31 +366,31 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 										<FormGroup
 											className='col-12'
 											id='name'
-											label='Tên mục tiêu'>
+											label='Tên công việc'>
 											<Input
 												onChange={handleChange}
-												value={mission.name || ''}
+												value={task.name || ''}
 												name='name'
 												ref={nameRef}
 												required
-												placeholder='Tên mục tiêu'
+												placeholder='Tên công việc'
 												size='lg'
 												className='border border-2'
 											/>
 										</FormGroup>
 										{errors?.name?.errorMsg && (
-											<ErrorText>Vui lòng nhập tên mục tiêu</ErrorText>
+											<ErrorText>Vui lòng nhập tên công việc</ErrorText>
 										)}
 										<FormGroup
 											className='col-12'
 											id='description'
-											label='Mô tả mục tiêu'>
+											label='Mô tả công việc'>
 											<Textarea
 												name='description'
 												onChange={handleChange}
-												value={mission.description || ''}
+												value={task.description || ''}
 												required
-												placeholder='Mô tả mục tiêu'
+												placeholder='Mô tả công việc'
 												className='border border-2'
 											/>
 										</FormGroup>
@@ -294,7 +403,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												type='number'
 												name='kpi_value'
 												onChange={handleChange}
-												value={mission.kpi_value || 0}
+												value={task.kpi_value || ''}
 												required
 												size='lg'
 												placeholder='Giá trị KPI'
@@ -306,35 +415,112 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 										)}
 										<FormGroup
 											className='col-12'
-											id='kpi_value'
-											label='Phòng ban phụ trách'>
+											id='priority'
+											label='Độ ưu tiên'>
 											<Select
+												ref={priorityRef}
+												name='priority'
+												ariaLabel='Board select'
+												className='border border-2'
+												placeholder='Độ ưu tiên'
+												onChange={handleChange}
+												value={task?.priority}>
+												{PRIORITIES.map((priority) => (
+													<Option key={priority} value={priority}>
+														{`Cấp ${priority}`}
+													</Option>
+												))}
+											</Select>
+										</FormGroup>
+										{errors?.priority?.errorMsg && (
+											<ErrorText>
+												Vui lòng chọn độ ưu tiên cho công việc
+											</ErrorText>
+										)}
+										{/* phòng ban phụ trách */}
+										<FormGroup
+											className='col-12'
+											id='departmentOption'
+											label='Phòng ban phụ trách'>
+											<SelectComponent
+												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
 												onChange={setDepartmentOption}
-												isMulti
 												options={departments}
 												ref={departmentRef}
 											/>
 										</FormGroup>
 										{errors?.departmentOption?.errorMsg && (
 											<ErrorText>
-												Vui lòng chọn phòng ban cho nhiệm vụ
+												Vui lòng chọn phòng ban phụ trách cho công việc
 											</ErrorText>
 										)}
+										{/* nhân viên phụ trách chính */}
+										<FormGroup
+											className='col-12'
+											id='userOption'
+											label='Nhân viên phụ trách'>
+											<SelectComponent
+												placeholder='Chọn nhân viên phụ trách'
+												defaultValue={userOption}
+												value={userOption}
+												onChange={setUserOption}
+												options={users}
+												ref={userRef}
+											/>
+										</FormGroup>
+										{errors?.userOption?.errorMsg && (
+											<ErrorText>
+												Vui lòng chọn nhân viên phụ trách cho công việc
+											</ErrorText>
+										)}
+										{/* phòng ban liên quan */}
+										<FormGroup
+											className='col-12'
+											id='departmentReplatedOption'
+											label='Phòng ban liên quan'>
+											<SelectComponent
+												placeholder='Chọn phòng ban liên quan'
+												defaultValue={departmentReplatedOption}
+												value={departmentReplatedOption}
+												onChange={setDepartmentRelatedOption}
+												options={departments.filter(
+													(department) =>
+														department.id !== departmentOption?.id,
+												)}
+												isMulti
+											/>
+										</FormGroup>
+										{/* Nhân viên liên quan */}
+										<FormGroup
+											className='col-12'
+											id='userReplatedOption'
+											label='Nhân viên liên quan'>
+											<SelectComponent
+												placeholder='Chọn nhân viên liên quan'
+												defaultValue={userReplatedOption}
+												value={userReplatedOption}
+												onChange={setUserRelatedOption}
+												options={users.filter(
+													(user) => user.id !== userOption?.id,
+												)}
+												isMulti
+											/>
+										</FormGroup>
 										<div className='d-flex align-items-center justify-content-between'>
 											<FormGroup
 												className='w-50 mr-2'
 												style={{ width: '45%', marginRight: 10 }}
-												id='start_time'
-												label='Ngày bắt đầu mục tiêu'
+												id='estimate_date'
+												label='Ngày dự kiến hoàn thành'
 												isFloating>
 												<Input
-													name='start_time'
-													placeholder='Ngày bắt đầu mục tiêu'
+													name='estimate_date'
+													placeholder='Ngày dự kiến hoàn thành'
 													onChange={handleChange}
 													value={
-														mission.start_time ||
+														task.estimate_date ||
 														moment().add(0, 'days').format('YYYY-MM-DD')
 													}
 													type='date'
@@ -343,20 +529,54 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												/>
 											</FormGroup>
 											<FormGroup
-												className='w-50 ml-2'
-												style={{ width: '45%', marginLeft: 10 }}
-												id='end_time'
-												label='Ngày kết thúc mục tiêu'
+												className='w-50 mr-2'
+												style={{ width: '45%', marginRight: 10 }}
+												id='estimate_time'
+												label='Thời gian dự kiến hoàn thành'
 												isFloating>
 												<Input
-													name='end_time'
-													placeholder='Ngày kết thúc mục tiêu'
+													name='estimate_time'
+													placeholder='Thời gian dự kiến hoàn thành'
+													type='time'
+													value={task.estimate_time || '08:00'}
+													onChange={handleChange}
+													size='lg'
+													className='border border-2'
+												/>
+											</FormGroup>
+										</div>
+										<div className='d-flex align-items-center justify-content-between'>
+											<FormGroup
+												className='w-50 ml-2'
+												style={{ width: '45%', marginRight: 10 }}
+												id='deadline_date'
+												label='Hạn ngày hoàn thành'
+												isFloating>
+												<Input
+													name='deadline_date'
+													placeholder='Hạn ngày hoàn thành'
 													onChange={handleChange}
 													value={
-														mission.end_time ||
+														task.deadline_date ||
 														moment().add(0, 'days').format('YYYY-MM-DD')
 													}
 													type='date'
+													size='lg'
+													className='border border-2'
+												/>
+											</FormGroup>
+											<FormGroup
+												className='w-50 mr-2'
+												style={{ width: '45%', marginLeft: 10 }}
+												id='deadline_time'
+												label='Hạn thời gian hoàn thành'
+												isFloating>
+												<Input
+													name='deadline_time'
+													placeholder='Hạn thời gian hoàn thành'
+													type='time'
+													value={task.deadline_time || '08:00'}
+													onChange={handleChange}
 													size='lg'
 													className='border border-2'
 												/>
@@ -368,7 +588,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											</Button>
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
-										{keysState.map((item, index) => {
+										{keysState?.map((item, index) => {
 											return (
 												<div
 													// eslint-disable-next-line react/no-array-index-key
@@ -462,4 +682,4 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	);
 };
 
-export default MissionFormModal;
+export default TaskFormModal;

@@ -15,8 +15,6 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
 import Button from '../../../components/bootstrap/Button';
-import Avatar, { AvatarGroup } from '../../../components/Avatar';
-import USERS from '../../../common/data/userDummyData';
 import { addNewItem, deleteItemById, getAll, getLatestTasks, updateItemById } from './services';
 import Dropdown, {
 	DropdownItem,
@@ -25,8 +23,6 @@ import Dropdown, {
 } from '../../../components/bootstrap/Dropdown';
 import MissionAlertConfirm from './MissionAlertConfirm';
 import MissionFormModal from './MissionFormModal';
-// import Chart from '../../../components/extras/Chart';
-// import { dataChart3 } from '../report-department/dataChart';
 import Badge from '../../../components/bootstrap/Badge';
 import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
@@ -71,47 +67,6 @@ const Item = ({ id, name, teamName, attachCount, taskCount, percent, dueDate, ..
 							{percent}%
 							<Progress isAutoColor value={percent} height={10} />
 						</div>
-						<div className='col-md-6 d-flex justify-content-end'>
-							<AvatarGroup>
-								<Avatar
-									srcSet={USERS.GRACE.srcSet}
-									src={USERS.GRACE.src}
-									userName={`${USERS.GRACE.name} ${USERS.GRACE.surname}`}
-									color={USERS.GRACE.color}
-								/>
-								<Avatar
-									srcSet={USERS.SAM.srcSet}
-									src={USERS.SAM.src}
-									userName={`${USERS.SAM.name} ${USERS.SAM.surname}`}
-									color={USERS.SAM.color}
-								/>
-								<Avatar
-									srcSet={USERS.CHLOE.srcSet}
-									src={USERS.CHLOE.src}
-									userName={`${USERS.CHLOE.name} ${USERS.CHLOE.surname}`}
-									color={USERS.CHLOE.color}
-								/>
-
-								<Avatar
-									srcSet={USERS.JANE.srcSet}
-									src={USERS.JANE.src}
-									userName={`${USERS.JANE.name} ${USERS.JANE.surname}`}
-									color={USERS.JANE.color}
-								/>
-								<Avatar
-									srcSet={USERS.JOHN.srcSet}
-									src={USERS.JOHN.src}
-									userName={`${USERS.JOHN.name} ${USERS.JOHN.surname}`}
-									color={USERS.JOHN.color}
-								/>
-								<Avatar
-									srcSet={USERS.RYAN.srcSet}
-									src={USERS.RYAN.src}
-									userName={`${USERS.RYAN.name} ${USERS.RYAN.surname}`}
-									color={USERS.RYAN.color}
-								/>
-							</AvatarGroup>
-						</div>
 					</div>
 				</CardBody>
 			</Card>
@@ -130,14 +85,14 @@ const MissionPage = () => {
 
 	const navigate = useNavigate();
 	const navigateToDetailPage = useCallback(
-		(page) => navigate(`/quan-ly-cong-viec/muc-tieu/${page}`),
+		(page) => navigate(`/muc-tieu/chi-tiet/${page}`),
 		[navigate],
 	);
 	const handleClearValueForm = () => {
 		setItemEdit({
 			name: '',
 			description: '',
-			kpi_value: 0,
+			kpi_value: '',
 			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			status: 1,
@@ -159,8 +114,7 @@ const MissionPage = () => {
 		try {
 			await deleteItemById(id);
 			const newState = [...missions];
-			newState.filter((item) => item.id !== id);
-			setMissions(newState);
+			setMissions(newState.filter((item) => item.id !== id));
 			handleCloseConfirmModal();
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
@@ -253,68 +207,6 @@ const MissionPage = () => {
 						<div className='display-6 fw-bold py-3'>Danh sách mục tiêu</div>
 					</div>
 				</div>
-				{/* <div className='row'>
-					<div className='col-xl-6 col-xxl-4 col-md-12 col-sm-12'>
-						<Card stretch>
-							<CardHeader>
-								<CardTitle
-									className='text-center w-100'
-									style={{ fontSize: '2rem', fontWeight: 500 }}>
-									Doanh thu
-								</CardTitle>
-							</CardHeader>
-							<CardBody>
-								<Chart
-									series={state3.series}
-									options={state3.options}
-									type={state3.options.chart.type}
-									width={state3.options.chart.width}
-									className='d-flex align-items-center justify-content-center'
-								/>
-							</CardBody>
-						</Card>
-					</div>
-					<div className='col-xl-6 col-xxl-4 col-md-12 col-sm-12'>
-						<Card stretch>
-							<CardHeader>
-								<CardTitle
-									className='text-center w-100'
-									style={{ fontSize: '2rem', fontWeight: 500 }}>
-									Sản phẩm bán ra
-								</CardTitle>
-							</CardHeader>
-							<CardBody>
-								<Chart
-									series={state3.series}
-									options={state3.options}
-									type={state3.options.chart.type}
-									width={state3.options.chart.width}
-									className='d-flex align-items-center justify-content-center'
-								/>
-							</CardBody>
-						</Card>
-					</div>
-					<div className='col-xl-6 col-xxl-4 col-md-12 col-sm-12'>
-						<Card stretch>
-							<CardHeader>
-								<CardTitle
-									className='text-center w-100'
-									style={{ fontSize: '2rem', fontWeight: 500 }}>
-									Khách hàng mới
-								</CardTitle>
-							</CardHeader>
-							<CardBody>
-								<Chart
-									series={state3.series}
-									options={state3.options}
-									type={state3.options.chart.type}
-									width={state3.options.chart.width}
-									className='d-flex align-items-center justify-content-center'
-								/>
-							</CardBody>
-						</Card>
-					</div>
-				</div> */}
 				<div className='row'>
 					{missions?.map((item) => (
 						<div className='col-md-6 col-xl-4 col-sm-12' key={item.id}>
@@ -371,45 +263,12 @@ const MissionPage = () => {
 									</CardActions>
 								</CardHeader>
 								<CardBody>
-									<AvatarGroup>
-										<Avatar
-											srcSet={USERS.GRACE.srcSet}
-											src={USERS.GRACE.src}
-											userName={`${USERS.GRACE.name} ${USERS.GRACE.surname}`}
-											color={USERS.GRACE.color}
-										/>
-										<Avatar
-											srcSet={USERS.SAM.srcSet}
-											src={USERS.SAM.src}
-											userName={`${USERS.SAM.name} ${USERS.SAM.surname}`}
-											color={USERS.SAM.color}
-										/>
-										<Avatar
-											srcSet={USERS.CHLOE.srcSet}
-											src={USERS.CHLOE.src}
-											userName={`${USERS.CHLOE.name} ${USERS.CHLOE.surname}`}
-											color={USERS.CHLOE.color}
-										/>
-
-										<Avatar
-											srcSet={USERS.JANE.srcSet}
-											src={USERS.JANE.src}
-											userName={`${USERS.JANE.name} ${USERS.JANE.surname}`}
-											color={USERS.JANE.color}
-										/>
-										<Avatar
-											srcSet={USERS.JOHN.srcSet}
-											src={USERS.JOHN.src}
-											userName={`${USERS.JOHN.name} ${USERS.JOHN.surname}`}
-											color={USERS.JOHN.color}
-										/>
-										<Avatar
-											srcSet={USERS.RYAN.srcSet}
-											src={USERS.RYAN.src}
-											userName={`${USERS.RYAN.name} ${USERS.RYAN.surname}`}
-											color={USERS.RYAN.color}
-										/>
-									</AvatarGroup>
+									<div className='row'>
+										<div className='col-md-6'>
+											{30}%
+											<Progress isAutoColor value={30} height={10} />
+										</div>
+									</div>
 								</CardBody>
 							</Card>
 						</div>

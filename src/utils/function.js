@@ -71,6 +71,10 @@ const calculateTotalStepOfTask = (task) => {
 
 const calculateTotalCompleteStepOfTask = (task) => {
 	// tính tổng số bước hoàn thành của 1 task
+<<<<<<< HEAD
+=======
+	// tính tổng số bước của 1 task
+>>>>>>> main
 	if (_.isEmpty(task)) return 0;
 	const { subtasks } = task;
 	if (_.isEmpty(subtasks)) return 0;

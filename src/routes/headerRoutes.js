@@ -16,7 +16,7 @@ const headers = [
 	},
 	// chi tiet muc tieu
 	{
-		path: `quan-ly-cong-viec/muc-tieu/:id`,
+		path: `/muc-tieu/chi-tiet/:id`,
 		element: <CommonHeader />,
 		exact: true,
 	},

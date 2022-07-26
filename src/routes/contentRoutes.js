@@ -63,7 +63,7 @@ const presentation = [
 	 * Trang chi tiết nhiệm vụ
 	 */
 	{
-		path: `/quan-ly-cong-viec/muc-tieu/:id`,
+		path: `/muc-tieu/chi-tiet/:id`,
 		element: <TASK.MISSION_DETAIL />,
 		exact: true,
 	},

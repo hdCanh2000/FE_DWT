@@ -2,46 +2,64 @@
   "departments": [
     {
       "id": 1,
-      "name": "Phòng Marketing"
+      "name": "Phòng Marketing",
+      "slug": "mkt"
     },
     {
       "id": 2,
-      "name": "Phòng Kinh doanh"
+      "name": "Phòng Kinh doanh",
+      "slug": "sales"
     },
     {
       "id": 3,
-      "name": "Phòng IT"
-    },
-    {
-      "id": 4,
-      "name": "Phòng Cung ứng"
+      "name": "Phòng Cung ứng",
+      "slug": "supply"
     }
   ],
   "users": [
     {
       "id": 1,
-      "department_id": 1,
-      "name": "Nhân viên 1 - Phòng Marketing"
+      "department": {
+        "id": 1,
+        "name": "Phòng Marketing",
+        "slug": "mkt"
+      },
+      "name": "Nhân viên 1 - Phòng Marketing",
+      "email": "employee1@mastertran.vn",
+      "phone": "113"
     },
     {
       "id": 2,
-      "department_id": 1,
-      "name": "Nhân viên 2 - Phòng Marketing"
+      "department": {
+        "id": 1,
+        "name": "Phòng Marketing",
+        "slug": "mkt"
+      },
+      "name": "Nhân viên 2 - Phòng Marketing",
+      "email": "employee2@mastertran.vn",
+      "phone": "114"
     },
     {
       "id": 3,
-      "department_id": 2,
-      "name": "Nhân viên 1 - Phòng Kinh doanh"
+      "department": {
+        "id": 2,
+        "name": "Phòng Kinh doanh",
+        "slug": "sales"
+      },
+      "name": "Nhân viên 1 - Phòng Kinh doanh",
+      "email": "employee3@mastertran.vn",
+      "phone": "115"
     },
     {
       "id": 4,
-      "department_id": 2,
-      "name": "Nhân viên 2 - Phòng Kinh doanh"
-    },
-    {
-      "id": 5,
-      "department_id": 3,
-      "name": "Nhân viên 3 - Phòng IT"
+      "department": {
+        "id": 2,
+        "name": "Phòng Kinh doanh",
+        "slug": "sales"
+      },
+      "name": "Nhân viên 2 - Phòng Kinh doanh",
+      "email": "employee4@mastertran.vn",
+      "phone": "116"
     }
   ],
   "missions": [
@@ -51,16 +69,28 @@
       "description": "Mô tả nhiệm vụ 1",
       "status": 0,
       "kpi_value": 2000,
-      "start_time": "01/01/2022",
-      "end_time": "01/12/2022",
-      "details": [
+      "start_time": "2022-07-20",
+      "end_time": "2022-12-20",
+      "keys": [
+        {
+          "key_name": "Doanh thu",
+          "key_value": "500 tỷ"
+        },
+        {
+          "key_name": "Mở mới khách hàng",
+          "key_value": "120%"
+        }
+      ],
+      "departments": [
         {
           "id": 1,
-          "name": "Doanh thu đạt 500 tỷ"
+          "name": "Phòng Marketing",
+          "slug": "mkt"
         },
         {
           "id": 2,
-          "name": "Mở mới 120% khách hàng"
+          "name": "Phòng Kinh doanh",
+          "slug": "sales"
         }
       ]
     },
@@ -72,14 +102,78 @@
       "start_time": "2022-07-20",
       "end_time": "2022-07-30",
       "status": 1,
-      "details": [
+      "keys": [
+        {
+          "key_name": "Doanh thu",
+          "key_value": "500 tỷ"
+        },
+        {
+          "key_name": "Mở mới khách hàng",
+          "key_value": "120%"
+        },
+        {
+          "key_name": "Đơn hàng",
+          "key_value": "10000"
+        }
+      ],
+      "departments": [
+        {
+          "id": 2,
+          "name": "Phòng Kinh doanh",
+          "slug": "sales"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Mở rộng thi trường Lào",
+      "description": "Mở rộng thị trường Lào",
+      "kpi_value": "2000",
+      "start_time": "2022-07-21",
+      "end_time": "2022-07-21",
+      "status": 1,
+      "keys": [
+        {
+          "key_name": "Doanh thu",
+          "key_value": "100 tỷ"
+        },
+        {
+          "key_name": "Đơn hàng",
+          "key_value": "10000 đơn"
+        }
+      ],
+      "departments": [
         {
           "id": 1,
-          "name": "Doanh thu đạt 500 tỷ"
+          "name": "Phòng Marketing",
+          "slug": "mkt"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Test",
+      "description": "Test",
+      "kpi_value": "1000",
+      "start_time": "2022-07-21",
+      "end_time": "2022-07-21",
+      "status": 1,
+      "keys": [
+        {
+          "key_name": "xx",
+          "key_value": "xxx"
+        }
+      ],
+      "departments": [
+        {
+          "id": 1,
+          "name": "Phòng Marketing",
+          "slug": "mkt"
         },
         {
           "id": 2,
-          "name": "Mở mới 120% khách hàng"
+          "name": "Phòng Kinh doanh",
+          "slug": "sales"
         }
       ]
     }
@@ -88,43 +182,92 @@
     {
       "id": 1,
       "mission_id": 1,
-      "departmnent": {
+      "department": {
         "id": 2,
         "name": "Phòng Kinh doanh"
       },
+      "departments_related": [
+        {
+          "id": 1,
+          "name": "Phòng Marketing",
+          "slug": "mkt"
+        },
+        {
+          "id": 3,
+          "name": "Phòng Cung ứng",
+          "slug": "supply"
+        }
+      ],
       "user": {
         "id": 1,
         "name": "Nhân viên 1"
       },
+      "users_related": [
+        {
+          "id": 2,
+          "name": "Nhân viên 2"
+        },
+        {
+          "id": 3,
+          "name": "Nhân viên 3"
+        }
+      ],
       "name": "Công việc 1 - Nhiệm vụ 1",
       "description": "Mô tả cônng việc 1 - Nhiệm vụ 1",
       "kpi_value": 200,
-      "estimate_date": "19/07/2022",
+      "estimate_date": "2022-07-20",
       "estimate_time": "08:00",
-      "deadline_date": "19/07/2022",
+      "deadline_date": "2022-07-20",
       "deadline_time": "17:00",
       "percent": 30,
       "priority": 2,
       "status": 0,
-      "keys": null,
+      "keys": [
+        {
+          "key_name": "Doanh thu",
+          "key_value": "100tr"
+        }
+      ],
       "subtasks": [
         {
           "id": 1,
           "task_id": 1,
-          "departmnent": {
+          "department": {
             "id": 2,
             "name": "Phòng Kinh doanh"
           },
+          "departments_related": [
+            {
+              "id": 1,
+              "name": "Phòng Marketing",
+              "slug": "mkt"
+            },
+            {
+              "id": 3,
+              "name": "Phòng Cung ứng",
+              "slug": "supply"
+            }
+          ],
           "user": {
             "id": 1,
             "name": "Nhân viên 1"
           },
+          "users_related": [
+            {
+              "id": 2,
+              "name": "Nhân viên 2"
+            },
+            {
+              "id": 3,
+              "name": "Nhân viên 3"
+            }
+          ],
           "name": "Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
           "description": "Mô tả Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
           "kpi_value": 200,
-          "estimate_date": "19/07/2022",
+          "estimate_date": "2022-07-20",
           "estimate_time": "08:00",
-          "deadline_date": "19/07/2022",
+          "deadline_date": "2022-07-20",
           "deadline_time": "17:00",
           "percent": 30,
           "priority": 2,
@@ -152,20 +295,42 @@
         {
           "id": 2,
           "task_id": 1,
-          "departmnent": {
+          "department": {
             "id": 2,
             "name": "Phòng Kinh doanh"
           },
+          "departments_related": [
+            {
+              "id": 1,
+              "name": "Phòng Marketing",
+              "slug": "mkt"
+            },
+            {
+              "id": 3,
+              "name": "Phòng Cung ứng",
+              "slug": "supply"
+            }
+          ],
           "user": {
             "id": 1,
             "name": "Nhân viên 1"
           },
+          "users_related": [
+            {
+              "id": 2,
+              "name": "Nhân viên 2"
+            },
+            {
+              "id": 3,
+              "name": "Nhân viên 3"
+            }
+          ],
           "name": "Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
           "description": "Mô tả Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
           "kpi_value": 200,
-          "estimate_date": "19/07/2022",
+          "estimate_date": "2022-07-20",
           "estimate_time": "08:00",
-          "deadline_date": "19/07/2022",
+          "deadline_date": "2022-07-20",
           "deadline_time": "17:00",
           "percent": 30,
           "priority": 2,
@@ -187,22 +352,44 @@
     {
       "id": 2,
       "mission_id": 2,
-      "departmnent": {
-        "id": 1,
-        "name": "Phòng Marketing"
+      "department": {
+        "id": 2,
+        "name": "Phòng Kinh doanh"
       },
+      "departments_related": [
+        {
+          "id": 1,
+          "name": "Phòng Marketing",
+          "slug": "mkt"
+        },
+        {
+          "id": 3,
+          "name": "Phòng Cung ứng",
+          "slug": "supply"
+        }
+      ],
       "user": {
         "id": 1,
         "name": "Nhân viên 1"
       },
+      "users_related": [
+        {
+          "id": 2,
+          "name": "Nhân viên 2"
+        },
+        {
+          "id": 3,
+          "name": "Nhân viên 3"
+        }
+      ],
       "name": "Công việc 1 - Nhiệm vụ 2",
       "description": "Mô tả công việc 1 - Nhiệm vụ 2",
       "kpi_value": 200,
       "priority": 5,
       "status": 1,
-      "estimate_date": "19/07/2022",
+      "estimate_date": "2022-07-20",
       "estimate_time": "08:00",
-      "deadline_date": "19/07/2022",
+      "deadline_date": "2022-07-20",
       "deadline_time": "17:00",
       "percent": 30,
       "keys": null,
@@ -210,20 +397,42 @@
         {
           "id": 1,
           "task_id": 2,
-          "departmnent": {
+          "department": {
             "id": 2,
             "name": "Phòng Kinh doanh"
           },
+          "departments_related": [
+            {
+              "id": 1,
+              "name": "Phòng Marketing",
+              "slug": "mkt"
+            },
+            {
+              "id": 3,
+              "name": "Phòng Cung ứng",
+              "slug": "supply"
+            }
+          ],
           "user": {
             "id": 1,
             "name": "Nhân viên 1"
           },
+          "users_related": [
+            {
+              "id": 2,
+              "name": "Nhân viên 2"
+            },
+            {
+              "id": 3,
+              "name": "Nhân viên 3"
+            }
+          ],
           "name": "Đầu việc 1 - Công việc 1 - Nhiệm vụ 2",
           "description": "Mô tả Đầu việc 1 - Công việc 1 - Nhiệm vụ 2",
           "kpi_value": 200,
-          "estimate_date": "19/07/2022",
+          "estimate_date": "2022-07-20",
           "estimate_time": "08:00",
-          "deadline_date": "19/07/2022",
+          "deadline_date": "2022-07-20",
           "deadline_time": "17:00",
           "percent": 30,
           "priority": 2,
@@ -251,20 +460,42 @@
         {
           "id": 2,
           "task_id": 2,
-          "departmnent": {
+          "department": {
             "id": 2,
             "name": "Phòng Kinh doanh"
           },
+          "departments_related": [
+            {
+              "id": 1,
+              "name": "Phòng Marketing",
+              "slug": "mkt"
+            },
+            {
+              "id": 3,
+              "name": "Phòng Cung ứng",
+              "slug": "supply"
+            }
+          ],
           "user": {
             "id": 1,
             "name": "Nhân viên 1"
           },
+          "users_related": [
+            {
+              "id": 2,
+              "name": "Nhân viên 2"
+            },
+            {
+              "id": 3,
+              "name": "Nhân viên 3"
+            }
+          ],
           "name": "Đầu việc 2 - Công việc 1 - Nhiệm vụ 2",
           "description": "Mô tả Đầu việc 2 - Công việc 1 - Nhiệm vụ 2",
           "kpi_value": 200,
-          "estimate_date": "19/07/2022",
+          "estimate_date": "2022-07-20",
           "estimate_time": "08:00",
-          "deadline_date": "19/07/2022",
+          "deadline_date": "2022-07-20",
           "deadline_time": "17:00",
           "percent": 30,
           "priority": 2,
@@ -292,20 +523,42 @@
         {
           "id": 3,
           "task_id": 2,
-          "departmnent": {
+          "department": {
             "id": 2,
             "name": "Phòng Kinh doanh"
           },
+          "departments_related": [
+            {
+              "id": 1,
+              "name": "Phòng Marketing",
+              "slug": "mkt"
+            },
+            {
+              "id": 3,
+              "name": "Phòng Cung ứng",
+              "slug": "supply"
+            }
+          ],
           "user": {
             "id": 1,
             "name": "Nhân viên 1"
           },
+          "users_related": [
+            {
+              "id": 2,
+              "name": "Nhân viên 2"
+            },
+            {
+              "id": 3,
+              "name": "Nhân viên 3"
+            }
+          ],
           "name": "Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
           "description": "Mô tả Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
           "kpi_value": 200,
-          "estimate_date": "19/07/2022",
+          "estimate_date": "2022-07-20",
           "estimate_time": "08:00",
-          "deadline_date": "19/07/2022",
+          "deadline_date": "2022-07-20",
           "deadline_time": "17:00",
           "percent": 30,
           "priority": 2,
@@ -327,6 +580,175 @@
               "name": "Bước 2 - Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
               "description": "Mô tả Bước 2 - Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
               "status": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "mission_id": 1,
+      "department": {
+        "id": 2,
+        "name": "Phòng Kinh doanh"
+      },
+      "departments_related": [
+        {
+          "id": 1,
+          "name": "Phòng Marketing",
+          "slug": "mkt"
+        },
+        {
+          "id": 3,
+          "name": "Phòng Cung ứng",
+          "slug": "supply"
+        }
+      ],
+      "user": {
+        "id": 1,
+        "name": "Nhân viên 1"
+      },
+      "users_related": [
+        {
+          "id": 2,
+          "name": "Nhân viên 2"
+        },
+        {
+          "id": 3,
+          "name": "Nhân viên 3"
+        }
+      ],
+      "name": "Công việc 2 - Nhiệm vụ 1",
+      "description": "Mô tả cônng việc 2 - Nhiệm vụ 1",
+      "kpi_value": 200,
+      "estimate_date": "2022-07-20",
+      "estimate_time": "08:00",
+      "deadline_date": "2022-07-20",
+      "deadline_time": "17:00",
+      "priority": 5,
+      "status": 0,
+      "keys": [
+        {
+          "key_name": "Đơn hàng",
+          "key_value": "1000"
+        }
+      ],
+      "subtasks": [
+        {
+          "id": 1,
+          "task_id": 1,
+          "department": {
+            "id": 2,
+            "name": "Phòng Kinh doanh"
+          },
+          "departments_related": [
+            {
+              "id": 1,
+              "name": "Phòng Marketing",
+              "slug": "mkt"
+            },
+            {
+              "id": 3,
+              "name": "Phòng Cung ứng",
+              "slug": "supply"
+            }
+          ],
+          "user": {
+            "id": 1,
+            "name": "Nhân viên 1"
+          },
+          "users_related": [
+            {
+              "id": 2,
+              "name": "Nhân viên 2"
+            },
+            {
+              "id": 3,
+              "name": "Nhân viên 3"
+            }
+          ],
+          "name": "Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+          "description": "Mô tả Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+          "kpi_value": 200,
+          "estimate_date": "2022-07-20",
+          "estimate_time": "08:00",
+          "deadline_date": "2022-07-20",
+          "deadline_time": "17:00",
+          "percent": 30,
+          "priority": 2,
+          "status": 1,
+          "keys": null,
+          "steps": [
+            {
+              "id": 1,
+              "task_id": 1,
+              "subtask_id": 1,
+              "name": "Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "status": 1
+            },
+            {
+              "id": 2,
+              "task_id": 1,
+              "subtask_id": 1,
+              "name": "Bước 2 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "status": 1
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "task_id": 1,
+          "department": {
+            "id": 2,
+            "name": "Phòng Kinh doanh"
+          },
+          "departments_related": [
+            {
+              "id": 1,
+              "name": "Phòng Marketing",
+              "slug": "mkt"
+            },
+            {
+              "id": 3,
+              "name": "Phòng Cung ứng",
+              "slug": "supply"
+            }
+          ],
+          "user": {
+            "id": 1,
+            "name": "Nhân viên 1"
+          },
+          "users_related": [
+            {
+              "id": 2,
+              "name": "Nhân viên 2"
+            },
+            {
+              "id": 3,
+              "name": "Nhân viên 3"
+            }
+          ],
+          "name": "Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
+          "description": "Mô tả Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
+          "kpi_value": 200,
+          "estimate_date": "2022-07-20",
+          "estimate_time": "08:00",
+          "deadline_date": "2022-07-20",
+          "deadline_time": "17:00",
+          "percent": 30,
+          "priority": 2,
+          "status": 1,
+          "keys": null,
+          "steps": [
+            {
+              "id": 1,
+              "task_id": 1,
+              "subtask_id": 2,
+              "name": "Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
+              "description": "Mô tả Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
+              "status": 1
             }
           ]
         }

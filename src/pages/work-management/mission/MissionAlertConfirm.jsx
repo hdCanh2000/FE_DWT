@@ -6,7 +6,7 @@ const MissionAlertConfirm = ({ openModal, onCloseModal, onConfirm, title, conten
 	return (
 		<Modal
 			show={openModal}
-			onHide={() => onConfirm()}
+			onHide={() => onCloseModal()}
 			aria-labelledby='contained-modal-title-vcenter'
 			backdrop='static'
 			keyboard={false}
