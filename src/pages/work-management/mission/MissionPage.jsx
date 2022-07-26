@@ -15,7 +15,13 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
 import Button from '../../../components/bootstrap/Button';
-import { addNewItem, deleteItemById, getAll, getLatestTasks, updateItemById } from './services';
+import {
+	addNewMission,
+	deleteMissionById,
+	getAllMission,
+	getLatestTasks,
+	updateMissionById,
+} from './services';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
@@ -81,7 +87,6 @@ const MissionPage = () => {
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	// const [state3] = useState(dataChart3);
 
 	const navigate = useNavigate();
 	const navigateToDetailPage = useCallback(
@@ -112,7 +117,7 @@ const MissionPage = () => {
 
 	const handleDeleteItem = async (id) => {
 		try {
-			await deleteItemById(id);
+			await deleteMissionById(id);
 			const newState = [...missions];
 			setMissions(newState.filter((item) => item.id !== id));
 			handleCloseConfirmModal();
@@ -148,7 +153,7 @@ const MissionPage = () => {
 	const handleSubmitMissionForm = async (data) => {
 		if (data.id) {
 			try {
-				const response = await updateItemById(data);
+				const response = await updateMissionById(data);
 				const result = await response.data;
 				const newMissions = [...missions];
 				setMissions(
@@ -166,7 +171,7 @@ const MissionPage = () => {
 			}
 		} else {
 			try {
-				const response = await addNewItem(data);
+				const response = await addNewMission(data);
 				const result = await response.data;
 				const newMissions = [...missions];
 				newMissions.push(result);
@@ -182,16 +187,14 @@ const MissionPage = () => {
 	};
 
 	useEffect(() => {
-		// missions
 		const fetchData = async () => {
-			const result = await getAll();
+			const result = await getAllMission();
 			setMissions(result.data);
 		};
 		fetchData();
 	}, []);
 
 	useEffect(() => {
-		// latest tasks
 		const fetchData = async () => {
 			const result = await getLatestTasks();
 			setLatestTasks(result.data);
@@ -210,13 +213,17 @@ const MissionPage = () => {
 				<div className='row'>
 					{missions?.map((item) => (
 						<div className='col-md-6 col-xl-4 col-sm-12' key={item.id}>
-							<Card stretch>
-								<CardHeader className='bg-transparent'>
-									<CardLabel>
-										<CardTitle tag='h4' className='h5'>
+							<Card stretch className='cursor-pointer'>
+								<CardHeader className='bg-transparent py-0'>
+									<CardLabel
+										className='py-4'
+										onClick={() => navigateToDetailPage(item.id)}>
+										<CardTitle tag='h3' className='h3'>
 											{item?.name}
 										</CardTitle>
-										<CardSubTitle>{item?.description}</CardSubTitle>
+										<CardSubTitle style={{ fontSize: 15 }}>
+											{item?.description}
+										</CardSubTitle>
 									</CardLabel>
 									<CardActions>
 										<Dropdown>
@@ -230,16 +237,6 @@ const MissionPage = () => {
 												/>
 											</DropdownToggle>
 											<DropdownMenu isAlignmentEnd>
-												<DropdownItem>
-													<Button
-														icon='ArrowForwardIos'
-														tag='a'
-														onClick={() =>
-															navigateToDetailPage(item.id)
-														}>
-														Chi tiết
-													</Button>
-												</DropdownItem>
 												<DropdownItem>
 													<Button
 														icon='Edit'
@@ -262,7 +259,7 @@ const MissionPage = () => {
 										</Dropdown>
 									</CardActions>
 								</CardHeader>
-								<CardBody>
+								<CardBody onClick={() => navigateToDetailPage(item.id)}>
 									<div className='row'>
 										<div className='col-md-6'>
 											{30}%
@@ -300,7 +297,6 @@ const MissionPage = () => {
 								id={item.id}
 								name={item?.name}
 								teamName={item.departmnent?.name}
-								// dueDate={`${item.deadline_date}  ${item.deadline_time}`}
 								dueDate={`${item.deadline_date}`}
 								percent={calculateProgressTaskBySteps(item?.subtasks) || 0}
 								data-tour='project-item'
