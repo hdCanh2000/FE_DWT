@@ -7,6 +7,7 @@ import CommonHeader from '../pages/common/Headers/CommonHeader';
 const headers = [
 	{ path: layoutMenu.pageLayout.subMenu.onlySubheader.path, element: null, exact: true },
 	{ path: layoutMenu.pageLayout.subMenu.onlyContent.path, element: null, exact: true },
+	{ path: '/dang-nhap', element: null, exact: true },
 	{ path: dashboardMenu.dashboard.path, element: <DashboardHeader />, exact: true },
 	// quan ly muc tieu
 	{
