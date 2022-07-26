@@ -1,15 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-<<<<<<< HEAD
-import React, { useCallback, useState } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
-=======
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
->>>>>>> main
 import classNames from 'classnames';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
@@ -46,138 +38,12 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
-<<<<<<< HEAD
-import Alert from '../../../components/bootstrap/Alert';
-import Button from '../../../components/bootstrap/Button';
-import Badge from '../../../components/bootstrap/Badge';
-import Icon from '../../../components/icon/Icon';
-import Progress from '../../../components/bootstrap/Progress';
-import Avatar, { AvatarGroup } from '../../../components/Avatar';
-import USERS from '../../../common/data/userDummyData';
-// import TaskProgress from '../task-management/TaskProgress';
-import MissionDetailForm from './TaskDetailForm/MissionDetailForm';
-import COLORS from '../../../common/data/enumColors';
-import dummyEventsData from '../../../common/data/dummyEventsData';
-import { priceFormat } from '../../../helpers/helpers';
-import EVENT_STATUS from '../../../common/data/enumEventStatus';
-import { getUserDataWithId } from '../../../common/data/userDummyData';
-import useDarkMode from '../../../hooks/useDarkMode';
-import Chart from '../../../components/extras/Chart';
-
-const Item = ({
-	name,
-	teamName,
-	attachCount,
-	taskCount,
-	percent,
-	startTime,
-	endTime,
-	id,
-	handleOpenModal,
-	setEditModalStatus,
-	mission,
-	setMission,
-	...props
-}) => {
-	const navigate = useNavigate();
-	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`../${demoPages.quanLyCongViec.subMenu.congViec.path}/${id}`),
-		[id, navigate],
-	);
-	const date = `Còn 30 ngày nữa`;
-	const handleDelete = async (idDelete) => {
-        try {
-			await axios.delete(`https://fake-data-dwt.herokuapp.com/tasks/${idDelete}`)
-			toast.success(`Delete Task success !`)
-			const newState = JSON.parse(JSON.stringify(mission));
-			setMission(newState.filter((item) => item.id !== idDelete));
-        } catch (error){
-            toast.error('Delete Task Error !')
-        }
-	
-		setEditModalStatus(false)
-	}
-	return (
-		<div className='col-md-6 col-xl-4 col-sm-12' {...props}>
-			<Toaster/>
-			<Card stretchclassName='cursor-pointer'>
-				<CardHeader>
-					<CardLabel icon='Ballot' onClick={handleOnClickToProjectPage} >
-						<CardTitle>{name}</CardTitle>
-						<CardSubTitle>{teamName}</CardSubTitle>
-					</CardLabel>
-					<CardActions>
-						<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-							{date}
-						</small>
-					</CardActions>
-					<Dropdown>
-						<DropdownToggle hasIcon={false}>
-							<Button icon='MoreHoriz' />
-						</DropdownToggle>
-						<DropdownMenu isAlignmentEnd>
-							<DropdownItem>
-								<Button icon='Delete' onClick={()=>handleDelete(id)}>
-									Delete
-								</Button>
-							</DropdownItem>
-							<DropdownItem>
-								<Button icon='Edit' onClick={()=>handleOpenModal(id)}>
-									Edit
-								</Button>
-							</DropdownItem>
-						</DropdownMenu>
-					</Dropdown>
-				</CardHeader>
-				<CardBody>
-					<div className='row g-2 mb-3'>
-						<div className='col-auto'>
-							<Badge color='dark' isLight style={{ fontSize: 18 }}>
-								<Icon icon='TaskAlt' /> {taskCount}
-							</Badge>
-						</div>
-					</div>
-					<div className='row'>
-						<div className='col-md-6'>
-							{percent}%
-							<Progress isAutoColor value={percent} height={10} />
-						</div>
-						<div className='col-md-6 d-flex justify-content-end'>
-							<AvatarGroup>
-								<Avatar
-									srcSet={USERS.GRACE.srcSet}
-									src={USERS.GRACE.src}
-									userName={`${USERS.GRACE.name} ${USERS.GRACE.surname}`}
-									color={USERS.GRACE.color}
-								/>
-								<Avatar
-									srcSet={USERS.SAM.srcSet}
-									src={USERS.SAM.src}
-									userName={`${USERS.SAM.name} ${USERS.SAM.surname}`}
-									color={USERS.SAM.color}
-								/>
-								<Avatar
-									srcSet={USERS.CHLOE.srcSet}
-									src={USERS.CHLOE.src}
-									userName={`${USERS.CHLOE.name} ${USERS.CHLOE.surname}`}
-									color={USERS.CHLOE.color}
-								/>
-							</AvatarGroup>
-						</div>
-					</div>
-				</CardBody>
-			</Card>
-		</div>
-	);
-};
-=======
 import {
 	STATUS,
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
 } from '../../../utils/constants';
->>>>>>> main
 
 const MissionDetailPage = () => {
 	const [mission, setMission] = useState({});
@@ -186,24 +52,6 @@ const MissionDetailPage = () => {
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const params = useParams();
-<<<<<<< HEAD
-	React.useEffect(() => {
-		axios.get(`https://fake-data-dwt.herokuapp.com/tasks?mission_id=${parseInt(params?.id, 10)}`)
-			.then(res => {
-				setMission(res);
-			});
-	}, [params?.id, editModalStatus]);
-	const data = getUserDataWithId(params?.id);
-	const { darkModeStatus } = useDarkMode();
-	const [editModalStatus, setEditModalStatus] = useState(false);
-	const [idEdit, setIdEdit] = useState();
-	const handleOpenModal = (id) => {
-		setEditModalStatus(true);
-		setIdEdit(id);
-	}
-	const [dayHours] = useState({
-		series: [
-=======
 	const { id } = params;
 
 	useEffect(() => {
@@ -258,72 +106,9 @@ const MissionDetailPage = () => {
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
 				{content}
 			</Toasts>,
->>>>>>> main
 			{
 				autoDismiss: true,
 			},
-<<<<<<< HEAD
-		],
-		options: {
-			colors: [process.env.REACT_APP_SUCCESS_COLOR],
-			chart: {
-				type: 'radar',
-				width: 200,
-				height: 200,
-				sparkline: {
-					enabled: true,
-				},
-			},
-			xaxis: {
-				categories: [
-					'Monday',
-					'Tuesday',
-					'Wednesday',
-					'Thursday',
-					'Friday',
-					'Saturday',
-					'Sunday',
-				],
-				convertedCatToNumeric: false,
-			},
-			tooltip: {
-				theme: 'dark',
-				fixed: {
-					enabled: false,
-				},
-				x: {
-					show: true,
-				},
-				y: {
-					title: {
-						// eslint-disable-next-line no-unused-vars
-						formatter(seriesName) {
-							return 'Hours';
-						},
-					},
-				},
-			},
-			stroke: {
-				curve: 'smooth',
-				width: 2,
-			},
-			plotOptions: {
-				radar: {
-					polygons: {
-						strokeColors: `${COLORS.SUCCESS.code}50`,
-						strokeWidth: 1,
-						connectorColors: `${COLORS.SUCCESS.code}50`,
-					},
-				},
-			},
-		},
-	});
-	const userTasks = dummyEventsData.filter((f) => f.assigned.username === data.username);
-	return (
-		<PageWrapper title={`${mission?.name}`}>
-			<Page container='fluid'>
-			<div className='row'>
-=======
 		);
 	};
 
@@ -409,7 +194,6 @@ const MissionDetailPage = () => {
 		<PageWrapper title={`${mission?.name}`}>
 			<Page container='fluid'>
 				<div className='row mb-4 pb-4'>
->>>>>>> main
 					<div className='col-12'>
 						<div className='display-4 fw-bold py-3'>{mission?.name}</div>
 					</div>
@@ -745,50 +529,6 @@ const MissionDetailPage = () => {
 						</Card>
 					</div>
 				</div>
-<<<<<<< HEAD
-				<div className='row mt-3'>
-					<div className='col-6'>
-						<div className='display-6 fw-bold py-3'>Danh sách công việc</div>
-					</div>
-					<div className='col-md-6 col-xl-6 col-sm-6'>
-						<div className='w-100 h-100 d-flex align-items-center justify-content-end'>
-							<Button
-								color='success'
-								size='lg'
-								isLight
-								className='w-50 h-100'
-								onClick={() => handleOpenModal()}
-								icon='AddCircle'>
-								Thêm công việc
-							</Button>
-						</div>
-					</div>
-				</div>
-				<div className='row mt-3'>
-					{mission?.data?.map((item, index) => {
-						return (
-							<Item
-								// eslint-disable-next-line react/no-array-index-key
-								key={index}
-								name={item.name}
-								teamName={item.teamName}
-								startTime={`${item.startTime}`}
-								endTime={`${item.endTime}`}
-								attachCount={6}
-								taskCount={24}
-								percent={65}
-								data-tour='project-item'
-								handleOpenModal={handleOpenModal}
-								id={item.id}
-								setEditModalStatus={setEditModalStatus}
-								mission={mission}
-								setMission={setMission}
-							/>
-						);
-					})}
-				</div>
-				<MissionDetailForm setEditModalStatus={setEditModalStatus} editModalStatus={editModalStatus} id={idEdit} />
-=======
 				<MissionAlertConfirm
 					openModal={openConfirmModal}
 					onCloseModal={handleCloseConfirmModal}
@@ -802,14 +542,9 @@ const MissionDetailPage = () => {
 					onSubmit={handleSubmitTaskForm}
 					item={itemEdit}
 				/>
->>>>>>> main
 			</Page>
 		</PageWrapper>
 	);
 };
-<<<<<<< HEAD
-export default MissionDetailPage;
-=======
 
 export default MissionDetailPage;
->>>>>>> main
