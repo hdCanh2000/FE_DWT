@@ -1,6 +1,5 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import classNames from 'classnames';
@@ -172,6 +171,14 @@ const MissionDetailPage = () => {
 			await deleteTaskById(taskId);
 			const newState = [...tasks];
 			setTasks(newState.filter((item) => item.id !== taskId));
+			try {
+				const missionClone = { ...mission };
+				missionClone.current_kpi_value = mission.current_kpi_value - itemEdit.kpi_value;
+				const newMission = await updateMissionById(missionClone);
+				setMission(newMission.data);
+			} catch (error) {
+				setMission(mission);
+			}
 			handleCloseConfirmModal();
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {

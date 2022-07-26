@@ -69,7 +69,7 @@
       "description": "Mô tả nhiệm vụ 1",
       "status": 0,
       "kpi_value": 100,
-      "current_kpi_value": 100,
+      "current_kpi_value": 90,
       "start_time": "2022-07-20",
       "end_time": "2022-12-20",
       "keys": [
