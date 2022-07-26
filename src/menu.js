@@ -41,10 +41,10 @@ export const dashboardMenu = {
 };
 
 export const demoPages = {
-	// pages: {
-	// 	id: 'pages',
-	// 	text: 'Pages',
-	// 	icon: 'Extension',
+	// login: {
+	// 	id: 'dangNhap',
+	// 	text: 'Đăng nhập',
+	// 	path: '/dang-nhap',
 	// },
 	mucTieu: {
 		id: 'mission',
