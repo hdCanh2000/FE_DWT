@@ -1,10 +1,11 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect } from "react";
-import axios from "axios";
 import moment from 'moment';
 import toast, { Toaster } from 'react-hot-toast';
 import styled from 'styled-components';
+import Select from 'react-select';
+import { updateSubtasks, getAllDepartments, getAllUser } from "../services";
 import Modal, { ModalHeader, ModalBody, ModalTitle, ModalFooter } from "../../../../components/bootstrap/Modal"
 import FormGroup from "../../../../components/bootstrap/forms/FormGroup";
 import Input from "../../../../components/bootstrap/forms/Input";
@@ -15,7 +16,18 @@ import Card, {
 import Button from "../../../../components/bootstrap/Button";
 import Icon from "../../../../components/icon/Icon";
 
+const ErrorText = styled.span`
+font-size: 14px;
+color: #e22828;
+margin-top: 5px;
+`;
 const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, setTask, idEdit }) => {
+    const [valueInput, setValueInput] = React.useState({});
+    const [keysState, setKeysState] = React.useState([]);
+    const [department, setDepartment] = React.useState([]);
+    const [valueDepartment, setValueDepartment] = React.useState({});
+    const [user, setUser] = React.useState([]);
+    const [valueUser, setValueUser] = React.useState({});
     const initValueInput = {
         task_id: id,
         priority: 2,
@@ -24,25 +36,55 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         name: '',
         description: '',
         departmnent: {
-            name: '',
         },
         user: {
-            name: '',
         },
         estimate_date: moment().add(0, 'days').format('YYYY/MM/DD'),
         estimate_time: "",
         deadline_date: moment().add(0, 'days').format('YYYY/MM/DD'),
         deadline_time: "",
         kpi_value: 0,
-        keys: null,
+        keys: [],
         steps: [],
     }
-    const [valueInput, setValueInput] = React.useState({});
-    const [keysState, setKeysState] = React.useState([]);
+
     useEffect(() => {
+        getAllDepartments().then(res => {
+            setDepartment(
+                res?.data?.map((item) => {
+                    return {
+                        id: item.id,
+                        label: item.name,
+                        value: item.slug,
+                    };
+                }),
+            )
+        })
+        getAllUser().then(res => {
+            setUser(
+                res?.data?.map((item) => {
+                    return {
+                        id: item.id,
+                        label: item.name,
+                        value: item.slug,
+                    };
+                }),
+            )
+        })
         if (idEdit && title !== 'add') {
             setValueInput((task.subtasks.filter((item) => item.id === idEdit))[0])
+            setValueUser({
+                id: (task.subtasks.filter((item) => item.id === idEdit))[0]?.user?.id,
+                label: (task.subtasks.filter((item) => item.id === idEdit))[0]?.user?.name,
+            });
+            setValueDepartment({
+                id: (task.subtasks.filter((item) => item.id === idEdit))[0]?.department?.id,
+                label: (task.subtasks.filter((item) => item.id === idEdit))[0]?.department?.name,
+            });
+            setKeysState((task.subtasks.filter((item) => item.id === idEdit))[0].keys)
         } else {
+            setValueDepartment({});
+            setValueUser({});
             setValueInput(initValueInput);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,27 +96,27 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
             [name]: value,
         });
     };
-    const handleChanges = (e) => {
-        const { value, name } = e.target;
-        setValueInput({
-            ...valueInput,
-            [name]: {
-                name: value,
-            }
-        });
-    };
     const handleSunmit = async () => {
         if (title === 'add') {
             const subTaskValue = JSON.parse(JSON.stringify(task.subtasks))
             subTaskValue.push({
                 ...valueInput,
+                keys: keysState,
+                user: {
+                    id: valueUser.id,
+                    name: valueUser.label,
+                },
+                department: {
+                    id: valueDepartment.id,
+                    name: valueDepartment.label,
+                },
                 id: task.subtasks.length + 1,
             })
             const taskValue = JSON.parse(JSON.stringify(task))
             const data = Object.assign(taskValue, { subtasks: subTaskValue })
             try {
 
-                const respose = await axios.patch(`https://fake-data-dwt.herokuapp.com/tasks/${id}`, data).then(
+                const respose = await updateSubtasks(id, data).then(
                     toast.success('Create Task Success !')
                 )
                 const result = await respose.data
@@ -82,16 +124,26 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
             } catch (error) {
                 toast.error('Create Task Error !')
             }
+
         } else {
-            // const newSubTasks = task.subtasks.filter((item) => item.id !== idEdit)
-            // newSubTasks.push(valueInput)
             const newSubTasks = task.subtasks.map((item) => {
-                return item.id === idEdit ? { ...valueInput } : item
+                return item.id === idEdit ? {
+                    ...valueInput,
+                    keys: keysState,
+                    user: {
+                        id: valueUser.id,
+                        name: valueUser.label,
+                    },
+                    department: {
+                        id: valueDepartment.id,
+                        name: valueDepartment.label,
+                    },
+                } : item
             })
             const taskValue = JSON.parse(JSON.stringify(task))
             const newData = Object.assign(taskValue, { subtasks: newSubTasks })
             try {
-                const respose = await axios.patch(`https://fake-data-dwt.herokuapp.com/tasks/${id}`, newData).then(
+                const respose = await updateSubtasks(id, newData).then(
                     toast.success('Edit Task Success !')
                 )
                 const result = await respose.data
@@ -102,11 +154,6 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         }
         setEditModalStatus(false)
     }
-    const ErrorText = styled.span`
-	font-size: 14px;
-	color: #e22828;
-	margin-top: 5px;
-`;
     const prevIsValid = () => {
         if (keysState.length === 0) {
             return true;
@@ -165,6 +212,7 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
             setKeysState((prev) => [...prev, initKeyState]);
         }
     };
+    console.log(valueUser, 'valueUser')
     return (
         <Modal
             setIsOpen={setEditModalStatus}
@@ -188,22 +236,22 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                         </FormGroup>
                     </div>
                     <div className='col-12'>
-                        <FormGroup id='departmnent' label='Phòng ban' isFloating>
-                            <Input
-                                placeholder='Phòng ban'
-                                value={valueInput.departmnent?.name || ''}
-                                name='departmnent'
-                                onChange={handleChanges}
+                        <FormGroup id='department' label='Phòng ban'>
+                            <Select
+                                defaultValue={valueDepartment}
+                                value={valueDepartment}
+                                onChange={setValueDepartment}
+                                options={department}
                             />
                         </FormGroup>
                     </div>
                     <div className='col-12'>
-                        <FormGroup id='name' label='Nhân viên phụ trách' isFloating>
-                            <Input
-                                placeholder='Nhân viên phụ trách'
-                                value={valueInput.user?.name || ''}
-                                name='user'
-                                onChange={handleChanges}
+                        <FormGroup id='valueUser' label='Nhân viên phụ trách'>
+                            <Select
+                                defaultValue={valueUser}
+                                value={valueUser}
+                                onChange={setValueUser}
+                                options={user}
                             />
                         </FormGroup>
                     </div>
@@ -291,16 +339,22 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                     </div>
                     <div className='col-12'>
                         <FormGroup>
-                            <Button variant='success' onClick={handleAddFieldKey}>
+                            <Button
+                                variant='success'
+                                onClick={handleAddFieldKey}
+                                icon='AddCircle'
+                                color='success'
+                                size='lg'
+                            >
                                 Thêm chỉ số key
                             </Button>
                         </FormGroup>
                         {/* eslint-disable-next-line no-shadow */}
-                        {keysState.map((item, index) => {
+                        {keysState?.map((item, index) => {
                             return (
                                 <div
+                                    key={item.id}
                                     // eslint-disable-next-line react/no-array-index-key
-                                    key={index}
                                     className='mt-4 d-flex align-items-center justify-content-between'>
                                     <div
                                         style={{

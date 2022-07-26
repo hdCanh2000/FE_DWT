@@ -27,14 +27,14 @@ import Progress from '../../../components/bootstrap/Progress';
 import AddTaskForm from './AddTaskForm';
 
 // eslint-disable-next-line react/prop-types
-const Item = ({ name, teamName, attachCount, taskCount, percent, dueDate, ...props }) => {
+const Item = ({ name, teamName, attachCount, taskCount, percent, dueDate }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
 		() => navigate(`../${demoPages.projectManagement.subMenu.itemID.path}/1`),
 		[navigate],
 	);
 	return (
-		<div className='col-md-6 col-xl-4 col-sm-12' {...props}>
+		<div className='col-md-6 col-xl-4 col-sm-12'>
 			<Card stretch onClick={handleOnClickToProjectPage} className='cursor-pointer'>
 				<CardHeader>
 					<CardLabel icon='Ballot'>
@@ -323,7 +323,7 @@ const TaskListPage = () => {
 					{dataWork.map((item) => {
 						return (
 							<div className='col-xl-3 col-md-6 col-sm-12' key={item.id}>
-								<CardAlert {...item} />
+								<CardAlert item={item} />
 							</div>
 						);
 					})}
