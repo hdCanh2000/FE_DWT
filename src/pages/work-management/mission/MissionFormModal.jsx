@@ -16,13 +16,22 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Icon from '../../../components/icon/Icon';
-import { getAllDepartments, getItemById } from './services';
+import { getAllDepartments, getMissionById } from './services';
 
 const ErrorText = styled.span`
 	font-size: 14px;
 	color: #e22828;
 	margin-top: 5px;
 `;
+
+const customStyles = {
+	control: (provided) => ({
+		...provided,
+		padding: '4px',
+		fontSize: '18px',
+		borderRadius: '1.25rem',
+	}),
+};
 
 const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const [mission, setMission] = useState({});
@@ -77,7 +86,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	useEffect(() => {
 		if (item?.id) {
-			getItemById(item?.id).then((res) => {
+			getMissionById(item?.id).then((res) => {
 				setMission(res.data);
 				setKeysState(res.data.keys);
 				setDepartmentOption(
@@ -200,9 +209,28 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		setKeysState((prev) => prev.filter((state) => state !== prev[index]));
 	};
 
+	// close form
+	const handleCloseForm = () => {
+		onClose();
+		setMission({
+			id: null,
+			name: '',
+			description: '',
+			kpi_value: '',
+			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+			status: 1,
+		});
+		setKeysState([]);
+		setDepartmentOption([]);
+		setErrors({});
+	};
+
 	const handleSubmit = () => {
 		const data = { ...mission };
 		data.keys = keysState;
+		data.kpi_value = parseInt(data.kpi_value, 10);
+		data.current_kpi_value = 0;
 		const departmentClone = [...departmentOption];
 		data.departments = departmentClone.map((department) => {
 			return {
@@ -238,7 +266,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	};
 
 	return (
-		<Modal show={show} onHide={onClose} size='lg' scrollable centered>
+		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
 				<Modal.Title>{item?.id ? 'Cập nhật mục tiêu' : 'Thêm mới mục tiêu'}</Modal.Title>
 			</Modal.Header>
@@ -281,6 +309,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												onChange={handleChange}
 												value={mission.description || ''}
 												required
+												size='lg'
 												placeholder='Mô tả mục tiêu'
 												className='border border-2'
 											/>
@@ -309,6 +338,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											id='kpi_value'
 											label='Phòng ban phụ trách'>
 											<Select
+												styles={customStyles}
+												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
 												onChange={setDepartmentOption}
@@ -451,7 +482,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				</div>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant='secondary' onClick={onClose}>
+				<Button variant='secondary' onClick={handleCloseForm}>
 					Đóng
 				</Button>
 				<Button variant='primary' type='submit' onClick={handleSubmit}>

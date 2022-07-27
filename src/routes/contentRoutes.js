@@ -27,6 +27,7 @@ const TASK = {
 
 const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
+	LOGIN: lazy(() => import('../pages/presentation/auth/Login')),
 };
 
 const presentation = [
