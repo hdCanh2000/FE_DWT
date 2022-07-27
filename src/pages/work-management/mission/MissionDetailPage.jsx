@@ -543,7 +543,7 @@ const MissionDetailPage = () => {
 														<div
 															className='text-muted'
 															style={{ fontSize: 15 }}>
-															Bế tắc/Xem xét
+															Quá hạn/Thất bại
 														</div>
 													</div>
 												</div>
