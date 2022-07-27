@@ -1,6 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import moment from 'moment';
 import toast, { Toaster } from 'react-hot-toast';
 import styled from 'styled-components';
@@ -22,12 +22,28 @@ color: #e22828;
 margin-top: 5px;
 `;
 const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, setTask, idEdit }) => {
+    // state
     const [valueInput, setValueInput] = React.useState({});
     const [keysState, setKeysState] = React.useState([]);
     const [department, setDepartment] = React.useState([]);
     const [valueDepartment, setValueDepartment] = React.useState({});
     const [user, setUser] = React.useState([]);
     const [valueUser, setValueUser] = React.useState({});
+
+    const initError = {
+        name: { errorMsg: '' },
+        description: { errorMsg: '' },
+        kpi_value: { errorMsg: '' },
+        user: { errorMsg: '' },
+        department: { errorMsg: '' },
+
+    }
+    const [errors, setErrors] = React.useState(initError);
+    const nameRef = useRef(null);
+    const descriptionRef = useRef(null);
+    const kpiRef = useRef(null);
+    const userRef = useRef(null);
+    const departmentRef = useRef(null);
     const initValueInput = {
         task_id: id,
         priority: 2,
@@ -35,10 +51,6 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         percent: 0,
         name: '',
         description: '',
-        departmnent: {
-        },
-        user: {
-        },
         estimate_date: moment().add(0, 'days').format('YYYY/MM/DD'),
         estimate_time: "",
         deadline_date: moment().add(0, 'days').format('YYYY/MM/DD'),
@@ -47,7 +59,7 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         keys: [],
         steps: [],
     }
-
+    // render data
     useEffect(() => {
         getAllDepartments().then(res => {
             setDepartment(
@@ -71,6 +83,7 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                 }),
             )
         })
+        setErrors(initError);
         if (idEdit && title !== 'add') {
             setValueInput((task.subtasks.filter((item) => item.id === idEdit))[0])
             setValueUser({
@@ -81,7 +94,7 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                 id: (task.subtasks.filter((item) => item.id === idEdit))[0]?.department?.id,
                 label: (task.subtasks.filter((item) => item.id === idEdit))[0]?.department?.name,
             });
-            setKeysState((task.subtasks.filter((item) => item.id === idEdit))[0].keys)
+            setKeysState((task.subtasks.filter((item) => item.id === idEdit))[0]?.keys || [])
         } else {
             setValueDepartment({});
             setValueUser({});
@@ -89,6 +102,7 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [idEdit])
+    // handle
     const handleChange = (e) => {
         const { value, name } = e.target;
         setValueInput({
@@ -97,6 +111,7 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         });
     };
     const handleSunmit = async () => {
+        setErrors(initError);
         if (title === 'add') {
             const subTaskValue = JSON.parse(JSON.stringify(task.subtasks))
             subTaskValue.push({
@@ -112,6 +127,27 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                 },
                 id: task.subtasks.length + 1,
             })
+            validateForm();
+            if (!valueInput?.name) {
+                nameRef.current.focus();
+                return;
+            }
+            if (!valueInput?.department) {
+                departmentRef.current.focus();
+                return;
+            }
+            if (!valueInput?.user) {
+                userRef.current.focus();
+                return;
+            }
+            if (!valueInput?.kpi_value) {
+                kpiRef.current.focus();
+                return;
+            }
+            if (!valueInput?.description) {
+                descriptionRef.current.focus();
+                return;
+            }
             const taskValue = JSON.parse(JSON.stringify(task))
             const data = Object.assign(taskValue, { subtasks: subTaskValue })
             try {
@@ -140,6 +176,27 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                     },
                 } : item
             })
+            validateForm();
+            if (!valueInput?.name) {
+                nameRef.current.focus();
+                return;
+            }
+            if (!valueInput?.department) {
+                departmentRef.current.focus();
+                return;
+            }
+            if (!valueInput?.user) {
+                userRef.current.focus();
+                return;
+            }
+            if (!valueInput?.kpi_value) {
+                kpiRef.current.focus();
+                return;
+            }
+            if (!valueInput?.description) {
+                descriptionRef.current.focus();
+                return;
+            }
             const taskValue = JSON.parse(JSON.stringify(task))
             const newData = Object.assign(taskValue, { subtasks: newSubTasks })
             try {
@@ -155,19 +212,19 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         setEditModalStatus(false)
     }
     const prevIsValid = () => {
-        if (keysState.length === 0) {
+        if (keysState?.length === 0 || !keysState) {
             return true;
         }
-        const someEmpty = keysState.some((key) => key.key_name === '' || key.key_value === '');
+        const someEmpty = keysState?.some((key) => key?.key_name === '' || key?.key_value === '');
 
         if (someEmpty) {
             // eslint-disable-next-line array-callback-return
-            keysState.map((key, index) => {
-                const allPrev = [...keysState];
-                if (keysState[index].key_name === '') {
+            keysState?.map((key, index) => {
+                const allPrev = [...keysState] || [];
+                if (keysState[index]?.key_name === '') {
                     allPrev[index].error.key_name = 'Nhập tên chỉ số key!';
                 }
-                if (keysState[index].key_value === '') {
+                if (keysState[index]?.key_value === '') {
                     allPrev[index].error.key_value = 'Nhập giá trị key!';
                 }
                 setKeysState(allPrev);
@@ -177,13 +234,13 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
         return !someEmpty;
     };
     const handleRemoveKeyField = (e, index) => {
-        setKeysState((prev) => prev.filter((state) => state !== prev[index]));
+        setKeysState((prev) => prev?.filter((state) => state !== prev[index]));
     };
     const handleChangeKeysState = (index, event) => {
         event.preventDefault();
         event.persist();
         setKeysState((prev) => {
-            return prev.map((key, i) => {
+            return prev?.map((key, i) => {
                 if (i !== index) return key;
                 return {
                     ...key,
@@ -212,7 +269,27 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
             setKeysState((prev) => [...prev, initKeyState]);
         }
     };
-    console.log(valueUser, 'valueUser')
+    // valueDalite
+    const onValidate = (value, name) => {
+        setErrors((prev) => ({
+            ...prev,
+            [name]: { ...prev[name], errorMsg: value },
+        }));
+    };
+    const validateFieldForm = (field, value) => {
+        if (!value) {
+            onValidate(true, field);
+        }
+    };
+    const validateForm = () => {
+        validateFieldForm('name', valueInput?.name);
+        validateFieldForm('description', valueInput?.description);
+        validateFieldForm('kpi_value', valueInput?.kpi_value);
+        validateFieldForm('department', valueInput?.department);
+        validateFieldForm('user', valueInput?.user);
+    };
+    console.log(valueDepartment, 'valueInput?.description');
+    console.log(valueUser, 'valueInput?.user');
     return (
         <Modal
             setIsOpen={setEditModalStatus}
@@ -221,19 +298,23 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
             isScrollable>
             <Toaster />
             <ModalHeader className='px-4' setIsOpen={setEditModalStatus}>
-                <ModalTitle id='project-edit'>Thêm mới công việc</ModalTitle>
+                <ModalTitle id='project-edit'>Thêm mới đầu việc</ModalTitle>
             </ModalHeader>
             <ModalBody>
                 <div className='row g-4'>
                     <div className='col-12'>
-                        <FormGroup id='name' label='Tên công việc' isFloating>
+                        <FormGroup id='name' label='Tên đầu việc' isFloating>
                             <Input
                                 onChange={handleChange}
-                                placeholder='Tên công việc'
+                                placeholder='Tên đầu việc'
                                 value={valueInput.name || ''}
                                 name='name'
+                                ref={nameRef}
                             />
                         </FormGroup>
+                        {errors?.name?.errorMsg && (
+                            <ErrorText>Vui lòng nhập tên mục tiêu</ErrorText>
+                        )}
                     </div>
                     <div className='col-12'>
                         <FormGroup id='department' label='Phòng ban'>
@@ -242,18 +323,26 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                                 value={valueDepartment}
                                 onChange={setValueDepartment}
                                 options={department}
+                                ref={departmentRef}
                             />
                         </FormGroup>
+                        {errors?.department?.errorMsg && (
+                            <ErrorText>Vui lòng chọn phòng ban phụ trách</ErrorText>
+                        )}
                     </div>
                     <div className='col-12'>
-                        <FormGroup id='valueUser' label='Nhân viên phụ trách'>
+                        <FormGroup id='user' label='Nhân viên phụ trách'>
                             <Select
                                 defaultValue={valueUser}
                                 value={valueUser}
                                 onChange={setValueUser}
                                 options={user}
+                                ref={userRef}
                             />
                         </FormGroup>
+                        {errors?.user?.errorMsg && (
+                            <ErrorText>Vui lòng chọn người phụ trách</ErrorText>
+                        )}
                     </div>
                     <div className='col-12'>
                         <FormGroup id='total_kpi_value' label='Mức điểm KPI' isFloating>
@@ -262,8 +351,12 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                                 value={valueInput.kpi_value || ''}
                                 name='kpi_value'
                                 onChange={handleChange}
+                                ref={kpiRef}
                             />
                         </FormGroup>
+                        {errors?.kpi_value?.errorMsg && (
+                            <ErrorText>Vui lòng nhập KPI</ErrorText>
+                        )}
                     </div>
                     <div className='col-6'>
                         <FormGroup
@@ -332,8 +425,12 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                                         value={valueInput.description}
                                         name='description'
                                         onChange={handleChange}
+                                        ref={descriptionRef}
                                     />
                                 </FormGroup>
+                                {errors?.description?.errorMsg && (
+                                    <ErrorText>Vui lòng nhập ghi chú</ErrorText>
+                                )}
                             </CardBody>
                         </Card>
                     </div>
@@ -435,7 +532,7 @@ const TaskDetailForm = ({ editModalStatus, setEditModalStatus, id, task, title, 
                     type='submit'
                     onClick={() => handleSunmit(id)}
                 >
-                    Lưu mục tiêu
+                    Lưu đầu việc
                 </Button>
             </ModalFooter>
         </Modal>
