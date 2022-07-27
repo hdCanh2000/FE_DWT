@@ -118,14 +118,17 @@ const calculateProgressTaskBySteps = (subtasks = []) => {
 	return Math.round((countStepComplete / stepsLength) * 100);
 };
 
-const calculateProgressSubTaskBySteps = (subtasks = []) => {
-	// tính % hoàn thành 1 subtask theo step
-	const subtasksLength = subtasks?.length;
+// tính % hoàn thành 1 subtask theo step
+const calculateProgressSubTaskBySteps = (subtask = {}) => {
+	if (isEmpty(subtask)) return 0;
+	const stepsLength = subtask?.steps?.length;
+	const { steps } = subtask;
+	if (!isArray(steps) || isEmpty(steps)) return 0;
 	let count = 0;
-	subtasks?.forEach((item) => {
+	steps?.forEach((item) => {
 		if (item?.status === 1) count += 1;
 	});
-	return Math.floor((count / subtasksLength) * 100);
+	return Math.floor((count / stepsLength) * 100);
 };
 
 // ------------		  UPDATE FUNCTION CALC PROGRESS MISSION & TASK		-----------------
@@ -200,6 +203,20 @@ const calcProgressMission = (mission, tasks) => {
 	return Math.round((totalCompleteKPI * 100) / mission.current_kpi_value);
 };
 
+// ------------		  UPDATE FUNCTION CALC TOTAL & PROGRESS SUBTASK		-----------------
+
+// tính tổng số step theo status của 1 subtask
+const calcTotalStepByStatus = (subtask, status) => {
+	if (isEmpty(subtask)) return 0;
+	let total = 0;
+	const { steps } = subtask;
+	if (isEmpty(steps) || !isArray(steps)) return 0;
+	steps.forEach((step) => {
+		if (step.status === status) total += 1;
+	});
+	return total;
+};
+
 // eslint-disable-next-line import/prefer-default-export
 export {
 	calculateProgressMission,
@@ -209,7 +226,13 @@ export {
 	calculateTotalTasks,
 	calcTotalTaskByStatus,
 	calculateTotalSubTasksInTasks,
+	// subtask
 	calculateTotalFailSubTask,
+	calcKPICompleteOfSubtask,
+	calcProgressSubtask,
+	calcTotalStepByStatus,
+	// tính tổng số bước của 1 subtask
+	calcTotalStepOfSubTask,
 	// UPDATE
 	// tính % hoàn thành task
 	calcProgressTask,
