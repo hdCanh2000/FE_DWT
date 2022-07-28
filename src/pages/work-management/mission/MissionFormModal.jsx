@@ -238,8 +238,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				name: department.label,
 				slug: department.value,
 			};
-		});
-		validateForm();
+		});	
+		console.log(validateForm(),'validate');
 		if (!mission?.name) {
 			nameRef.current.focus();
 			return;

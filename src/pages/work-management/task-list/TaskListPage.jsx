@@ -57,7 +57,7 @@ const Item = ({ id, name, teamName, attachCount, taskCount, percent, dueDate, ..
 		[id, navigate],
 	);
 	return (
-		<div className='col-md-6 col-xl-4 col-sm-12' {...props}>
+		<div className='col-md-6 col-xl-4 col-sm-12'>
 			<Card stretch onClick={handleOnClickToProjectPage} className='cursor-pointer'>
 				<CardHeader>
 					<CardLabel icon='Ballot'>
