@@ -302,7 +302,9 @@ const TaskDetailForm = ({
 		<Modal setIsOpen={setEditModalStatus} isOpen={editModalStatus} size='lg' isScrollable>
 			<Toaster />
 			<ModalHeader className='px-4' setIsOpen={setEditModalStatus}>
-				<ModalTitle id='project-edit'>Thêm mới đầu việc</ModalTitle>
+				<ModalTitle id='project-edit'>
+					{title === 'add' ? 'Thêm mới đầu việc ' : 'Sửa đầu việc'}
+				</ModalTitle>
 			</ModalHeader>
 			<ModalBody>
 				<div className='row g-4'>
