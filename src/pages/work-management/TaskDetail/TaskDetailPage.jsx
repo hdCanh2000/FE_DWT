@@ -5,7 +5,13 @@ import { useParams } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
-import Dropdown, { DropdownToggle, DropdownMenu, DropdownItem } from '../../../components/bootstrap/Dropdown';
+import Tab from 'react-bootstrap/Tab';
+import Tabs from 'react-bootstrap/Tabs';
+import Dropdown, {
+	DropdownToggle,
+	DropdownMenu,
+	DropdownItem,
+} from '../../../components/bootstrap/Dropdown';
 import { updateSubtasks, getAllSubtasks } from './services';
 import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
@@ -25,7 +31,7 @@ import ComfirmSubtask from './TaskDetailForm/ComfirmSubtask';
 import useDarkMode from '../../../hooks/useDarkMode';
 
 const TaskDetailPage = () => {
-	// State 
+	// State
 	const [task, setTask] = useState({});
 	const { darkModeStatus } = useDarkMode();
 	const [editModalStatus, setEditModalStatus] = useState(false);
@@ -90,44 +96,43 @@ const TaskDetailPage = () => {
 	// Data
 	function color(props) {
 		if (props === 0) {
-			return { name: "Đang thực hiện", color: "primary" }
+			return { name: 'Đang thực hiện', color: 'primary' };
 		}
 		if (props === 1) {
-			return { name: "Đã hoàn thành", color: "success" }
+			return { name: 'Đã hoàn thành', color: 'success' };
 		}
 		if (props === 2) {
-			return { name: "Bế tắc", color: "danger" }
+			return { name: 'Bế tắc', color: 'danger' };
 		}
 		if (props === 3) {
-			return { name: "Xem xét", color: "warning" }
+			return { name: 'Xem xét', color: 'warning' };
 		}
-		return 'light'
+		return 'light';
 	}
 
 	function priority(props) {
 		if (props === 1) {
-			return "success"
+			return 'success';
 		}
 		if (props === 2) {
-			return "primary"
+			return 'primary';
 		}
 		if (props === 3) {
-			return "danger"
+			return 'danger';
 		}
 		if (props === 4) {
-			return "warning"
+			return 'warning';
 		}
 		if (props === 5) {
-			return "warning"
+			return 'warning';
 		}
-		return 'light'
+		return 'light';
 	}
 	React.useEffect(() => {
 		const fetchSubtasks = async (id) => {
 			const res = await getAllSubtasks(id);
 			setTask(res.data);
-
-		}
+		};
 		fetchSubtasks(parseInt(params?.id, 10));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -144,7 +149,7 @@ const TaskDetailPage = () => {
 	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	// }, [task])
 	React.useEffect(() => {
-		setSubTask(task.subtasks)
+		setSubTask(task.subtasks);
 	}, [task]);
 
 	// Handle
@@ -152,7 +157,7 @@ const TaskDetailPage = () => {
 		setEditModalStatus(true);
 		setIdEdit(id);
 		setTitle(titles);
-	}
+	};
 
 	const handleDelete = async (idDelete) => {
 		const newSubTasks = subtask.filter((item) => item.id !== idDelete);
@@ -161,31 +166,31 @@ const TaskDetailPage = () => {
 		const respose = await updateSubtasks(parseInt(params?.id, 10), newData);
 		const result = await respose.data;
 		setTask(result);
-	}
+	};
 	const handleOpenConfirm = (item) => {
 		setDeletes({
 			id: item.id,
-			name: item.name
+			name: item.name,
 		});
 		set0penConfirm(true);
-	}
+	};
 	const handleCloseComfirm = () => {
 		setDeletes({});
 		set0penConfirm(false);
-	}
-	// funtion caculator 
+	};
+	// funtion caculator
 
 	// phần trăm hòan thành subtask
 	const progressSubtask = (subtasks) => {
 		const length = subtasks?.steps.length;
 		let count = 0;
-		subtasks?.steps.forEach(element => {
+		subtasks?.steps.forEach((element) => {
 			if (element.status === 1) {
-				count += 1
+				count += 1;
 			}
 		});
-		return ((count / length).toFixed(2)) * 100;
-	}
+		return (count / length).toFixed(2) * 100;
+	};
 	// số đầu việc xem xét/ bế tắc của 1 task
 	const totalFailSubtask = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
@@ -199,11 +204,11 @@ const TaskDetailPage = () => {
 			}
 		});
 		return total;
-	}
-	// phầm trăm số đầu việc xem xét / bế tắc trên task 
+	};
+	// phầm trăm số đầu việc xem xét / bế tắc trên task
 	const progressAllSubtask = (a, b) => {
-		return ((a / b).toFixed(2)) * 100;
-	}
+		return (a / b).toFixed(2) * 100;
+	};
 	// số đầu việc hoàn thành trên task
 	const totalSuccessSubtaskOfTask = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
@@ -217,33 +222,46 @@ const TaskDetailPage = () => {
 			}
 		});
 		return total;
-	}
+	};
 	// phần trăm hoàn thành task theo subtask
 	const progressTaskBySubtask = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
 		const { subtasks } = tasks;
 		if (_.isEmpty(subtasks)) return 0;
-		const total = totalSuccessSubtaskOfTask(tasks)
+		const total = totalSuccessSubtaskOfTask(tasks);
 		const lengthSubtask = subtasks.length;
-		return ((total / lengthSubtask).toFixed(2)) * 100;
-	}
+		return (total / lengthSubtask).toFixed(2) * 100;
+	};
 	// Số kpi đã được giao
-	const totalKpiSubtask = (tasks) => {
+	// const totalKpiSubtask = (tasks) => {
+	// 	if (_.isEmpty(tasks)) return 0;
+	// 	const { subtasks } = tasks;
+	// 	if (_.isEmpty(subtasks)) return 0;
+	// 	let totalKpi = 0;
+	// 	subtasks.forEach((item) => {
+	// 		totalKpi += item.kpi_value;
+	// 	});
+	// 	return totalKpi;
+	// };
+	// Số kpi được giao đã hoàn thành
+	const totalKpiSubtaskSuccess = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
 		const { subtasks } = tasks;
 		if (_.isEmpty(subtasks)) return 0;
 		let totalKpi = 0;
 		subtasks.forEach((item) => {
-			totalKpi += item.kpi_value;
-		})
+			if (item.status === 1) {
+				totalKpi += item.kpi_value;
+			}
+		});
 		return totalKpi;
-	}
+	};
 	// phầm trăm kpi đã được giao trên task
 	const progressKpi = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
-		const totalKpi = totalKpiSubtask(task)
-		return ((totalKpi / tasks.kpi_value).toFixed(2)) * 100;
-	}
+		const totalKpi = totalKpiSubtaskSuccess(task);
+		return (totalKpi / tasks.kpi_value).toFixed(2) * 100;
+	};
 	// Số đầu đang chờ xét duyệt
 	const totalPendingSubtaskOfTask = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
@@ -257,28 +275,32 @@ const TaskDetailPage = () => {
 			}
 		});
 		return total;
-	}
+	};
 	// Số đầu việc đang thực hiện
 	const subtasksDangThucHien = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
 		const { subtasks } = tasks;
 		if (_.isEmpty(subtasks)) return 0;
 		const leng = subtasks.length;
-		return (leng - (totalPendingSubtaskOfTask(tasks) + totalSuccessSubtaskOfTask(tasks) + totalFailSubtask(tasks)))
-	}
+		return (
+			leng -
+			(totalPendingSubtaskOfTask(tasks) +
+				totalSuccessSubtaskOfTask(tasks) +
+				totalFailSubtask(tasks))
+		);
+	};
 	React.useEffect(() => {
 		setState({
 			series: [
 				subtasksDangThucHien(task),
 				totalPendingSubtaskOfTask(task),
 				totalSuccessSubtaskOfTask(task),
-				totalFailSubtask(task)],
+				totalFailSubtask(task),
+			],
 			options: chartOptions,
-		})
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [task])
-	const date = Date.now();
-	console.log(date);
+	}, [task]);
 	return (
 		<PageWrapper title={`${task?.name}`}>
 			<Page container='fluid'>
@@ -287,7 +309,7 @@ const TaskDetailPage = () => {
 						<div className='display-4 fw-bold py-3'>{task?.name}</div>
 					</div>
 					<div className='col-lg-4'>
-						<Card>
+						<Card style={{ height: '400px' }}>
 							<CardBody>
 								<CardLabel icon='Stream' iconColor='success'>
 									<CardTitle>Phòng ban</CardTitle>
@@ -313,10 +335,12 @@ const TaskDetailPage = () => {
 										<div className='flex-grow-1 ms-3'>
 											{task?.departments_related?.map((item) => {
 												return (
-													<div key={item.id} className='fw-bold fs-5 mb-0'>
+													<div
+														key={item.id}
+														className='fw-bold fs-5 mb-0'>
 														{item.name}
 													</div>
-												)
+												);
 											})}
 										</div>
 									</div>
@@ -330,7 +354,11 @@ const TaskDetailPage = () => {
 									<div className='col-12'>
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
-												<Icon icon='LayoutTextWindow' size='3x' color='info' />
+												<Icon
+													icon='LayoutTextWindow'
+													size='3x'
+													color='info'
+												/>
 											</div>
 											<div className='flex-grow-1 ms-3'>
 												<div className='fw-bold fs-2 mb-0'>
@@ -347,10 +375,12 @@ const TaskDetailPage = () => {
 											<div className='flex-grow-1 ms-3'>
 												{task?.users_related?.map((item) => {
 													return (
-														<div key={item.id} className='fw-bold fs-5 mb-0'>
+														<div
+															key={item.id}
+															className='fw-bold fs-5 mb-0'>
 															{item.name}
 														</div>
-													)
+													);
 												})}
 											</div>
 										</div>
@@ -370,40 +400,37 @@ const TaskDetailPage = () => {
 										<span className='text-info fs-5 fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
-										&nbsp;
-										Tên công việc : {task?.name}
+										&nbsp; Tên công việc : {task?.name}
 									</div>
 									<br />
 									<div className=' fs-5 fw-bold ms-3'>
 										<span className='text-info fs-5 fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
-										&nbsp;
-										Mô tả : {task?.description}
+										&nbsp; Mô tả : {task?.description}
 									</div>
 									<br />
 									<div className=' fs-5 fw-bold ms-3'>
 										<span className='text-info fs-5 fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
-										&nbsp;
-										Giá trị Kpi : {task?.kpi_value}
+										&nbsp; Giá trị Kpi : {task?.kpi_value}
 									</div>
 									<br />
 									<div className=' fs-5 fw-bold ms-3'>
 										<span className='text-info fs-5 fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
-										&nbsp;
-										Ngày bắt đầu : {moment(task?.estimate_date).format('DD-MM-YYYY')}
+										&nbsp; Ngày bắt đầu :{' '}
+										{moment(task?.estimate_date).format('DD-MM-YYYY')}
 									</div>
 									<br />
 									<div className=' fs-5 fw-bold ms-3'>
 										<span className='text-info fs-5 fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
-										&nbsp;
-										Ngày kết thúc : {moment(task?.deadline_date).format('DD-MM-YYYY')}
+										&nbsp; Ngày kết thúc :{' '}
+										{moment(task?.deadline_date).format('DD-MM-YYYY')}
 									</div>
 								</div>
 							</CardBody>
@@ -422,15 +449,17 @@ const TaskDetailPage = () => {
 								<div className='row g-4'>
 									<div className='col-md-5'>
 										<Card
-											className={`bg-l${darkModeStatus ? 'o25' : '25'
-												}-primary bg-l${darkModeStatus ? 'o50' : '10'
-												}-primary-hover transition-base rounded-2 mb-4`}
+											className={`bg-l${
+												darkModeStatus ? 'o25' : '25'
+											}-primary bg-l${
+												darkModeStatus ? 'o50' : '10'
+											}-primary-hover transition-base rounded-2 mb-4`}
 											shadow='sm'>
 											<CardHeader className='bg-transparent'>
 												<CardLabel>
 													<CardTitle tag='h4' className='h5'>
-														<Icon icon='Activity' color='success' />&nbsp;
-														Tiến độ công việc
+														<Icon icon='Activity' color='success' />
+														&nbsp; Tiến độ công việc
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>
@@ -452,40 +481,57 @@ const TaskDetailPage = () => {
 															</span>
 														</div>
 														<div className='text-muted'>
-															trên tổng số {task?.subtasks?.length} đầu việc .
+															trên tổng số {task?.subtasks?.length}{' '}
+															đầu việc .
 														</div>
 													</div>
 												</div>
 												<div className='row d-flex align-items-center pb-3'>
 													<div className='col col-sm-5 text-start'>
-														<div className='fw-bold fs-2 mb-10'>
+														<div className='fw-bold fs-4 mb-10'>
 															{task?.kpi_value}
 														</div>
 														<div className='text-muted'>
-															KPI
+															Tổng số KPI
+														</div>
+														<div className='fw-bold fs-4 mb-10'>
+															{task?.kpi_value}
+														</div>
+														<div className='text-muted'>
+															KPI đã được giao
 														</div>
 													</div>
 													<div className='col col-sm-7'>
+														<div className='fw-bold fs-4 mb-10'>
+															{totalKpiSubtaskSuccess(task)}/
+															{task?.kpi_value}
+														</div>
 														<div className='text-muted'>
-															{totalKpiSubtask(task)}
+															Kpi đã hoàn thành
 														</div>
 														<div>
-															<Progress isAutoColor value={progressKpi(task)} height={20} />
+															<Progress
+																isAutoColor
+																value={progressKpi(task)}
+																height={20}
+															/>
 														</div>
 													</div>
 												</div>
 											</CardBody>
 										</Card>
 										<Card
-											className={`bg-l${darkModeStatus ? 'o25' : '25'
-												}-danger bg-l${darkModeStatus ? 'o50' : '10'
-												}-danger-hover transition-base rounded-2 mb-4`}
+											className={`bg-l${
+												darkModeStatus ? 'o25' : '25'
+											}-danger bg-l${
+												darkModeStatus ? 'o50' : '10'
+											}-danger-hover transition-base rounded-2 mb-4`}
 											shadow='sm'>
 											<CardHeader className='bg-transparent'>
 												<CardLabel>
 													<CardTitle tag='h4' className='h5'>
-														<Icon icon='Lightning' color='danger' />&nbsp;
-														Đầu việc bị huỷ/thất bại
+														<Icon icon='Lightning' color='danger' />
+														&nbsp; Đầu việc bị huỷ/thất bại
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>
@@ -500,49 +546,66 @@ const TaskDetailPage = () => {
 													</div>
 													<div className='flex-grow-1 ms-3'>
 														<div className='fw-bold fs-3 mb-0'>
-															{progressAllSubtask(totalFailSubtask(task), task?.subtasks?.length)}%
+															{progressAllSubtask(
+																totalFailSubtask(task),
+																task?.subtasks?.length,
+															)}
+															%
 															<span className='text-danger fs-5 fw-bold ms-3'>
 																{totalFailSubtask(task)}
 																<Icon icon='TrendingFlat' />
 															</span>
 														</div>
 														<div className='text-muted'>
-															trên tổng số {task?.subtasks?.length} đầu việc .
+															trên tổng số {task?.subtasks?.length}{' '}
+															đầu việc .
 														</div>
 													</div>
 												</div>
 											</CardBody>
 										</Card>
 										<Card
-											className={`bg-l${darkModeStatus ? 'o25' : '25'
-												}-warning bg-l${darkModeStatus ? 'o50' : '10'
-												}-warning-hover transition-base rounded-2 mb-4`}
+											className={`bg-l${
+												darkModeStatus ? 'o25' : '25'
+											}-warning bg-l${
+												darkModeStatus ? 'o50' : '10'
+											}-warning-hover transition-base rounded-2 mb-4`}
 											shadow='sm'>
 											<CardHeader className='bg-transparent'>
 												<CardLabel>
 													<CardTitle tag='h4' className='h5'>
-														<Icon icon='ShowChart' color='danger' />&nbsp;
-														Chỉ số key
+														<Icon icon='ShowChart' color='danger' />
+														&nbsp; Chỉ số key
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>
 											<CardBody>
 												<div className='row g-4 align-items-center'>
 													{task?.keys?.map((item) => (
-														<div className='col-xl-6' key={item.key_name}>
+														<div
+															className='col-xl-6'
+															key={item.key_name}>
 															<div
 																className={classNames(
 																	'd-flex align-items-center rounded-2 p-3',
 																	{
-																		'bg-l10-warning': !darkModeStatus,
-																		'bg-lo25-warning': darkModeStatus,
+																		'bg-l10-warning':
+																			!darkModeStatus,
+																		'bg-lo25-warning':
+																			darkModeStatus,
 																	},
 																)}>
 																<div className='flex-shrink-0'>
-																	<Icon icon='DoneAll' size='3x' color='warning' />
+																	<Icon
+																		icon='DoneAll'
+																		size='3x'
+																		color='warning'
+																	/>
 																</div>
 																<div className='flex-grow-1 ms-3'>
-																	<div className='fw-bold fs-5 mb-0'>{item.key_value}</div>
+																	<div className='fw-bold fs-5 mb-0'>
+																		{item.key_value}
+																	</div>
 																	<div className='text-muted mt-n2 truncate-line-1'>
 																		{item.key_name}
 																	</div>
@@ -563,10 +626,13 @@ const TaskDetailPage = () => {
 											</CardHeader>
 											<CardBody>
 												<Card
-													className={`bg-l${darkModeStatus ? 'o25' : '25'
-														}-success bg-l${darkModeStatus ? 'o50' : '10'
-														}-success-hover transition-base rounded-2 mb-4`}
-													shadow='sm' style={{ width: '90%', marginLeft: '5%' }}>
+													className={`bg-l${
+														darkModeStatus ? 'o25' : '25'
+													}-success bg-l${
+														darkModeStatus ? 'o50' : '10'
+													}-success-hover transition-base rounded-2 mb-4`}
+													shadow='sm'
+													style={{ width: '90%', marginLeft: '5%' }}>
 													<CardBody>
 														<div className='row'>
 															<div className='col'>
@@ -579,7 +645,9 @@ const TaskDetailPage = () => {
 															</div>
 															<div className='col'>
 																<div className='fw-bold fs-2 mb-10'>
-																	{totalSuccessSubtaskOfTask(task)}
+																	{totalSuccessSubtaskOfTask(
+																		task,
+																	)}
 																</div>
 																<div className='text-muted'>
 																	Đã hoàn thành
@@ -619,26 +687,100 @@ const TaskDetailPage = () => {
 														<div className='row'>
 															<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 																<div className='d-flex align-items-center justify-content-center'>
-																	<div className='p-4' style={{ background: '#6C5DD3' }} />
-																	<span style={{ marginLeft: '1rem' }}>{subtasksDangThucHien(task)} đầu việc ({progressAllSubtask(subtasksDangThucHien(task), task?.subtasks?.length)}%)</span>
+																	<div
+																		className='p-4'
+																		style={{
+																			background: '#6C5DD3',
+																		}}
+																	/>
+																	<span
+																		style={{
+																			marginLeft: '1rem',
+																		}}>
+																		{subtasksDangThucHien(task)}{' '}
+																		đầu việc (
+																		{progressAllSubtask(
+																			subtasksDangThucHien(
+																				task,
+																			),
+																			task?.subtasks?.length,
+																		)}
+																		%)
+																	</span>
 																</div>
 															</div>
 															<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 																<div className='d-flex align-items-center justify-content-center'>
-																	<div className='p-4' style={{ background: '#FFA2C0' }} />
-																	<span style={{ marginLeft: '1rem' }}>{totalPendingSubtaskOfTask(task)} đầu việc ({progressAllSubtask(totalPendingSubtaskOfTask(task), task?.subtasks?.length)}%)</span>
+																	<div
+																		className='p-4'
+																		style={{
+																			background: '#FFA2C0',
+																		}}
+																	/>
+																	<span
+																		style={{
+																			marginLeft: '1rem',
+																		}}>
+																		{totalPendingSubtaskOfTask(
+																			task,
+																		)}{' '}
+																		đầu việc (
+																		{progressAllSubtask(
+																			totalPendingSubtaskOfTask(
+																				task,
+																			),
+																			task?.subtasks?.length,
+																		)}
+																		%)
+																	</span>
 																</div>
 															</div>
 															<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 																<div className='d-flex align-items-center justify-content-center'>
-																	<div className='p-4' style={{ background: '#46BCAA' }} />
-																	<span style={{ marginLeft: '1rem' }}>{totalSuccessSubtaskOfTask(task)} đầu việc ({progressAllSubtask(totalSuccessSubtaskOfTask(task), task?.subtasks?.length)}%)</span>
+																	<div
+																		className='p-4'
+																		style={{
+																			background: '#46BCAA',
+																		}}
+																	/>
+																	<span
+																		style={{
+																			marginLeft: '1rem',
+																		}}>
+																		{totalSuccessSubtaskOfTask(
+																			task,
+																		)}{' '}
+																		đầu việc (
+																		{progressAllSubtask(
+																			totalSuccessSubtaskOfTask(
+																				task,
+																			),
+																			task?.subtasks?.length,
+																		)}
+																		%)
+																	</span>
 																</div>
 															</div>
 															<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 																<div className='d-flex align-items-center justify-content-center'>
-																	<div className='p-4' style={{ background: 'blue' }} />
-																	<span style={{ marginLeft: '1rem' }}>{totalFailSubtask(task)} đầu việc ({progressAllSubtask(totalFailSubtask(task), task?.subtasks?.length)}%)</span>
+																	<div
+																		className='p-4'
+																		style={{
+																			background: 'blue',
+																		}}
+																	/>
+																	<span
+																		style={{
+																			marginLeft: '1rem',
+																		}}>
+																		{totalFailSubtask(task)} đầu
+																		việc (
+																		{progressAllSubtask(
+																			totalFailSubtask(task),
+																			task?.subtasks?.length,
+																		)}
+																		%)
+																	</span>
 																</div>
 															</div>
 														</div>
@@ -652,191 +794,239 @@ const TaskDetailPage = () => {
 						</Card>
 					</div>
 					<Card>
-						<CardHeader>
-							<CardLabel icon='Task' iconColor='danger'>
-								<CardTitle>
-									<CardLabel>Danh sách đầu việc</CardLabel>
-								</CardTitle>
-							</CardLabel>
-							<Button
-								color='success'
-								size='lg'
-								isLight
-								className='w-30 h-100'
-								onClick={() => handleOpenModal(0, 'add')}
-								icon='AddCircle'>
-								Thêm đầu việc
-							</Button>
-						</CardHeader>
-						<CardBody isScrollable style={{ height: '300px' }}>
-							<div className='table-responsive'>
-								<table className='table table-modern mb-0 align-middle' style={{ textAlign: 'center' }}>
-									<thead>
-										<tr>
-											<th>Ngày tạo</th>
-											<th>Tên đầu việc</th>
-											<th>Độ ưu tiên</th>
-											<th>Giá trị kpi</th>
-											<th>Hạn hoàn thành</th>
-											<th>Tiến độ công việc</th>
-											<th>Trạng thái</th>
-											<th>Hành động</th>
-										</tr>
-									</thead>
-									<tbody>
-										{subtask ? '' : <tr style={{ textAlign: 'center' }}><td>Chưa có đầu việc nào</td></tr>}
-										{subtask?.map((item) => (
-											<tr key={item.id}>
-												<td>
-													<div className='d-flex align-items-center'>
-														<span className='text-nowrap'>
+						<Tabs
+							defaultActiveKey='DetailSubtask'
+							id='uncontrolled-tab-example'
+							style={{ height: '50px', fontSize: '16px' }}>
+							<Tab
+								eventKey='DetailSubtask'
+								title='Chi tiết đầu việc'
+								className='mb-3'
+								style={{ paddingBottom: '15px' }}>
+								<CardHeader>
+									<CardLabel icon='Task' iconColor='danger'>
+										<CardTitle>
+											<CardLabel>Danh sách đầu việc</CardLabel>
+										</CardTitle>
+									</CardLabel>
+									<Button
+										color='success'
+										size='lg'
+										isLight
+										className='w-30 h-100'
+										onClick={() => handleOpenModal(0, 'add')}
+										icon='AddCircle'>
+										Thêm đầu việc
+									</Button>
+								</CardHeader>
+								<CardBody isScrollable style={{ height: '300px' }}>
+									<div className='table-responsive'>
+										<table
+											className='table table-modern mb-0 align-middle'
+											style={{ textAlign: 'center' }}>
+											<thead>
+												<tr>
+													<th>Ngày tạo</th>
+													<th>Tên đầu việc</th>
+													<th>Độ ưu tiên</th>
+													<th>Giá trị kpi</th>
+													<th>Hạn hoàn thành</th>
+													<th>Tiến độ công việc</th>
+													<th>Trạng thái</th>
+													<th>Hành động</th>
+												</tr>
+											</thead>
+											<tbody>
+												{subtask ? (
+													''
+												) : (
+													<tr style={{ textAlign: 'center' }}>
+														<td>Chưa có đầu việc nào</td>
+													</tr>
+												)}
+												{subtask?.map((item) => (
+													<tr key={item.id}>
+														<td>
+															<div className='d-flex align-items-center'>
+																<span className='text-nowrap'>
+																	{moment(
+																		`${item.estimate_date} ${item.estimate_time}`,
+																	).format('DD-MM-YYYY, HH:mm')}
+																</span>
+															</div>
+														</td>
+														<td>
+															<div>
+																<div>{item.name}</div>
+																<div className='small text-muted'>
+																	{item.departmnent?.name}
+																</div>
+															</div>
+														</td>
+														<td>
+															<span
+																style={{
+																	paddingRight: '1rem',
+																	paddingLeft: '1rem',
+																}}
+																className={classNames(
+																	'badge',
+																	'border border-2',
+																	// [`border-${themeStatus}`],
+																	'bg-success',
+																	'pt-2 pb-2 me-2',
+																	`bg-${priority(item.priority)}`,
+																)}>
+																<span className=''>{`Cấp ${item.priority}`}</span>
+															</span>
+														</td>
+														<td>{item.kpi_value}</td>
+														<td>
 															{moment(
-																`${item.estimate_date} ${item.estimate_time}`,
+																`${item.deadline_date} ${item.deadline_time}`,
 															).format('DD-MM-YYYY, HH:mm')}
-														</span>
-													</div>
-												</td>
-												<td>
-													<div>
-														<div>{item.name}</div>
-														<div className='small text-muted'>
-															{item.departmnent?.name}
-														</div>
-													</div>
-												</td>
-												<td>
-													<span
-														style={{
-															paddingRight: '1rem',
-															paddingLeft: '1rem',
-														}}
-														className={classNames(
-															'badge',
-															'border border-2',
-															// [`border-${themeStatus}`],
-															'bg-success',
-															'pt-2 pb-2 me-2',
-															`bg-${priority(item.priority)}`,
-														)}>
-														<span className=''>{`Cấp ${item.priority}`}</span>
-													</span>
-												</td>
-												<td>{item.kpi_value}</td>
-												<td>
-													{moment(
-														`${item.deadline_date} ${item.deadline_time}`,
-													).format('DD-MM-YYYY, HH:mm')}
-												</td>
-												<td>
-													<Progress isAutoColor value={progressSubtask(item)} height={10} />
-												</td>
-												<td>
-													<Icon
-														icon='Circle'
-														color={color(item.status).color} />
-													{color(item.status).name}
-												</td>
-												<td>
-													<Dropdown>
-														<DropdownToggle hasIcon={false}>
-															<Button icon='MoreHoriz' />
-														</DropdownToggle>
-														<DropdownMenu isAlignmentEnd>
-															<DropdownItem>
-																<Button icon='Delete' onClick={() => handleOpenConfirm(item)}>
-																	Delete
-																</Button>
-
-															</DropdownItem>
-															<DropdownItem>
-																<Button icon='Edit' onClick={() => handleOpenModal(item.id, 'edit')}>
-																	Edit
-																</Button>
-															</DropdownItem>
-														</DropdownMenu>
-													</Dropdown>
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
-						</CardBody>
-					</Card>
-					<Card>
-						<CardHeader>
-							<CardLabel icon='ContactSupport' iconColor='secondary'>
-								<CardTitle tag='h4' className='h5'>
-									Đầu việc chờ xác nhận
-								</CardTitle>
-								<CardSubTitle tag='h5' className='h6'>
-									Người kiểm duyệt : {task?.user?.name}
-								</CardSubTitle>
-							</CardLabel>
-						</CardHeader>
-						<CardBody isScrollable style={{ height: '300px' }}>
-							<div className='table-responsive'>
-								<table className='table table-modern mb-0 align-middle' style={{ textAlign: 'center' }}>
-									<thead>
-										<tr>
-											<th>Ngày nộp</th>
-											<th>Lời nhắn</th>
-											<th>Người yêu cầu xác nhận</th>
-											<th>Tên đầu việc</th>
-											<th>Thời gian làm</th>
-											<th>KPI</th>
-											<th>Trạng thái</th>
-											<th>Hành động</th>
-										</tr>
-									</thead>
-									<tbody>
-										{subtask ? '' : <tr style={{ textAlign: 'center' }}><td>Chưa có đầu việc nào</td></tr>}
-										{subtask?.map((item) => (
-											<tr key={item.id}>
-												<td>
-													<div className='d-flex align-items-center'>
-														<span className='text-nowrap'>
-															{moment(
-																`${item.estimate_date} ${item.estimate_time}`,
-															).format('DD-MM-YYYY, HH:mm')}
-														</span>
-													</div>
-												</td>
-												<td>{item.name}</td>
-												<td>{item?.user?.name}</td>
-												<td>{item.name}</td>
-												<td>20h</td>
-												<td>{item?.kpi_value}</td>
-												<td>
-													<Icon
-														icon='Circle'
-														color={color(item.status).color} />
-													{color(item.status).name}
-												</td>
-												<td>
-													<Button
-														isOutline={!darkModeStatus}
-														color='success'
-														isLight={darkModeStatus}
-														className='text-nowrap mx-2'
-														icon='Edit'>
-														Xác nhận
-													</Button>
-													<Button
-														isOutline={!darkModeStatus}
-														color='danger'
-														isLight={darkModeStatus}
-														className='text-nowrap mx-2 '
-														icon='Trash'>
-														Từ chối
-													</Button>
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
-						</CardBody>
+														</td>
+														<td>
+															<Progress
+																isAutoColor
+																value={progressSubtask(item)}
+																height={10}
+															/>
+														</td>
+														<td>
+															<Icon
+																icon='Circle'
+																color={color(item.status).color}
+															/>
+															{color(item.status).name}
+														</td>
+														<td>
+															<Dropdown>
+																<DropdownToggle hasIcon={false}>
+																	<Button icon='MoreHoriz' />
+																</DropdownToggle>
+																<DropdownMenu isAlignmentEnd>
+																	<DropdownItem>
+																		<Button
+																			icon='Delete'
+																			onClick={() =>
+																				handleOpenConfirm(
+																					item,
+																				)
+																			}>
+																			Delete
+																		</Button>
+																	</DropdownItem>
+																	<DropdownItem>
+																		<Button
+																			icon='Edit'
+																			onClick={() =>
+																				handleOpenModal(
+																					item.id,
+																					'edit',
+																				)
+																			}>
+																			Edit
+																		</Button>
+																	</DropdownItem>
+																</DropdownMenu>
+															</Dropdown>
+														</td>
+													</tr>
+												))}
+											</tbody>
+										</table>
+									</div>
+								</CardBody>
+							</Tab>
+							<Tab
+								eventKey='SubmitSubtask'
+								title='Xác nhận hoàn thành'
+								style={{ paddingBottom: '15px' }}>
+								<CardHeader>
+									<CardLabel icon='ContactSupport' iconColor='secondary'>
+										<CardTitle tag='h4' className='h5'>
+											Đầu việc chờ xác nhận
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Người kiểm duyệt : {task?.user?.name}
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody isScrollable style={{ height: '300px' }}>
+									<div className='table-responsive'>
+										<table
+											className='table table-modern mb-0 align-middle'
+											style={{ textAlign: 'center' }}>
+											<thead>
+												<tr>
+													<th>Ngày nộp</th>
+													<th>Lời nhắn</th>
+													<th>Người yêu cầu xác nhận</th>
+													<th>Tên đầu việc</th>
+													<th>Thời gian làm</th>
+													<th>KPI</th>
+													<th>Trạng thái</th>
+													<th>Hành động</th>
+												</tr>
+											</thead>
+											<tbody>
+												{subtask ? (
+													''
+												) : (
+													<tr style={{ textAlign: 'center' }}>
+														<td>Chưa có đầu việc nào</td>
+													</tr>
+												)}
+												{subtask?.map((item) => (
+													<tr key={item.id}>
+														<td>
+															<div className='d-flex align-items-center'>
+																<span className='text-nowrap'>
+																	{moment(
+																		`${item.estimate_date} ${item.estimate_time}`,
+																	).format('DD-MM-YYYY, HH:mm')}
+																</span>
+															</div>
+														</td>
+														<td>{item.name}</td>
+														<td>{item?.user?.name}</td>
+														<td>{item.name}</td>
+														<td>20h</td>
+														<td>{item?.kpi_value}</td>
+														<td>
+															<Icon
+																icon='Circle'
+																color={color(item.status).color}
+															/>
+															{color(item.status).name}
+														</td>
+														<td>
+															<Button
+																isOutline={!darkModeStatus}
+																color='success'
+																isLight={darkModeStatus}
+																className='text-nowrap mx-2'
+																icon='Edit'>
+																Xác nhận
+															</Button>
+															<Button
+																isOutline={!darkModeStatus}
+																color='danger'
+																isLight={darkModeStatus}
+																className='text-nowrap mx-2 '
+																icon='Trash'>
+																Từ chối
+															</Button>
+														</td>
+													</tr>
+												))}
+											</tbody>
+										</table>
+									</div>
+								</CardBody>
+							</Tab>
+						</Tabs>
 					</Card>
 				</div>
 				<ComfirmSubtask
@@ -855,8 +1045,8 @@ const TaskDetailPage = () => {
 					id={parseInt(params?.id, 10)}
 					idEdit={idEdit}
 				/>
-			</Page >
-		</PageWrapper >
+			</Page>
+		</PageWrapper>
 	);
 };
 export default TaskDetailPage;
