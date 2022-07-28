@@ -14,6 +14,11 @@
       "id": 3,
       "name": "Phòng Cung ứng",
       "slug": "supply"
+    },
+    {
+      "id": 4,
+      "name": "Phòng IT",
+      "slug": "it"
     }
   ],
   "users": [
@@ -24,7 +29,7 @@
         "name": "Phòng Marketing",
         "slug": "mkt"
       },
-      "name": "Nhân viên 1 - Phòng Marketing",
+      "name": "Nguyễn Văn A",
       "email": "employee1@mastertran.vn",
       "phone": "113"
     },
@@ -35,7 +40,7 @@
         "name": "Phòng Marketing",
         "slug": "mkt"
       },
-      "name": "Nhân viên 2 - Phòng Marketing",
+      "name": "Nguyễn Văn B",
       "email": "employee2@mastertran.vn",
       "phone": "114"
     },
@@ -46,18 +51,40 @@
         "name": "Phòng Kinh doanh",
         "slug": "sales"
       },
-      "name": "Nhân viên 1 - Phòng Kinh doanh",
+      "name": "Nguyễn Văn C",
       "email": "employee3@mastertran.vn",
       "phone": "115"
     },
     {
       "id": 4,
       "department": {
-        "id": 2,
-        "name": "Phòng Kinh doanh",
-        "slug": "sales"
+        "id": 4,
+        "name": "Phòng IT",
+        "slug": "it"
       },
-      "name": "Nhân viên 2 - Phòng Kinh doanh",
+      "name": "Phan Minh Hải",
+      "email": "employee4@mastertran.vn",
+      "phone": "116"
+    },
+    {
+      "id": 5,
+      "department": {
+        "id": 4,
+        "name": "Phòng IT",
+        "slug": "it"
+      },
+      "name": "Nguyễn Ngọc Bảo",
+      "email": "employee4@mastertran.vn",
+      "phone": "116"
+    },
+    {
+      "id": 6,
+      "department": {
+        "id": 4,
+        "name": "Phòng IT",
+        "slug": "it"
+      },
+      "name": "Nguyễn Công Hướng",
       "email": "employee4@mastertran.vn",
       "phone": "116"
     }
@@ -65,64 +92,19 @@
   "missions": [
     {
       "id": 1,
-      "name": "Mở rộng thị trường miền Trung",
-      "description": "Mô tả nhiệm vụ 1",
+      "name": "Phát triển phần mềm cho công ty Mastertran",
+      "description": "Phát triển các phần mềm DWT, S-Contract, Docca cho công ty Mastertran",
       "status": 0,
       "kpi_value": 100,
       "current_kpi_value": 80,
-      "start_time": "2022-07-20",
-      "end_time": "2022-12-20",
-      "keys": [
-        {
-          "key_name": "Doanh thu",
-          "key_value": "500 tỷ"
-        },
-        {
-          "key_name": "Mở mới khách hàng",
-          "key_value": "120%"
-        }
-      ],
+      "start_time": "2022-08-01",
+      "end_time": "2022-12-01",
+      "keys": [],
       "departments": [
         {
-          "id": 1,
-          "name": "Phòng Marketing",
-          "slug": "mkt"
-        },
-        {
-          "id": 2,
-          "name": "Phòng Kinh doanh",
-          "slug": "sales"
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "name": "Mở rộng thị trường miền Nam",
-      "description": "Mở rộng thị trường miền Nam",
-      "kpi_value": 200,
-      "current_kpi_value": 40,
-      "start_time": "2022-07-20",
-      "end_time": "2022-07-30",
-      "status": 1,
-      "keys": [
-        {
-          "key_name": "Doanh thu",
-          "key_value": "500 tỷ"
-        },
-        {
-          "key_name": "Mở mới khách hàng",
-          "key_value": "120%"
-        },
-        {
-          "key_name": "Đơn hàng",
-          "key_value": "10000"
-        }
-      ],
-      "departments": [
-        {
-          "id": 2,
-          "name": "Phòng Kinh doanh",
-          "slug": "sales"
+          "id": 4,
+          "name": "Phòng IT",
+          "slug": "it"
         }
       ]
     }
@@ -132,144 +114,86 @@
       "id": 1,
       "mission_id": 1,
       "department": {
-        "id": 2,
-        "name": "Phòng Kinh doanh"
+        "id": 4,
+        "name": "Phòng IT",
+        "slug": "it"
       },
-      "departments_related": [
-        {
-          "id": 1,
-          "name": "Phòng Marketing",
-          "slug": "mkt"
-        },
-        {
-          "id": 3,
-          "name": "Phòng Cung ứng",
-          "slug": "supply"
-        }
-      ],
+      "departments_related": [],
       "user": {
-        "id": 1,
-        "name": "Nhân viên 1"
+        "id": 4,
+        "name": "Phan Minh Hải"
       },
       "users_related": [
         {
-          "id": 2,
-          "name": "Nhân viên 2"
+          "id": 5,
+          "name": "Nguyễn Ngọc Bảo"
         },
         {
-          "id": 3,
-          "name": "Nhân viên 3"
+          "id": 6,
+          "name": "Nguyễn Công Hướng"
         }
       ],
-      "name": "Công việc 1 - Nhiệm vụ 1",
-      "description": "Mô tả cônng việc 1 - Nhiệm vụ 1",
+      "name": "Phát triển phần mềm DWT",
+      "description": "Phát triển phần mềm DWT cho công ty",
       "kpi_value": 40,
-      "estimate_date": "2022-07-20",
+      "estimate_date": "2022-12-01",
       "estimate_time": "08:00",
-      "deadline_date": "2022-07-20",
+      "deadline_date": "2022-12-01",
       "deadline_time": "17:00",
-      "percent": 30,
       "priority": 2,
       "status": 0,
-      "keys": [
-        {
-          "key_name": "Doanh thu",
-          "key_value": "100 triệu"
-        }
-      ],
+      "keys": [],
       "subtasks": [
         {
           "id": 1,
           "task_id": 1,
           "department": {
-            "id": 2,
-            "name": "Phòng Kinh doanh"
+            "id": 4,
+            "name": "Phòng IT",
+            "slug": "it"
           },
-          "departments_related": [
-            {
-              "id": 1,
-              "name": "Phòng Marketing",
-              "slug": "mkt"
-            },
-            {
-              "id": 3,
-              "name": "Phòng Cung ứng",
-              "slug": "supply"
-            }
-          ],
+          "departments_related": [],
           "user": {
-            "id": 1,
-            "name": "Nhân viên 1"
+            "id": 4,
+            "name": "Phan Minh Hải"
           },
           "users_related": [
             {
-              "id": 2,
-              "name": "Nhân viên 2"
+              "id": 5,
+              "name": "Nguyễn Ngọc Bảo"
             },
             {
-              "id": 3,
-              "name": "Nhân viên 3"
+              "id": 6,
+              "name": "Nguyễn Công Hướng"
             }
           ],
-          "name": "Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-          "description": "Mô tả Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+          "name": "Phát triển chức năng phía client",
+          "description": "Phát triển chức năng phía client",
           "kpi_value": 10,
-          "estimate_date": "2022-07-20",
+          "estimate_date": "2022-12-01",
           "estimate_time": "08:00",
-          "deadline_date": "2022-07-20",
+          "deadline_date": "2022-12-01",
           "deadline_time": "17:00",
-          "percent": 30,
           "priority": 2,
-          "status": 1,
-          "keys": [
-            {
-              "key_name": "Doanh thu",
-              "key_value": "20 triệu"
-            }
-          ],
+          "status": 0,
+          "keys": [],
           "steps": [
             {
-              "id": 1,
-              "task_id": 1,
-              "subtask_id": 1,
-              "name": "Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "status": 1
-            },
-            {
-              "id": 2,
-              "task_id": 1,
-              "subtask_id": 1,
-              "name": "Bước 2 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "status": 0
-            },
-            {
-              "name": "Testttt",
-              "description": "Testttt",
-              "status": 2,
-              "partner": "Nhân viên 1 - Phòng Marketing",
-              "task_id": 1,
-              "subtask_id": 1,
-              "id": 3
-            },
-            {
-              "name": "Bước 3 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Bước 3 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "name": "Phát triển giao diện trang chủ",
+              "description": "Phát triển giao diện trang chủ",
               "status": 0,
               "partner": "",
               "task_id": 1,
               "subtask_id": 1,
-              "id": 4
+              "id": 1
             },
             {
-              "name": "Failure",
-              "description": "Failure",
-              "status": 3,
-              "partner": "",
+              "id": 2,
               "task_id": 1,
               "subtask_id": 1,
-              "id": 5
+              "name": "Phát triển giao diện trang đăng nhập",
+              "description": "Phát triển giao diện trang đăng nhập",
+              "status": 0
             }
           ]
         },
@@ -277,79 +201,53 @@
           "id": 2,
           "task_id": 1,
           "department": {
-            "id": 2,
-            "name": "Phòng Kinh doanh"
+            "id": 4,
+            "name": "Phòng IT",
+            "slug": "it"
           },
-          "departments_related": [
-            {
-              "id": 1,
-              "name": "Phòng Marketing",
-              "slug": "mkt"
-            },
-            {
-              "id": 3,
-              "name": "Phòng Cung ứng",
-              "slug": "supply"
-            }
-          ],
+          "departments_related": [],
           "user": {
-            "id": 1,
-            "name": "Nhân viên 1"
+            "id": 4,
+            "name": "Phan Minh Hải"
           },
           "users_related": [
             {
-              "id": 2,
-              "name": "Nhân viên 2"
+              "id": 5,
+              "name": "Nguyễn Ngọc Bảo"
             },
             {
-              "id": 3,
-              "name": "Nhân viên 3"
+              "id": 6,
+              "name": "Nguyễn Công Hướng"
             }
           ],
-          "name": "Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-          "description": "Mô tả Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
+          "name": "Phát triển chức năng phía admin",
+          "description": "Phát triển chức năng phía admin",
           "kpi_value": 30,
-          "estimate_date": "2022-07-20",
+          "estimate_date": "2022-12-01",
           "estimate_time": "08:00",
-          "deadline_date": "2022-07-20",
+          "deadline_date": "2022-12-01",
           "deadline_time": "17:00",
-          "percent": 30,
           "priority": 2,
           "status": 0,
-          "keys": null,
+          "keys": [],
           "steps": [
             {
-              "id": 1,
-              "task_id": 1,
-              "subtask_id": 2,
-              "name": "Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-              "status": 1
-            },
-            {
-              "id": 1,
-              "task_id": 1,
-              "subtask_id": 2,
-              "name": "Bước 2 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-              "status": 1
-            },
-            {
-              "id": 1,
-              "task_id": 1,
-              "subtask_id": 2,
-              "name": "Bước 3 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-              "status": 0
-            },
-            {
-              "name": "Test DWT",
-              "description": "Test DWT",
+              "name": "Phát triển giao diện trang dashboard",
+              "description": "Phát triển giao diện trang dashboard",
               "status": 0,
               "partner": "",
               "task_id": 1,
               "subtask_id": 2,
-              "id": 4
+              "id": 1
+            },
+            {
+              "name": "Phát triển giao diện trang quản lý mục tiêu",
+              "description": "Phát triển giao diện trang quản lý mục tiêu",
+              "status": 0,
+              "partner": "",
+              "task_id": 1,
+              "subtask_id": 2,
+              "id": 2
             }
           ]
         }
@@ -357,348 +255,86 @@
     },
     {
       "id": 2,
-      "mission_id": 2,
-      "department": {
-        "id": 2,
-        "name": "Phòng Kinh doanh"
-      },
-      "departments_related": [
-        {
-          "id": 1,
-          "name": "Phòng Marketing",
-          "slug": "mkt"
-        },
-        {
-          "id": 3,
-          "name": "Phòng Cung ứng",
-          "slug": "supply"
-        }
-      ],
-      "user": {
-        "id": 1,
-        "name": "Nhân viên 1"
-      },
-      "users_related": [
-        {
-          "id": 2,
-          "name": "Nhân viên 2"
-        },
-        {
-          "id": 3,
-          "name": "Nhân viên 3"
-        }
-      ],
-      "name": "Công việc 1 - Nhiệm vụ 2",
-      "description": "Mô tả công việc 1 - Nhiệm vụ 2",
-      "kpi_value": 40,
-      "priority": 5,
-      "status": 0,
-      "estimate_date": "2022-07-20",
-      "estimate_time": "08:00",
-      "deadline_date": "2022-07-20",
-      "deadline_time": "17:00",
-      "percent": 30,
-      "keys": null,
-      "subtasks": [
-        {
-          "id": 1,
-          "task_id": 2,
-          "department": {
-            "id": 2,
-            "name": "Phòng Kinh doanh"
-          },
-          "departments_related": [
-            {
-              "id": 1,
-              "name": "Phòng Marketing",
-              "slug": "mkt"
-            },
-            {
-              "id": 3,
-              "name": "Phòng Cung ứng",
-              "slug": "supply"
-            }
-          ],
-          "user": {
-            "id": 1,
-            "name": "Nhân viên 1"
-          },
-          "users_related": [
-            {
-              "id": 2,
-              "name": "Nhân viên 2"
-            },
-            {
-              "id": 3,
-              "name": "Nhân viên 3"
-            }
-          ],
-          "name": "Đầu việc 1 - Công việc 1 - Nhiệm vụ 2",
-          "description": "Mô tả Đầu việc 1 - Công việc 1 - Nhiệm vụ 2",
-          "kpi_value": 10,
-          "estimate_date": "2022-07-20",
-          "estimate_time": "08:00",
-          "deadline_date": "2022-07-20",
-          "deadline_time": "17:00",
-          "percent": 30,
-          "priority": 2,
-          "status": 1,
-          "keys": null,
-          "steps": [
-            {
-              "id": 1,
-              "task_id": 2,
-              "subtask_id": 1,
-              "name": "Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 2",
-              "description": "Mô tả Bước 1 - Đầu việc 1- Công việc 1 - Nhiệm vụ 2",
-              "status": 1
-            },
-            {
-              "id": 2,
-              "task_id": 2,
-              "subtask_id": 1,
-              "name": "Bước 2 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 2",
-              "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 2",
-              "status": 0
-            }
-          ]
-        },
-        {
-          "id": 2,
-          "task_id": 2,
-          "department": {
-            "id": 2,
-            "name": "Phòng Kinh doanh"
-          },
-          "departments_related": [
-            {
-              "id": 1,
-              "name": "Phòng Marketing",
-              "slug": "mkt"
-            },
-            {
-              "id": 3,
-              "name": "Phòng Cung ứng",
-              "slug": "supply"
-            }
-          ],
-          "user": {
-            "id": 1,
-            "name": "Nhân viên 1"
-          },
-          "users_related": [
-            {
-              "id": 2,
-              "name": "Nhân viên 2"
-            },
-            {
-              "id": 3,
-              "name": "Nhân viên 3"
-            }
-          ],
-          "name": "Đầu việc 2 - Công việc 1 - Nhiệm vụ 2",
-          "description": "Mô tả Đầu việc 2 - Công việc 1 - Nhiệm vụ 2",
-          "kpi_value": 10,
-          "estimate_date": "2022-07-20",
-          "estimate_time": "08:00",
-          "deadline_date": "2022-07-20",
-          "deadline_time": "17:00",
-          "percent": 30,
-          "priority": 2,
-          "status": 1,
-          "keys": null,
-          "steps": [
-            {
-              "id": 1,
-              "task_id": 2,
-              "subtask_id": 2,
-              "name": "Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 2",
-              "description": "Mô tả Bước 1 - Đầu việc 2- Công việc 1 - Nhiệm vụ 2",
-              "status": 1
-            },
-            {
-              "id": 2,
-              "task_id": 2,
-              "subtask_id": 2,
-              "name": "Bước 2 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 2",
-              "description": "Mô tả Bước 2 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 2",
-              "status": 0
-            }
-          ]
-        },
-        {
-          "id": 3,
-          "task_id": 2,
-          "department": {
-            "id": 2,
-            "name": "Phòng Kinh doanh"
-          },
-          "departments_related": [
-            {
-              "id": 1,
-              "name": "Phòng Marketing",
-              "slug": "mkt"
-            },
-            {
-              "id": 3,
-              "name": "Phòng Cung ứng",
-              "slug": "supply"
-            }
-          ],
-          "user": {
-            "id": 1,
-            "name": "Nhân viên 1"
-          },
-          "users_related": [
-            {
-              "id": 2,
-              "name": "Nhân viên 2"
-            },
-            {
-              "id": 3,
-              "name": "Nhân viên 3"
-            }
-          ],
-          "name": "Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
-          "description": "Mô tả Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
-          "kpi_value": 20,
-          "estimate_date": "2022-07-20",
-          "estimate_time": "08:00",
-          "deadline_date": "2022-07-20",
-          "deadline_time": "17:00",
-          "percent": 30,
-          "priority": 2,
-          "status": 1,
-          "keys": null,
-          "steps": [
-            {
-              "id": 1,
-              "task_id": 2,
-              "subtask_id": 3,
-              "name": "Bước 1 - Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
-              "description": "Mô tả Bước 1 - Đầu việc 3- Công việc 1 - Nhiệm vụ 2",
-              "status": 0
-            },
-            {
-              "id": 2,
-              "task_id": 2,
-              "subtask_id": 3,
-              "name": "Bước 2 - Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
-              "description": "Mô tả Bước 2 - Đầu việc 3 - Công việc 1 - Nhiệm vụ 2",
-              "status": 0
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": 3,
       "mission_id": 1,
       "department": {
-        "id": 2,
-        "name": "Phòng Kinh doanh"
+        "id": 4,
+        "name": "Phòng IT",
+        "slug": "it"
       },
-      "departments_related": [
-        {
-          "id": 1,
-          "name": "Phòng Marketing",
-          "slug": "mkt"
-        },
-        {
-          "id": 3,
-          "name": "Phòng Cung ứng",
-          "slug": "supply"
-        }
-      ],
+      "departments_related": [],
       "user": {
-        "id": 1,
-        "name": "Nhân viên 1"
+        "id": 4,
+        "name": "Phan Minh Hải"
       },
       "users_related": [
         {
-          "id": 2,
-          "name": "Nhân viên 2"
+          "id": 5,
+          "name": "Nguyễn Ngọc Bảo"
         },
         {
-          "id": 3,
-          "name": "Nhân viên 3"
+          "id": 6,
+          "name": "Nguyễn Công Hướng"
         }
       ],
-      "name": "Công việc 2 - Nhiệm vụ 1",
-      "description": "Mô tả cônng việc 2 - Nhiệm vụ 1",
+      "name": "Phát triển phần mềm S-Contract",
+      "description": "Phát triển phần mềm S-Contract cho công ty",
       "kpi_value": 40,
-      "estimate_date": "2022-07-20",
+      "estimate_date": "2022-12-01",
       "estimate_time": "08:00",
-      "deadline_date": "2022-07-20",
+      "deadline_date": "2022-12-01",
       "deadline_time": "17:00",
-      "priority": 4,
+      "priority": 2,
       "status": 0,
-      "keys": [
-        {
-          "key_name": "Đơn hàng",
-          "key_value": "1000"
-        }
-      ],
+      "keys": [],
       "subtasks": [
         {
           "id": 1,
           "task_id": 1,
           "department": {
-            "id": 2,
-            "name": "Phòng Kinh doanh"
+            "id": 4,
+            "name": "Phòng IT",
+            "slug": "it"
           },
-          "departments_related": [
-            {
-              "id": 1,
-              "name": "Phòng Marketing",
-              "slug": "mkt"
-            },
-            {
-              "id": 3,
-              "name": "Phòng Cung ứng",
-              "slug": "supply"
-            }
-          ],
+          "departments_related": [],
           "user": {
-            "id": 1,
-            "name": "Nhân viên 1"
+            "id": 4,
+            "name": "Phan Minh Hải"
           },
           "users_related": [
             {
-              "id": 2,
-              "name": "Nhân viên 2"
+              "id": 5,
+              "name": "Nguyễn Ngọc Bảo"
             },
             {
-              "id": 3,
-              "name": "Nhân viên 3"
+              "id": 6,
+              "name": "Nguyễn Công Hướng"
             }
           ],
-          "name": "Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-          "description": "Mô tả Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+          "name": "Phát triển chức năng phía client",
+          "description": "Phát triển chức năng phía client",
           "kpi_value": 10,
-          "estimate_date": "2022-07-20",
+          "estimate_date": "2022-12-01",
           "estimate_time": "08:00",
-          "deadline_date": "2022-07-20",
+          "deadline_date": "2022-12-01",
           "deadline_time": "17:00",
-          "percent": 30,
           "priority": 2,
-          "status": 1,
-          "keys": null,
+          "status": 0,
+          "keys": [],
           "steps": [
             {
               "id": 1,
-              "task_id": 1,
+              "task_id": 2,
               "subtask_id": 1,
-              "name": "Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "name": "Phát triển giao diện trang chủ",
+              "description": "Phát triển giao diện trang chủ",
               "status": 0
             },
             {
               "id": 2,
-              "task_id": 1,
+              "task_id": 2,
               "subtask_id": 1,
-              "name": "Bước 2 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "name": "Phát triển giao diện trang đăng ký hợp đồng",
+              "description": "Phát triển giao diện trang đăng ký hợp đồng",
               "status": 0
             }
           ]
@@ -707,53 +343,50 @@
           "id": 2,
           "task_id": 1,
           "department": {
-            "id": 2,
-            "name": "Phòng Kinh doanh"
+            "id": 4,
+            "name": "Phòng IT",
+            "slug": "it"
           },
-          "departments_related": [
-            {
-              "id": 1,
-              "name": "Phòng Marketing",
-              "slug": "mkt"
-            },
-            {
-              "id": 3,
-              "name": "Phòng Cung ứng",
-              "slug": "supply"
-            }
-          ],
+          "departments_related": [],
           "user": {
-            "id": 1,
-            "name": "Nhân viên 1"
+            "id": 4,
+            "name": "Phan Minh Hải"
           },
           "users_related": [
             {
-              "id": 2,
-              "name": "Nhân viên 2"
+              "id": 5,
+              "name": "Nguyễn Ngọc Bảo"
             },
             {
-              "id": 3,
-              "name": "Nhân viên 3"
+              "id": 6,
+              "name": "Nguyễn Công Hướng"
             }
           ],
-          "name": "Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-          "description": "Mô tả Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
+          "name": "Phát triển chức năng phía admin",
+          "description": "Phát triển chức năng phía admin",
           "kpi_value": 30,
-          "estimate_date": "2022-07-20",
+          "estimate_date": "2022-12-01",
           "estimate_time": "08:00",
-          "deadline_date": "2022-07-20",
+          "deadline_date": "2022-12-01",
           "deadline_time": "17:00",
-          "percent": 30,
           "priority": 2,
-          "status": 1,
-          "keys": null,
+          "status": 0,
+          "keys": [],
           "steps": [
             {
               "id": 1,
               "task_id": 1,
               "subtask_id": 2,
-              "name": "Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
-              "description": "Mô tả Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
+              "name": "Phát triển giao diện trang dashboard",
+              "description": "Phát triển giao diện trang dashboard",
+              "status": 0
+            },
+            {
+              "id": 2,
+              "task_id": 1,
+              "subtask_id": 2,
+              "name": "Phát triển giao diện trang quản lý thông tin hợp đồng",
+              "description": "Phát triển giao diện trang quản lý thông tin hợp đồng",
               "status": 0
             }
           ]

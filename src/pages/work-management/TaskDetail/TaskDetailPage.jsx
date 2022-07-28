@@ -136,18 +136,7 @@ const TaskDetailPage = () => {
 		fetchSubtasks(parseInt(params?.id, 10));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-	// React.useEffect(() => {
-	// 	task?.subtasks?.map((item) => {
-	// 		if (item.status === 2) {
-	// 			setSubTaskPending({
-	// 				...subtaskPending,
-	// 				item,
-	// 			})
-	// 		}
-	// 		return 0
-	// 	})
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [task])
+
 	React.useEffect(() => {
 		setSubTask(task.subtasks);
 	}, [task]);

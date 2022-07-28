@@ -53,7 +53,7 @@ const minWidth100 = {
 const Item = ({ id, name, teamName, percent, dueDate }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`../${demoPages.quanLyCongViec.subMenu.danhSach.path}/${id}`),
+		() => navigate(`../${demoPages.quanLyCongViec.subMenu.congViec.path}/${id}`),
 		[id, navigate],
 	);
 	return (
