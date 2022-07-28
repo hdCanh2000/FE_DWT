@@ -542,7 +542,7 @@ const TaskDetailPage = () => {
 																	<Icon icon='DoneAll' size='3x' color='warning' />
 																</div>
 																<div className='flex-grow-1 ms-3'>
-																	<div className='fw-bold fs-3 mb-0'>{item.key_value}</div>
+																	<div className='fw-bold fs-5 mb-0'>{item.key_value}</div>
 																	<div className='text-muted mt-n2 truncate-line-1'>
 																		{item.key_name}
 																	</div>
