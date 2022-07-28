@@ -13,6 +13,7 @@ import Card, {
 	CardLabel,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
+import { FORMAT_TASK_STATUS } from '../../../utils/constants';
 import { addStepIntoSubtask, getTaskById } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -445,6 +446,24 @@ const SubTaskPage = () => {
 																		Giá trị KPI:{' '}
 																	</span>
 																	{subtask.kpi_value}
+																</div>
+															</div>
+														</div>
+													</div>
+													<div className='col-12 mb-4'>
+														<div className='d-flex align-items-center'>
+															<div className='flex-shrink-0'>
+																<Icon
+																	icon='Dash'
+																	size='2x'
+																	color='danger'
+																/>
+															</div>
+															<div className='flex-grow-1 ms-3'>
+																<div className='fw-bold fs-5 mb-0'>
+																	{FORMAT_TASK_STATUS(
+																		subtask?.status,
+																	)}
 																</div>
 															</div>
 														</div>

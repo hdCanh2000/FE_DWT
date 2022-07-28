@@ -69,7 +69,7 @@
       "description": "Mô tả nhiệm vụ 1",
       "status": 0,
       "kpi_value": 100,
-      "current_kpi_value": 90,
+      "current_kpi_value": 80,
       "start_time": "2022-07-20",
       "end_time": "2022-12-20",
       "keys": [
@@ -125,88 +125,6 @@
           "slug": "sales"
         }
       ]
-    },
-    {
-      "id": 3,
-      "name": "Mở rộng thi trường Lào",
-      "description": "Mở rộng thị trường Lào",
-      "kpi_value": 100,
-      "current_kpi_value": 0,
-      "start_time": "2022-07-21",
-      "end_time": "2022-07-21",
-      "status": 1,
-      "keys": [
-        {
-          "key_name": "Doanh thu",
-          "key_value": "100 tỷ"
-        },
-        {
-          "key_name": "Đơn hàng",
-          "key_value": "10000 đơn"
-        }
-      ],
-      "departments": [
-        {
-          "id": 1,
-          "name": "Phòng Marketing",
-          "slug": "mkt"
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "name": "Test",
-      "description": "Test",
-      "kpi_value": 100,
-      "current_kpi_value": 0,
-      "start_time": "2022-07-21",
-      "end_time": "2022-07-21",
-      "status": 1,
-      "keys": [
-        {
-          "key_name": "xx",
-          "key_value": "xxx"
-        }
-      ],
-      "departments": [
-        {
-          "id": 1,
-          "name": "Phòng Marketing",
-          "slug": "mkt"
-        },
-        {
-          "id": 2,
-          "name": "Phòng Kinh doanh",
-          "slug": "sales"
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "name": "BBB",
-      "description": "",
-      "kpi_value": 100,
-      "start_time": "2022-07-26",
-      "end_time": "2022-07-26",
-      "status": 1,
-      "keys": [
-        {
-          "key_name": "xx",
-          "key_value": "xxx",
-          "error": {
-            "key_name": null,
-            "key_value": null
-          }
-        }
-      ],
-      "current_kpi_value": 0,
-      "departments": [
-        {
-          "id": 1,
-          "name": "Phòng Marketing",
-          "slug": "mkt"
-        }
-      ]
     }
   ],
   "tasks": [
@@ -256,7 +174,7 @@
       "keys": [
         {
           "key_name": "Doanh thu",
-          "key_value": "100tr"
+          "key_value": "100 triệu"
         }
       ],
       "subtasks": [
@@ -303,7 +221,12 @@
           "percent": 30,
           "priority": 2,
           "status": 1,
-          "keys": null,
+          "keys": [
+            {
+              "key_name": "Doanh thu",
+              "key_value": "20 triệu"
+            }
+          ],
           "steps": [
             {
               "id": 1,
@@ -311,7 +234,7 @@
               "subtask_id": 1,
               "name": "Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
               "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
-              "status": 0
+              "status": 1
             },
             {
               "id": 2,
@@ -320,6 +243,33 @@
               "name": "Bước 2 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
               "description": "Mô tả Bước 1 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
               "status": 0
+            },
+            {
+              "name": "Testttt",
+              "description": "Testttt",
+              "status": 2,
+              "partner": "Nhân viên 1 - Phòng Marketing",
+              "task_id": 1,
+              "subtask_id": 1,
+              "id": 3
+            },
+            {
+              "name": "Bước 3 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "description": "Bước 3 - Đầu việc 1 - Công việc 1 - Nhiệm vụ 1",
+              "status": 0,
+              "partner": "",
+              "task_id": 1,
+              "subtask_id": 1,
+              "id": 4
+            },
+            {
+              "name": "Failure",
+              "description": "Failure",
+              "status": 3,
+              "partner": "",
+              "task_id": 1,
+              "subtask_id": 1,
+              "id": 5
             }
           ]
         },
@@ -391,6 +341,15 @@
               "name": "Bước 3 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
               "description": "Mô tả Bước 1 - Đầu việc 2 - Công việc 1 - Nhiệm vụ 1",
               "status": 0
+            },
+            {
+              "name": "Test DWT",
+              "description": "Test DWT",
+              "status": 0,
+              "partner": "",
+              "task_id": 1,
+              "subtask_id": 2,
+              "id": 4
             }
           ]
         }
@@ -800,124 +759,6 @@
           ]
         }
       ]
-    },
-    {
-      "id": 5,
-      "name": "Task Without Mission",
-      "description": "Task Without Mission",
-      "kpi_value": 100,
-      "estimate_date": "2022-07-25",
-      "estimate_time": "08:00",
-      "deadline_date": "2022-07-28",
-      "deadline_time": "17:00",
-      "status": 0,
-      "priority": 1,
-      "mission_id": null,
-      "keys": [
-        {
-          "key_name": "xx",
-          "key_value": "xxx"
-        }
-      ],
-      "subtasks": [],
-      "department": {
-        "id": 1,
-        "name": "Phòng Marketing",
-        "slug": "mkt"
-      },
-      "departments_related": [],
-      "user": {
-        "id": 2,
-        "name": "Nhân viên 2 - Phòng Marketing"
-      },
-      "users_related": []
-    },
-    {
-      "id": 6,
-      "name": "Task Without Mission 1",
-      "description": "Task Without Mission 1",
-      "kpi_value": 19,
-      "estimate_date": "2022-07-25",
-      "estimate_time": "08:00",
-      "deadline_date": "2022-07-28",
-      "deadline_time": "17:00",
-      "status": 0,
-      "priority": 2,
-      "mission_id": null,
-      "keys": [
-        {
-          "key_name": "xx",
-          "key_value": "xxx"
-        },
-        {
-          "key_name": "xx",
-          "key_value": "xxx"
-        }
-      ],
-      "subtasks": [],
-      "department": {
-        "id": 1,
-        "name": "Phòng Marketing",
-        "slug": "mkt"
-      },
-      "departments_related": [],
-      "user": {
-        "id": 2,
-        "name": "Nhân viên 2 - Phòng Marketing"
-      },
-      "users_related": []
-    },
-    {
-      "id": 7,
-      "name": "cccc",
-      "description": "ccc",
-      "kpi_value": 10,
-      "estimate_date": "2022-07-26",
-      "estimate_time": "08:00",
-      "deadline_date": "2022-07-26",
-      "deadline_time": "17:00",
-      "status": 0,
-      "priority": 3,
-      "mission_id": 1,
-      "keys": [],
-      "subtasks": [],
-      "department": {
-        "id": 1,
-        "name": "Phòng Marketing",
-        "slug": "mkt"
-      },
-      "departments_related": [],
-      "user": {
-        "id": 1,
-        "name": "Nhân viên 1 - Phòng Marketing"
-      },
-      "users_related": []
-    },
-    {
-      "id": 8,
-      "name": "BBB",
-      "description": "bbb",
-      "kpi_value": 10,
-      "estimate_date": "2022-07-26",
-      "estimate_time": "08:00",
-      "deadline_date": "2022-07-26",
-      "deadline_time": "08:00",
-      "status": 0,
-      "priority": 4,
-      "mission_id": 1,
-      "keys": [],
-      "subtasks": [],
-      "department": {
-        "id": 1,
-        "name": "Phòng Marketing",
-        "slug": "mkt"
-      },
-      "departments_related": [],
-      "user": {
-        "id": 2,
-        "name": "Nhân viên 2 - Phòng Marketing"
-      },
-      "users_related": []
     }
   ]
 }

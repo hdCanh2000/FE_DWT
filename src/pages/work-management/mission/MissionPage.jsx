@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import _ from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -21,6 +22,7 @@ import {
 	getAllMission,
 	getLatestTasks,
 	updateMissionById,
+	getAllTasks,
 } from './services';
 import Dropdown, {
 	DropdownItem,
@@ -32,13 +34,31 @@ import MissionFormModal from './MissionFormModal';
 import Badge from '../../../components/bootstrap/Badge';
 import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
-import { calculateProgressTaskBySteps } from '../../../utils/function';
+import { calcProgressMission, calcProgressTask } from '../../../utils/function';
+
+const iconColors = [
+	{
+		index: 1,
+		color: 'primary',
+		icon: 'AutoAwesome',
+	},
+	{
+		index: 2,
+		color: 'danger',
+		icon: 'Beenhere',
+	},
+	{
+		id: 3,
+		color: 'success',
+		icon: 'Bolt',
+	},
+];
 
 // eslint-disable-next-line react/prop-types
-const Item = ({ id, name, teamName, attachCount, taskCount, percent, dueDate, ...props }) => {
+const Item = ({ id, name, keys = [], teamName, percent, dueDate, ...props }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`../${demoPages.quanLyCongViec.subMenu.danhSach.path}/${id}`),
+		() => navigate(`/quan-ly-cong-viec/cong-viec/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -56,17 +76,23 @@ const Item = ({ id, name, teamName, attachCount, taskCount, percent, dueDate, ..
 					</CardActions>
 				</CardHeader>
 				<CardBody>
-					<div className='row g-2 mb-3'>
-						<div className='col-auto'>
-							<Badge color='light' isLight>
-								<Icon icon='AttachFile' /> {attachCount}
-							</Badge>
-						</div>
-						<div className='col-auto'>
-							<Badge color='light' isLight>
-								<Icon icon='TaskAlt' /> {taskCount}
-							</Badge>
-						</div>
+					<div className='row g-2 mt-3'>
+						{keys?.map((k, index) => (
+							// eslint-disable-next-line react/no-array-index-key
+							<div key={index} className='col-auto'>
+								<Badge
+									isLight
+									color={iconColors[index].color}
+									className='px-3 py-2'>
+									<Icon
+										icon={iconColors[index].icon}
+										size='lg'
+										className='me-1'
+									/>
+									{k.key_name}
+								</Badge>
+							</div>
+						))}
 					</div>
 					<div className='row'>
 						<div className='col-md-6'>
@@ -83,6 +109,7 @@ const Item = ({ id, name, teamName, attachCount, taskCount, percent, dueDate, ..
 const MissionPage = () => {
 	const { addToast } = useToasts();
 	const [missions, setMissions] = useState([]);
+	const [missionsWithTask, setMissionsWithTask] = useState([]);
 	const [latestTasks, setLatestTasks] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
@@ -188,11 +215,49 @@ const MissionPage = () => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			const result = await getAllMission();
-			setMissions(result.data);
+			const response = await getAllMission();
+			const result = await response.data;
+			setMissions(result);
 		};
 		fetchData();
 	}, []);
+
+	const mergeObjToArray = (arr) => {
+		const output = [];
+		arr.forEach((item) => {
+			const existing = output.filter((v) => {
+				return v.task.mission_id === item.task.mission_id;
+			});
+			if (existing.length) {
+				const existingIndex = output.indexOf(existing[0]);
+				output[existingIndex].tasks = output[existingIndex].tasks.concat(item.task);
+			} else {
+				if (typeof item.task === 'object') item.tasks = [item.task];
+				output.push(item);
+			}
+		});
+		return output;
+	};
+
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await getAllTasks();
+			const result = await response.data;
+			const kq = [];
+			missions?.forEach((mission) => {
+				result?.forEach((task) => {
+					if (mission.id === task.mission_id) {
+						kq.push({
+							...mission,
+							task,
+						});
+					}
+				});
+			});
+			setMissionsWithTask(_.uniqBy([...mergeObjToArray(kq), ...missions], 'id'));
+		};
+		fetchData();
+	}, [missions]);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -211,7 +276,7 @@ const MissionPage = () => {
 					</div>
 				</div>
 				<div className='row'>
-					{missions?.map((item) => (
+					{missionsWithTask?.map((item) => (
 						<div className='col-md-6 col-xl-4 col-sm-12' key={item.id}>
 							<Card stretch className='cursor-pointer'>
 								<CardHeader className='bg-transparent py-0'>
@@ -261,9 +326,32 @@ const MissionPage = () => {
 								</CardHeader>
 								<CardBody onClick={() => navigateToDetailPage(item.id)}>
 									<div className='row'>
+										{item?.keys.slice(0, 6)?.map((k, index) => (
+											// eslint-disable-next-line react/no-array-index-key
+											<div key={index} className='col-auto'>
+												<Badge
+													isLight
+													color={iconColors[index].color}
+													className='px-3 py-2'
+													style={{ fontSize: 13 }}>
+													<Icon
+														icon={iconColors[index].icon}
+														size='lg'
+														className='me-1'
+													/>
+													{k.key_name}
+												</Badge>
+											</div>
+										))}
+									</div>
+									<div className='row mt-4'>
 										<div className='col-md-6'>
-											{30}%
-											<Progress isAutoColor value={30} height={10} />
+											{calcProgressMission(item, item?.tasks)}%
+											<Progress
+												isAutoColor
+												value={calcProgressMission(item, item?.tasks)}
+												height={10}
+											/>
 										</div>
 									</div>
 								</CardBody>
@@ -294,11 +382,12 @@ const MissionPage = () => {
 						return (
 							<Item
 								key={item.id}
+								keys={item.keys}
 								id={item.id}
 								name={item?.name}
 								teamName={item.departmnent?.name}
 								dueDate={`${item.deadline_date}`}
-								percent={calculateProgressTaskBySteps(item?.subtasks) || 0}
+								percent={calcProgressTask(item) || 0}
 								data-tour='project-item'
 							/>
 						);

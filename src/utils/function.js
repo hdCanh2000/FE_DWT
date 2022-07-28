@@ -158,8 +158,10 @@ const calcProgressSubtask = (subtask) => {
 	if (isEmpty(subtask)) return 0;
 	const { steps } = subtask;
 	if (isEmpty(steps)) return 0;
-	return Math.round(
-		(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
+	return (
+		Math.round(
+			(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
+		) || 0
 	);
 };
 
@@ -183,7 +185,7 @@ const calcKPICompleteOfTask = (task) => {
 // tính % hoàn thành của 1 task (thông qua giá trị kpi)
 const calcProgressTask = (task) => {
 	const totalCompleteKPI = calcKPICompleteOfTask(task);
-	return Math.round((totalCompleteKPI * 100) / task.kpi_value);
+	return Math.round((totalCompleteKPI * 100) / task.kpi_value) || 0;
 };
 
 // tính tổng số kpi đã dùng của 1 mission
@@ -200,7 +202,7 @@ const calcKPICompleteOfMission = (mission, tasks) => {
 const calcProgressMission = (mission, tasks) => {
 	if (isEmpty(mission)) return 0;
 	const totalCompleteKPI = calcKPICompleteOfMission(mission, tasks);
-	return Math.round((totalCompleteKPI * 100) / mission.current_kpi_value);
+	return Math.round((totalCompleteKPI * 100) / mission.current_kpi_value) || 0;
 };
 
 // ------------		  UPDATE FUNCTION CALC TOTAL & PROGRESS SUBTASK		-----------------
