@@ -50,10 +50,10 @@ const minWidth100 = {
 };
 
 // eslint-disable-next-line react/prop-types
-const Item = ({ id, name, teamName, attachCount, taskCount, percent, dueDate, ...props }) => {
+const Item = ({ id, name, teamName, percent, dueDate }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`../${demoPages.quanLyCongViec.subMenu.danhSach.path}/${id}`),
+		() => navigate(`../${demoPages.quanLyCongViec.subMenu.congViec.path}/${id}`),
 		[id, navigate],
 	);
 	return (

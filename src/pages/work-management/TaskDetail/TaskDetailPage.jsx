@@ -584,7 +584,7 @@ const TaskDetailPage = () => {
 					<div className='col-lg-4'>
 						{/* Phòng ban */}
 						<Card style={{ height: '430px' }}>
-							<CardBody style={{ paddingTop: '5vh' , paddingLeft: '2vw' }}>
+							<CardBody style={{ paddingTop: '5vh', paddingLeft: '2vw' }}>
 								<CardLabel icon='LayoutTextWindow' iconColor='info'>
 									<CardTitle>Chịu trách nhiệm chính</CardTitle>
 								</CardLabel>
@@ -632,7 +632,7 @@ const TaskDetailPage = () => {
 											);
 										})}
 									</div>
-									<div style={{marginBottom : '10%'}}>
+									<div style={{ marginBottom: '10%' }}>
 										<div className='flex-grow-1 fs-6 fw-bold'>Nhân viên</div>
 										{task?.users_related?.map((item) => {
 											return (

@@ -27,6 +27,12 @@ const headers = [
 		element: <CommonHeader />,
 		exact: true,
 	},
+	// chi tiet cong viec
+	{
+		path: `/quan-ly-cong-viec/cong-viec/:id`,
+		element: <CommonHeader />,
+		exact: true,
+	},
 	// chi tiết đầu việc -step
 	{
 		path: `/quan-ly-cong-viec/cong-viec-:taskid/dau-viec/:id`,
