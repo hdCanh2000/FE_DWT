@@ -41,6 +41,8 @@ const TaskDetailForm = ({
 	const [valueDepartment, setValueDepartment] = React.useState({});
 	const [user, setUser] = React.useState([]);
 	const [valueUser, setValueUser] = React.useState({});
+	const [usersRelated, setUsersRelated] = React.useState([]);
+	const [departmentRelated, setDepartmentRelated] = React.useState([]);
 
 	const initError = {
 		name: { errorMsg: '' },
@@ -89,24 +91,45 @@ const TaskDetailForm = ({
 					return {
 						id: item.id,
 						label: item.name,
-						value: item.slug,
+						value: item.id,
 					};
 				}),
 			);
 		});
 		setErrors(initError);
 		if (idEdit && title !== 'add') {
-			setValueInput(task.subtasks.filter((item) => item.id === idEdit)[0]);
+			const value = task.subtasks.filter((item) => item.id === idEdit)[0];
+			setValueInput(value);
+			setUsersRelated(
+				value?.users_related?.map((item) => {
+					return {
+						id: item.id,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
+			setDepartmentRelated(
+				value?.departments_related?.map((item) => {
+					return {
+						id: item.id,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
 			setValueUser({
-				id: task.subtasks.filter((item) => item.id === idEdit)[0]?.user?.id,
-				label: task.subtasks.filter((item) => item.id === idEdit)[0]?.user?.name,
+				id: value?.user?.id,
+				label: value?.user?.name,
 			});
 			setValueDepartment({
-				id: task.subtasks.filter((item) => item.id === idEdit)[0]?.department?.id,
-				label: task.subtasks.filter((item) => item.id === idEdit)[0]?.department?.name,
+				id: value?.department?.id,
+				label: value?.department?.name,
 			});
-			setKeysState(task.subtasks.filter((item) => item.id === idEdit)[0]?.keys || []);
+			setKeysState(value?.keys || []);
 		} else {
+			setUsersRelated([]);
+			setDepartmentRelated([]);
 			setValueDepartment({});
 			setValueUser({});
 			setValueInput(initValueInput);
@@ -123,6 +146,18 @@ const TaskDetailForm = ({
 		});
 	};
 	const handleSunmit = async () => {
+		const valueUsers = usersRelated.map((item) => {
+			return {
+				id: item?.id,
+				name: item?.label,
+			};
+		});
+		const valueDepartments = departmentRelated.map((item) => {
+			return {
+				id: item?.id,
+				name: item?.label,
+			};
+		});
 		setErrors(initError);
 		if (title === 'add') {
 			const subTaskValue = JSON.parse(JSON.stringify(task.subtasks));
@@ -138,6 +173,8 @@ const TaskDetailForm = ({
 					id: valueDepartment.id,
 					name: valueDepartment.label,
 				},
+				departments_related: valueDepartments,
+				users_related: valueUsers,
 				id: task.subtasks.length + 1,
 			});
 			validateForm();
@@ -184,6 +221,8 @@ const TaskDetailForm = ({
 							...valueInput,
 							keys: keysState,
 							kpi_value: parseInt(valueInput?.kpi_value),
+							departments_related: valueDepartments,
+							users_related: valueUsers,
 							user: {
 								id: valueUser.id,
 								name: valueUser.label,
@@ -368,6 +407,38 @@ const TaskDetailForm = ({
 						</FormGroup>
 						{errors?.user?.errorMsg && (
 							<ErrorText>Vui lòng chọn người phụ trách</ErrorText>
+						)}
+					</div>
+					<div className='col-12'>
+						<FormGroup id='department' label='Phòng ban liên quan'>
+							<Select
+								isMulti
+								defaultValue={departmentRelated}
+								value={departmentRelated}
+								onChange={setDepartmentRelated}
+								options={department?.filter(
+									(item) => item.id !== valueDepartment.id,
+								)}
+								ref={departmentRef}
+							/>
+						</FormGroup>
+						{errors?.department?.errorMsg && (
+							<ErrorText>Vui lòng chọn phòng ban liên quan</ErrorText>
+						)}
+					</div>
+					<div className='col-12'>
+						<FormGroup id='user' label='Nhân viên liên quan'>
+							<Select
+								isMulti
+								defaultValue={usersRelated}
+								value={usersRelated}
+								onChange={setUsersRelated}
+								options={user?.filter((item) => item.id !== valueUser.id)}
+								ref={userRef}
+							/>
+						</FormGroup>
+						{errors?.user?.errorMsg && (
+							<ErrorText>Vui lòng chọn nhân viên liên quan</ErrorText>
 						)}
 					</div>
 					<div className='col-12'>
