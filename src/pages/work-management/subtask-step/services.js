@@ -14,6 +14,14 @@ const getSubTaskById = () => {
 	});
 };
 
+const updateStatusPendingSubtask = (data) => {
+	return axiosClient({
+		method: 'PUT',
+		url: `/tasks/${data.id}`,
+		data,
+	});
+};
+
 const addStepIntoSubtask = (data) => {
 	return axiosClient({
 		method: 'PUT',
@@ -31,4 +39,4 @@ const getAllUser = () => {
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export { getTaskById, getSubTaskById, getAllUser, addStepIntoSubtask };
+export { getTaskById, getSubTaskById, updateStatusPendingSubtask, getAllUser, addStepIntoSubtask };
