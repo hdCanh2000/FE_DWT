@@ -102,26 +102,29 @@ const TaskDetailPage = () => {
 			return { name: 'Đã hoàn thành', color: 'success' };
 		}
 		if (props === 2) {
-			return { name: 'Bế tắc', color: 'danger' };
+			return { name: 'Chờ duyệt', color: 'danger' };
 		}
 		if (props === 3) {
-			return { name: 'Xem xét', color: 'warning' };
+			return { name: 'Quá hạn / thất bại', color: 'dark' };
+		}
+		if (props === 4) {
+			return { name: 'Quá hạn / thất bại', color: 'warning' };
 		}
 		return 'light';
 	}
 
 	function priority(props) {
 		if (props === 1) {
-			return 'success';
+			return 'dark';
 		}
 		if (props === 2) {
-			return 'primary';
+			return 'success';
 		}
 		if (props === 3) {
-			return 'danger';
+			return 'primary';
 		}
 		if (props === 4) {
-			return 'warning';
+			return 'danger';
 		}
 		if (props === 5) {
 			return 'warning';
@@ -161,7 +164,10 @@ const TaskDetailPage = () => {
 	const handleDelete = async (idDelete) => {
 		const newSubTasks = subtask.filter((item) => item.id !== idDelete);
 		const taskValue = JSON.parse(JSON.stringify(task));
-		const newData = Object.assign(taskValue, { subtasks: newSubTasks });
+		const newData = Object.assign(taskValue, {
+			subtasks: newSubTasks,
+			current_kpi_value: totalKpiSubtask(newSubTasks),
+		});
 		const respose = await updateSubtasks(parseInt(params?.id, 10), newData);
 		const result = await respose.data;
 		setTask(result);
@@ -232,16 +238,15 @@ const TaskDetailPage = () => {
 		return (total / lengthSubtask).toFixed(2) * 100;
 	};
 	// Số kpi đã được giao
-	// const totalKpiSubtask = (tasks) => {
-	// 	if (_.isEmpty(tasks)) return 0;
-	// 	const { subtasks } = tasks;
-	// 	if (_.isEmpty(subtasks)) return 0;
-	// 	let totalKpi = 0;
-	// 	subtasks.forEach((item) => {
-	// 		totalKpi += item.kpi_value;
-	// 	});
-	// 	return totalKpi;
-	// };
+	const totalKpiSubtask = (newSubtask) => {
+		if (_.isEmpty(newSubtask)) return 0;
+		let totalKpi = 0;
+		newSubtask.forEach((item) => {
+			totalKpi += item.kpi_value;
+		});
+		return totalKpi;
+	};
+
 	// Số kpi được giao đã hoàn thành
 	const totalKpiSubtaskSuccess = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
@@ -259,7 +264,7 @@ const TaskDetailPage = () => {
 	const progressKpi = (tasks) => {
 		if (_.isEmpty(tasks)) return 0;
 		const totalKpi = totalKpiSubtaskSuccess(task);
-		return (totalKpi / tasks.kpi_value).toFixed(2) * 100;
+		return (totalKpi / totalKpiSubtask(tasks?.subtasks)).toFixed(2) * 100;
 	};
 	// Số đầu đang chờ xét duyệt
 	const totalPendingSubtaskOfTask = (tasks) => {
@@ -367,16 +372,16 @@ const TaskDetailPage = () => {
 															Tổng số KPI
 														</div>
 														<div className='fw-bold fs-4 mb-10'>
-															{task?.kpi_value}
+															{totalKpiSubtask(task?.subtasks)}
 														</div>
 														<div className='text-muted'>
-															KPI đã được giao
+															KPI Thực tế
 														</div>
 													</div>
 													<div className='col col-sm-7'>
 														<div className='fw-bold fs-4 mb-10'>
 															{totalKpiSubtaskSuccess(task)}/
-															{task?.kpi_value}
+															{totalKpiSubtask(task?.subtasks)}
 														</div>
 														<div className='text-muted'>
 															Kpi đã hoàn thành
