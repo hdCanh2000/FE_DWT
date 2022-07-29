@@ -68,7 +68,7 @@ const SubTaskPage = () => {
 				<div className='row'>
 					{workCountData.map((item) => (
 						<div className='col-xl-3 col-md-6 col-sm-12'>
-							<CardAlert key={item.id} {...item} />
+							<CardAlert key={item.id} item={item} />
 						</div>
 					))}
 				</div>

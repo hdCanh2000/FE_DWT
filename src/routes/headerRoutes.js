@@ -12,19 +12,31 @@ const headers = [
 	// quan ly muc tieu
 	{
 		path: demoPages.mucTieu.subMenu.mission.path,
-		element: <CommonHeader />,
+		element: null,
 		exact: true,
 	},
 	// chi tiet muc tieu
 	{
 		path: `/muc-tieu/chi-tiet/:id`,
-		element: <CommonHeader />,
+		element: null,
+		exact: true,
+	},
+	// chi tiet cong viec
+	{
+		path: `/quan-ly-cong-viec/cong-viec/danh-sach/:id`,
+		element: null,
+		exact: true,
+	},
+	// chi tiet cong viec
+	{
+		path: `/quan-ly-cong-viec/cong-viec/:id`,
+		element: null,
 		exact: true,
 	},
 	// chi tiết đầu việc -step
 	{
 		path: `/quan-ly-cong-viec/cong-viec-:taskid/dau-viec/:id`,
-		element: <CommonHeader />,
+		element: null,
 		exact: true,
 	},
 	// quan ly cong viec

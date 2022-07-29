@@ -156,11 +156,16 @@ const calcTotalStepCompleteOfSubTask = (subtask) => {
 // tính % hoàn thành của 1 subtask
 const calcProgressSubtask = (subtask) => {
 	if (isEmpty(subtask)) return 0;
+	// if (subtask?.status === 1) {
 	const { steps } = subtask;
 	if (isEmpty(steps)) return 0;
-	return Math.round(
-		(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
+	return (
+		Math.round(
+			(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
+		) || 0
 	);
+	// }
+	// return 0;
 };
 
 // tính số kpi đã dùng cho 1 subtask
@@ -175,7 +180,9 @@ const calcKPICompleteOfTask = (task) => {
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
 	subtasks.forEach((subtask) => {
-		totalKPI += calcKPICompleteOfSubtask(subtask);
+		if (subtask?.status === 1) {
+			totalKPI += calcKPICompleteOfSubtask(subtask);
+		}
 	});
 	return totalKPI;
 };
@@ -183,7 +190,7 @@ const calcKPICompleteOfTask = (task) => {
 // tính % hoàn thành của 1 task (thông qua giá trị kpi)
 const calcProgressTask = (task) => {
 	const totalCompleteKPI = calcKPICompleteOfTask(task);
-	return Math.round((totalCompleteKPI * 100) / task.kpi_value);
+	return Math.round((totalCompleteKPI * 100) / task.kpi_value) || 0;
 };
 
 // tính tổng số kpi đã dùng của 1 mission
@@ -192,7 +199,9 @@ const calcKPICompleteOfMission = (mission, tasks) => {
 	if (isEmpty(tasks) || !isArray(tasks)) return 0;
 	let totalKPI = 0;
 	tasks.forEach((task) => {
-		totalKPI += calcKPICompleteOfTask(task);
+		if (task?.status === 1) {
+			totalKPI += calcKPICompleteOfTask(task);
+		}
 	});
 	return totalKPI;
 };
@@ -200,7 +209,7 @@ const calcKPICompleteOfMission = (mission, tasks) => {
 const calcProgressMission = (mission, tasks) => {
 	if (isEmpty(mission)) return 0;
 	const totalCompleteKPI = calcKPICompleteOfMission(mission, tasks);
-	return Math.round((totalCompleteKPI * 100) / mission.current_kpi_value);
+	return Math.round((totalCompleteKPI * 100) / mission.current_kpi_value) || 0;
 };
 
 // ------------		  UPDATE FUNCTION CALC TOTAL & PROGRESS SUBTASK		-----------------

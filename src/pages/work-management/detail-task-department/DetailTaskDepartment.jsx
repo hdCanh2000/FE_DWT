@@ -10,7 +10,9 @@ const DetailTaskDepartmentPage = () => {
 			<Page container='fluid'>
 				<div className='row mt-2 mb-4'>
 					<div className='col-12'>
-						<div className='display-6 fw-bold py-3'>Công việc phòng ban chi tiết</div>
+						<div className='display-6 fw-bold py-3'>
+							Công việc phòng ban chi tiếtttt
+						</div>
 					</div>
 				</div>
 				<div className='row'>

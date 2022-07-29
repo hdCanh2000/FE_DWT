@@ -37,6 +37,10 @@ import Progress from '../../../components/bootstrap/Progress';
 import ExpandRow from './ExpandRow';
 import { calculateProgressTaskBySteps } from '../../../utils/function';
 
+const minWidth300 = {
+	minWidth: 300,
+};
+
 const minWidth200 = {
 	minWidth: 200,
 };
@@ -50,14 +54,14 @@ const minWidth100 = {
 };
 
 // eslint-disable-next-line react/prop-types
-const Item = ({ id, name, teamName, attachCount, taskCount, percent, dueDate, ...props }) => {
+const Item = ({ id, name, teamName, percent, dueDate }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`../${demoPages.quanLyCongViec.subMenu.danhSach.path}/${id}`),
+		() => navigate(`../${demoPages.quanLyCongViec.subMenu.congViec.path}/${id}`),
 		[id, navigate],
 	);
 	return (
-		<div className='col-md-6 col-xl-4 col-sm-12' {...props}>
+		<div className='col-md-6 col-xl-4 col-sm-12'>
 			<Card stretch onClick={handleOnClickToProjectPage} className='cursor-pointer'>
 				<CardHeader>
 					<CardLabel icon='Ballot'>
@@ -288,7 +292,7 @@ const TaskListPage = () => {
 										<thead>
 											<tr>
 												<th className='text-center'>STT</th>
-												<th className='text-center'>Tên công việc</th>
+												<th>Tên công việc</th>
 												<th className='text-center'>Số đầu việc</th>
 												<th className='text-center'>Phòng ban</th>
 												<th className='text-center'>Nhân viên</th>
@@ -308,7 +312,7 @@ const TaskListPage = () => {
 														<td>{index + 1}</td>
 														<td
 															className='cursor-pointer'
-															style={minWidth200}>
+															style={minWidth300}>
 															<Link
 																className='text-underline'
 																to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>

@@ -12,6 +12,7 @@ const TASK = {
 	TASKMANAGEMENT: lazy(() =>
 		import('../pages/work-management/task-management/TaskManagementPage'),
 	),
+	TASKDETAIL: lazy(() => import('../pages/work-management/TaskDetail/TaskDetailPage')),
 	TASKLIST: lazy(() => import('../pages/work-management/task-list/TaskListPage')),
 	SUBTASK: lazy(() => import('../pages/work-management/subtask/SubTaskPage')),
 	TASKLISTDEPARTMENT: lazy(() =>
@@ -88,8 +89,8 @@ const presentation = [
 	 * Trang chi tiết công việc theo id
 	 */
 	{
-		path: `${demoPages.quanLyCongViec.subMenu.danhSach.path}/:id`,
-		element: <TASK.TASKLIST />,
+		path: `${demoPages.quanLyCongViec.subMenu.congViec.path}/:id`,
+		element: <TASK.TASKDETAIL />,
 		exact: true,
 	},
 
@@ -117,7 +118,12 @@ const presentation = [
 		element: <TASK.DETAIL_TASK_DEPARTMENT />,
 		exact: true,
 	},
-
+	// trang chi tiết công việc
+	{
+		path: `${demoPages.quanLyCongViec.subMenu.danhSach}/:id`,
+		element: <TASK.TASKDETAIL />,
+		exact: true,
+	},
 	/**
 	 * trang công việc phòng ban chi tiết - cấu hình
 	 */
