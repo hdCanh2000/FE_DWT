@@ -51,7 +51,13 @@ const TaskDetailPage = () => {
 		stroke: {
 			width: 0,
 		},
-		labels: ['Đang thực hiện', 'Chờ xét duyệt', 'Đã hoàn thành', 'Quá hạn / thất bại'],
+		labels: [
+			'Đang thực hiện',
+			'Chờ xét duyệt',
+			'Đã hoàn thành',
+			'Quá hạn / thất bại',
+			'Từ chối',
+		],
 		dataLabels: {
 			enabled: false,
 		},
@@ -107,6 +113,9 @@ const TaskDetailPage = () => {
 		}
 		if (props === 3) {
 			return { name: 'Quá hạn / thất bại', color: 'dark' };
+		}
+		if (props === 4) {
+			return { name: 'Quá hạn / thất bại', color: 'warning' };
 		}
 		return 'light';
 	}
@@ -168,6 +177,30 @@ const TaskDetailPage = () => {
 	const handleCloseComfirm = () => {
 		setDeletes({});
 		set0penConfirm(false);
+	};
+	const handleStatus = async (newStatus, items) => {
+		const newSubTasks = task.subtasks.map((item) => {
+			return item.id === items.id
+				? {
+						...item,
+						status: newStatus,
+				  }
+				: item;
+		});
+		const taskValue = JSON.parse(JSON.stringify(task));
+		const newData = Object.assign(taskValue, {
+			subtasks: newSubTasks,
+			current_kpi_value: totalKpiSubtask(newSubTasks),
+		});
+		try {
+			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
+				toast.success('Cập nhật trạng thái thành công !'),
+			);
+			const result = await respose.data;
+			setTask(result);
+		} catch (error) {
+			toast.error('Cập nhạt trạng thái thất bại !');
+		}
 	};
 	const handleUpdateStatus = async (statuss, data) => {
 		const newSubTasks = task.subtasks.map((item) => {
@@ -345,6 +378,15 @@ const TaskDetailPage = () => {
 													<CardTitle tag='h4' className='h5'>
 														<Icon icon='Activity' color='success' />
 														&nbsp; Tiến độ công việc
+														<div
+															className='text-muted'
+															style={{
+																fontSize: '12px',
+																marginLeft: '1 vw',
+															}}>
+															&emsp;&emsp;&ensp;
+															{FORMAT_TASK_STATUS(task.status)}
+														</div>
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>
@@ -667,38 +709,38 @@ const TaskDetailPage = () => {
 								</CardLabel>
 							</CardHeader>
 							<CardBody>
-								<div className='row'>
-									<div className=' fs-5 fw-bold ms-3'>
-										<span className='text-info fs-5 fw-bold ms-3'>
+								<div className='row fs-6'>
+									<div className=' fw-bold ms-3'>
+										<span className='text-info fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
 										&nbsp; Tên công việc : {task?.name}
 									</div>
 									<br />
-									<div className=' fs-5 fw-bold ms-3'>
-										<span className='text-info fs-5 fw-bold ms-3'>
+									<div className=' fw-bold ms-3'>
+										<span className='text-info fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
 										&nbsp; Mô tả : {task?.description}
 									</div>
 									<br />
-									<div className=' fs-5 fw-bold ms-3'>
-										<span className='text-info fs-5 fw-bold ms-3'>
+									<div className=' fw-bold ms-3'>
+										<span className='text-info fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
 										&nbsp; Giá trị Kpi : {task?.kpi_value}
 									</div>
 									<br />
-									<div className=' fs-5 fw-bold ms-3'>
-										<span className='text-info fs-5 fw-bold ms-3'>
+									<div className='fw-bold ms-3'>
+										<span className='text-info fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
 										&nbsp; Ngày bắt đầu :{' '}
 										{moment(task?.estimate_date).format('DD-MM-YYYY')}
 									</div>
 									<br />
-									<div className=' fs-5 fw-bold ms-3'>
-										<span className='text-info fs-5 fw-bold ms-3'>
+									<div className=' fw-bold ms-3'>
+										<span className='text-info fw-bold ms-3'>
 											<Icon icon='TrendingFlat' />
 										</span>
 										&nbsp; Ngày kết thúc :{' '}
@@ -760,7 +802,9 @@ const TaskDetailPage = () => {
 												{subtask
 													?.filter(
 														(item) =>
-															item.status === 0 || item.status === 1,
+															item.status === 0 ||
+															item.status === 1 ||
+															item.status === 4,
 													)
 													.map((item) => (
 														<tr key={item.id}>
@@ -884,7 +928,7 @@ const TaskDetailPage = () => {
 																			'edit',
 																		)
 																	}>
-																	Edit
+																	Sửa
 																</Button>
 																<Button
 																	isOutline={!darkModeStatus}
@@ -895,7 +939,7 @@ const TaskDetailPage = () => {
 																	onClick={() =>
 																		handleOpenConfirm(item)
 																	}>
-																	Delete
+																	Xóa
 																</Button>
 															</td>
 														</tr>
@@ -923,11 +967,11 @@ const TaskDetailPage = () => {
 										<table className='table table-modern mb-0 align-middle'>
 											<thead>
 												<tr>
-													<th>Ngày nộp</th>
+													<th>Ngày dự kiến</th>
 													<th>Lời nhắn</th>
 													<th>Người yêu cầu xác nhận</th>
 													<th>Tên đầu việc</th>
-													<th>Thời gian làm</th>
+													<th>Hạn nộp</th>
 													<th>KPI</th>
 													<th>Trạng thái</th>
 													<th>Hành động</th>
@@ -962,7 +1006,17 @@ const TaskDetailPage = () => {
 															<td>{item.name}</td>
 															<td>{item?.user?.name}</td>
 															<td>{item.name}</td>
-															<td>20h</td>
+															<td>
+																<div className='d-flex align-items-center'>
+																	<span className='text-nowrap'>
+																		{moment(
+																			`${item.deadline_date} ${item.deadline_time}`,
+																		).format(
+																			'DD-MM-YYYY, HH:mm',
+																		)}
+																	</span>
+																</div>
+															</td>
 															<td>{item?.kpi_value}</td>
 															<td>
 																<Icon
@@ -977,12 +1031,9 @@ const TaskDetailPage = () => {
 																	color='success'
 																	isLight={darkModeStatus}
 																	className='text-nowrap mx-2'
-																	// onClick={() =>
-																	// 	handleUpdateStatus(
-																	// 		STATUS[key].value,
-																	// 		item,
-																	// 	)
-																	// }
+																	onClick={() =>
+																		handleStatus(1, item)
+																	}
 																	icon='Edit'>
 																	Xác nhận
 																</Button>
@@ -991,6 +1042,9 @@ const TaskDetailPage = () => {
 																	color='danger'
 																	isLight={darkModeStatus}
 																	className='text-nowrap mx-2 '
+																	onClick={() =>
+																		handleStatus(4, item)
+																	}
 																	icon='Trash'>
 																	Từ chối
 																</Button>
