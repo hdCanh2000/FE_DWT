@@ -197,7 +197,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 						[event.target.name]:
 							event.target.value.length > 0
 								? null
-								: `${[event.target.name]} is required!`,
+								: `Vui lòng nhập đầy đủ thông tin!`,
 					},
 				};
 			});
@@ -228,9 +228,14 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	const handleSubmit = () => {
 		const data = { ...mission };
-		data.keys = keysState;
+		data.keys = keysState.map((key) => {
+			return {
+				key_name: key.key_name,
+				key_value: key.key_value,
+			};
+		});
 		data.kpi_value = parseInt(data.kpi_value, 10);
-		data.current_kpi_value = 0;
+		data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
 		const departmentClone = [...departmentOption];
 		data.departments = departmentClone.map((department) => {
 			return {
