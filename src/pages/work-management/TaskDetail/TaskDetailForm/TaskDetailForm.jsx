@@ -64,10 +64,10 @@ const TaskDetailForm = ({
 		percent: 0,
 		name: '',
 		description: '',
-		estimate_date: moment().add(0, 'days').format('YYYY/MM/DD'),
-		estimate_time: '',
-		deadline_date: moment().add(0, 'days').format('YYYY/MM/DD'),
-		deadline_time: '',
+		estimate_date: '2022-12-01',
+		estimate_time: '08:00',
+		deadline_date: '2022-12-01',
+		deadline_time: '17:00',
 		kpi_value: 0,
 		keys: [],
 		steps: [],
@@ -145,7 +145,7 @@ const TaskDetailForm = ({
 			[name]: value,
 		});
 	};
-	const handleSunmit = async () => {
+	const handleSubmit = async () => {
 		const valueUsers = usersRelated.map((item) => {
 			return {
 				id: item?.id,
@@ -207,12 +207,12 @@ const TaskDetailForm = ({
 			});
 			try {
 				const respose = await updateSubtasks(id, data).then(
-					toast.success('Create Task Success !'),
+					toast.success('Tạo đầu việc thành công !'),
 				);
 				const result = await respose.data;
 				setTask(result);
 			} catch (error) {
-				toast.error('Create Task Error !');
+				toast.error('Tạo đầu việc thất bại  !');
 			}
 		} else {
 			const newSubTasks = task.subtasks.map((item) => {
@@ -262,12 +262,12 @@ const TaskDetailForm = ({
 			});
 			try {
 				const respose = await updateSubtasks(id, newData).then(
-					toast.success('Edit Task Success !'),
+					toast.success('Sửa đầu việc thành công !'),
 				);
 				const result = await respose.data;
 				setTask(result);
 			} catch (error) {
-				toast.error('Edit Task Error !');
+				toast.error('Sửa đầu việc thất bại !');
 			}
 		}
 		setEditModalStatus(false);
@@ -609,7 +609,7 @@ const TaskDetailForm = ({
 					color='primary'
 					className='w-100'
 					type='submit'
-					onClick={() => handleSunmit(id)}>
+					onClick={() => handleSubmit(id)}>
 					Lưu đầu việc
 				</Button>
 			</ModalFooter>
