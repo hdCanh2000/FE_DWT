@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import classNames from 'classnames';
 import { useToasts } from 'react-toast-notifications';
+import _ from 'lodash';
 import COLORS from '../../../common/data/enumColors';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -29,6 +30,9 @@ import Button from '../../../components/bootstrap/Button';
 import useDarkMode from '../../../hooks/useDarkMode';
 import Chart from '../../../components/extras/Chart';
 import SubHeader, { SubHeaderLeft } from '../../../layout/SubHeader/SubHeader';
+import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
+import { updateSubtasks } from '../TaskDetail/services';
+import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
 
 const chartOptions = {
 	chart: {
@@ -115,13 +119,13 @@ const SubTaskPage = () => {
 	]);
 	const [subtask, setSubtask] = useState({});
 	const [task, setTask] = useState({});
-
 	const { addToast } = useToasts();
 	const { darkModeStatus } = useDarkMode();
 	const navigate = useNavigate();
 	const params = useParams(); // taskid, id
 	const { taskid, id } = params;
-
+	const [editModalStatus, setEditModalStatus] = useState(false);
+	const [openConfirm, set0penConfirm] = React.useState(false);
 	useEffect(() => {
 		async function fetchDataTaskById() {
 			const reponse = await getTaskById(taskid);
@@ -227,7 +231,43 @@ const SubTaskPage = () => {
 			setSubtask(subtask);
 		}
 	};
+	// Số kpi của subtask đã được giao
+	const totalKpiSubtask = (newSubtask) => {
+		if (_.isEmpty(newSubtask)) return 0;
+		let totalKpi = 0;
+		newSubtask.forEach((item) => {
+			totalKpi += item.kpi_value;
+		});
+		return totalKpi;
+	};
 
+	// edit task
+	const handleEditTask = () => {
+		setEditModalStatus(true);
+	};
+	const handleOpenConfirm = () => {
+		set0penConfirm(true);
+	};
+	const handleCloseConfirm = () => {
+		set0penConfirm(false);
+	};
+	const handleDeleteSubTask = async (subtasks) => {
+		const newSubTasks = task?.subtasks?.filter((item) => item.id !== subtasks?.id);
+		const taskValue = JSON.parse(JSON.stringify(task));
+		const newData = Object.assign(taskValue, {
+			subtasks: newSubTasks,
+			current_kpi_value: totalKpiSubtask(newSubTasks),
+		});
+		try {
+			const respose = await updateSubtasks(task?.id, newData);
+			const result = await respose.data;
+			setTask(result);
+			navigate(`/quan-ly-cong-viec/cong-viec/${task?.id}`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thất bại!`);
+		}
+	};
 	return (
 		<PageWrapper title={subtask?.name}>
 			<SubHeader>
@@ -238,9 +278,29 @@ const SubTaskPage = () => {
 				</SubHeaderLeft>
 			</SubHeader>
 			<Page container='fluid' className='overflow-hidden'>
-				<div className='row'>
+				<div className='col-12'>
 					<div className='d-flex justify-content-between align-items-center'>
 						<div className='display-4 fw-bold py-3'>{subtask?.name}</div>
+						<div>
+							<Button
+								isOutline={!darkModeStatus}
+								color='primary'
+								isLight={darkModeStatus}
+								className='text-nowrap mx-2'
+								icon='Edit'
+								onClick={handleEditTask}>
+								Sửa
+							</Button>
+							<Button
+								isOutline={!darkModeStatus}
+								color='danger'
+								isLight={darkModeStatus}
+								className='text-nowrap mx-2'
+								icon='Trash'
+								onClick={handleOpenConfirm}>
+								Xoá
+							</Button>
+						</div>
 					</div>
 				</div>
 				<div className='row mb-4'>
@@ -733,6 +793,21 @@ const SubTaskPage = () => {
 						/>
 					</div>
 				</div>
+				<ComfirmSubtask
+					openModal={openConfirm}
+					onCloseModal={handleCloseConfirm}
+					onConfirm={() => handleDeleteSubTask(subtask)}
+					title='Xoá Đầu việc'
+					content={`Xác nhận xoá đầu việc <strong>${subtask?.name}</strong> ?`}
+				/>
+				<TaskDetailForm
+					setTask={setTask}
+					task={task}
+					setEditModalStatus={setEditModalStatus}
+					editModalStatus={editModalStatus}
+					id={parseInt(params?.id, 10)}
+					idEdit={subtask.id}
+				/>
 			</Page>
 		</PageWrapper>
 	);

@@ -5,20 +5,32 @@ import _, { parseInt } from 'lodash';
 import moment from 'moment';
 import toast, { Toaster } from 'react-hot-toast';
 import styled from 'styled-components';
-import Select from 'react-select';
-import { updateSubtasks, getAllDepartments, getAllUser } from '../services';
+import SelectComponent from 'react-select';
+import { useToasts } from 'react-toast-notifications';
+import {
+	updateSubtasks,
+	getAllDepartments,
+	getAllUser,
+	getTask,
+	getMission,
+	updateCurrentKpiMission,
+} from '../services';
+// updateCurrentKpiMission
 import Modal, {
 	ModalHeader,
 	ModalBody,
 	ModalTitle,
 	ModalFooter,
 } from '../../../../components/bootstrap/Modal';
+import Option from '../../../../components/bootstrap/Option';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
 import Textarea from '../../../../components/bootstrap/forms/Textarea';
 import Card, { CardBody } from '../../../../components/bootstrap/Card';
 import Button from '../../../../components/bootstrap/Button';
 import Icon from '../../../../components/icon/Icon';
+import Toasts from '../../../../components/bootstrap/Toasts';
+import Select from '../../../../components/bootstrap/forms/Select';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -43,7 +55,8 @@ const TaskDetailForm = ({
 	const [valueUser, setValueUser] = React.useState({});
 	const [usersRelated, setUsersRelated] = React.useState([]);
 	const [departmentRelated, setDepartmentRelated] = React.useState([]);
-
+	const { addToast } = useToasts();
+	const PRIORITIES = [5, 4, 3, 2, 1];
 	const initError = {
 		name: { errorMsg: '' },
 		description: { errorMsg: '' },
@@ -145,6 +158,41 @@ const TaskDetailForm = ({
 			[name]: value,
 		});
 	};
+	const handleShowToast = (titles, content) => {
+		addToast(
+			<Toasts title={titles} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+	const handleChangeCurrentKpiMission = async () => {
+		let CurrentKpi = 0;
+		const newTask = await (await getTask()).data;
+		newTask?.forEach((item) => {
+			item?.subtasks?.forEach((res) => {
+				CurrentKpi += res.kpi_value;
+			});
+		});
+		const misson = await (await getMission()).data;
+		const newMission = misson?.map((item) => {
+			return item.id === task?.mission_id
+				? {
+						...item,
+						current_kpi_value: CurrentKpi,
+				  }
+				: item;
+		});
+		await updateCurrentKpiMission(task?.mission_id, newMission[0]);
+	};
+	React.useEffect(() => {
+		if (task.mission_id) {
+			handleChangeCurrentKpiMission();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [task]);
 	const handleSubmit = async () => {
 		const valueUsers = usersRelated.map((item) => {
 			return {
@@ -207,12 +255,15 @@ const TaskDetailForm = ({
 			});
 			try {
 				const respose = await updateSubtasks(id, data).then(
-					toast.success('Tạo đầu việc thành công !'),
+					handleShowToast(
+						`Tạo đầu việc!`,
+						`Tạo đầu việc ${valueInput?.name} thành công!`,
+					),
 				);
 				const result = await respose.data;
 				setTask(result);
 			} catch (error) {
-				toast.error('Tạo đầu việc thất bại  !');
+				handleShowToast(`Tạo đầu việc!`, `Tạo đầu việc ${valueInput?.name} thất bại!`);
 			}
 		} else {
 			const newSubTasks = task.subtasks.map((item) => {
@@ -383,7 +434,7 @@ const TaskDetailForm = ({
 					</div>
 					<div className='col-12'>
 						<FormGroup id='department' label='Phòng ban'>
-							<Select
+							<SelectComponent
 								defaultValue={valueDepartment}
 								value={valueDepartment}
 								onChange={setValueDepartment}
@@ -397,7 +448,7 @@ const TaskDetailForm = ({
 					</div>
 					<div className='col-12'>
 						<FormGroup id='user' label='Nhân viên phụ trách'>
-							<Select
+							<SelectComponent
 								defaultValue={valueUser}
 								value={valueUser}
 								onChange={setValueUser}
@@ -411,7 +462,7 @@ const TaskDetailForm = ({
 					</div>
 					<div className='col-12'>
 						<FormGroup id='department' label='Phòng ban liên quan'>
-							<Select
+							<SelectComponent
 								isMulti
 								defaultValue={departmentRelated}
 								value={departmentRelated}
@@ -428,7 +479,7 @@ const TaskDetailForm = ({
 					</div>
 					<div className='col-12'>
 						<FormGroup id='user' label='Nhân viên liên quan'>
-							<Select
+							<SelectComponent
 								isMulti
 								defaultValue={usersRelated}
 								value={usersRelated}
@@ -440,6 +491,22 @@ const TaskDetailForm = ({
 						{errors?.user?.errorMsg && (
 							<ErrorText>Vui lòng chọn nhân viên liên quan</ErrorText>
 						)}
+					</div>
+					<div className='col-12'>
+						<FormGroup id='priority' label='Độ ưu tiên'>
+							<Select
+								name='priority'
+								placeholder='Độ ưu tiên'
+								onChange={handleChange}
+								value={valueInput?.priority}
+								defaultValue={2}>
+								{PRIORITIES.map((priority) => (
+									<Option key={priority} value={priority}>
+										{`Cấp ${priority}`}
+									</Option>
+								))}
+							</Select>
+						</FormGroup>
 					</div>
 					<div className='col-12'>
 						<FormGroup id='total_kpi_value' label='Mức điểm KPI' isFloating>

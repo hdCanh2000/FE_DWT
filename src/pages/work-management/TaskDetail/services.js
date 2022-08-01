@@ -25,7 +25,25 @@ const updateSubtasks = (id, data) => {
 		data,
 	});
 };
-
+const updateCurrentKpiMission = (id, data) => {
+	return axiosClient({
+		method: 'PATCH',
+		url: `/missions/${id}`,
+		data,
+	});
+};
+const getMission = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/missions`,
+	});
+};
+const getTask = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/tasks`,
+	});
+};
 const updateStatusPendingTask = (data) => {
 	return axiosClient({
 		method: 'PUT',
@@ -33,5 +51,13 @@ const updateStatusPendingTask = (data) => {
 		data,
 	});
 };
-
-export { updateSubtasks, getAllDepartments, getAllSubtasks, getAllUser, updateStatusPendingTask };
+export {
+	updateSubtasks,
+	getAllDepartments,
+	getAllSubtasks,
+	getAllUser,
+	updateCurrentKpiMission,
+	getMission,
+	getTask,
+	updateStatusPendingTask,
+};
