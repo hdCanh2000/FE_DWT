@@ -190,7 +190,7 @@ const calcKPICompleteOfTask = (task) => {
 // tính % hoàn thành của 1 task (thông qua giá trị kpi)
 const calcProgressTask = (task) => {
 	const totalCompleteKPI = calcKPICompleteOfTask(task);
-	return Math.round((totalCompleteKPI * 100) / task.kpi_value) || 0;
+	return Math.round((totalCompleteKPI * 100) / task.current_kpi_value) || 0;
 };
 
 // tính tổng số kpi đã dùng của 1 mission

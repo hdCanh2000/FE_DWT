@@ -57,6 +57,18 @@ import Chart from '../../../components/extras/Chart';
 import '../TaskDetail/styleTaskDetail.scss';
 import MissionFormModal from './MissionFormModal';
 
+const minWith300 = {
+	minWidth: 300,
+};
+
+const minWith150 = {
+	minWidth: 150,
+};
+
+const minWith100 = {
+	minWidth: 100,
+};
+
 const chartOptions = {
 	chart: {
 		type: 'donut',
@@ -65,7 +77,7 @@ const chartOptions = {
 	stroke: {
 		width: 0,
 	},
-	labels: ['Đang thực hiện', 'Chờ xét duyệt', 'Đã hoàn thành', 'Quá hạn/Thất bại'],
+	labels: ['Đang thực hiện', 'Chờ duyệt', 'Đã hoàn thành', 'Quá hạn/Thất bại'],
 	dataLabels: {
 		enabled: false,
 	},
@@ -108,7 +120,6 @@ const chartOptions = {
 const MissionDetailPage = () => {
 	const [mission, setMission] = useState({});
 	const [tasks, setTasks] = useState([]);
-	const [tasksPending, setTasksPeding] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [editModalMissionStatus, setEditModalMissionStatus] = useState(false);
@@ -133,7 +144,6 @@ const MissionDetailPage = () => {
 			const response = await getAllTaksByMissionID(id);
 			const result = await response.data;
 			setTasks(result);
-			setTasksPeding(result.filter((item) => item.status === 2 || item.status === 3));
 		}
 		fetchDataTaskByMissionID();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -205,7 +215,8 @@ const MissionDetailPage = () => {
 			setTasks(newState.filter((item) => item.id !== taskId));
 			try {
 				const missionClone = { ...mission };
-				missionClone.current_kpi_value = mission.current_kpi_value - itemEdit.kpi_value;
+				missionClone.current_kpi_value =
+					mission.current_kpi_value - itemEdit.current_kpi_value;
 				const newMission = await updateMissionById(missionClone);
 				setMission(newMission.data);
 			} catch (error) {
@@ -260,14 +271,8 @@ const MissionDetailPage = () => {
 				const result = await response.data;
 				const newTasks = [...tasks];
 				setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-				// update thì giá trị curent kpi = ?
 				try {
 					const missionClone = { ...mission };
-					const temp =
-						itemEdit?.kpi_value > data.kpi_value
-							? mission.current_kpi_value - (itemEdit.kpi_value - data.kpi_value)
-							: mission.current_kpi_value + (data.kpi_value - itemEdit.kpi_value);
-					missionClone.current_kpi_value = temp;
 					const newMission = await updateMissionById(missionClone);
 					setMission(newMission.data);
 				} catch (error) {
@@ -285,14 +290,17 @@ const MissionDetailPage = () => {
 			}
 		} else {
 			try {
-				const response = await addNewTask(data);
+				const response = await addNewTask({
+					...data,
+					current_kpi_value: 0,
+					mission_id: parseInt(params.id, 10),
+				});
 				const result = await response.data;
 				const newTasks = [...tasks];
 				newTasks.push(result);
 				setTasks(newTasks);
 				try {
 					const missionClone = { ...mission };
-					missionClone.current_kpi_value = mission.current_kpi_value + data.kpi_value;
 					const newMission = await updateMissionById(missionClone);
 					setMission(newMission.data);
 				} catch (error) {
@@ -332,14 +340,7 @@ const MissionDetailPage = () => {
 			newData.status = status;
 			const response = await updateTaskByID(newData);
 			const result = await response.data;
-			const newTasks = [...tasks];
-			const newTasksPending = [...tasksPending];
-			setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-			setTasksPeding(
-				newTasksPending
-					.map((item) => (item.id === data.id ? { ...result } : item))
-					.filter((item) => item.status === 2 || item.status === 3),
-			);
+			setTasks(tasks.map((item) => (item.id === data.id ? { ...result } : item)));
 			handleClearValueForm();
 			handleCloseEditForm();
 			handleShowToast(
@@ -421,14 +422,21 @@ const MissionDetailPage = () => {
 													</div>
 													<div className='flex-grow-1 ms-3'>
 														<div className='fw-bold fs-3 mb-0'>
-															{calcProgressMission(mission, tasks)}%
-															<span className='text-info fs-5 fw-bold ms-3'>
+															{Math.round(
+																(calcTotalTaskByStatus(tasks, 1) *
+																	100) /
+																	tasks.length,
+															) || 0}
+															%
+															{/* <span className='text-info fs-5 fw-bold ms-3'>
 																{calcTotalTaskByStatus(tasks, 1)}
 																<Icon icon='TrendingFlat' />
-															</span>
+															</span> */}
 														</div>
-														<div className='text-muted'>
-															trên tổng số {tasks?.length} công việc (
+														<div
+															style={{ fontSize: 14, color: '#000' }}>
+															{calcTotalTaskByStatus(tasks, 1)} trên
+															tổng số {tasks?.length} công việc (
 															{calculateTotalSubTasksInTasks(tasks)}{' '}
 															đầu việc).
 														</div>
@@ -455,15 +463,16 @@ const MissionDetailPage = () => {
 																mission,
 																tasks,
 															)}
-															/{mission?.current_kpi_value}
+															/{mission?.current_kpi_value} ~
+															{calcProgressMission(mission, tasks)}%
 														</div>
 														<div className='text-muted'>
-															Kpi đã hoàn thành
+															Kpi thực tế đã hoàn thành
 														</div>
 														<div>
 															<Progress
 																isAutoColor
-																value={calcKPICompleteOfMission(
+																value={calcProgressMission(
 																	mission,
 																	tasks,
 																)}
@@ -504,15 +513,17 @@ const MissionDetailPage = () => {
 																(calcTotalTaskByStatus(tasks, 3) *
 																	100) /
 																	tasks.length,
-															)}
+															) || 0}
 															%
-															<span className='text-danger fs-5 fw-bold ms-3'>
+															{/* <span className='text-danger fs-5 fw-bold ms-3'>
 																{calcTotalTaskByStatus(tasks, 3)}
 																<Icon icon='TrendingFlat' />
-															</span>
+															</span> */}
 														</div>
-														<div className='text-muted'>
-															trên tổng số {tasks?.length} công việc.
+														<div
+															style={{ fontSize: 14, color: '#000' }}>
+															{calcTotalTaskByStatus(tasks, 3)} trên
+															tổng số {tasks?.length} công việc.
 														</div>
 													</div>
 												</div>
@@ -535,11 +546,11 @@ const MissionDetailPage = () => {
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>
-											<CardBody>
-												<div className='row g-4 align-items-center'>
+											<CardBody isScrollable style={{ minHeight: 300 }}>
+												<div className='row g-4 align-items-center justify-content-center'>
 													{mission?.keys?.map((item, index) => (
 														// eslint-disable-next-line react/no-array-index-key
-														<div className='col-xl-6' key={index}>
+														<div className='col-xl-12' key={index}>
 															<div
 																className={classNames(
 																	'd-flex align-items-center rounded-2 p-3 bg-l25-light',
@@ -556,7 +567,7 @@ const MissionDetailPage = () => {
 																		{item?.key_value}
 																	</div>
 																	<div
-																		className='text-muted mt-n2 truncate-line-1'
+																		className='mt-n2'
 																		style={{ fontSize: 14 }}>
 																		{item?.key_name}
 																	</div>
@@ -632,21 +643,23 @@ const MissionDetailPage = () => {
 														</div>
 													</CardBody>
 												</Card>
-												<div className='row align-items-center'>
-													<div className='col-xl-12 col-md-12'>
-														<Chart
-															series={[
-																calcTotalTaskByStatus(tasks, 0),
-																calcTotalTaskByStatus(tasks, 2),
-																calcTotalTaskByStatus(tasks, 1),
-																calcTotalTaskByStatus(tasks, 3),
-															]}
-															options={chartOptions}
-															type={chartOptions.chart.type}
-															height={chartOptions.chart.height}
-														/>
+												{tasks?.length > 0 ? (
+													<div className='row align-items-center'>
+														<div className='col-xl-12 col-md-12'>
+															<Chart
+																series={[
+																	calcTotalTaskByStatus(tasks, 0),
+																	calcTotalTaskByStatus(tasks, 2),
+																	calcTotalTaskByStatus(tasks, 1),
+																	calcTotalTaskByStatus(tasks, 3),
+																]}
+																options={chartOptions}
+																type={chartOptions.chart.type}
+																height={chartOptions.chart.height}
+															/>
+														</div>
 													</div>
-												</div>
+												) : null}
 											</CardBody>
 										</Card>
 									</div>
@@ -655,101 +668,108 @@ const MissionDetailPage = () => {
 						</Card>
 					</div>
 					<div className='col-lg-4'>
-						<Card className='mb-4 shadow-3d-info' style={{ height: 400 }}>
-							<CardHeader>
-								<CardLabel icon='LayoutTextWindow' iconColor='info'>
-									<CardTitle>Phòng ban phụ trách</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody className='pt-0'>
-								<div className='row g-5'>
-									{mission?.departments?.map((department) => (
-										<div className='col-12 ms-5'>
-											<div
-												className='d-flex align-items-center'
-												key={department.id}>
-												<div className='flex-shrink-0'>
-													<Icon icon='Award' size='2x' color='info' />
-												</div>
-												<div className='flex-grow-1 ms-3'>
-													<div className='fw-bold fs-5 mb-0'>
-														{department.name}
-													</div>
+						<Card className='mb-4 h-100 shadow-3d-info'>
+							<CardBody className='mb-4'>
+								<Card className='mb-4 h-50' shadow='lg'>
+									<CardHeader>
+										<CardLabel icon='LayoutTextWindow' iconColor='info'>
+											<CardTitle>Phòng ban phụ trách</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody className='pt-0'>
+										<div className='row g-5'>
+											{mission?.departments?.map((department) => (
+												<div className='col-12 ms-5' key={department.id}>
 													<div
-														className='text-muted'
-														style={{ fontSize: 14 }}>
-														{department.slug}
+														className='d-flex align-items-center'
+														key={department.id}>
+														<div className='flex-shrink-0'>
+															<Icon
+																icon='TrendingFlat'
+																size='2x'
+																color='info'
+															/>
+														</div>
+														<div className='flex-grow-1 ms-3'>
+															<div className='fw-bold fs-5 mb-0'>
+																{department.name}
+															</div>
+														</div>
+													</div>
+												</div>
+											))}
+										</div>
+									</CardBody>
+								</Card>
+								<Card className='h-50 mb-4' shadow='lg'>
+									<CardHeader>
+										<CardLabel icon='Stream' iconColor='warning'>
+											<CardTitle>Thông tin mục tiêu</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody isScrollable>
+										<div className='row g-2'>
+											<div className='col-12 mb-4'>
+												<div className='d-flex align-items-center'>
+													<div className='flex-shrink-0'>
+														<Icon
+															icon='TrendingFlat'
+															size='2x'
+															color='danger'
+														/>
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='fw-bold fs-5 mb-0'>
+															{mission.description}
+														</div>
+													</div>
+												</div>
+											</div>
+											<div className='col-12 mb-4'>
+												<div className='d-flex align-items-center'>
+													<div className='flex-shrink-0'>
+														<Icon
+															icon='TrendingFlat'
+															size='2x'
+															color='danger'
+														/>
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='fw-bold fs-5 mb-0'>
+															<span className='me-2'>
+																Ngày bắt đầu:
+															</span>
+															{moment(
+																`${mission?.start_time}`,
+															).format('DD-MM-YYYY')}
+														</div>
+													</div>
+												</div>
+											</div>
+											<div className='col-12 mb-4'>
+												<div className='d-flex align-items-center'>
+													<div className='flex-shrink-0'>
+														<Icon
+															icon='TrendingFlat'
+															size='2x'
+															color='danger'
+														/>
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='fw-bold fs-5 mb-0'>
+															<span className='me-2'>
+																Ngày kết thúc:
+															</span>
+															{moment(`${mission?.end_time}`).format(
+																'DD-MM-YYYY',
+															)}
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
-									))}
-								</div>
-							</CardBody>
-						</Card>
-						<Card className='shadow-3d-info h-50 mb-0'>
-							<CardHeader>
-								<CardLabel icon='Stream' iconColor='warning'>
-									<CardTitle>Thông tin mục tiêu</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody isScrollable>
-								<div className='row g-2'>
-									<div className='col-12 mb-4'>
-										<div className='d-flex align-items-center'>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='TrendingFlat'
-													size='2x'
-													color='danger'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-5 mb-0'>
-													{mission.description}
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-12 mb-4'>
-										<div className='d-flex align-items-center'>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='TrendingFlat'
-													size='2x'
-													color='danger'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-5 mb-0'>
-													<span className='me-2'>Ngày bắt đầu:</span>
-													{moment(`${mission?.start_time}`).format(
-														'DD-MM-YYYY',
-													)}
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-12 mb-4'>
-										<div className='d-flex align-items-center'>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='TrendingFlat'
-													size='2x'
-													color='danger'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-5 mb-0'>
-													<span className='me-2'>Ngày kết thúc:</span>
-													{moment(`${mission?.end_time}`).format(
-														'DD-MM-YYYY',
-													)}
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+									</CardBody>
+								</Card>
 							</CardBody>
 						</Card>
 					</div>
@@ -758,7 +778,14 @@ const MissionDetailPage = () => {
 							<Tabs defaultActiveKey='ListTask' id='uncontrolled-tab-example'>
 								<Tab
 									eventKey='ListTask'
-									title='Danh sách công việc'
+									title={`Danh sách công việc (${
+										tasks.filter(
+											(item) =>
+												item.status === 0 ||
+												item.status === 1 ||
+												item.status === 4,
+										)?.length || 0
+									})`}
 									className='mb-3'>
 									<Card style={{ minHeight: '80vh' }}>
 										<CardHeader>
@@ -783,114 +810,148 @@ const MissionDetailPage = () => {
 												style={{ fontSize: 14 }}>
 												<thead>
 													<tr>
-														<th align='center'>STT</th>
-														<th align='center'>Tên công việc</th>
-														<th align='center'>Thời gian dự kiến</th>
-														<th align='center'>Thời hạn hoàn thành</th>
-														<th align='center'>Tiến độ công việc</th>
-														<th align='center'>Giá trị KPI</th>
-														<th align='center'>Độ ưu tiên</th>
-														<th align='center'>Trạng thái</th>
-														<th align='center'>Số đầu việc</th>
+														<th>STT</th>
+														<th>Tên công việc</th>
+														<th className='text-center'>
+															Thời gian dự kiến
+														</th>
+														<th className='text-center'>
+															Hạn hoàn thành
+														</th>
+														<th className='text-center'>Tiến độ</th>
+														<th className='text-center'>Giá trị KPI</th>
+														<th className='text-center'>KPI thực tế</th>
+														<th className='text-center'>Độ ưu tiên</th>
+														<th className='text-center'>Trạng thái</th>
 														<td />
 													</tr>
 												</thead>
 												<tbody>
-													{tasks?.map((item, index) => (
-														<tr key={item.id}>
-															<td>{index + 1}</td>
-															<td className='cursor-pointer'>
-																<Link
-																	className='text-underline'
-																	to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
-																	{item?.name}
-																</Link>
-															</td>
-															<td align='center'>
-																<div className='d-flex align-items-center'>
-																	<span className='text-nowrap'>
-																		{moment(
-																			`${item.estimate_date} ${item.estimate_time}`,
-																		).format(
-																			'DD-MM-YYYY, HH:mm',
-																		)}
-																	</span>
-																</div>
-															</td>
-															<td align='center'>
-																<div className='d-flex align-items-center'>
-																	<span className='text-nowrap'>
-																		{moment(
-																			`${item.deadline_date} ${item.deadline_time}`,
-																		).format(
-																			'DD-MM-YYYY, HH:mm',
-																		)}
-																	</span>
-																</div>
-															</td>
-															<td align='center'>
-																<div className='d-flex align-items-center'>
-																	<div className='flex-shrink-0 me-3'>
-																		{`${calcProgressTask(
-																			item,
-																		)}%`}
+													{tasks
+														.filter(
+															(item) =>
+																item.status === 0 ||
+																item.status === 1 ||
+																item.status === 4,
+														)
+														?.map((item, index) => (
+															<tr key={item.id}>
+																<td>{index + 1}</td>
+																<td
+																	className='cursor-pointer'
+																	style={minWith300}>
+																	<Link
+																		className='text-underline'
+																		to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
+																		{item?.name}
+																	</Link>
+																</td>
+																<td
+																	className='text-center'
+																	style={minWith100}>
+																	<div className='d-flex align-items-center'>
+																		<span className='text-nowrap w-100'>
+																			{moment(
+																				`${item.estimate_date}`,
+																			).format('DD-MM-YYYY')}
+																			{/* {moment(
+																				`${item.estimate_date} ${item.estimate_time}`,
+																			).format(
+																				'DD-MM-YYYY, HH:mm',
+																			)} */}
+																		</span>
 																	</div>
-																	<Progress
-																		className='flex-grow-1'
-																		isAutoColor
-																		value={calcProgressTask(
-																			item,
-																		)}
-																		style={{
-																			height: 10,
-																		}}
-																	/>
-																</div>
-															</td>
-															<td align='center'>
-																{item?.kpi_value}
-															</td>
-															<td>
-																<div className='d-flex align-items-center'>
-																	<span
-																		style={{
-																			paddingRight: '1rem',
-																			paddingLeft: '1rem',
-																		}}
-																		className={classNames(
-																			'badge',
-																			'border border-2',
-																			[
-																				`border-${themeStatus}`,
-																			],
-																			'bg-success',
-																			'pt-2 pb-2 me-2',
-																			`bg-${formatColorPriority(
-																				item.priority,
-																			)}`,
-																		)}>
-																		<span className=''>{`Cấp ${item.priority}`}</span>
-																	</span>
-																</div>
-															</td>
-															<td>
-																<Dropdown>
-																	<DropdownToggle hasIcon={false}>
-																		<Button
-																			isLink
-																			color={formatColorStatus(
-																				item.status,
+																</td>
+																<td
+																	className='text-center'
+																	style={minWith100}>
+																	<div className='d-flex align-items-center'>
+																		<span className='text-nowrap w-100'>
+																			{moment(
+																				`${item.deadline_date}`,
+																			).format('DD-MM-YYYY')}
+																			{/* {moment(
+																				`${item.deadline_date} ${item.deadline_time}`,
+																			).format(
+																				'DD-MM-YYYY, HH:mm',
+																			)} */}
+																		</span>
+																	</div>
+																</td>
+																<td style={minWith150}>
+																	<div className='d-flex align-items-center flex-column'>
+																		<div className='flex-shrink-0 me-3'>
+																			{`${calcProgressTask(
+																				item,
+																			)}%`}
+																		</div>
+																		<Progress
+																			className='flex-grow-1'
+																			isAutoColor
+																			value={calcProgressTask(
+																				item,
 																			)}
-																			icon='Circle'
-																			className='text-nowrap'>
-																			{FORMAT_TASK_STATUS(
-																				item.status,
-																			)}
-																		</Button>
-																	</DropdownToggle>
-																	<DropdownMenu>
-																		{Object.keys(STATUS).map(
-																			(key) => (
+																			style={{
+																				height: 10,
+																				width: '100%',
+																			}}
+																		/>
+																	</div>
+																</td>
+																<td
+																	style={minWith100}
+																	className='text-center'>
+																	{item?.kpi_value}
+																</td>
+																<td
+																	style={minWith150}
+																	className='text-center'>
+																	{item?.current_kpi_value}
+																</td>
+																<td style={minWith100}>
+																	<div className='d-flex align-items-center'>
+																		<span
+																			style={{
+																				paddingRight:
+																					'1rem',
+																				paddingLeft: '1rem',
+																			}}
+																			className={classNames(
+																				'badge',
+																				'border border-2',
+																				[
+																					`border-${themeStatus}`,
+																				],
+																				'bg-success',
+																				'pt-2 pb-2 me-2',
+																				`bg-${formatColorPriority(
+																					item.priority,
+																				)}`,
+																			)}>
+																			<span className=''>{`Cấp ${item.priority}`}</span>
+																		</span>
+																	</div>
+																</td>
+																<td>
+																	<Dropdown>
+																		<DropdownToggle
+																			hasIcon={false}>
+																			<Button
+																				isLink
+																				color={formatColorStatus(
+																					item.status,
+																				)}
+																				icon='Circle'
+																				className='text-nowrap'>
+																				{FORMAT_TASK_STATUS(
+																					item.status,
+																				)}
+																			</Button>
+																		</DropdownToggle>
+																		<DropdownMenu>
+																			{Object.keys(
+																				STATUS,
+																			).map((key) => (
 																				<DropdownItem
 																					key={key}
 																					onClick={() =>
@@ -918,43 +979,45 @@ const MissionDetailPage = () => {
 																						}
 																					</div>
 																				</DropdownItem>
-																			),
-																		)}
-																	</DropdownMenu>
-																</Dropdown>
-															</td>
-															<td align='center'>
-																{item?.subtasks?.length || 0}
-															</td>
-															<td>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='success'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2'
-																	icon='Edit'
-																	onClick={() =>
-																		handleOpenEditForm(item)
-																	}>
-																	Sửa
-																</Button>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='danger'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2'
-																	icon='Trash'
-																	onClick={() =>
-																		handleOpenConfirmModal(item)
-																	}>
-																	Xoá
-																</Button>
-															</td>
-														</tr>
-													))}
+																			))}
+																		</DropdownMenu>
+																	</Dropdown>
+																</td>
+																<td
+																	style={minWith150}
+																	className='d-flex align-items-center justify-content-between'>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='success'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-2'
+																		icon='Edit'
+																		onClick={() =>
+																			handleOpenEditForm(item)
+																		}>
+																		Sửa
+																	</Button>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='danger'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-2'
+																		icon='Trash'
+																		onClick={() =>
+																			handleOpenConfirmModal(
+																				item,
+																			)
+																		}>
+																		Xoá
+																	</Button>
+																</td>
+															</tr>
+														))}
 												</tbody>
 											</table>
-											{!tasks?.length && (
+											{!tasks.filter(
+												(item) => item.status !== 2 || item.status !== 3,
+											)?.length && (
 												<Alert
 													color='warning'
 													isLight
@@ -968,11 +1031,15 @@ const MissionDetailPage = () => {
 								</Tab>
 								<Tab
 									eventKey='ListPendingTask'
-									title='Công việc chờ xác nhận'
+									title={`Công việc chờ xác nhận (${
+										tasks.filter(
+											(item) => item.status === 2 || item.status === 3,
+										)?.length || 0
+									})`}
 									className='mb-3'>
 									<Card style={{ minHeight: '80vh' }}>
 										<CardHeader>
-											<CardLabel icon='Task' iconColor='danger'>
+											<CardLabel icon='ContactSupport' iconColor='secondary'>
 												<CardTitle>
 													<CardLabel>
 														Danh sách công việc chờ xác nhận
@@ -986,141 +1053,152 @@ const MissionDetailPage = () => {
 												style={{ fontSize: 14 }}>
 												<thead>
 													<tr>
-														<th align='center'>STT</th>
-														<th align='center'>Tên công việc</th>
-														<th align='center'>Thời gian dự kiến</th>
-														<th align='center'>Thời hạn hoàn thành</th>
-														<th align='center'>Tiến độ công việc</th>
-														<th align='center'>Giá trị KPI</th>
-														<th align='center'>KPI thực tế</th>
-														<th align='center'>Độ ưu tiên</th>
-														<th align='center'>Trạng thái</th>
+														<th>STT</th>
+														<th>Tên công việc</th>
+														<th>Thời gian dự kiến</th>
+														<th>Thời hạn hoàn thành</th>
+														<th>Tiến độ công việc</th>
+														<th>Giá trị KPI</th>
+														<th>KPI thực tế</th>
+														<th>Độ ưu tiên</th>
+														<th>Trạng thái</th>
 														<td />
 													</tr>
 												</thead>
 												<tbody>
-													{tasksPending?.map((item, index) => (
-														<tr key={item.id}>
-															<td>{index + 1}</td>
-															<td className='cursor-pointer'>
-																<Link
-																	className='text-underline'
-																	to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
-																	{item?.name}
-																</Link>
-															</td>
-															<td align='center'>
-																<div className='d-flex align-items-center'>
-																	<span className='text-nowrap'>
-																		{moment(
-																			`${item.estimate_date} ${item.estimate_time}`,
-																		).format(
-																			'DD-MM-YYYY, HH:mm',
-																		)}
-																	</span>
-																</div>
-															</td>
-															<td align='center'>
-																<div className='d-flex align-items-center'>
-																	<span className='text-nowrap'>
-																		{moment(
-																			`${item.deadline_date} ${item.deadline_time}`,
-																		).format(
-																			'DD-MM-YYYY, HH:mm',
-																		)}
-																	</span>
-																</div>
-															</td>
-															<td align='center'>
-																<div className='d-flex align-items-center'>
-																	<div className='flex-shrink-0 me-3'>
-																		{`${calcProgressTask(
-																			item,
-																		)}%`}
+													{tasks
+														.filter(
+															(item) =>
+																item.status === 2 ||
+																item.status === 3,
+														)
+														?.map((item, index) => (
+															<tr key={item.id}>
+																<td>{index + 1}</td>
+																<td className='cursor-pointer'>
+																	<Link
+																		className='text-underline'
+																		to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
+																		{item?.name}
+																	</Link>
+																</td>
+																<td>
+																	<div className='d-flex align-items-center'>
+																		<span className='text-nowrap'>
+																			{moment(
+																				`${item.estimate_date} ${item.estimate_time}`,
+																			).format(
+																				'DD-MM-YYYY, HH:mm',
+																			)}
+																		</span>
 																	</div>
-																	<Progress
-																		className='flex-grow-1'
-																		isAutoColor
-																		value={calcProgressTask(
-																			item,
+																</td>
+																<td>
+																	<div className='d-flex align-items-center'>
+																		<span className='text-nowrap'>
+																			{moment(
+																				`${item.deadline_date} ${item.deadline_time}`,
+																			).format(
+																				'DD-MM-YYYY, HH:mm',
+																			)}
+																		</span>
+																	</div>
+																</td>
+																<td>
+																	<div className='d-flex align-items-center'>
+																		<div className='flex-shrink-0 me-3'>
+																			{`${calcProgressTask(
+																				item,
+																			)}%`}
+																		</div>
+																		<Progress
+																			className='flex-grow-1'
+																			isAutoColor
+																			value={calcProgressTask(
+																				item,
+																			)}
+																			style={{
+																				height: 10,
+																			}}
+																		/>
+																	</div>
+																</td>
+																<td>{item?.kpi_value}</td>
+																<td>{item?.current_kpi_value}</td>
+																<td>
+																	<div className='d-flex align-items-center'>
+																		<span
+																			style={{
+																				paddingRight:
+																					'1rem',
+																				paddingLeft: '1rem',
+																			}}
+																			className={classNames(
+																				'badge',
+																				'border border-2',
+																				[
+																					`border-${themeStatus}`,
+																				],
+																				'bg-success',
+																				'pt-2 pb-2 me-2',
+																				`bg-${formatColorPriority(
+																					item.priority,
+																				)}`,
+																			)}>
+																			<span className=''>{`Cấp ${item.priority}`}</span>
+																		</span>
+																	</div>
+																</td>
+																<td>
+																	<Button
+																		isLink
+																		color={formatColorStatus(
+																			item.status,
 																		)}
-																		style={{
-																			height: 10,
-																		}}
-																	/>
-																</div>
-															</td>
-															<td align='center'>
-																{item?.kpi_value}
-															</td>
-															<td align='center'>
-																{item?.current_kpi_value}
-															</td>
-															<td>
-																<div className='d-flex align-items-center'>
-																	<span
-																		style={{
-																			paddingRight: '1rem',
-																			paddingLeft: '1rem',
-																		}}
-																		className={classNames(
-																			'badge',
-																			'border border-2',
-																			[
-																				`border-${themeStatus}`,
-																			],
-																			'bg-success',
-																			'pt-2 pb-2 me-2',
-																			`bg-${formatColorPriority(
-																				item.priority,
-																			)}`,
-																		)}>
-																		<span className=''>{`Cấp ${item.priority}`}</span>
-																	</span>
-																</div>
-															</td>
-															<td>
-																<Button
-																	isLink
-																	color={formatColorStatus(
-																		item.status,
-																	)}
-																	icon='Circle'
-																	className='text-nowrap'>
-																	{FORMAT_TASK_STATUS(
-																		item.status,
-																	)}
-																</Button>
-															</td>
-															<td style={{ minWidth: 200 }}>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='success'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2'
-																	icon='Check'
-																	onClick={() =>
-																		handleUpdateStatus(1, item)
-																	}>
-																	Duyệt
-																</Button>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='danger'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2'
-																	icon='Trash'
-																	onClick={() =>
-																		handleUpdateStatus(4, item)
-																	}>
-																	Từ chối
-																</Button>
-															</td>
-														</tr>
-													))}
+																		icon='Circle'
+																		className='text-nowrap'>
+																		{FORMAT_TASK_STATUS(
+																			item.status,
+																		)}
+																	</Button>
+																</td>
+																<td style={{ minWidth: 200 }}>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='success'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-2'
+																		icon='Check'
+																		onClick={() =>
+																			handleUpdateStatus(
+																				1,
+																				item,
+																			)
+																		}>
+																		Duyệt
+																	</Button>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='danger'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-2'
+																		icon='Trash'
+																		onClick={() =>
+																			handleUpdateStatus(
+																				4,
+																				item,
+																			)
+																		}>
+																		Từ chối
+																	</Button>
+																</td>
+															</tr>
+														))}
 												</tbody>
 											</table>
-											{!tasksPending?.length && (
+											{!tasks.filter(
+												(item) => item.status === 2 || item.status === 3,
+											)?.length && (
 												<Alert
 													color='warning'
 													isLight

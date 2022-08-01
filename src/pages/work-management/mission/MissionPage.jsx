@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, createSearchParams, useSearchParams } from 'react-router-dom';
 import moment from 'moment';
 import { uniqBy } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
@@ -54,6 +54,21 @@ const iconColors = [
 		color: 'success',
 		icon: 'Bolt',
 	},
+	{
+		index: 4,
+		color: 'primary',
+		icon: 'AutoAwesome',
+	},
+	{
+		index: 5,
+		color: 'danger',
+		icon: 'Beenhere',
+	},
+	{
+		id: 6,
+		color: 'success',
+		icon: 'Bolt',
+	},
 ];
 
 // eslint-disable-next-line react/prop-types
@@ -78,16 +93,17 @@ const Item = ({ id, name, keys = [], teamName, percent, dueDate, ...props }) => 
 					</CardActions>
 				</CardHeader>
 				<CardBody>
-					<div className='row g-2 mt-3'>
+					<div className='row g-2'>
 						{keys?.map((k, index) => (
 							// eslint-disable-next-line react/no-array-index-key
-							<div key={index} className='col-auto'>
+							<div key={index} className='col-auto mt-2'>
 								<Badge
 									isLight
-									color={iconColors[index].color}
-									className='px-3 py-2'>
+									color={iconColors[index]?.color}
+									className='px-3 py-2'
+									style={{ fontSize: 13 }}>
 									<Icon
-										icon={iconColors[index].icon}
+										icon={iconColors[index]?.icon}
 										size='lg'
 										className='me-1'
 									/>
@@ -96,8 +112,8 @@ const Item = ({ id, name, keys = [], teamName, percent, dueDate, ...props }) => 
 							</div>
 						))}
 					</div>
-					<div className='row'>
-						<div className='col-md-6'>
+					<div className='row mt-4'>
+						<div className='col-md-12'>
 							{percent}%
 							<Progress isAutoColor value={percent} height={10} />
 						</div>
@@ -116,9 +132,9 @@ const MissionPage = () => {
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [switchView, setSwitchView] = useState(1);
 
 	const { darkModeStatus } = useDarkMode();
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const navigateToDetailPage = useCallback(
 		(page) => navigate(`/muc-tieu/chi-tiet/${page}`),
@@ -271,6 +287,15 @@ const MissionPage = () => {
 		fetchData();
 	}, []);
 
+	const handleClickSwitchView = (view) => {
+		navigate({
+			pathname: '/muc-tieu/danh-sach',
+			search: `?${createSearchParams({
+				view,
+			})}`,
+		});
+	};
+
 	return (
 		<PageWrapper title={demoPages.quanLyCongViec.subMenu.danhSach.text}>
 			<Page container='fluid'>
@@ -284,27 +309,29 @@ const MissionPage = () => {
 									className='rounded-0'
 									color='info'
 									icon='CardList'
-									onClick={() => setSwitchView(1)}
+									onClick={() => handleClickSwitchView(1)}
 								/>
 								<Button
 									size='lg'
 									className='rounded-0'
 									color='primary'
 									icon='Table'
-									onClick={() => setSwitchView(0)}
+									onClick={() => handleClickSwitchView(2)}
 								/>
 							</div>
 						</div>
 					</div>
 				</div>
-				{switchView === 1 ? (
+				{searchParams.get('view') === 1 ||
+				searchParams.get('view') === '1' ||
+				!searchParams.get('view') ? (
 					<div className='row'>
 						{missionsWithTask?.map((item) => (
 							<div className='col-md-6 col-xl-4 col-sm-12' key={item.id}>
 								<Card stretch className='cursor-pointer'>
 									<CardHeader className='bg-transparent py-0'>
 										<CardLabel
-											className='py-4'
+											className='pt-4 pb-2'
 											onClick={() => navigateToDetailPage(item.id)}>
 											<CardTitle tag='h3' className='h3'>
 												{item?.name}
@@ -349,18 +376,20 @@ const MissionPage = () => {
 											</Dropdown>
 										</CardActions>
 									</CardHeader>
-									<CardBody onClick={() => navigateToDetailPage(item.id)}>
+									<CardBody
+										className='pt-2 pb-4'
+										onClick={() => navigateToDetailPage(item.id)}>
 										<div className='row'>
 											{item?.keys.slice(0, 6)?.map((k, index) => (
 												// eslint-disable-next-line react/no-array-index-key
-												<div key={index} className='col-auto'>
+												<div key={index} className='col-auto mt-2'>
 													<Badge
 														isLight
-														color={iconColors[index].color}
+														color={iconColors[index]?.color}
 														className='px-3 py-2'
 														style={{ fontSize: 13 }}>
 														<Icon
-															icon={iconColors[index].icon}
+															icon={iconColors[index]?.icon}
 															size='lg'
 															className='me-1'
 														/>
@@ -370,7 +399,7 @@ const MissionPage = () => {
 											))}
 										</div>
 										<div className='row mt-4'>
-											<div className='col-md-6'>
+											<div className='col-md-12'>
 												{calcProgressMission(item, item?.tasks)}%
 												<Progress
 													isAutoColor
@@ -539,7 +568,7 @@ const MissionPage = () => {
 								keys={item.keys}
 								id={item.id}
 								name={item?.name}
-								teamName={item.departmnent?.name}
+								teamName={item.department?.name}
 								dueDate={`${item.deadline_date}`}
 								percent={calcProgressTask(item) || 0}
 								data-tour='project-item'

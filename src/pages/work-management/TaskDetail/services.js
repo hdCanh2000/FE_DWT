@@ -44,6 +44,13 @@ const getTask = () => {
 		url: `/tasks`,
 	});
 };
+const updateStatusPendingTask = (data) => {
+	return axiosClient({
+		method: 'PUT',
+		url: `/tasks/${data.id}`,
+		data,
+	});
+};
 export {
 	updateSubtasks,
 	getAllDepartments,
@@ -52,4 +59,5 @@ export {
 	updateCurrentKpiMission,
 	getMission,
 	getTask,
+	updateStatusPendingTask,
 };
