@@ -25,4 +25,13 @@ const updateSubtasks = (id, data) => {
 		data,
 	});
 };
-export { updateSubtasks, getAllDepartments, getAllSubtasks, getAllUser };
+
+const updateStatusPendingTask = (data) => {
+	return axiosClient({
+		method: 'PUT',
+		url: `/tasks/${data.id}`,
+		data,
+	});
+};
+
+export { updateSubtasks, getAllDepartments, getAllSubtasks, getAllUser, updateStatusPendingTask };

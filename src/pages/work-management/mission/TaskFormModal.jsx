@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { isArray } from 'lodash';
 import moment from 'moment';
 import { Button, Modal } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
 import SelectComponent from 'react-select';
 import styled from 'styled-components';
 import Card, {
@@ -38,7 +37,6 @@ const customStyles = {
 };
 
 const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
-	const params = useParams();
 	const [task, setTask] = useState({});
 	const [keysState, setKeysState] = useState([]);
 	const [departments, setDepartments] = useState([]);
@@ -317,8 +315,9 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 
 	const handleSubmit = () => {
 		const data = { ...task };
-		data.mission_id = parseInt(params?.id, 10);
+		data.mission_id = parseInt(data?.mission_id, 10);
 		data.kpi_value = parseInt(task?.kpi_value, 10);
+		data.current_kpi_value = task.id ? task?.current_kpi_value : parseInt(task?.kpi_value, 10);
 		data.priority = parseInt(task?.priority, 10);
 		data.keys = keysState.map((key) => {
 			return {
