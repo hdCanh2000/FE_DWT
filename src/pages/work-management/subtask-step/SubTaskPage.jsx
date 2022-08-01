@@ -440,11 +440,11 @@ const SubTaskPage = () => {
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>
-											<CardBody>
-												<div className='row g-4 align-items-center'>
+											<CardBody isScrollable style={{ minHeight: 300 }}>
+												<div className='row g-4 align-items-center justify-content-center'>
 													{subtask?.keys?.map((item, index) => (
 														// eslint-disable-next-line react/no-array-index-key
-														<div className='col-xl-6' key={index}>
+														<div className='col-xl-12' key={index}>
 															<div
 																className={classNames(
 																	'd-flex align-items-center rounded-2 p-3 bg-l25-light',
