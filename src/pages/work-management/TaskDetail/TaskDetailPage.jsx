@@ -13,6 +13,7 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownItem,
 } from '../../../components/bootstrap/Dropdown';
+import Alert from '../../../components/bootstrap/Alert';
 import { updateSubtasks, getAllSubtasks } from './services';
 import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
@@ -870,13 +871,20 @@ const TaskDetailPage = () => {
 						<Tabs defaultActiveKey='DetailSubtask' id='uncontrolled-tab-example'>
 							<Tab
 								eventKey='DetailSubtask'
-								title='Danh sách đầu việc'
+								title={`Danh sách đầu việc (${
+									subtask?.filter(
+										(item) =>
+											item.status === 1 ||
+											item.status === 0 ||
+											item.status === 4,
+									).length
+								})`}
 								className='mb-3'>
 								{/* Danh sách đầu việc */}
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
 										<CardTitle>
-											<CardLabel>Danh sách đầu việc</CardLabel>
+											<CardLabel>Danh sách đầu việc </CardLabel>
 										</CardTitle>
 									</CardLabel>
 									<Button
@@ -908,12 +916,26 @@ const TaskDetailPage = () => {
 												</tr>
 											</thead>
 											<tbody>
-												{subtask ? (
-													''
-												) : (
-													<tr style={{ textAlign: 'center' }}>
-														<td>Chưa có đầu việc nào</td>
+												{subtask?.filter(
+													(item) =>
+														item.status === 1 ||
+														item.status === 0 ||
+														item.status === 4,
+												).length === 0 ? (
+													<tr>
+														<td colSpan='8'>
+															<Alert
+																color='warning'
+																isLight
+																icon='Report'
+																className='mt-3'>
+																Không có đầu việc thuộc công việc
+																này !
+															</Alert>
+														</td>
 													</tr>
+												) : (
+													''
 												)}
 												{subtask
 													?.filter(
@@ -1061,7 +1083,13 @@ const TaskDetailPage = () => {
 									</div>
 								</CardBody>
 							</Tab>
-							<Tab eventKey='SubmitSubtask' title='Đầu việc chờ xác nhận'>
+							<Tab
+								eventKey='SubmitSubtask'
+								title={`Đầu việc chờ xác nhận (${
+									subtask?.filter(
+										(item) => item.status === 2 || item.status === 3,
+									).length
+								})`}>
 								<CardHeader>
 									<CardLabel icon='ContactSupport' iconColor='secondary'>
 										<CardTitle tag='h4' className='h5'>
@@ -1090,12 +1118,24 @@ const TaskDetailPage = () => {
 												</tr>
 											</thead>
 											<tbody>
-												{subtask ? (
-													''
-												) : (
-													<tr style={{ textAlign: 'center' }}>
-														<td>Chưa có đầu việc nào</td>
+												{subtask?.filter(
+													(item) =>
+														item.status === 2 || item.status === 3,
+												).length === 0 ? (
+													<tr>
+														<td colSpan='8'>
+															<Alert
+																color='warning'
+																isLight
+																icon='Report'
+																className='mt-3'>
+																Không có đầu việc thuộc công việc
+																này !
+															</Alert>
+														</td>
 													</tr>
+												) : (
+													''
 												)}
 												{subtask
 													?.filter(
