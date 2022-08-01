@@ -25,4 +25,31 @@ const updateSubtasks = (id, data) => {
 		data,
 	});
 };
-export { updateSubtasks, getAllDepartments, getAllSubtasks, getAllUser };
+const updateCurrentKpiMission = (id, data) => {
+	return axiosClient({
+		method: 'PATCH',
+		url: `/missions/${id}`,
+		data,
+	});
+};
+const getMission = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/missions`,
+	});
+};
+const getTask = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/tasks`,
+	});
+};
+export {
+	updateSubtasks,
+	getAllDepartments,
+	getAllSubtasks,
+	getAllUser,
+	updateCurrentKpiMission,
+	getMission,
+	getTask,
+};
