@@ -32,10 +32,22 @@ const LoginHeader = ({ isNewUser }) => {
 const Login = ({ isSignUp }) => {
 	const { darkModeStatus } = useDarkMode();
 	const [isNewUser] = useState(isSignUp);
+	const [account, setAccount] = useState({
+		login_username: '',
+		login_password: '',
+	});
+
+	const handleChange = (e) => {
+		const { value } = e.target;
+		setAccount({
+			...account,
+			[e.target.name]: value,
+		});
+	};
 
 	const navigate = useNavigate();
 	const handleOnClick = () => {
-		if (!localStorage.getItem('token')) {
+		if (!localStorage.getItem('token') && account.login_username === 'admin') {
 			localStorage.setItem('token', '110ce079a5e79a185e12b04289536364');
 			navigate('/muc-tieu/danh-sach');
 		}
@@ -113,14 +125,17 @@ const Login = ({ isSignUp }) => {
 										<>
 											<div className='col-12 mb-'>
 												<FormGroup
-													id='login-username'
+													id='login_username'
 													className='mb-3'
 													isFloating
-													label='Your email or username'>
-													<Input autoComplete='username' />
+													label='Nhập tên tài khoản hoặc email'>
+													<Input
+														autoComplete='username'
+														onChange={handleChange}
+													/>
 												</FormGroup>
 												<FormGroup
-													id='login-password'
+													id='login_password'
 													className='mb-3'
 													isFloating
 													label='Password'>
@@ -134,62 +149,16 @@ const Login = ({ isSignUp }) => {
 												<Button
 													color='warning'
 													className='w-100 py-3'
-													onClick={handleOnClick}>
-													Login
+													onClick={handleOnClick}
+													onChange={handleChange}>
+													Đăng nhập
 												</Button>
 											</div>
 										</>
 									)}
-									{/* BEGIN :: Social Login */}
-									<div className='col-12 mt-3 text-center text-muted'>OR</div>
-									<div className='col-12 mt-3'>
-										<Button
-											isOutline
-											color={darkModeStatus ? 'light' : 'dark'}
-											className={classNames('w-100 py-3', {
-												'border-light': !darkModeStatus,
-												'border-dark': darkModeStatus,
-											})}
-											icon='CustomApple'
-											onClick={handleOnClick}>
-											Sign in with Apple
-										</Button>
-									</div>
-									<div className='col-12'>
-										<Button
-											isOutline
-											color={darkModeStatus ? 'light' : 'dark'}
-											className={classNames('w-100 py-3', {
-												'border-light': !darkModeStatus,
-												'border-dark': darkModeStatus,
-											})}
-											icon='CustomGoogle'
-											onClick={handleOnClick}>
-											Continue with Google
-										</Button>
-									</div>
-									{/* END :: Social Login */}
 								</form>
 							</CardBody>
 						</Card>
-						<div className='text-center'>
-							<a
-								href='/'
-								className={classNames('text-decoration-none me-3', {
-									'link-light': isNewUser,
-									'link-dark': !isNewUser,
-								})}>
-								Privacy policy
-							</a>
-							<a
-								href='/'
-								className={classNames('link-light text-decoration-none', {
-									'link-light': isNewUser,
-									'link-dark': !isNewUser,
-								})}>
-								Terms of use
-							</a>
-						</div>
 					</div>
 				</div>
 			</Page>

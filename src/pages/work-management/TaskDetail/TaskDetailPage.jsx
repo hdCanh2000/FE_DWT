@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
@@ -13,7 +13,7 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownItem,
 } from '../../../components/bootstrap/Dropdown';
-import { updateSubtasks, getAllSubtasks } from './services';
+import { updateSubtasks, getAllSubtasks, updateStatusPendingTask } from './services';
 import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -31,6 +31,10 @@ import TaskDetailForm from './TaskDetailForm/TaskDetailForm';
 import ComfirmSubtask from './TaskDetailForm/ComfirmSubtask';
 import useDarkMode from '../../../hooks/useDarkMode';
 import './styleTaskDetail.scss';
+import SubHeader, { SubHeaderLeft } from '../../../layout/SubHeader/SubHeader';
+import TaskFormModal from '../mission/TaskFormModal';
+import { deleteTaskById, updateTaskByID } from '../mission/services';
+import TaskAlertConfirm from '../mission/TaskAlertConfirm';
 
 const TaskDetailPage = () => {
 	// State
@@ -43,6 +47,10 @@ const TaskDetailPage = () => {
 	const [subtask, setSubTask] = React.useState();
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [deletes, setDeletes] = React.useState({});
+	const [editModalTaskStatus, setEditModalTaskStatus] = useState(false);
+	const [taskEdit, setTaskEdit] = useState({});
+	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
+
 	const chartOptions = {
 		chart: {
 			type: 'donut',
@@ -53,7 +61,7 @@ const TaskDetailPage = () => {
 		},
 		labels: [
 			'Đang thực hiện',
-			'Chờ xét duyệt',
+			'Chờ xác nhận',
 			'Đã hoàn thành',
 			'Quá hạn / thất bại',
 			'Từ chối',
@@ -100,6 +108,8 @@ const TaskDetailPage = () => {
 		series: [0, 0, 0, 0],
 		options: chartOptions,
 	});
+
+	const navigate = useNavigate();
 	// Data
 	function color(props) {
 		if (props === 0) {
@@ -109,7 +119,7 @@ const TaskDetailPage = () => {
 			return { name: 'Đã hoàn thành', color: 'success' };
 		}
 		if (props === 2) {
-			return { name: 'Chờ duyệt', color: 'danger' };
+			return { name: 'Chờ xác nhận', color: 'danger' };
 		}
 		if (props === 3) {
 			return { name: 'Quá hạn / thất bại', color: 'dark' };
@@ -225,6 +235,29 @@ const TaskDetailPage = () => {
 			toast.error('Thay đổi trạng thái thất bại !');
 		}
 	};
+
+	// form task modal
+	const handleOpenEditTaskForm = (item) => {
+		setEditModalTaskStatus(true);
+		setTaskEdit({ ...item });
+	};
+
+	const handleCloseEditTaskForm = () => {
+		setEditModalTaskStatus(false);
+		setTaskEdit(null);
+	};
+
+	// // confirm task modal
+	const handleOpenConfirmTaskModal = (item) => {
+		setOpenConfirmTaskModal(true);
+		setTaskEdit({ ...item });
+	};
+
+	const handleCloseConfirmTaskModal = () => {
+		setOpenConfirmTaskModal(false);
+		setTaskEdit(null);
+	};
+
 	// funtion caculator
 
 	// phần trăm hòan thành subtask
@@ -345,13 +378,83 @@ const TaskDetailPage = () => {
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [task]);
+
+	const handleClickChangeStatusPending = async (data) => {
+		try {
+			const taskClone = { ...data };
+			taskClone.status = 2;
+			const response = await updateStatusPendingTask(taskClone);
+			const result = await response.data;
+			setTask(result);
+			toast.success('Báo công việc chờ duyệt thành công!');
+		} catch (error) {
+			toast.error('Báo công việc không thành công. Vui lòng thử lại!');
+		}
+	};
+
+	const handleDeleteTask = async (taskId) => {
+		try {
+			await deleteTaskById(taskId);
+			handleCloseConfirmTaskModal();
+			navigate(-1);
+			toast.success('Xoá công việc thành công!');
+		} catch (error) {
+			handleCloseConfirmTaskModal();
+			toast.error('Xoá công việc không thành công. Vui lòng thử lại!');
+		}
+	};
+
+	const handleSubmitTaskForm = async (data) => {
+		if (data.id) {
+			try {
+				const response = await updateTaskByID(data);
+				const result = await response.data;
+				setTask(result);
+				toast.success('Cập nhật công việc thành công!');
+				handleCloseEditTaskForm();
+			} catch (error) {
+				setTask(task);
+				toast.error('Cập nhật công việc không thành công. Xin vui lòng thử lại!');
+			}
+		}
+	};
+
 	return (
 		<PageWrapper title={`${task?.name}`}>
 			<Toaster />
+			<SubHeader>
+				<SubHeaderLeft>
+					<Button color='info' isLink icon='ArrowBack' onClick={() => navigate(-1)}>
+						Quay lại
+					</Button>
+				</SubHeaderLeft>
+			</SubHeader>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
-						<div className='display-4 fw-bold py-3'>{task?.name}</div>
+						<div className='d-flex justify-content-between align-items-center'>
+							<div className='display-4 fw-bold py-3'>{task?.name}</div>
+							<div>
+								<Button
+									isOutline={!darkModeStatus}
+									color='primary'
+									isLight={darkModeStatus}
+									className='text-nowrap mx-2'
+									icon='Edit'
+									onClick={() => handleOpenEditTaskForm(task)}>
+									Sửa
+								</Button>
+								<Button
+									isOutline={!darkModeStatus}
+									color='danger'
+									isLight={darkModeStatus}
+									className='text-nowrap mx-2'
+									icon='Trash'
+									onClick={() => handleOpenConfirmTaskModal(task)}>
+									Xoá
+								</Button>
+							</div>
+						</div>
 					</div>
 					<div className='col-lg-8'>
 						<Card className='shadow-3d-primary'>
@@ -361,6 +464,13 @@ const TaskDetailPage = () => {
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
+								<Button
+									color='danger'
+									icon='Report'
+									isLight
+									onClick={() => handleClickChangeStatusPending(task)}>
+									Xác nhận hoàn thành
+								</Button>
 							</CardHeader>
 							<CardBody>
 								<div className='row g-4'>
@@ -1074,6 +1184,19 @@ const TaskDetailPage = () => {
 					editModalStatus={editModalStatus}
 					id={parseInt(params?.id, 10)}
 					idEdit={idEdit}
+				/>
+				<TaskFormModal
+					show={editModalTaskStatus}
+					onClose={handleCloseEditTaskForm}
+					onSubmit={handleSubmitTaskForm}
+					item={taskEdit}
+				/>
+				<TaskAlertConfirm
+					openModal={openConfirmTaskModal}
+					onCloseModal={handleCloseConfirmTaskModal}
+					onConfirm={() => handleDeleteTask(taskEdit?.id)}
+					title='Xoá công việc'
+					content={`Xác nhận xoá công việc <strong>${taskEdit?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>
