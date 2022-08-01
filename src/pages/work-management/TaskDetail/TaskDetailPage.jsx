@@ -781,12 +781,13 @@ const TaskDetailPage = () => {
 										<table className='table table-modern mb-0'>
 											<thead>
 												<tr>
-													<th>Ngày tạo</th>
+													<th>STT</th>
 													<th>Tên đầu việc</th>
-													<th>Độ ưu tiên</th>
-													<th>Giá trị kpi</th>
+													<th>Thời gian dự kiến</th>
 													<th>Hạn hoàn thành</th>
-													<th>Tiến độ công việc</th>
+													<th>Tiến độ đầu việc</th>
+													<th>Giá trị kpi</th>
+													<th>Độ ưu tiên</th>
 													<th>Trạng thái</th>
 													<th>Hành động</th>
 												</tr>
@@ -806,19 +807,9 @@ const TaskDetailPage = () => {
 															item.status === 1 ||
 															item.status === 4,
 													)
-													.map((item) => (
+													.map((item, index) => (
 														<tr key={item.id}>
-															<td>
-																<div className='d-flex align-items-center'>
-																	<span className='text-nowrap'>
-																		{moment(
-																			`${item.estimate_date} ${item.estimate_time}`,
-																		).format(
-																			'DD-MM-YYYY, HH:mm',
-																		)}
-																	</span>
-																</div>
-															</td>
+															<td>{index + 1}</td>
 															<td>
 																<div>
 																	<div>
@@ -833,6 +824,25 @@ const TaskDetailPage = () => {
 																	</div>
 																</div>
 															</td>
+															<td>
+																{moment(
+																	`${item.estimate_date} ${item.estimate_time}`,
+																).format('DD-MM-YYYY, HH:mm')}
+															</td>
+															<td>
+																{moment(
+																	`${item.deadline_date} ${item.deadline_time}`,
+																).format('DD-MM-YYYY, HH:mm')}
+															</td>
+															<td>
+																{progressSubtask(item)} %
+																<Progress
+																	isAutoColor
+																	value={progressSubtask(item)}
+																	height={10}
+																/>
+															</td>
+															<td>{item.kpi_value}</td>
 															<td>
 																<span
 																	style={{
@@ -851,19 +861,6 @@ const TaskDetailPage = () => {
 																	)}>
 																	<span className=''>{`Cấp ${item.priority}`}</span>
 																</span>
-															</td>
-															<td>{item.kpi_value}</td>
-															<td>
-																{moment(
-																	`${item.deadline_date} ${item.deadline_time}`,
-																).format('DD-MM-YYYY, HH:mm')}
-															</td>
-															<td>
-																<Progress
-																	isAutoColor
-																	value={progressSubtask(item)}
-																	height={10}
-																/>
 															</td>
 															<td>
 																<Dropdown>
