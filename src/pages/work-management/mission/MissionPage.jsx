@@ -1,3 +1,6 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react/prop-types */
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, Link, createSearchParams, useSearchParams } from 'react-router-dom';
 import moment from 'moment';
@@ -32,47 +35,21 @@ import Dropdown, {
 import MissionAlertConfirm from './MissionAlertConfirm';
 import MissionFormModal from './MissionFormModal';
 import Badge from '../../../components/bootstrap/Badge';
-import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
 import { calcProgressMission, calcProgressTask } from '../../../utils/function';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 
-const iconColors = [
-	{
-		index: 1,
-		color: 'primary',
-		icon: 'AutoAwesome',
-	},
-	{
-		index: 2,
-		color: 'danger',
-		icon: 'Beenhere',
-	},
-	{
-		id: 3,
-		color: 'success',
-		icon: 'Bolt',
-	},
-	{
-		index: 4,
-		color: 'primary',
-		icon: 'AutoAwesome',
-	},
-	{
-		index: 5,
-		color: 'danger',
-		icon: 'Beenhere',
-	},
-	{
-		id: 6,
-		color: 'success',
-		icon: 'Bolt',
-	},
-];
-
-// eslint-disable-next-line react/prop-types
-const Item = ({ id, name, keys = [], teamName, percent, dueDate, ...props }) => {
+const Item = ({
+	id,
+	name,
+	teamName,
+	percent,
+	dueDate,
+	departmentsRelated = [],
+	usersRelated = [],
+	...props
+}) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
 		() => navigate(`/quan-ly-cong-viec/cong-viec/${id}`),
@@ -84,35 +61,50 @@ const Item = ({ id, name, keys = [], teamName, percent, dueDate, ...props }) => 
 				<CardHeader>
 					<CardLabel icon='Ballot'>
 						<CardTitle>{name}</CardTitle>
-						<CardSubTitle>{teamName}</CardSubTitle>
+						<CardSubTitle>{`Phụ trách: ${teamName}`}</CardSubTitle>
 					</CardLabel>
 					<CardActions>
 						<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-							{dueDate}
+							{moment(`${dueDate}`).format('DD-MM-YYYY')}
 						</small>
 					</CardActions>
 				</CardHeader>
 				<CardBody>
-					<div className='row g-2'>
-						{keys?.map((k, index) => (
+					<div className='row g-2 align-items-center'>
+						<div className='col-auto mt-2'>
+							<span>Phòng ban:</span>
+						</div>
+						{departmentsRelated?.map((k, index) => (
 							// eslint-disable-next-line react/no-array-index-key
 							<div key={index} className='col-auto mt-2'>
 								<Badge
 									isLight
-									color={iconColors[index]?.color}
-									className='px-3 py-2'
-									style={{ fontSize: 13 }}>
-									<Icon
-										icon={iconColors[index]?.icon}
-										size='lg'
-										className='me-1'
-									/>
-									{k.key_name}
+									color='primary'
+									className='px-3 py-3'
+									style={{ fontSize: 14 }}>
+									{k?.name}
 								</Badge>
 							</div>
 						))}
 					</div>
-					<div className='row mt-4'>
+					<div className='row g-2 mt-2 align-items-center'>
+						<div className='col-auto mt-2'>
+							<span>Nhân viên:</span>
+						</div>
+						{usersRelated?.map((k, index) => (
+							// eslint-disable-next-line react/no-array-index-key
+							<div key={index} className='col-auto mt-2'>
+								<Badge
+									isLight
+									color='danger'
+									className='px-3 py-3'
+									style={{ fontSize: 14 }}>
+									{k?.name}
+								</Badge>
+							</div>
+						))}
+					</div>
+					<div className='row mt-2'>
 						<div className='col-md-12'>
 							{percent}%
 							<Progress isAutoColor value={percent} height={10} />
@@ -322,22 +314,26 @@ const MissionPage = () => {
 						</div>
 					</div>
 				</div>
-				{searchParams.get('view') === 1 ||
-				searchParams.get('view') === '1' ||
-				!searchParams.get('view') ? (
+				{parseInt(searchParams.get('view'), 10) === 1 || !searchParams.get('view') ? (
 					<div className='row'>
 						{missionsWithTask?.map((item) => (
-							<div className='col-md-6 col-xl-4 col-sm-12' key={item.id}>
+							<div className='col-md-6 col-xl-4 col-sm-12' key={item?.id}>
 								<Card stretch className='cursor-pointer'>
 									<CardHeader className='bg-transparent py-0'>
 										<CardLabel
-											className='pt-4 pb-2'
-											onClick={() => navigateToDetailPage(item.id)}>
+											icon='StarOutline'
+											className='pt-4 pb-2 w-100'
+											onClick={() => navigateToDetailPage(item?.id)}>
 											<CardTitle tag='h3' className='h3'>
 												{item?.name}
 											</CardTitle>
-											<CardSubTitle style={{ fontSize: 15 }}>
-												{item?.description}
+											<CardSubTitle>
+												Số công việc:
+												<span
+													style={{ fontSize: 14 }}
+													className='text-danger fw-bold ps-2'>
+													{item?.tasks?.length || 0}
+												</span>
 											</CardSubTitle>
 										</CardLabel>
 										<CardActions>
@@ -378,22 +374,40 @@ const MissionPage = () => {
 									</CardHeader>
 									<CardBody
 										className='pt-2 pb-4'
-										onClick={() => navigateToDetailPage(item.id)}>
+										onClick={() => navigateToDetailPage(item?.id)}>
 										<div className='row'>
-											{item?.keys.slice(0, 6)?.map((k, index) => (
+											<div className='col-md-12'>
+												<div className='d-flex align-items-center jusify-content-start'>
+													<small
+														style={{ fontSize: 14 }}
+														className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+														{moment(`${item?.start_time}`).format(
+															'DD-MM-YYYY',
+														)}
+													</small>
+													<span style={{ fontSize: 14 }} className='px-2'>
+														-
+													</span>
+													<small
+														style={{ fontSize: 14 }}
+														className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+														{moment(`${item?.end_time}`).format(
+															'DD-MM-YYYY',
+														)}
+													</small>
+												</div>
+											</div>
+										</div>
+										<div className='row'>
+											{item?.departments.slice(0, 6)?.map((k, index) => (
 												// eslint-disable-next-line react/no-array-index-key
 												<div key={index} className='col-auto mt-2'>
 													<Badge
 														isLight
-														color={iconColors[index]?.color}
-														className='px-3 py-2'
-														style={{ fontSize: 13 }}>
-														<Icon
-															icon={iconColors[index]?.icon}
-															size='lg'
-															className='me-1'
-														/>
-														{k.key_name}
+														color='primary'
+														className='px-3 py-3'
+														style={{ fontSize: 14 }}>
+														{k?.name}
 													</Badge>
 												</div>
 											))}
@@ -564,12 +578,14 @@ const MissionPage = () => {
 					{latestTasks.map((item) => {
 						return (
 							<Item
-								key={item.id}
-								keys={item.keys}
-								id={item.id}
+								key={item?.id}
+								keys={item?.keys}
+								departmentsRelated={item?.departments_related}
+								usersRelated={item?.users_related}
+								id={item?.id}
 								name={item?.name}
-								teamName={item.department?.name}
-								dueDate={`${item.deadline_date}`}
+								teamName={`${item?.department?.name} - ${item?.user?.name}`}
+								dueDate={`${item?.deadline_date}`}
 								percent={calcProgressTask(item) || 0}
 								data-tour='project-item'
 							/>

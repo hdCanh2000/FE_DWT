@@ -36,7 +36,40 @@ import MissionAlertConfirm from '../mission/MissionAlertConfirm';
 import Progress from '../../../components/bootstrap/Progress';
 import ExpandRow from './ExpandRow';
 import { calculateProgressTaskBySteps } from '../../../utils/function';
+import Badge from '../../../components/bootstrap/Badge';
 
+const iconColors = [
+	{
+		index: 1,
+		color: 'primary',
+		icon: 'AutoAwesome',
+	},
+	{
+		index: 2,
+		color: 'danger',
+		icon: 'Beenhere',
+	},
+	{
+		id: 3,
+		color: 'success',
+		icon: 'Bolt',
+	},
+	{
+		index: 4,
+		color: 'primary',
+		icon: 'AutoAwesome',
+	},
+	{
+		index: 5,
+		color: 'danger',
+		icon: 'Beenhere',
+	},
+	{
+		id: 6,
+		color: 'success',
+		icon: 'Bolt',
+	},
+];
 const minWidth300 = {
 	minWidth: 300,
 };
@@ -54,7 +87,7 @@ const minWidth100 = {
 };
 
 // eslint-disable-next-line react/prop-types
-const Item = ({ id, name, teamName, percent, dueDate }) => {
+const Item = ({ id, name, teamName, percent, dueDate, keys = [] }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
 		() => navigate(`../${demoPages.quanLyCongViec.subMenu.congViec.path}/${id}`),
@@ -63,7 +96,7 @@ const Item = ({ id, name, teamName, percent, dueDate }) => {
 	return (
 		<div className='col-md-6 col-xl-4 col-sm-12'>
 			<Card stretch onClick={handleOnClickToProjectPage} className='cursor-pointer'>
-				<CardHeader>
+				<CardHeader className='pt-4 pb-1'>
 					<CardLabel icon='Ballot'>
 						<CardTitle>{name}</CardTitle>
 						<CardSubTitle>{teamName}</CardSubTitle>
@@ -74,9 +107,28 @@ const Item = ({ id, name, teamName, percent, dueDate }) => {
 						</small>
 					</CardActions>
 				</CardHeader>
-				<CardBody>
+				<CardBody className='pt-1 pb-4'>
 					<div className='row'>
-						<div className='col-md-6'>
+						{keys?.slice(0, 6)?.map((k, index) => (
+							// eslint-disable-next-line react/no-array-index-key
+							<div key={index} className='col-auto mt-2'>
+								<Badge
+									isLight
+									color={iconColors[index]?.color}
+									className='px-3 py-2'
+									style={{ fontSize: 13 }}>
+									<Icon
+										icon={iconColors[index]?.icon}
+										size='lg'
+										className='me-1'
+									/>
+									{k.key_name}
+								</Badge>
+							</div>
+						))}
+					</div>
+					<div className='row mt-4'>
+						<div className='col-md-12'>
 							{percent}%
 							<Progress isAutoColor value={percent} height={10} />
 						</div>
@@ -527,15 +579,31 @@ const TaskListPage = () => {
 											key={item.id}
 											id={item.id}
 											name={item?.name}
-											teamName={item.departmnent?.name}
+											teamName={item.department?.name}
 											dueDate={`${item.deadline_date}`}
 											percent={
 												calculateProgressTaskBySteps(item?.subtasks) || 0
 											}
+											keys={item?.keys}
 											data-tour='project-item'
 										/>
 									);
 								})}
+								<div className='col-md-12 col-xl-4 col-sm-12'>
+									<Card stretch>
+										<CardBody className='d-flex align-items-center justify-content-center'>
+											<Button
+												color='info'
+												size='lg'
+												isLight
+												className='w-100 h-100'
+												icon='AddCircle'
+												onClick={() => handleOpenEditForm(null)}>
+												Thêm công việc
+											</Button>
+										</CardBody>
+									</Card>
+								</div>
 							</div>
 						)}
 					</div>

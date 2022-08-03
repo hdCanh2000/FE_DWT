@@ -35,7 +35,7 @@ import {
 	calcProgressMission,
 	calcProgressTask,
 	calcTotalTaskByStatus,
-	calculateTotalSubTasksInTasks,
+	// calculateTotalSubTasksInTasks,
 } from '../../../utils/function';
 import Button from '../../../components/bootstrap/Button';
 import MissionAlertConfirm from './MissionAlertConfirm';
@@ -56,6 +56,7 @@ import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
 import '../TaskDetail/styleTaskDetail.scss';
 import MissionFormModal from './MissionFormModal';
+import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
 
 const minWith300 = {
 	minWidth: 300,
@@ -77,7 +78,7 @@ const chartOptions = {
 	stroke: {
 		width: 0,
 	},
-	labels: ['Đang thực hiện', 'Chờ duyệt', 'Đã hoàn thành', 'Quá hạn/Thất bại'],
+	labels: ['Đang thực hiện', 'Chờ duyệt', 'Đã hoàn thành', 'Quá hạn/Huỷ'],
 	dataLabels: {
 		enabled: false,
 	},
@@ -389,22 +390,22 @@ const MissionDetailPage = () => {
 							</div>
 						</div>
 					</div>
-					<div className='col-lg-8'>
+					<div className='col-lg-7'>
 						<Card className='shadow-3d-primary h-100 mb-4 pb-4'>
-							<CardHeader>
+							<CardHeader className='py-2'>
 								<CardLabel icon='Summarize' iconColor='success'>
 									<CardTitle tag='h4' className='h5'>
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
 							</CardHeader>
-							<CardBody>
+							<CardBody className='py-2'>
 								<div className='row g-4'>
-									<div className='col-md-5'>
+									<div className='col-md-5 mb-4'>
 										<Card
 											className='bg-l25-primary transition-base rounded-2 mb-4'
 											shadow='sm'>
-											<CardHeader className='bg-transparent'>
+											<CardHeader className='bg-transparent py-2'>
 												<CardLabel icon='Activity' iconColor='primary'>
 													<CardTitle tag='h4' className='h5'>
 														Tiến độ mục tiêu
@@ -428,17 +429,21 @@ const MissionDetailPage = () => {
 																	tasks.length,
 															) || 0}
 															%
-															{/* <span className='text-info fs-5 fw-bold ms-3'>
-																{calcTotalTaskByStatus(tasks, 1)}
-																<Icon icon='TrendingFlat' />
-															</span> */}
 														</div>
 														<div
 															style={{ fontSize: 14, color: '#000' }}>
-															{calcTotalTaskByStatus(tasks, 1)} trên
-															tổng số {tasks?.length} công việc (
-															{calculateTotalSubTasksInTasks(tasks)}{' '}
-															đầu việc).
+															<span
+																className='fw-bold text-danger'
+																style={{ fontSize: 15 }}>
+																{calcTotalTaskByStatus(tasks, 1)}
+															</span>{' '}
+															cv hoàn thành trên tổng{' '}
+															<span
+																className='fw-bold text-danger'
+																style={{ fontSize: 15 }}>
+																{tasks?.length}
+															</span>{' '}
+															cv.
 														</div>
 													</div>
 												</div>
@@ -483,93 +488,31 @@ const MissionDetailPage = () => {
 												</div>
 											</CardBody>
 										</Card>
-										<Card
-											className={`bg-l${
-												darkModeStatus ? 'o25' : '25'
-											}-danger bg-l${
-												darkModeStatus ? 'o50' : '10'
-											}-danger-hover transition-base rounded-2 mb-4`}
-											shadow='sm'>
-											<CardHeader className='bg-transparent'>
-												<CardLabel>
-													<CardTitle tag='h4' className='h5'>
-														<Icon icon='Lightning' color='danger' />
-														&nbsp; Công việc bị huỷ/thất bại
-													</CardTitle>
+										<Card className='mb-4 h-50' shadow='lg'>
+											<CardHeader>
+												<CardLabel icon='LayoutTextWindow' iconColor='info'>
+													<CardTitle>Phòng ban phụ trách</CardTitle>
 												</CardLabel>
 											</CardHeader>
-											<CardBody>
-												<div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='Healing'
-															size='4x'
-															color='danger'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															{Math.round(
-																(calcTotalTaskByStatus(tasks, 3) *
-																	100) /
-																	tasks.length,
-															) || 0}
-															%
-															{/* <span className='text-danger fs-5 fw-bold ms-3'>
-																{calcTotalTaskByStatus(tasks, 3)}
-																<Icon icon='TrendingFlat' />
-															</span> */}
-														</div>
+											<CardBody className='pt-0' isScrollable>
+												<div className='row'>
+													{mission?.departments?.map((department) => (
 														<div
-															style={{ fontSize: 14, color: '#000' }}>
-															{calcTotalTaskByStatus(tasks, 3)} trên
-															tổng số {tasks?.length} công việc.
-														</div>
-													</div>
-												</div>
-											</CardBody>
-										</Card>
-										{/* Chỉ số key */}
-										<Card
-											className={`bg-l${
-												darkModeStatus ? 'o25' : '25'
-											}-warning bg-l${
-												darkModeStatus ? 'o50' : '10'
-											}-warning-hover transition-base rounded-2 mb-4`}
-											shadow='sm'
-											style={{ minHeight: 200 }}>
-											<CardHeader className='bg-transparent'>
-												<CardLabel>
-													<CardTitle tag='h4' className='h5'>
-														<Icon icon='ShowChart' color='danger' />
-														&nbsp; Chỉ số key
-													</CardTitle>
-												</CardLabel>
-											</CardHeader>
-											<CardBody isScrollable style={{ minHeight: 300 }}>
-												<div className='row g-4 align-items-center justify-content-center'>
-													{mission?.keys?.map((item, index) => (
-														// eslint-disable-next-line react/no-array-index-key
-														<div className='col-xl-12' key={index}>
+															className='col-12 ps-5 mb-2'
+															key={department.id}>
 															<div
-																className={classNames(
-																	'd-flex align-items-center rounded-2 p-3 bg-l25-light',
-																)}>
+																className='d-flex align-items-center'
+																key={department.id}>
 																<div className='flex-shrink-0'>
 																	<Icon
-																		icon='DoneAll'
-																		size='3x'
-																		color='warning'
+																		icon='TrendingFlat'
+																		size='2x'
+																		color='info'
 																	/>
 																</div>
-																<div className='flex-grow-1 ms-3'>
-																	<div className='fw-bold fs-3 mb-0'>
-																		{item?.key_value}
-																	</div>
-																	<div
-																		className='mt-n2'
-																		style={{ fontSize: 14 }}>
-																		{item?.key_name}
+																<div className='ms-3'>
+																	<div className='fw-bold fs-5 mb-0'>
+																		{department.name}
 																	</div>
 																</div>
 															</div>
@@ -581,20 +524,19 @@ const MissionDetailPage = () => {
 									</div>
 									<div className='col-md-7'>
 										<Card className='h-100'>
-											<CardHeader>
+											<CardHeader className='py-2'>
 												<CardLabel icon='DoubleArrow' iconColor='success'>
 													<CardTitle>Thống kê công việc</CardTitle>
 												</CardLabel>
 											</CardHeader>
-											<CardBody>
+											<CardBody className='py-2'>
 												<Card
 													className={`bg-l${
 														darkModeStatus ? 'o25' : '25'
 													}-success bg-l${
 														darkModeStatus ? 'o50' : '10'
 													}-success-hover transition-base rounded-2 mb-4`}
-													shadow='sm'
-													style={{ width: '90%', marginLeft: '5%' }}>
+													shadow='sm'>
 													<CardBody>
 														<div className='row'>
 															<div className='col'>
@@ -641,6 +583,19 @@ const MissionDetailPage = () => {
 																</div>
 															</div>
 														</div>
+														<div className='row'>
+															<div className='col'>
+																<div className='fw-bold fs-2 mb-10'>
+																	{calcTotalTaskByStatus(
+																		tasks,
+																		3,
+																	)}
+																</div>
+																<div className='text-muted'>
+																	Huỷ/thất bại
+																</div>
+															</div>
+														</div>
 													</CardBody>
 												</Card>
 												{tasks?.length > 0 ? (
@@ -667,110 +622,164 @@ const MissionDetailPage = () => {
 							</CardBody>
 						</Card>
 					</div>
-					<div className='col-lg-4'>
+					<div className='col-lg-5'>
 						<Card className='mb-4 h-100 shadow-3d-info'>
-							<CardBody className='mb-4'>
-								<Card className='mb-4 h-50' shadow='lg'>
-									<CardHeader>
-										<CardLabel icon='LayoutTextWindow' iconColor='info'>
-											<CardTitle>Phòng ban phụ trách</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody className='pt-0'>
-										<div className='row g-5'>
-											{mission?.departments?.map((department) => (
-												<div className='col-12 ms-5' key={department.id}>
-													<div
-														className='d-flex align-items-center'
-														key={department.id}>
-														<div className='flex-shrink-0'>
-															<Icon
-																icon='TrendingFlat'
-																size='2x'
-																color='info'
-															/>
-														</div>
-														<div className='flex-grow-1 ms-3'>
-															<div className='fw-bold fs-5 mb-0'>
-																{department.name}
-															</div>
-														</div>
-													</div>
+							<Card className='mb-4' shadow='lg' style={{ minHeight: 250 }}>
+								<CardHeader className='py-2'>
+									<CardLabel icon='Stream' iconColor='warning'>
+										<CardTitle>Thông tin mục tiêu</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-2'>
+									<div className='row g-2'>
+										<div className='col-12 mb-4'>
+											<div className='d-flex align-items-center'>
+												<div className='flex-shrink-0'>
+													<Icon
+														icon='TrendingFlat'
+														size='2x'
+														color='danger'
+													/>
 												</div>
-											))}
-										</div>
-									</CardBody>
-								</Card>
-								<Card className='h-50 mb-4' shadow='lg'>
-									<CardHeader>
-										<CardLabel icon='Stream' iconColor='warning'>
-											<CardTitle>Thông tin mục tiêu</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody isScrollable>
-										<div className='row g-2'>
-											<div className='col-12 mb-4'>
-												<div className='d-flex align-items-center'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='TrendingFlat'
-															size='2x'
-															color='danger'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-5 mb-0'>
-															{mission.description}
-														</div>
-													</div>
-												</div>
-											</div>
-											<div className='col-12 mb-4'>
-												<div className='d-flex align-items-center'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='TrendingFlat'
-															size='2x'
-															color='danger'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-5 mb-0'>
-															<span className='me-2'>
-																Ngày bắt đầu:
-															</span>
-															{moment(
-																`${mission?.start_time}`,
-															).format('DD-MM-YYYY')}
-														</div>
-													</div>
-												</div>
-											</div>
-											<div className='col-12 mb-4'>
-												<div className='d-flex align-items-center'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='TrendingFlat'
-															size='2x'
-															color='danger'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-5 mb-0'>
-															<span className='me-2'>
-																Ngày kết thúc:
-															</span>
-															{moment(`${mission?.end_time}`).format(
-																'DD-MM-YYYY',
-															)}
-														</div>
+												<div className='flex-grow-1 ms-3'>
+													<div className='fw-bold fs-5 mb-0'>
+														{mission.description}
 													</div>
 												</div>
 											</div>
 										</div>
-									</CardBody>
-								</Card>
-							</CardBody>
+										<div className='col-12 mb-4'>
+											<div className='d-flex align-items-center'>
+												<div className='flex-shrink-0'>
+													<Icon
+														icon='TrendingFlat'
+														size='2x'
+														color='danger'
+													/>
+												</div>
+												<div className='flex-grow-1 ms-3'>
+													<div className='fw-bold fs-5 mb-0'>
+														<span className='me-2'>Ngày bắt đầu:</span>
+														{moment(`${mission?.start_time}`).format(
+															'DD-MM-YYYY',
+														)}
+													</div>
+												</div>
+											</div>
+										</div>
+										<div className='col-12 mb-4'>
+											<div className='d-flex align-items-center'>
+												<div className='flex-shrink-0'>
+													<Icon
+														icon='TrendingFlat'
+														size='2x'
+														color='danger'
+													/>
+												</div>
+												<div className='flex-grow-1 ms-3'>
+													<div className='fw-bold fs-5 mb-0'>
+														<span className='me-2'>Ngày kết thúc:</span>
+														{moment(`${mission?.end_time}`).format(
+															'DD-MM-YYYY',
+														)}
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+							<Card
+								className='bg-l50-warning transition-base w-100 rounded-2 mb-4'
+								shadow='sm'
+								style={{ minHeight: 300 }}>
+								<CardHeader className='bg-transparent py-2'>
+									<CardLabel>
+										<CardTitle tag='h4' className='h5'>
+											<Icon icon='ShowChart' color='danger' />
+											&nbsp; Chỉ số key
+										</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody isScrollable className='pt-0 pb-4'>
+									<div className='row g-4 align-items-center justify-content-center'>
+										{mission?.keys?.map((item, index) => (
+											// eslint-disable-next-line react/no-array-index-key
+											<div className='col-xl-12 mb-0' key={index}>
+												<div
+													className={classNames(
+														'd-flex align-items-center rounded-2 py-2 px-3 bg-l25-light',
+													)}>
+													<div className='flex-shrink-0'>
+														<Icon
+															icon='DoneAll'
+															size='3x'
+															color='warning'
+														/>
+													</div>
+													<div className='flex-grow-1 ms-3'>
+														<div className='fw-bold fs-3 mb-0'>
+															{item?.key_value}
+														</div>
+														<div
+															className='mt-n2'
+															style={{ fontSize: 14 }}>
+															{item?.key_name}
+														</div>
+													</div>
+												</div>
+											</div>
+										))}
+									</div>
+								</CardBody>
+							</Card>
+							<Card className='h-25'>
+								<CardHeader className='py-2'>
+									<CardLabel icon='NotificationsActive' iconColor='warning'>
+										<CardTitle tag='h4' className='h5'>
+											Hoạt động gần đây
+										</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody isScrollable className='py-2'>
+									<Timeline>
+										{tasks?.map((item) => (
+											<div>
+												{item?.logs?.map((log) => (
+													<TimelineItem
+														className='align-items-center'
+														label={log.time}
+														color='primary'>
+														<span
+															className='text-success fw-bold'
+															style={{ fontSize: 14 }}>
+															{log?.user?.name}
+														</span>{' '}
+														đã chuyển trạng thái công việc{' '}
+														<span
+															className='text-danger fw-bold'
+															style={{ fontSize: 14 }}>
+															{`#${log?.task_id}`}
+														</span>{' '}
+														từ{' '}
+														<span
+															className='text-primary fw-bold'
+															style={{ fontSize: 14 }}>
+															{log?.prev_status}
+														</span>{' '}
+														sang{' '}
+														<span
+															className='text-info fw-bold'
+															style={{ fontSize: 14 }}>
+															{log?.next_status}
+														</span>
+													</TimelineItem>
+												))}
+											</div>
+										))}
+									</Timeline>
+								</CardBody>
+							</Card>
 						</Card>
 					</div>
 					<div className='col-md-12' style={{ marginTop: 50 }}>
