@@ -73,7 +73,7 @@ const TaskDetailForm = ({
 	const initValueInput = {
 		task_id: id,
 		priority: 2,
-		status: 0,
+		status: 1,
 		percent: 0,
 		name: '',
 		description: '',
@@ -265,6 +265,7 @@ const TaskDetailForm = ({
 			} catch (error) {
 				handleShowToast(`Tạo đầu việc!`, `Tạo đầu việc ${valueInput?.name} thất bại!`);
 			}
+			setValueInput(initValueInput);
 		} else {
 			const newSubTasks = task.subtasks.map((item) => {
 				return item.id === idEdit
