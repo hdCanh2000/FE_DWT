@@ -689,8 +689,8 @@ const SubTaskPage = () => {
 							</Card>
 							{/* Chỉ số key */}
 							<Card
-								className='bg-l50-warning transition-base w-100 rounded-2 mb-4'
-								shadow='sm'
+								className='transition-base w-100 rounded-2 mb-4'
+								shadow='lg'
 								style={{ minHeight: 300 }}>
 								<CardHeader className='bg-transparent py-2'>
 									<CardLabel>
@@ -732,7 +732,7 @@ const SubTaskPage = () => {
 									</div>
 								</CardBody>
 							</Card>
-							<Card className='h-100'>
+							<Card className='h-100' shadow='lg'>
 								<CardHeader className='py-2'>
 									<CardLabel icon='NotificationsActive' iconColor='warning'>
 										<CardTitle tag='h4' className='h5'>
