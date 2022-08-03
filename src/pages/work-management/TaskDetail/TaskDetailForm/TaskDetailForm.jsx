@@ -265,6 +265,7 @@ const TaskDetailForm = ({
 			} catch (error) {
 				handleShowToast(`Tạo đầu việc!`, `Tạo đầu việc ${valueInput?.name} thất bại!`);
 			}
+			setValueInput(initValueInput);
 		} else {
 			const newSubTasks = task.subtasks.map((item) => {
 				return item.id === idEdit
