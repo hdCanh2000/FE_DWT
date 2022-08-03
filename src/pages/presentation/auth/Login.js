@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
@@ -10,6 +9,7 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
 import useDarkMode from '../../../hooks/useDarkMode';
+import { login } from './services';
 
 // eslint-disable-next-line react/prop-types
 const LoginHeader = ({ isNewUser }) => {
@@ -36,6 +36,7 @@ const Login = ({ isSignUp }) => {
 		login_username: '',
 		login_password: '',
 	});
+	const [errorMessage, setErrorMessage] = useState('');
 
 	const handleChange = (e) => {
 		const { value } = e.target;
@@ -46,10 +47,22 @@ const Login = ({ isSignUp }) => {
 	};
 
 	const navigate = useNavigate();
-	const handleOnClick = () => {
-		if (!localStorage.getItem('token') && account.login_username === 'admin') {
-			localStorage.setItem('token', '110ce079a5e79a185e12b04289536364');
-			navigate('/muc-tieu/danh-sach');
+	const handleOnClick = async () => {
+		try {
+			const response = await login();
+			const result = await response.data;
+			if (
+				result.login_username === account.login_username &&
+				result.login_password === account.login_password
+			) {
+				localStorage.setItem('token', result.token);
+				localStorage.setItem('username', result.login_username);
+				navigate('/muc-tieu/danh-sach');
+			} else {
+				setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
+			}
+		} catch (error) {
+			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 		}
 	};
 
@@ -142,8 +155,17 @@ const Login = ({ isSignUp }) => {
 													<Input
 														type='password'
 														autoComplete='password'
+														onChange={handleChange}
 													/>
 												</FormGroup>
+											</div>
+											<div className='col-12'>
+												{errorMessage && (
+													<span
+														style={{ fontSize: 14, color: '#e22828' }}>
+														{errorMessage}
+													</span>
+												)}
 											</div>
 											<div className='col-12'>
 												<Button
