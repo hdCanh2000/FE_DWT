@@ -156,7 +156,6 @@ const calcTotalStepCompleteOfSubTask = (subtask) => {
 // tính % hoàn thành của 1 subtask
 const calcProgressSubtask = (subtask) => {
 	if (isEmpty(subtask)) return 0;
-	// if (subtask?.status === 1) {
 	const { steps } = subtask;
 	if (isEmpty(steps)) return 0;
 	return (
@@ -164,8 +163,6 @@ const calcProgressSubtask = (subtask) => {
 			(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
 		) || 0
 	);
-	// }
-	// return 0;
 };
 
 // tính số kpi đã dùng cho 1 subtask

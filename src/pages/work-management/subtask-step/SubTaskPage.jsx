@@ -33,6 +33,7 @@ import SubHeader, { SubHeaderLeft } from '../../../layout/SubHeader/SubHeader';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import { updateSubtasks } from '../TaskDetail/services';
 import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
+import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
 
 const chartOptions = {
 	chart: {
@@ -160,9 +161,9 @@ const SubTaskPage = () => {
 	}, [taskid, id]);
 
 	// show toast
-	const handleShowToast = (title, content) => {
+	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
 		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
 				{content}
 			</Toasts>,
 			{
@@ -209,26 +210,44 @@ const SubTaskPage = () => {
 	};
 
 	const handleClickChangeStatusPending = async (data) => {
-		try {
-			const taskClone = { ...task };
-			const subtaskClone = { ...data };
-			subtaskClone.status = 2;
-			const subtaskSubmit = taskClone?.subtasks?.map((item) =>
-				item.id === data.id ? { ...subtaskClone } : item,
-			);
-			const taskSubmit = { ...taskClone };
-			taskSubmit.subtasks = subtaskSubmit;
-			const response = await updateStatusPendingSubtask(taskSubmit);
-			const result = await response.data;
-			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
-			setTask(result);
-			setSubtask(subtaskRes);
+		if (data.status === 1) {
 			handleShowToast(
 				`Báo đầu việc chờ duyệt!`,
-				`Báo đầu việc ${subtaskRes.name} thành công!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đã hoàn thành!`,
+				'Error',
+				'danger',
 			);
-		} catch (error) {
-			setSubtask(subtask);
+		} else if (data.status === 2) {
+			handleShowToast(
+				`Báo đầu việc chờ duyệt!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đang chờ duyệt!`,
+				'Error',
+				'danger',
+			);
+		} else {
+			try {
+				const taskClone = { ...task };
+				const subtaskClone = { ...data };
+				subtaskClone.status = 2;
+				const subtaskSubmit = taskClone?.subtasks?.map((item) =>
+					item.id === data.id ? { ...subtaskClone } : item,
+				);
+				const taskSubmit = { ...taskClone };
+				taskSubmit.subtasks = subtaskSubmit;
+				const response = await updateStatusPendingSubtask(taskSubmit);
+				const result = await response.data;
+				const subtaskRes = result?.subtasks.filter(
+					(item) => item.id === parseInt(id, 10),
+				)[0];
+				setTask(result);
+				setSubtask(subtaskRes);
+				handleShowToast(
+					`Báo đầu việc chờ duyệt!`,
+					`Báo đầu việc ${subtaskRes.name} thành công!`,
+				);
+			} catch (error) {
+				setSubtask(subtask);
+			}
 		}
 	};
 	// Số kpi của subtask đã được giao
@@ -306,7 +325,7 @@ const SubTaskPage = () => {
 				<div className='row mb-4'>
 					<div className='col-lg-8'>
 						<Card className='shadow-3d-primary h-100 mb-4 pb-4'>
-							<CardHeader>
+							<CardHeader className='py-2'>
 								<CardLabel icon='Summarize' iconColor='success'>
 									<CardTitle tag='h4' className='h5'>
 										Tổng kết
@@ -320,7 +339,7 @@ const SubTaskPage = () => {
 									Xác nhận hoàn thành
 								</Button>
 							</CardHeader>
-							<CardBody>
+							<CardBody className='py-2'>
 								<div className='row g-4'>
 									<div className='col-md-5'>
 										<Card
@@ -336,11 +355,17 @@ const SubTaskPage = () => {
 													</CardSubTitle>
 												</CardLabel>
 											</CardHeader>
-											<CardBody>
+											<CardBody className='py-2'>
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col-12 text-start'>
 														<div className='fw-bold fs-3 mb-0'>
 															{calcProgressSubtask(subtask)}%
+														</div>
+														<div
+															className='text-muted'
+															style={{ fontSize: 15 }}>
+															trên tổng số{' '}
+															{calcTotalStepOfSubTask(subtask)} bước
 														</div>
 														<Progress
 															isAutoColor
@@ -348,12 +373,6 @@ const SubTaskPage = () => {
 															height={10}
 															size='lg'
 														/>
-														<div
-															className='text-muted'
-															style={{ fontSize: 15 }}>
-															trên tổng số{' '}
-															{calcTotalStepOfSubTask(subtask)} bước
-														</div>
 													</div>
 												</div>
 												<div className='row d-flex align-items-end pb-3'>
@@ -377,118 +396,140 @@ const SubTaskPage = () => {
 											</CardBody>
 										</Card>
 										<Card
-											className={`bg-l${
-												darkModeStatus ? 'o25' : '25'
-											}-danger bg-l${
-												darkModeStatus ? 'o50' : '10'
-											}-danger-hover transition-base rounded-2 mb-4 h-25`}
-											shadow='sm'>
-											<CardHeader className='bg-transparent'>
-												<CardLabel>
-													<CardTitle tag='h4' className='h5'>
-														<Icon icon='Lightning' color='danger' />
-														&nbsp; Số bước Quá hạn/Huỷ
-													</CardTitle>
+											className='mb-4'
+											shadow='lg'
+											style={{ minHeight: 250 }}>
+											<CardBody
+												isScrollable
+												className='py-2'
+												style={{ overFlowX: 'hidden' }}>
+												<CardLabel
+													className='mt-2'
+													icon='LayoutTextWindow'
+													iconColor='info'>
+													<CardTitle>Phòng ban phụ trách</CardTitle>
 												</CardLabel>
-											</CardHeader>
-											<CardBody>
-												<div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='Healing'
-															size='4x'
-															color='danger'
-														/>
+												<div className='row g-5'>
+													<div className='col-12 ps-5'>
+														<div className='d-flex align-items-center'>
+															<div className='flex-shrink-0'>
+																<Icon
+																	icon='TrendingFlat'
+																	size='2x'
+																	color='info'
+																/>
+															</div>
+															<div className='flex-grow-1 ms-3'>
+																<div className='fw-bold fs-5 mb-0'>
+																	{subtask?.department?.name}
+																</div>
+															</div>
+														</div>
 													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															{/* {calcTotalStepByStatus(subtask, 1)}% */}
-															{Math.round(
-																(calcTotalStepByStatus(subtask, 3) *
-																	100) /
-																	// eslint-disable-next-line no-unsafe-optional-chaining
-																	subtask?.steps?.length,
-															) || 0}
-															%
-															<span className='text-danger fs-5 fw-bold ms-3'>
-																{calcTotalStepByStatus(subtask, 3)}
-																<Icon icon='TrendingFlat' />
-															</span>
-														</div>
-														<div className='text-muted'>
-															trên tổng số {subtask?.steps?.length}{' '}
-															bước.
-														</div>
+												</div>
+												<CardLabel
+													className='mt-4'
+													icon='LayoutTextWindow'
+													iconColor='info'>
+													<CardTitle>Phòng ban liên quan</CardTitle>
+												</CardLabel>
+												<div className='row g-5'>
+													<div className='col-12 ps-5'>
+														{subtask?.departments_related?.map(
+															(department) => (
+																<div className='d-flex align-items-center mb-2'>
+																	<div className='flex-shrink-0'>
+																		<Icon
+																			icon='TrendingFlat'
+																			size='2x'
+																			color='info'
+																		/>
+																	</div>
+																	<div className='flex-grow-1 ms-3'>
+																		<div className='fw-bold fs-5 mb-0'>
+																			{department?.name}
+																		</div>
+																	</div>
+																</div>
+															),
+														)}
 													</div>
 												</div>
 											</CardBody>
 										</Card>
-										{/* Chỉ số key */}
 										<Card
-											className={`bg-l${
-												darkModeStatus ? 'o25' : '25'
-											}-warning bg-l${
-												darkModeStatus ? 'o50' : '10'
-											}-warning-hover transition-base rounded-2 mb-4`}
-											shadow='sm'
-											style={{ minHeight: 260 }}>
-											<CardHeader className='bg-transparent'>
-												<CardLabel>
-													<CardTitle tag='h4' className='h5'>
-														<Icon icon='ShowChart' color='danger' />
-														&nbsp; Chỉ số key
-													</CardTitle>
+											className='mb-4'
+											shadow='lg'
+											style={{ minHeight: 250 }}>
+											<CardBody isScrollable className='py-2'>
+												<CardLabel
+													className='mt-2'
+													icon='PersonCircle'
+													iconColor='info'>
+													<CardTitle>Nhân viên phụ trách</CardTitle>
 												</CardLabel>
-											</CardHeader>
-											<CardBody isScrollable style={{ minHeight: 300 }}>
-												<div className='row g-4 align-items-center justify-content-center'>
-													{subtask?.keys?.map((item, index) => (
-														// eslint-disable-next-line react/no-array-index-key
-														<div className='col-xl-12' key={index}>
-															<div
-																className={classNames(
-																	'd-flex align-items-center rounded-2 p-3 bg-l25-light',
-																)}>
-																<div className='flex-shrink-0'>
-																	<Icon
-																		icon='DoneAll'
-																		size='3x'
-																		color='warning'
-																	/>
-																</div>
-																<div className='flex-grow-1 ms-3'>
-																	<div className='fw-bold fs-3 mb-0'>
-																		{item?.key_value}
-																	</div>
-																	<div
-																		className='text-muted mt-n2 truncate-line-1'
-																		style={{ fontSize: 14 }}>
-																		{item?.key_name}
-																	</div>
+												<div className='row g-5'>
+													<div className='col-12 ps-5'>
+														<div className='d-flex align-items-center'>
+															<div className='flex-shrink-0'>
+																<Icon
+																	icon='TrendingFlat'
+																	size='2x'
+																	color='info'
+																/>
+															</div>
+															<div className='flex-grow-1 ms-3'>
+																<div className='fw-bold fs-5 mb-0'>
+																	{subtask?.user?.name}
 																</div>
 															</div>
 														</div>
-													))}
+													</div>
+												</div>
+												<CardLabel
+													className='mt-4'
+													icon='PersonCircle'
+													iconColor='info'>
+													<CardTitle>Nhân viên liên quan</CardTitle>
+												</CardLabel>
+												<div className='row g-5'>
+													<div className='col-12 ps-5'>
+														{subtask?.users_related?.map((user) => (
+															<div className='d-flex align-items-center mb-2'>
+																<div className='flex-shrink-0'>
+																	<Icon
+																		icon='TrendingFlat'
+																		size='2x'
+																		color='info'
+																	/>
+																</div>
+																<div className='flex-grow-1 ms-3'>
+																	<div className='fw-bold fs-5 mb-0'>
+																		{user?.name}
+																	</div>
+																</div>
+															</div>
+														))}
+													</div>
 												</div>
 											</CardBody>
 										</Card>
 									</div>
 									<div className='col-md-7'>
 										<Card className='h-100'>
-											<CardHeader>
+											<CardHeader className='py-2'>
 												<CardLabel icon='DoubleArrow' iconColor='success'>
 													<CardTitle>Thống kê đầu việc</CardTitle>
 												</CardLabel>
 											</CardHeader>
-											<CardBody>
+											<CardBody className='py-2'>
 												<Card
 													className={`bg-l${
 														darkModeStatus ? 'o25' : '25'
 													}-success bg-l${
 														darkModeStatus ? 'o50' : '10'
 													}-success-hover transition-base rounded-2 mb-4`}
-													shadow='sm'
-													style={{ width: '90%', marginLeft: '5%' }}>
+													shadow='sm'>
 													<CardBody>
 														<div className='row'>
 															<div className='col'>
@@ -529,11 +570,11 @@ const SubTaskPage = () => {
 																<div className='fw-bold fs-2 mb-10'>
 																	{calcTotalStepByStatus(
 																		subtask,
-																		2,
+																		3,
 																	)}
 																</div>
 																<div className='text-muted'>
-																	Dự kiến
+																	Quá hạn/Huỷ
 																</div>
 															</div>
 														</div>
@@ -576,205 +617,164 @@ const SubTaskPage = () => {
 						</Card>
 					</div>
 					<div className='col-lg-4'>
-						<Card className='mb-4 shadow-3d-info h-100'>
-							<CardBody className='pt-0 mb-4'>
-								<Card className='mb-4 h-50' shadow='lg'>
-									<CardHeader>
-										<CardLabel icon='LayoutTextWindow' iconColor='info'>
-											<CardTitle>Phòng ban phụ trách</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<div className='row g-5'>
-										<div className='col-12 ms-5'>
+						<Card className='mb-4 h-100 shadow-3d-info'>
+							<Card className='mb-4' shadow='lg' style={{ minHeight: 250 }}>
+								<CardHeader className='py-2'>
+									<CardLabel icon='Stream' iconColor='warning'>
+										<CardTitle>Thông tin đầu việc</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody isScrollable className='py-2'>
+									<div className='row g-2'>
+										<div className='col-12 mb-4'>
 											<div className='d-flex align-items-center'>
 												<div className='flex-shrink-0'>
 													<Icon
 														icon='TrendingFlat'
 														size='2x'
-														color='info'
+														color='danger'
 													/>
 												</div>
 												<div className='flex-grow-1 ms-3'>
 													<div className='fw-bold fs-5 mb-0'>
-														{subtask?.department?.name}
+														{subtask.description}
+													</div>
+												</div>
+											</div>
+										</div>
+										<div className='col-12 mb-4'>
+											<div className='d-flex align-items-center'>
+												<div className='flex-shrink-0'>
+													<Icon
+														icon='TrendingFlat'
+														size='2x'
+														color='danger'
+													/>
+												</div>
+												<div className='flex-grow-1 ms-3'>
+													<div className='fw-bold fs-5 mb-0'>
+														<span className='me-2'>
+															Thời gian dự kiến hoàn thành:
+														</span>
+														{moment(
+															`${subtask?.estimate_date} ${subtask.estimate_time}`,
+														).format('DD-MM-YYYY, HH:mm')}
+													</div>
+												</div>
+											</div>
+										</div>
+										<div className='col-12 mb-4'>
+											<div className='d-flex align-items-center'>
+												<div className='flex-shrink-0'>
+													<Icon
+														icon='TrendingFlat'
+														size='2x'
+														color='danger'
+													/>
+												</div>
+												<div className='flex-grow-1 ms-3'>
+													<div className='fw-bold fs-5 mb-0'>
+														<span className='me-2'>
+															Hạn thời gian hoàn thành:
+														</span>
+														{moment(
+															`${subtask?.deadline_date} ${subtask.deadline_time}`,
+														).format('DD-MM-YYYY, HH:mm')}
 													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-									<CardHeader className='mt-4'>
-										<CardLabel icon='LayoutTextWindow' iconColor='info'>
-											<CardTitle>Phòng ban liên quan</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<div className='row g-5'>
-										<div className='col-12 ms-5'>
-											{subtask?.departments_related?.map((department) => (
-												<div className='d-flex align-items-center mb-2'>
+								</CardBody>
+							</Card>
+							{/* Chỉ số key */}
+							<Card
+								className='bg-l50-warning transition-base w-100 rounded-2 mb-4'
+								shadow='sm'
+								style={{ minHeight: 300 }}>
+								<CardHeader className='bg-transparent py-2'>
+									<CardLabel>
+										<CardTitle tag='h4' className='h5'>
+											<Icon icon='ShowChart' color='danger' />
+											&nbsp; Chỉ số key
+										</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody isScrollable className='pt-0 pb-4'>
+									<div className='row g-4 align-items-center justify-content-center'>
+										{subtask?.keys?.map((item, index) => (
+											// eslint-disable-next-line react/no-array-index-key
+											<div className='col-xl-12 mb-0' key={index}>
+												<div
+													className={classNames(
+														'd-flex align-items-center rounded-2 py-2 px-3 bg-l25-light',
+													)}>
 													<div className='flex-shrink-0'>
 														<Icon
-															icon='TrendingFlat'
-															size='2x'
-															color='info'
+															icon='DoneAll'
+															size='3x'
+															color='warning'
 														/>
 													</div>
 													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-5 mb-0'>
-															{department?.name}
-														</div>
-													</div>
-												</div>
-											))}
-										</div>
-									</div>
-								</Card>
-								<Card className='mb-4 h-50' shadow='lg'>
-									<CardBody className='pt-0'>
-										<CardHeader>
-											<CardLabel icon='PersonCircle' iconColor='info'>
-												<CardTitle>Nhân viên phụ trách</CardTitle>
-											</CardLabel>
-										</CardHeader>
-										<div className='row g-5'>
-											<div className='col-12 ms-5'>
-												<div className='d-flex align-items-center'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='TrendingFlat'
-															size='2x'
-															color='info'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-5 mb-0'>
-															{subtask?.user?.name}
+														<div className='fw-bold fs-3 mb-0'>
+															{item?.key_value}
 														</div>
 														<div
-															className='text-muted'
+															className='mt-n2'
 															style={{ fontSize: 14 }}>
-															{subtask?.user?.slug}
+															{item?.key_name}
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-										<CardHeader className='mt-4'>
-											<CardLabel icon='PersonCircle' iconColor='info'>
-												<CardTitle>Nhân viên liên quan</CardTitle>
-											</CardLabel>
-										</CardHeader>
-										<div className='row g-5'>
-											<div className='col-12 ms-5'>
-												{subtask?.users_related?.map((user) => (
-													<div className='d-flex align-items-center mb-2'>
-														<div className='flex-shrink-0'>
-															<Icon
-																icon='TrendingFlat'
-																size='2x'
-																color='info'
-															/>
-														</div>
-														<div className='flex-grow-1 ms-3'>
-															<div className='fw-bold fs-5 mb-0'>
-																{user?.name}
-															</div>
-														</div>
-													</div>
-												))}
-											</div>
-										</div>
-									</CardBody>
-								</Card>
-							</CardBody>
-						</Card>
-					</div>
-					<div className='col-lg-12' style={{ marginTop: 50 }}>
-						<Card className='shadow-3d-info h-100 mb-0'>
-							<CardHeader>
-								<CardLabel icon='Stream' iconColor='warning'>
-									<CardTitle tag='h4' className='h5'>
-										Thông tin đầu việc
-									</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody>
-								<div className='row g-2'>
-									<div className='col-12 mb-4'>
-										<div className='d-flex align-items-center'>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='TrendingFlat'
-													size='2x'
-													color='danger'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-5 mb-0'>
-													{subtask.description}
-												</div>
-											</div>
-										</div>
+										))}
 									</div>
-									<div className='col-12 mb-4'>
-										<div className='d-flex align-items-center'>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='TrendingFlat'
-													size='2x'
-													color='danger'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-5 mb-0'>
-													{FORMAT_TASK_STATUS(subtask?.status)}
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-12 mb-4'>
-										<div className='d-flex align-items-center'>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='TrendingFlat'
-													size='2x'
-													color='danger'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-5 mb-0'>
-													<span className='me-2'>
-														Thời gian dự kiến hoàn thành:
-													</span>
-													{moment(
-														`${subtask?.estimate_date} ${subtask.estimate_time}`,
-													).format('DD-MM-YYYY, HH:mm')}
-												</div>
-											</div>
-										</div>
-									</div>
-									<div className='col-12 mb-4'>
-										<div className='d-flex align-items-center'>
-											<div className='flex-shrink-0'>
-												<Icon
-													icon='TrendingFlat'
-													size='2x'
-													color='danger'
-												/>
-											</div>
-											<div className='flex-grow-1 ms-3'>
-												<div className='fw-bold fs-5 mb-0'>
-													<span className='me-2'>
-														Hạn thời gian hoàn thành:
-													</span>
-													{moment(
-														`${subtask?.deadline_date} ${subtask.deadline_time}`,
-													).format('DD-MM-YYYY, HH:mm')}
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</CardBody>
+								</CardBody>
+							</Card>
+							<Card className='h-100'>
+								<CardHeader className='py-2'>
+									<CardLabel icon='NotificationsActive' iconColor='warning'>
+										<CardTitle tag='h4' className='h5'>
+											Hoạt động gần đây
+										</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody isScrollable className='py-2'>
+									<Timeline>
+										{subtask?.logs?.map((log) => (
+											<TimelineItem
+												className='align-items-center'
+												label={log.time}
+												color='primary'>
+												<span
+													className='text-success fw-bold'
+													style={{ fontSize: 14 }}>
+													{log?.user?.name}
+												</span>{' '}
+												đã chuyển trạng thái công việc{' '}
+												<span
+													className='text-danger fw-bold'
+													style={{ fontSize: 14 }}>
+													{`#${log?.task_id}`}
+												</span>{' '}
+												từ{' '}
+												<span
+													className='text-primary fw-bold'
+													style={{ fontSize: 14 }}>
+													{log?.prev_status}
+												</span>{' '}
+												sang{' '}
+												<span
+													className='text-info fw-bold'
+													style={{ fontSize: 14 }}>
+													{log?.next_status}
+												</span>
+											</TimelineItem>
+										))}
+									</Timeline>
+								</CardBody>
+							</Card>
 						</Card>
 					</div>
 				</div>
