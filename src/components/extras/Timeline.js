@@ -8,7 +8,7 @@ export const TimelineItem = forwardRef(({ className, color, label, children, ...
 	return (
 		// eslint-disable-next-line react/jsx-props-no-spreading
 		<div ref={ref} className={classNames('timeline-item', className)} {...props}>
-			<div className='timeline-label text-truncate d-inline-block fw-bold'>
+			<div className='timeline-label d-inline-block fw-bold' style={{ minWidth: '6rem' }}>
 				<Popovers desc={label} trigger='hover'>
 					<span>{label}</span>
 				</Popovers>

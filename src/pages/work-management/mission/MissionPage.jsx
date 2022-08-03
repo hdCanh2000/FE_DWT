@@ -322,16 +322,21 @@ const MissionPage = () => {
 									<CardHeader className='bg-transparent py-0'>
 										<CardLabel
 											icon='StarOutline'
-											className='pt-4 pb-2 w-100'
+											className='pt-4 pb-2 w-100 align-items-start'
 											onClick={() => navigateToDetailPage(item?.id)}>
 											<CardTitle tag='h3' className='h3'>
 												{item?.name}
 											</CardTitle>
 											<CardSubTitle>
-												Số công việc:
 												<span
-													style={{ fontSize: 14 }}
-													className='text-danger fw-bold ps-2'>
+													style={{ fontSize: 16 }}
+													className='text-success fw-bold ps-0 d-block pb-2'>
+													#MT{item?.id}
+												</span>
+											</CardSubTitle>
+											<CardSubTitle style={{ fontSize: 15 }}>
+												Số công việc:
+												<span className='text-danger fw-bold ps-2'>
 													{item?.tasks?.length || 0}
 												</span>
 											</CardSubTitle>
