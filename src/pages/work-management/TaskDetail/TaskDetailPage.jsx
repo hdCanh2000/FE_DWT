@@ -25,7 +25,12 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import SubHeader, { SubHeaderLeft } from '../../../layout/SubHeader/SubHeader';
-import { STATUS, FORMAT_TASK_STATUS, formatColorStatus } from '../../../utils/constants';
+import {
+	STATUS,
+	FORMAT_TASK_STATUS,
+	formatColorStatus,
+	formatColorPriority,
+} from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
@@ -37,7 +42,6 @@ import TaskAlertConfirm from '../mission/TaskAlertConfirm';
 import TaskFormModal from '../mission/TaskFormModal';
 import { deleteTaskById, updateTaskByID } from '../mission/services';
 import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
-
 
 const TaskDetailPage = () => {
 	// State
@@ -112,53 +116,6 @@ const TaskDetailPage = () => {
 		options: chartOptions,
 	});
 	// Data
-	function color(props) {
-		let cases = {};
-		switch (props) {
-			case 1:
-				cases = { name: 'Đang thực hiện', color: 'primary' };
-				break;
-			case 2:
-				cases = { name: 'Đã hoàn thành', color: 'success' };
-				break;
-			case 3:
-				cases = { name: 'Chờ duyệt', color: 'danger' };
-				break;
-			case 4:
-				cases = { name: 'Quá hạn / thất bại', color: 'dark' };
-				break;
-			case 5:
-				cases = { name: 'Từ chối', color: 'warning' };
-				break;
-			default:
-				cases = { name: 'Đang thực hiện', color: 'primary' };
-		}
-		return cases;
-	}
-
-	function priority(props) {
-		let cases = {};
-		switch (props) {
-			case 1:
-				cases = 'dark';
-				break;
-			case 2:
-				cases = 'success';
-				break;
-			case 3:
-				cases = 'primary';
-				break;
-			case 4:
-				cases = 'danger';
-				break;
-			case 5:
-				cases = 'warning';
-				break;
-			default:
-				cases = 'primary';
-		}
-		return cases;
-	}
 	React.useEffect(() => {
 		const fetchSubtasks = async (id) => {
 			const res = await getAllSubtasks(id);
@@ -1174,7 +1131,7 @@ const TaskDetailPage = () => {
 																		// [`border-${themeStatus}`],
 																		'bg-success',
 																		'pt-2 pb-2 me-2',
-																		`bg-${priority(
+																		`bg-${formatColorPriority(
 																			item.priority,
 																		)}`,
 																	)}>
@@ -1355,9 +1312,11 @@ const TaskDetailPage = () => {
 															<td>
 																<Icon
 																	icon='Circle'
-																	color={color(item.status).color}
+																	color={formatColorStatus(
+																		item.status,
+																	)}
 																/>
-																{color(item.status).name}
+																{FORMAT_TASK_STATUS(item.status)}
 															</td>
 															<td style={{ width: '270px' }}>
 																<Button
