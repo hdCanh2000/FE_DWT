@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
@@ -58,18 +58,8 @@ import MissionFormModal from './MissionFormModal';
 import RelatedActionCommon from '../../common/ComponentCommon/RelatedActionCommon';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
-
-const minWith300 = {
-	minWidth: 300,
-};
-
-const minWith150 = {
-	minWidth: 150,
-};
-
-const minWith100 = {
-	minWidth: 100,
-};
+import Popovers from '../../../components/bootstrap/Popovers';
+import TableCommon from '../../common/ComponentCommon/TableCommon';
 
 const chartOptions = {
 	chart: {
@@ -132,6 +122,279 @@ const MissionDetailPage = () => {
 	const params = useParams();
 	const navigate = useNavigate();
 	const { id } = params;
+
+	const columns = [
+		{
+			title: 'ID',
+			id: 'id',
+			key: 'id',
+			type: 'number',
+		},
+		{
+			title: 'Tên công việc',
+			id: 'name',
+			key: 'name',
+			type: 'text',
+			render: (item) => (
+				<Link className='text-underline' to={`/quan-ly-cong-viec/cong-viec/${item.id}`}>
+					{item.name}
+				</Link>
+			),
+		},
+		{
+			title: 'Thời gian dự kiến',
+			id: 'estimate_date',
+			key: 'estimate_date',
+			type: 'text',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Hạn hoàn thành',
+			id: 'deadline_date',
+			key: 'deadline_date',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Tiến độ',
+			id: 'progress',
+			key: 'progress',
+			type: 'text',
+			render: (item) => (
+				<div className='d-flex align-items-center flex-column'>
+					<div className='flex-shrink-0 me-3'>{`${calcProgressTask(item)}%`}</div>
+					<Progress
+						className='flex-grow-1'
+						isAutoColor
+						value={calcProgressTask(item)}
+						style={{
+							height: 10,
+							width: '100%',
+						}}
+					/>
+				</div>
+			),
+		},
+		{
+			title: 'Giá trị KPI',
+			id: 'kpi_value',
+			key: 'kpi_value',
+			type: 'number',
+		},
+		{
+			title: 'KPI thực tế',
+			id: 'current_kpi_value',
+			key: 'current_kpi_value',
+			type: 'number',
+		},
+		{
+			title: 'Độ ưu tiên',
+			id: 'priority',
+			key: 'priority',
+			type: 'text',
+			render: (item) => (
+				<div className='d-flex align-items-center'>
+					<span
+						style={{
+							paddingRight: '1rem',
+							paddingLeft: '1rem',
+						}}
+						className={classNames(
+							'badge',
+							'border border-2',
+							[`border-${themeStatus}`],
+							'bg-success',
+							'pt-2 pb-2 me-2',
+							`bg-${formatColorPriority(item.priority)}`,
+						)}>
+						<span className=''>{`Cấp ${item.priority}`}</span>
+					</span>
+				</div>
+			),
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'number',
+			render: (item) => (
+				<Dropdown>
+					<DropdownToggle hasIcon={false}>
+						<Button
+							isLink
+							color={formatColorStatus(item.status)}
+							icon='Circle'
+							className='text-nowrap'>
+							{FORMAT_TASK_STATUS(item.status)}
+						</Button>
+					</DropdownToggle>
+					<DropdownMenu>
+						{Object.keys(STATUS).map((key) => (
+							<DropdownItem
+								key={key}
+								onClick={() => handleUpdateStatus(STATUS[key].value, item)}>
+								<div>
+									<Icon icon='Circle' color={STATUS[key].color} />
+									{STATUS[key].name}
+								</div>
+							</DropdownItem>
+						))}
+					</DropdownMenu>
+				</Dropdown>
+			),
+		},
+		{
+			title: '',
+			id: 'action',
+			key: 'action',
+			render: (item) => (
+				<>
+					<Button
+						isOutline={!darkModeStatus}
+						color='success'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='Edit'
+						onClick={() => handleOpenEditForm(item)}>
+						Sửa
+					</Button>
+					<Button
+						isOutline={!darkModeStatus}
+						color='danger'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='Trash'
+						onClick={() => handleOpenConfirmModal(item)}>
+						Xoá
+					</Button>
+				</>
+			),
+		},
+	];
+
+	const columnsPending = [
+		{
+			title: 'ID',
+			id: 'id',
+			key: 'id',
+			type: 'number',
+		},
+		{
+			title: 'Tên công việc',
+			id: 'name',
+			key: 'name',
+			type: 'text',
+			render: (item) => (
+				<Link className='text-underline' to={`/quan-ly-cong-viec/cong-viec/${item.id}`}>
+					{item.name}
+				</Link>
+			),
+		},
+		{
+			title: 'Hạn hoàn thành',
+			id: 'deadline_date',
+			key: 'deadline_date',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Tiến độ',
+			id: 'progress',
+			key: 'progress',
+			type: 'text',
+			render: (item) => (
+				<div className='d-flex align-items-center flex-column'>
+					<div className='flex-shrink-0 me-3'>{`${calcProgressTask(item)}%`}</div>
+					<Progress
+						className='flex-grow-1'
+						isAutoColor
+						value={calcProgressTask(item)}
+						style={{
+							height: 10,
+							width: '100%',
+						}}
+					/>
+				</div>
+			),
+		},
+		{
+			title: 'Giá trị KPI',
+			id: 'kpi_value',
+			key: 'kpi_value',
+			type: 'number',
+		},
+		{
+			title: 'KPI thực tế',
+			id: 'current_kpi_value',
+			key: 'current_kpi_value',
+			type: 'number',
+		},
+		{
+			title: 'Độ ưu tiên',
+			id: 'priority',
+			key: 'priority',
+			type: 'text',
+			render: (item) => (
+				<div className='d-flex align-items-center'>
+					<span
+						style={{
+							paddingRight: '1rem',
+							paddingLeft: '1rem',
+						}}
+						className={classNames(
+							'badge',
+							'border border-2',
+							[`border-${themeStatus}`],
+							'bg-success',
+							'pt-2 pb-2 me-2',
+							`bg-${formatColorPriority(item.priority)}`,
+						)}>
+						<span className=''>{`Cấp ${item.priority}`}</span>
+					</span>
+				</div>
+			),
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'number',
+			render: (item) => (
+				<Button
+					isLink
+					color={formatColorStatus(item.status)}
+					icon='Circle'
+					className='text-nowrap'>
+					{FORMAT_TASK_STATUS(item.status)}
+				</Button>
+			),
+		},
+		{
+			title: '',
+			id: 'action',
+			key: 'action',
+			render: (item) => (
+				<>
+					<Button
+						isOutline={!darkModeStatus}
+						color='success'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='Check'
+						onClick={() => handleUpdateStatus(1, item)}>
+						Duyệt
+					</Button>
+					<Button
+						isOutline={!darkModeStatus}
+						color='danger'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='Trash'
+						onClick={() => handleUpdateStatus(4, item)}>
+						Từ chối
+					</Button>
+				</>
+			),
+		},
+	];
 
 	useEffect(() => {
 		async function fetchDataMissionByID() {
@@ -491,39 +754,25 @@ const MissionDetailPage = () => {
 												</div>
 											</CardBody>
 										</Card>
-										<Card className='mb-4 h-50' shadow='lg'>
-											<CardHeader>
-												<CardLabel icon='LayoutTextWindow' iconColor='info'>
-													<CardTitle>Phòng ban phụ trách</CardTitle>
-												</CardLabel>
-											</CardHeader>
-											<CardBody className='pt-0' isScrollable>
-												<div className='row'>
-													{mission?.departments?.map((department) => (
-														<div
-															className='col-12 ps-5 mb-2'
-															key={department.id}>
-															<div
-																className='d-flex align-items-center'
-																key={department.id}>
-																<div className='flex-shrink-0'>
-																	<Icon
-																		icon='TrendingFlat'
-																		size='2x'
-																		color='info'
-																	/>
-																</div>
-																<div className='ms-3'>
-																	<div className='fw-bold fs-5 mb-0'>
-																		{department.name}
-																	</div>
-																</div>
-															</div>
+										<CardInfoCommon
+											className='mb-4 pb-4'
+											shadow='lg'
+											style={{ minHeight: 300 }}
+											title='Phòng ban phụ trách'
+											icon='LayoutTextWindow'
+											iconColor='info'
+											data={mission?.departments?.map((department) => {
+												return {
+													icon: 'TrendingFlat',
+													color: 'info',
+													children: (
+														<div className='fw-bold fs-5 mb-1'>
+															{department?.name}
 														</div>
-													))}
-												</div>
-											</CardBody>
-										</Card>
+													),
+												};
+											})}
+										/>
 									</div>
 									<div className='col-md-7'>
 										<Card className='h-100'>
@@ -590,77 +839,81 @@ const MissionDetailPage = () => {
 								style={{ minHeight: 250 }}
 								title='Thông tin mục tiêu'
 								icon='Stream'
-								iconColor='warning'
+								iconColor='primary'
 								data={[
 									{
 										icon: 'Pen',
 										color: 'primary',
-										text: mission?.description,
+										children: (
+											<Popovers desc={mission?.description} trigger='hover'>
+												<div
+													className='fs-5'
+													style={{
+														'-webkit-line-clamp': '2',
+														overflow: 'hidden',
+														textOverflow: 'ellipsis',
+														display: '-webkit-box',
+														'-webkit-box-orient': 'vertical',
+													}}>
+													{mission?.description}
+												</div>
+											</Popovers>
+										),
 									},
 									{
 										icon: 'ClockHistory',
 										color: 'primary',
-										text: `Ngày bắt đầu:
-										${moment(`${mission?.start_time}`).format('DD-MM-YYYY')}`,
+										children: (
+											<div className='fs-5'>
+												<span className='me-2'>Ngày bắt đầu:</span>
+												{moment(`${mission?.start_time}`).format(
+													'DD-MM-YYYY',
+												)}
+											</div>
+										),
 									},
 									{
 										icon: 'CalendarCheck',
 										color: 'primary',
-										text: `Ngày kết thúc:
-										${moment(`${mission?.end_time}`).format('DD-MM-YYYY')}`,
+										children: (
+											<div className='fs-5'>
+												<span className='me-2'>Ngày kết thúc:</span>
+												{moment(`${mission?.end_time}`).format(
+													'DD-MM-YYYY',
+												)}
+											</div>
+										),
 									},
 								]}
 							/>
-							<Card
+							<CardInfoCommon
 								className='transition-base w-100 rounded-2 mb-4'
 								shadow='lg'
-								style={{ minHeight: 300 }}>
-								<CardHeader className='bg-transparent py-2'>
-									<CardLabel>
-										<CardTitle tag='h4' className='h5'>
-											<Icon icon='ShowChart' color='danger' />
-											&nbsp; Chỉ số key
-										</CardTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody isScrollable className='pt-0 pb-4'>
-									<div className='row g-4 align-items-center justify-content-center'>
-										{mission?.keys?.map((item, index) => (
-											// eslint-disable-next-line react/no-array-index-key
-											<div className='col-xl-12 mb-0' key={index}>
-												<div
-													className={classNames(
-														'd-flex align-items-center rounded-2 py-2 px-3 bg-l25-light',
-													)}>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='DoneAll'
-															size='3x'
-															color='warning'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
-														<div className='fw-bold fs-3 mb-0'>
-															{item?.key_value}
-														</div>
-														<div
-															className='mt-n2'
-															style={{ fontSize: 14 }}>
-															{item?.key_name}
-														</div>
-													</div>
+								style={{ minHeight: 250 }}
+								title='Chỉ số key'
+								icon='ShowChart'
+								iconColor='danger'
+								data={mission?.keys?.map((key) => {
+									return {
+										icon: 'DoneAll',
+										color: 'danger',
+										children: (
+											<>
+												<div className='fw-bold fs-5 mb-1'>
+													{key?.key_value}
 												</div>
-											</div>
-										))}
-									</div>
-								</CardBody>
-							</Card>
-							<Card className='h-25' shadow='lg'>
+												<div className='mt-n2' style={{ fontSize: 14 }}>
+													{key?.key_name}
+												</div>
+											</>
+										),
+									};
+								})}
+							/>
+							<Card style={{ minHeight: 240 }} shadow='lg'>
 								<CardHeader className='py-2'>
 									<CardLabel icon='NotificationsActive' iconColor='warning'>
-										<CardTitle tag='h4' className='h5'>
-											Hoạt động gần đây
-										</CardTitle>
+										<CardTitle>Hoạt động gần đây</CardTitle>
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
@@ -683,7 +936,7 @@ const MissionDetailPage = () => {
 										)?.length || 0
 									})`}
 									className='mb-3'>
-									<Card style={{ minHeight: '80vh' }}>
+									<Card>
 										<CardHeader>
 											<CardLabel icon='Task' iconColor='danger'>
 												<CardTitle>
@@ -701,219 +954,28 @@ const MissionDetailPage = () => {
 											</CardActions>
 										</CardHeader>
 										<CardBody className='table-responsive'>
-											<table
+											<TableCommon
 												className='table table-modern mb-0'
-												style={{ fontSize: 14 }}>
-												<thead>
-													<tr>
-														<th>STT</th>
-														<th>Tên công việc</th>
-														<th className='text-center'>
-															Thời gian dự kiến
-														</th>
-														<th className='text-center'>
-															Hạn hoàn thành
-														</th>
-														<th className='text-center'>Tiến độ</th>
-														<th className='text-center'>Giá trị KPI</th>
-														<th className='text-center'>KPI thực tế</th>
-														<th className='text-center'>Độ ưu tiên</th>
-														<th className='text-center'>Trạng thái</th>
-														<td />
-													</tr>
-												</thead>
-												<tbody>
-													{tasks
-														.filter(
-															(item) =>
-																item.status === 0 ||
-																item.status === 1 ||
-																item.status === 4,
-														)
-														?.map((item, index) => (
-															<tr key={item.id}>
-																<td>{index + 1}</td>
-																<td
-																	className='cursor-pointer'
-																	style={minWith300}>
-																	<Link
-																		className='text-underline'
-																		to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
-																		{item?.name}
-																	</Link>
-																</td>
-																<td
-																	className='text-center'
-																	style={minWith100}>
-																	<div className='d-flex align-items-center'>
-																		<span className='text-nowrap w-100'>
-																			{moment(
-																				`${item.estimate_date}`,
-																			).format('DD-MM-YYYY')}
-																		</span>
-																	</div>
-																</td>
-																<td
-																	className='text-center'
-																	style={minWith100}>
-																	<div className='d-flex align-items-center'>
-																		<span className='text-nowrap w-100'>
-																			{moment(
-																				`${item.deadline_date}`,
-																			).format('DD-MM-YYYY')}
-																		</span>
-																	</div>
-																</td>
-																<td style={minWith150}>
-																	<div className='d-flex align-items-center flex-column'>
-																		<div className='flex-shrink-0 me-3'>
-																			{`${calcProgressTask(
-																				item,
-																			)}%`}
-																		</div>
-																		<Progress
-																			className='flex-grow-1'
-																			isAutoColor
-																			value={calcProgressTask(
-																				item,
-																			)}
-																			style={{
-																				height: 10,
-																				width: '100%',
-																			}}
-																		/>
-																	</div>
-																</td>
-																<td
-																	style={minWith100}
-																	className='text-center'>
-																	{item?.kpi_value}
-																</td>
-																<td
-																	style={minWith150}
-																	className='text-center'>
-																	{item?.current_kpi_value}
-																</td>
-																<td style={minWith100}>
-																	<div className='d-flex align-items-center'>
-																		<span
-																			style={{
-																				paddingRight:
-																					'1rem',
-																				paddingLeft: '1rem',
-																			}}
-																			className={classNames(
-																				'badge',
-																				'border border-2',
-																				[
-																					`border-${themeStatus}`,
-																				],
-																				'bg-success',
-																				'pt-2 pb-2 me-2',
-																				`bg-${formatColorPriority(
-																					item.priority,
-																				)}`,
-																			)}>
-																			<span className=''>{`Cấp ${item.priority}`}</span>
-																		</span>
-																	</div>
-																</td>
-																<td>
-																	<Dropdown>
-																		<DropdownToggle
-																			hasIcon={false}>
-																			<Button
-																				isLink
-																				color={formatColorStatus(
-																					item.status,
-																				)}
-																				icon='Circle'
-																				className='text-nowrap'>
-																				{FORMAT_TASK_STATUS(
-																					item.status,
-																				)}
-																			</Button>
-																		</DropdownToggle>
-																		<DropdownMenu>
-																			{Object.keys(
-																				STATUS,
-																			).map((key) => (
-																				<DropdownItem
-																					key={key}
-																					onClick={() =>
-																						handleUpdateStatus(
-																							STATUS[
-																								key
-																							].value,
-																							item,
-																						)
-																					}>
-																					<div>
-																						<Icon
-																							icon='Circle'
-																							color={
-																								STATUS[
-																									key
-																								]
-																									.color
-																							}
-																						/>
-																						{
-																							STATUS[
-																								key
-																							].name
-																						}
-																					</div>
-																				</DropdownItem>
-																			))}
-																		</DropdownMenu>
-																	</Dropdown>
-																</td>
-																<td
-																	style={minWith150}
-																	className='d-flex align-items-center justify-content-between'>
-																	<Button
-																		isOutline={!darkModeStatus}
-																		color='success'
-																		isLight={darkModeStatus}
-																		className='text-nowrap mx-2'
-																		icon='Edit'
-																		onClick={() =>
-																			handleOpenEditForm(item)
-																		}>
-																		Sửa
-																	</Button>
-																	<Button
-																		isOutline={!darkModeStatus}
-																		color='danger'
-																		isLight={darkModeStatus}
-																		className='text-nowrap mx-2'
-																		icon='Trash'
-																		onClick={() =>
-																			handleOpenConfirmModal(
-																				item,
-																			)
-																		}>
-																		Xoá
-																	</Button>
-																</td>
-															</tr>
-														))}
-												</tbody>
-											</table>
-											{!tasks.filter(
-												(item) => item.status !== 2 || item.status !== 3,
-											)?.length && (
-												<Alert
-													color='warning'
-													isLight
-													icon='Report'
-													className='mt-3'>
-													Không có công việc thuộc mục tiêu này!
-												</Alert>
-											)}
+												columns={columns}
+												data={tasks.filter(
+													(item) =>
+														item.status === 0 ||
+														item.status === 1 ||
+														item.status === 4,
+												)}
+											/>
 										</CardBody>
 									</Card>
+									{!tasks.filter((item) => item.status !== 2 || item.status !== 3)
+										?.length && (
+										<Alert
+											color='warning'
+											isLight
+											icon='Report'
+											className='mt-3'>
+											Không có công việc thuộc mục tiêu này!
+										</Alert>
+									)}
 								</Tab>
 								<Tab
 									eventKey='ListPendingTask'
@@ -923,7 +985,7 @@ const MissionDetailPage = () => {
 										)?.length || 0
 									})`}
 									className='mb-3'>
-									<Card style={{ minHeight: '80vh' }}>
+									<Card stretch>
 										<CardHeader>
 											<CardLabel icon='ContactSupport' iconColor='secondary'>
 												<CardTitle>
@@ -934,154 +996,41 @@ const MissionDetailPage = () => {
 											</CardLabel>
 										</CardHeader>
 										<CardBody className='table-responsive'>
-											<table
+											<TableCommon
 												className='table table-modern mb-0'
-												style={{ fontSize: 14 }}>
-												<thead>
-													<tr>
-														<th>STT</th>
-														<th>Tên công việc</th>
-														<th>Thời gian dự kiến</th>
-														<th>Thời hạn hoàn thành</th>
-														<th>Tiến độ công việc</th>
-														<th>Giá trị KPI</th>
-														<th>KPI thực tế</th>
-														<th>Độ ưu tiên</th>
-														<th>Trạng thái</th>
-														<td />
-													</tr>
-												</thead>
-												<tbody>
-													{tasks
-														.filter(
-															(item) =>
-																item.status === 2 ||
-																item.status === 3,
-														)
-														?.map((item, index) => (
-															<tr key={item.id}>
-																<td>{index + 1}</td>
-																<td className='cursor-pointer'>
-																	<Link
-																		className='text-underline'
-																		to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
-																		{item?.name}
-																	</Link>
-																</td>
-																<td>
-																	<div className='d-flex align-items-center'>
-																		<span className='text-nowrap'>
-																			{moment(
-																				`${item.estimate_date} ${item.estimate_time}`,
-																			).format(
-																				'DD-MM-YYYY, HH:mm',
-																			)}
-																		</span>
-																	</div>
-																</td>
-																<td>
-																	<div className='d-flex align-items-center'>
-																		<span className='text-nowrap'>
-																			{moment(
-																				`${item.deadline_date} ${item.deadline_time}`,
-																			).format(
-																				'DD-MM-YYYY, HH:mm',
-																			)}
-																		</span>
-																	</div>
-																</td>
-																<td>
-																	<div className='d-flex align-items-center'>
-																		<div className='flex-shrink-0 me-3'>
-																			{`${calcProgressTask(
-																				item,
-																			)}%`}
-																		</div>
-																		<Progress
-																			className='flex-grow-1'
-																			isAutoColor
-																			value={calcProgressTask(
-																				item,
-																			)}
-																			style={{
-																				height: 10,
-																			}}
-																		/>
-																	</div>
-																</td>
-																<td>{item?.kpi_value}</td>
-																<td>{item?.current_kpi_value}</td>
-																<td>
-																	<div className='d-flex align-items-center'>
-																		<span
-																			style={{
-																				paddingRight:
-																					'1rem',
-																				paddingLeft: '1rem',
-																			}}
-																			className={classNames(
-																				'badge',
-																				'border border-2',
-																				[
-																					`border-${themeStatus}`,
-																				],
-																				'bg-success',
-																				'pt-2 pb-2 me-2',
-																				`bg-${formatColorPriority(
-																					item.priority,
-																				)}`,
-																			)}>
-																			<span className=''>{`Cấp ${item.priority}`}</span>
-																		</span>
-																	</div>
-																</td>
-																<td>
-																	<Button
-																		isLink
-																		color={formatColorStatus(
-																			item.status,
-																		)}
-																		icon='Circle'
-																		className='text-nowrap'>
-																		{FORMAT_TASK_STATUS(
-																			item.status,
-																		)}
-																	</Button>
-																</td>
-																<td style={{ minWidth: 200 }}>
-																	<Button
-																		isOutline={!darkModeStatus}
-																		color='success'
-																		isLight={darkModeStatus}
-																		className='text-nowrap mx-2'
-																		icon='Check'
-																		onClick={() =>
-																			handleUpdateStatus(
-																				1,
-																				item,
-																			)
-																		}>
-																		Duyệt
-																	</Button>
-																	<Button
-																		isOutline={!darkModeStatus}
-																		color='danger'
-																		isLight={darkModeStatus}
-																		className='text-nowrap mx-2'
-																		icon='Trash'
-																		onClick={() =>
-																			handleUpdateStatus(
-																				4,
-																				item,
-																			)
-																		}>
-																		Từ chối
-																	</Button>
-																</td>
-															</tr>
-														))}
-												</tbody>
-											</table>
+												columns={columnsPending}
+												data={tasks.filter(
+													(item) =>
+														item.status === 2 || item.status === 3,
+												)}
+												// eslint-disable-next-line react/no-unstable-nested-components
+												actions={(item) => (
+													<>
+														<Button
+															isOutline={!darkModeStatus}
+															color='success'
+															isLight={darkModeStatus}
+															className='text-nowrap mx-2'
+															icon='Check'
+															onClick={() =>
+																handleUpdateStatus(1, item)
+															}>
+															Duyệt
+														</Button>
+														<Button
+															isOutline={!darkModeStatus}
+															color='danger'
+															isLight={darkModeStatus}
+															className='text-nowrap mx-2'
+															icon='Trash'
+															onClick={() =>
+																handleUpdateStatus(4, item)
+															}>
+															Từ chối
+														</Button>
+													</>
+												)}
+											/>
 											{!tasks.filter(
 												(item) => item.status === 2 || item.status === 3,
 											)?.length && (

@@ -11,6 +11,7 @@ import Card, {
 import Icon from '../../../components/icon/Icon';
 
 const CardInfoCommon = ({
+	children,
 	data,
 	title,
 	subTitle,
@@ -30,9 +31,9 @@ const CardInfoCommon = ({
 				</CardLabel>
 			</CardHeader>
 			<CardBody isScrollable={isScrollable} className='py-2'>
-				<div className='row g-2'>
+				<div className='row g-2 ps-5 pe-4'>
 					{data?.map((item) => (
-						<div className='col-12 mb-4'>
+						<div className='col-12 mb-2'>
 							<div className='d-flex align-items-center'>
 								<div className='flex-shrink-0'>
 									<Icon
@@ -41,9 +42,7 @@ const CardInfoCommon = ({
 										color={item?.color || 'primary'}
 									/>
 								</div>
-								<div className='flex-grow-1 ms-3'>
-									<div className='fw-bold fs-5 mb-0'>{item?.text}</div>
-								</div>
+								<div className='flex-grow-1 ps-3'>{item.children}</div>
 							</div>
 						</div>
 					))}
@@ -54,6 +53,7 @@ const CardInfoCommon = ({
 };
 
 CardInfoCommon.propTypes = {
+	children: PropTypes.node.isRequired,
 	className: PropTypes.string,
 	shadow: PropTypes.oneOf([null, 'none', 'sm', 'md', 'lg', '3d']),
 	title: PropTypes.string,

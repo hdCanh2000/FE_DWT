@@ -57,7 +57,7 @@ const Login = ({ isSignUp }) => {
 			) {
 				localStorage.setItem('token', result.token);
 				localStorage.setItem('username', result.login_username);
-				navigate('/muc-tieu/danh-sach');
+				navigate('/muc-tieu');
 			} else {
 				setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 			}
