@@ -2,6 +2,7 @@ import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
+import moment from 'moment';
 import useDarkMode from '../../../../hooks/useDarkMode';
 import Card, {
 	// CardActions,
@@ -23,7 +24,6 @@ import Button from '../../../../components/bootstrap/Button';
 import Select from '../../../../components/bootstrap/forms/Select';
 import Option from '../../../../components/bootstrap/Option';
 import { getAllUser } from '../services';
-// import Avatar from '../../../../components/Avatar';
 
 const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -38,7 +38,23 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 		},
 		onSubmit: (values) => {
 			const valuesClone = { ...values };
-			const subtaskClone = { ...subtask };
+			const newWorks = JSON.parse(JSON.stringify(subtask.logs ? subtask.logs : []));
+			const newLogs = [
+				...newWorks,
+				{
+					user: {
+						id: subtask?.user?.id,
+						name: subtask?.user?.name,
+					},
+					type: 2,
+					prev_status: null,
+					next_status: `Chỉnh sửa`,
+					step_id: card?.step_id,
+					step_name: card?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
+			const subtaskClone = { ...subtask, logs: newLogs };
 			const { steps } = subtaskClone;
 			const stepsClone = [...steps];
 			valuesClone.task_id = subtaskClone?.task_id;
@@ -52,7 +68,6 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 			setEditModalStatus(false);
 		},
 	});
-
 	useEffect(() => {
 		async function fetchDataUsers() {
 			const response = await getAllUser();

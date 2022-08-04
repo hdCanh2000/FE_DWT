@@ -33,7 +33,8 @@ import SubHeader, { SubHeaderLeft } from '../../../layout/SubHeader/SubHeader';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import { updateSubtasks } from '../TaskDetail/services';
 import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
-import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
+// import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
+import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
 
 const chartOptions = {
 	chart: {
@@ -127,11 +128,13 @@ const SubTaskPage = () => {
 	const { taskid, id } = params;
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirm, set0penConfirm] = React.useState(false);
+	const [newWork, setNewWork] = React.useState();
 	useEffect(() => {
 		async function fetchDataTaskById() {
 			const reponse = await getTaskById(taskid);
 			const result = await reponse.data;
 			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
+			setNewWork(result.logs);
 			setTask(result);
 			setSubtask(subtaskRes);
 			setBoardData(
@@ -271,11 +274,28 @@ const SubTaskPage = () => {
 		set0penConfirm(false);
 	};
 	const handleDeleteSubTask = async (subtasks) => {
+		const newWorks = JSON.parse(JSON.stringify(newWork));
+		const newLogs = [
+			...newWorks,
+			{
+				user: {
+					id: task?.user?.id,
+					name: task?.user?.name,
+				},
+				type: 2,
+				prev_status: null,
+				next_status: `Xóa`,
+				subtask_id: subtasks.id,
+				subtask_name: subtasks.name,
+				time: moment().format('YYYY/MM/DD hh:mm'),
+			},
+		];
 		const newSubTasks = task?.subtasks?.filter((item) => item.id !== subtasks?.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
+			logs: newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(task?.id, newData);
@@ -741,38 +761,27 @@ const SubTaskPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
-									<Timeline>
-										{subtask?.logs?.map((log) => (
-											<TimelineItem
-												className='align-items-center'
-												label={log.time}
-												color='primary'>
-												<span
-													className='text-success fw-bold'
-													style={{ fontSize: 14 }}>
-													{log?.user?.name}
-												</span>{' '}
-												đã chuyển trạng thái công việc{' '}
-												<span
-													className='text-danger fw-bold'
-													style={{ fontSize: 14 }}>
-													{`#${log?.task_id}`}
-												</span>{' '}
-												từ{' '}
-												<span
-													className='text-primary fw-bold'
-													style={{ fontSize: 14 }}>
-													{log?.prev_status}
-												</span>{' '}
-												sang{' '}
-												<span
-													className='text-info fw-bold'
-													style={{ fontSize: 14 }}>
-													{log?.next_status}
-												</span>
-											</TimelineItem>
+									{subtask?.logs
+										?.slice()
+										.reverse()
+										.map((item) => (
+											<RelatedActionCommonItem
+												key={item?.id}
+												type={item?.type}
+												time={item?.time}
+												username={item?.user?.name}
+												id={
+													item?.step_id ? item?.step_id : item?.subtask_id
+												}
+												taskName={
+													item?.step_name
+														? item?.step_name
+														: item?.subtask_name
+												}
+												prevStatus={item?.prev_status}
+												nextStatus={item?.next_status}
+											/>
 										))}
-									</Timeline>
 								</CardBody>
 							</Card>
 						</Card>
@@ -805,8 +814,9 @@ const SubTaskPage = () => {
 					task={task}
 					setEditModalStatus={setEditModalStatus}
 					editModalStatus={editModalStatus}
-					id={parseInt(params?.id, 10)}
+					id={subtask?.task_id}
 					idEdit={subtask.id}
+					newWork={newWork}
 				/>
 			</Page>
 		</PageWrapper>

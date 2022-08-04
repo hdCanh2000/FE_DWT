@@ -8,6 +8,7 @@ import _ from 'lodash';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import toast, { Toaster } from 'react-hot-toast';
+import { useToasts } from 'react-toast-notifications';
 import Dropdown, {
 	DropdownToggle,
 	DropdownMenu,
@@ -41,7 +42,8 @@ import './styleTaskDetail.scss';
 import TaskAlertConfirm from '../mission/TaskAlertConfirm';
 import TaskFormModal from '../mission/TaskFormModal';
 import { deleteTaskById, updateTaskByID } from '../mission/services';
-import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
+import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
+import Toasts from '../../../components/bootstrap/Toasts';
 
 const TaskDetailPage = () => {
 	// State
@@ -59,6 +61,7 @@ const TaskDetailPage = () => {
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
 	const [newWork, setNewWork] = React.useState([]);
 	const navigate = useNavigate();
+	const { addToast } = useToasts();
 	const chartOptions = {
 		chart: {
 			type: 'donut',
@@ -130,21 +133,55 @@ const TaskDetailPage = () => {
 		setSubTask(task.subtasks);
 	}, [task]);
 	// Handle
-	const handleOpenModal = (id, titles) => {
+	const handleOpenModal = (items, titles) => {
 		setEditModalStatus(true);
-		setIdEdit(id);
+		setIdEdit(items.id);
 		setTitle(titles);
 	};
-	const handleDelete = async (idDelete) => {
-		const newSubTasks = subtask.filter((item) => item.id !== idDelete);
+	const handleShowToast = (titles, content) => {
+		addToast(
+			<Toasts title={titles} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+	const handleDelete = async (valueDelete) => {
+		const newWorks = JSON.parse(JSON.stringify(newWork));
+		const newLogs = [
+			...newWorks,
+			{
+				user: {
+					id: task?.user?.id,
+					name: task?.user?.name,
+				},
+				type: 2,
+				prev_status: null,
+				next_status: `Xóa`,
+				subtask_id: valueDelete.id,
+				subtask_name: valueDelete.name,
+				time: moment().format('YYYY/MM/DD hh:mm'),
+			},
+		];
+		const newSubTasks = subtask.filter((item) => item.id !== valueDelete.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
+			logs: newLogs,
 		});
-		const respose = await updateSubtasks(parseInt(params?.id, 10), newData);
-		const result = await respose.data;
-		setTask(result);
+
+		try {
+			const respose = await updateSubtasks(parseInt(params?.id, 10), newData);
+			const result = await respose.data;
+			setTask(result);
+			navigate(`/quan-ly-cong-viec/cong-viec/${task?.id}`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thất bại!`);
+		}
 	};
 	const handleOpenConfirm = (item) => {
 		setDeletes({
@@ -209,7 +246,7 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			logs : newLogs,
+			logs: newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
@@ -989,29 +1026,29 @@ const TaskDetailPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable>
-									<Timeline>
-										{task?.logs?.slice().reverse().map((item) => (
-											<TimelineItem
-												key={item.id}
-												label={item?.time}
-												color='primary'>
-												<b style={{ color: 'green' }}>{item?.user?.name}</b>
-												&ensp; đã cập nhật trạng thái của{' '}
-												<b style={{ color: 'red' }}>
-													#
-													{item?.subtask_id
+									{task?.logs
+										?.slice()
+										.reverse()
+										.map((item) => (
+											<RelatedActionCommonItem
+												key={item?.id}
+												type={item?.type}
+												time={item?.time}
+												username={item?.user?.name}
+												id={
+													item?.subtask_id
 														? item?.subtask_id
-														: item?.task_id}
-												</b>{' '}
-												từ{' '}
-												<b style={{ color: '#6C5DD3' }}>
-													{item?.prev_status}
-												</b>
-												&ensp;sang{' '}
-												<b style={{ color: 'blue' }}>{item?.next_status}</b>
-											</TimelineItem>
+														: item?.task_id
+												}
+												taskName={
+													item?.subtask_name
+														? item?.subtask_name
+														: item?.task_name
+												}
+												prevStatus={item?.prev_status}
+												nextStatus={item?.next_status}
+											/>
 										))}
-									</Timeline>
 								</CardBody>
 							</Card>
 						</div>
@@ -1208,7 +1245,7 @@ const TaskDetailPage = () => {
 																	icon='Edit'
 																	onClick={() =>
 																		handleOpenModal(
-																			item.id,
+																			item,
 																			'edit',
 																		)
 																	}>
@@ -1366,7 +1403,7 @@ const TaskDetailPage = () => {
 				<ComfirmSubtask
 					openModal={openConfirm}
 					onCloseModal={handleCloseComfirm}
-					onConfirm={() => handleDelete(deletes?.id)}
+					onConfirm={() => handleDelete(deletes)}
 					title='Xoá Đầu việc'
 					content={`Xác nhận xoá đầu việc <strong>${deletes?.name}</strong> ?`}
 				/>
