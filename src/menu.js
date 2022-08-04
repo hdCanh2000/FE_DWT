@@ -50,13 +50,13 @@ export const demoPages = {
 		id: 'mission',
 		text: 'Mục tiêu',
 		path: '/muc-tieu',
-		subMenu: {
-			mission: {
-				id: 'mission',
-				text: 'Danh sách',
-				path: '/muc-tieu/danh-sach',
-			},
-		},
+		// subMenu: {
+		// 	mission: {
+		// 		id: 'mission',
+		// 		text: 'Danh sách',
+		// 		path: '/muc-tieu/danh-sach',
+		// 	},
+		// },
 	},
 	quanLyCongViec: {
 		id: 'quanlycongviec',
