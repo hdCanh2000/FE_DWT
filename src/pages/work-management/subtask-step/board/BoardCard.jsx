@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import moment from 'moment';
 import useDarkMode from '../../../../hooks/useDarkMode';
 import Card, {
-	// CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
@@ -79,7 +78,12 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 
 	return (
 		<>
-			<Card shadow='md' borderSize={1} className='rounded-2' borderColor='info'>
+			<Card
+				shadow='md'
+				borderSize={1}
+				className='rounded-2'
+				borderColor='info'
+				onClick={() => setEditModalStatus(true)}>
 				<CardHeader>
 					<CardLabel>
 						<CardTitle
@@ -88,33 +92,12 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 								'link-dark': !darkModeStatus,
 								'link-light': darkModeStatus,
 							})}
-							onClick={() => setEditModalStatus(true)}
 							data-tour={card.name}>
 							{card.name}
 						</CardTitle>
 					</CardLabel>
-					{/* {card.user && (
-						<CardActions>
-							<Avatar
-								src={card.user.src}
-								srcSet={card.user.srcSet}
-								color={card.user.color}
-								size={24}
-								userName={`${card.user.name} ${card.user.surname}`}
-							/>
-						</CardActions>
-					)} */}
 				</CardHeader>
-				<CardBody className='pt-0'>
-					{/* <div className='row g-2 mb-3'>
-						{card.label && (
-							<div className='col-auto'>
-								<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-									{card.label}
-								</small>
-							</div>
-						)}
-					</div> */}
+				<CardBody className='pt-0' onClick={() => setEditModalStatus(true)}>
 					{card.description}
 				</CardBody>
 			</Card>

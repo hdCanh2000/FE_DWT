@@ -106,7 +106,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 						</CardActions>
 					</CardHeader>
 					{!!_cardCount && (
-						<CardBody isScrollable={_cardCount > 3}>
+						<CardBody className='cursor-pointer' isScrollable={_cardCount > 3}>
 							{groups.cards.map((card) => (
 								<BoardCard
 									key={card.id}

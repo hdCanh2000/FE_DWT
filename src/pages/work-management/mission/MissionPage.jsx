@@ -2,7 +2,13 @@
 /* eslint-disable react/prop-types */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, Link, createSearchParams, useSearchParams } from 'react-router-dom';
+import {
+	useNavigate,
+	Link,
+	createSearchParams,
+	useSearchParams,
+	useLocation,
+} from 'react-router-dom';
 import moment from 'moment';
 import { uniqBy } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
@@ -63,47 +69,55 @@ const Item = ({
 						<CardTitle>{name}</CardTitle>
 						<CardSubTitle>{`Phụ trách: ${teamName}`}</CardSubTitle>
 					</CardLabel>
-					<CardActions>
-						<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-							{moment(`${dueDate}`).format('DD-MM-YYYY')}
-						</small>
-					</CardActions>
 				</CardHeader>
 				<CardBody>
-					<div className='row g-2 align-items-center'>
-						<div className='col-auto mt-2'>
-							<span>Phòng ban:</span>
+					<div className='col-md-12'>
+						<div className='d-flex align-items-center jusify-content-start'>
+							<small
+								style={{ fontSize: 14 }}
+								className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+								{moment(`${dueDate}`).format('DD-MM-YYYY')}
+							</small>
 						</div>
-						{departmentsRelated?.map((k, index) => (
-							// eslint-disable-next-line react/no-array-index-key
-							<div key={index} className='col-auto mt-2'>
-								<Badge
-									isLight
-									color='primary'
-									className='px-3 py-3'
-									style={{ fontSize: 14 }}>
-									{k?.name}
-								</Badge>
-							</div>
-						))}
 					</div>
-					<div className='row g-2 mt-2 align-items-center'>
-						<div className='col-auto mt-2'>
-							<span>Nhân viên:</span>
+					{departmentsRelated?.length > 0 && (
+						<div className='row g-2 align-items-center'>
+							<div className='col-auto mt-2'>
+								<span>Phòng ban:</span>
+							</div>
+							{departmentsRelated?.map((k, index) => (
+								// eslint-disable-next-line react/no-array-index-key
+								<div key={index} className='col-auto mt-2'>
+									<Badge
+										isLight
+										color='primary'
+										className='px-3 py-3'
+										style={{ fontSize: 14 }}>
+										{k?.name}
+									</Badge>
+								</div>
+							))}
 						</div>
-						{usersRelated?.map((k, index) => (
-							// eslint-disable-next-line react/no-array-index-key
-							<div key={index} className='col-auto mt-2'>
-								<Badge
-									isLight
-									color='danger'
-									className='px-3 py-3'
-									style={{ fontSize: 14 }}>
-									{k?.name}
-								</Badge>
+					)}
+					{usersRelated?.length > 0 && (
+						<div className='row g-2 mt-2 align-items-center'>
+							<div className='col-auto mt-2'>
+								<span>Nhân viên:</span>
 							</div>
-						))}
-					</div>
+							{usersRelated?.map((k, index) => (
+								// eslint-disable-next-line react/no-array-index-key
+								<div key={index} className='col-auto mt-2'>
+									<Badge
+										isLight
+										color='danger'
+										className='px-3 py-3'
+										style={{ fontSize: 14 }}>
+										{k?.name}
+									</Badge>
+								</div>
+							))}
+						</div>
+					)}
 					<div className='row mt-2'>
 						<div className='col-md-12'>
 							{percent}%
@@ -127,6 +141,7 @@ const MissionPage = () => {
 
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
+	const location = useLocation();
 	const navigate = useNavigate();
 	const navigateToDetailPage = useCallback(
 		(page) => navigate(`/muc-tieu/chi-tiet/${page}`),
@@ -281,7 +296,7 @@ const MissionPage = () => {
 
 	const handleClickSwitchView = (view) => {
 		navigate({
-			pathname: '/muc-tieu/danh-sach',
+			pathname: location.pathname,
 			search: `?${createSearchParams({
 				view,
 			})}`,

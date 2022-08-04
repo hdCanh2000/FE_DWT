@@ -159,6 +159,7 @@ const MissionDetailPage = () => {
 			id: 'progress',
 			key: 'progress',
 			type: 'text',
+			minWidth: 100,
 			render: (item) => (
 				<div className='d-flex align-items-center flex-column'>
 					<div className='flex-shrink-0 me-3'>{`${calcProgressTask(item)}%`}</div>
@@ -254,18 +255,16 @@ const MissionDetailPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenEditForm(item)}>
-						Sửa
-					</Button>
+						onClick={() => handleOpenEditForm(item)}
+					/>
 					<Button
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenConfirmModal(item)}>
-						Xoá
-					</Button>
+						onClick={() => handleOpenConfirmModal(item)}
+					/>
 				</>
 			),
 		},
@@ -657,7 +656,7 @@ const MissionDetailPage = () => {
 						</div>
 					</div>
 					<div className='col-lg-8'>
-						<Card className='shadow-3d-primary h-100 mb-4 pb-4'>
+						<Card className='shadow-3d-primary h-100 mb-0'>
 							<CardHeader className='py-2'>
 								<CardLabel icon='Summarize' iconColor='success'>
 									<CardTitle tag='h4' className='h5'>
@@ -666,10 +665,10 @@ const MissionDetailPage = () => {
 								</CardLabel>
 							</CardHeader>
 							<CardBody className='py-2'>
-								<div className='row g-4'>
+								<div className='row h-100'>
 									<div className='col-md-5 mb-4'>
 										<Card
-											className='bg-l25-primary transition-base rounded-2 mb-4'
+											className='h-50 bg-l25-primary transition-base rounded-2 mb-4'
 											shadow='sm'>
 											<CardHeader className='bg-transparent py-2'>
 												<CardLabel icon='Activity' iconColor='primary'>
@@ -755,12 +754,13 @@ const MissionDetailPage = () => {
 											</CardBody>
 										</Card>
 										<CardInfoCommon
-											className='mb-4 pb-4'
+											className='mb-4 pb-4 h-50'
 											shadow='lg'
-											style={{ minHeight: 300 }}
+											// style={{ minHeight: 300 }}
 											title='Phòng ban phụ trách'
 											icon='LayoutTextWindow'
 											iconColor='info'
+											isScrollable={mission?.departments?.length > 5}
 											data={mission?.departments?.map((department) => {
 												return {
 													icon: 'TrendingFlat',
@@ -832,7 +832,7 @@ const MissionDetailPage = () => {
 						</Card>
 					</div>
 					<div className='col-lg-4'>
-						<Card className='mb-4 h-100 shadow-3d-info'>
+						<Card className='mb-0 h-100 shadow-3d-info'>
 							<CardInfoCommon
 								className='mb-4'
 								shadow='lg'
@@ -887,12 +887,13 @@ const MissionDetailPage = () => {
 								]}
 							/>
 							<CardInfoCommon
-								className='transition-base w-100 rounded-2 mb-4'
+								className='transition-base w-100 rounded-2 mb-4 pb-4'
 								shadow='lg'
 								style={{ minHeight: 250 }}
 								title='Chỉ số key'
 								icon='ShowChart'
 								iconColor='danger'
+								isScrollable={mission?.keys?.length > 3}
 								data={mission?.keys?.map((key) => {
 									return {
 										icon: 'DoneAll',
@@ -910,8 +911,8 @@ const MissionDetailPage = () => {
 									};
 								})}
 							/>
-							<Card style={{ minHeight: 240 }} shadow='lg'>
-								<CardHeader className='py-2'>
+							<Card style={{ minHeight: 240 }} shadow='lg' className='mb-0'>
+								<CardHeader className='py-2 transition-base w-100 rounded-2'>
 									<CardLabel icon='NotificationsActive' iconColor='warning'>
 										<CardTitle>Hoạt động gần đây</CardTitle>
 									</CardLabel>
@@ -1002,33 +1003,6 @@ const MissionDetailPage = () => {
 												data={tasks.filter(
 													(item) =>
 														item.status === 2 || item.status === 3,
-												)}
-												// eslint-disable-next-line react/no-unstable-nested-components
-												actions={(item) => (
-													<>
-														<Button
-															isOutline={!darkModeStatus}
-															color='success'
-															isLight={darkModeStatus}
-															className='text-nowrap mx-2'
-															icon='Check'
-															onClick={() =>
-																handleUpdateStatus(1, item)
-															}>
-															Duyệt
-														</Button>
-														<Button
-															isOutline={!darkModeStatus}
-															color='danger'
-															isLight={darkModeStatus}
-															className='text-nowrap mx-2'
-															icon='Trash'
-															onClick={() =>
-																handleUpdateStatus(4, item)
-															}>
-															Từ chối
-														</Button>
-													</>
 												)}
 											/>
 											{!tasks.filter(
