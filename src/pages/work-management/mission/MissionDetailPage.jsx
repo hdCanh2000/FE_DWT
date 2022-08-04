@@ -35,7 +35,6 @@ import {
 	calcProgressMission,
 	calcProgressTask,
 	calcTotalTaskByStatus,
-	// calculateTotalSubTasksInTasks,
 } from '../../../utils/function';
 import Button from '../../../components/bootstrap/Button';
 import MissionAlertConfirm from './MissionAlertConfirm';
@@ -56,7 +55,9 @@ import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
 import '../TaskDetail/styleTaskDetail.scss';
 import MissionFormModal from './MissionFormModal';
-import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
+import RelatedActionCommon from '../../common/ComponentCommon/RelatedActionCommon';
+import ReportCommon from '../../common/ComponentCommon/ReportCommon';
+import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 
 const minWith300 = {
 	minWidth: 300,
@@ -121,6 +122,7 @@ const chartOptions = {
 const MissionDetailPage = () => {
 	const [mission, setMission] = useState({});
 	const [tasks, setTasks] = useState([]);
+	const [taskLogs, setTaskLogs] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [editModalMissionStatus, setEditModalMissionStatus] = useState(false);
@@ -145,6 +147,7 @@ const MissionDetailPage = () => {
 			const response = await getAllTaksByMissionID(id);
 			const result = await response.data;
 			setTasks(result);
+			setTaskLogs(result.filter((item) => item?.logs?.length > 0)?.map((item) => item.logs));
 		}
 		fetchDataTaskByMissionID();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -390,7 +393,7 @@ const MissionDetailPage = () => {
 							</div>
 						</div>
 					</div>
-					<div className='col-lg-7'>
+					<div className='col-lg-8'>
 						<Card className='shadow-3d-primary h-100 mb-4 pb-4'>
 							<CardHeader className='py-2'>
 								<CardLabel icon='Summarize' iconColor='success'>
@@ -530,74 +533,31 @@ const MissionDetailPage = () => {
 												</CardLabel>
 											</CardHeader>
 											<CardBody className='py-2'>
-												<Card
-													className={`bg-l${
-														darkModeStatus ? 'o25' : '25'
-													}-success bg-l${
-														darkModeStatus ? 'o50' : '10'
-													}-success-hover transition-base rounded-2 mb-4`}
-													shadow='sm'>
-													<CardBody>
-														<div className='row'>
-															<div className='col'>
-																<div className='fw-bold fs-2 mb-10'>
-																	{tasks?.length}
-																</div>
-																<div className='text-muted'>
-																	Số công việc
-																</div>
-															</div>
-															<div className='col'>
-																<div className='fw-bold fs-2 mb-10'>
-																	{calcTotalTaskByStatus(
-																		tasks,
-																		1,
-																	)}
-																</div>
-																<div className='text-muted'>
-																	Đã hoàn thành
-																</div>
-															</div>
-														</div>
-														<div className='row'>
-															<div className='col'>
-																<div className='fw-bold fs-2 mb-10'>
-																	{calcTotalTaskByStatus(
-																		tasks,
-																		0,
-																	)}
-																</div>
-																<div className='text-muted'>
-																	Đang thực hiện
-																</div>
-															</div>
-															<div className='col'>
-																<div className='fw-bold fs-2 mb-10'>
-																	{calcTotalTaskByStatus(
-																		tasks,
-																		2,
-																	)}
-																</div>
-																<div className='text-muted'>
-																	Chờ xét duyệt
-																</div>
-															</div>
-														</div>
-														<div className='row'>
-															<div className='col'>
-																<div className='fw-bold fs-2 mb-10'>
-																	{calcTotalTaskByStatus(
-																		tasks,
-																		3,
-																	)}
-																</div>
-																<div className='text-muted'>
-																	Huỷ/thất bại
-																</div>
-															</div>
-														</div>
-													</CardBody>
-												</Card>
+												{/* 	Report Component	 */}
+												<ReportCommon
+													data={[
+														{
+															label: 'Số công việc',
+															value: tasks?.length,
+														},
+														{
+															label: 'Đã hoàn thành',
+															value: calcTotalTaskByStatus(tasks, 1),
+														},
+														{
+															label: 'Đang thực hiện',
+															value: calcTotalTaskByStatus(tasks, 0),
+														},
+														{
+															label: 'Chờ xét duyệt',
+															value: calcTotalTaskByStatus(tasks, 2),
+														},
+														{
+															label: 'Huỷ/Quá hạn',
+															value: calcTotalTaskByStatus(tasks, 3),
+														},
+													]}
+												/>
 												{tasks?.length > 0 ? (
 													<div className='row align-items-center'>
 														<div className='col-xl-12 col-md-12'>
@@ -622,73 +582,35 @@ const MissionDetailPage = () => {
 							</CardBody>
 						</Card>
 					</div>
-					<div className='col-lg-5'>
+					<div className='col-lg-4'>
 						<Card className='mb-4 h-100 shadow-3d-info'>
-							<Card className='mb-4' shadow='lg' style={{ minHeight: 250 }}>
-								<CardHeader className='py-2'>
-									<CardLabel icon='Stream' iconColor='warning'>
-										<CardTitle>Thông tin mục tiêu</CardTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-2'>
-									<div className='row g-2'>
-										<div className='col-12 mb-4'>
-											<div className='d-flex align-items-center'>
-												<div className='flex-shrink-0'>
-													<Icon
-														icon='TrendingFlat'
-														size='2x'
-														color='danger'
-													/>
-												</div>
-												<div className='flex-grow-1 ms-3'>
-													<div className='fw-bold fs-5 mb-0'>
-														{mission.description}
-													</div>
-												</div>
-											</div>
-										</div>
-										<div className='col-12 mb-4'>
-											<div className='d-flex align-items-center'>
-												<div className='flex-shrink-0'>
-													<Icon
-														icon='TrendingFlat'
-														size='2x'
-														color='danger'
-													/>
-												</div>
-												<div className='flex-grow-1 ms-3'>
-													<div className='fw-bold fs-5 mb-0'>
-														<span className='me-2'>Ngày bắt đầu:</span>
-														{moment(`${mission?.start_time}`).format(
-															'DD-MM-YYYY',
-														)}
-													</div>
-												</div>
-											</div>
-										</div>
-										<div className='col-12 mb-4'>
-											<div className='d-flex align-items-center'>
-												<div className='flex-shrink-0'>
-													<Icon
-														icon='TrendingFlat'
-														size='2x'
-														color='danger'
-													/>
-												</div>
-												<div className='flex-grow-1 ms-3'>
-													<div className='fw-bold fs-5 mb-0'>
-														<span className='me-2'>Ngày kết thúc:</span>
-														{moment(`${mission?.end_time}`).format(
-															'DD-MM-YYYY',
-														)}
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</CardBody>
-							</Card>
+							<CardInfoCommon
+								className='mb-4'
+								shadow='lg'
+								style={{ minHeight: 250 }}
+								title='Thông tin mục tiêu'
+								icon='Stream'
+								iconColor='warning'
+								data={[
+									{
+										icon: 'Pen',
+										color: 'primary',
+										text: mission?.description,
+									},
+									{
+										icon: 'ClockHistory',
+										color: 'primary',
+										text: `Ngày bắt đầu:
+										${moment(`${mission?.start_time}`).format('DD-MM-YYYY')}`,
+									},
+									{
+										icon: 'CalendarCheck',
+										color: 'primary',
+										text: `Ngày kết thúc:
+										${moment(`${mission?.end_time}`).format('DD-MM-YYYY')}`,
+									},
+								]}
+							/>
 							<Card
 								className='transition-base w-100 rounded-2 mb-4'
 								shadow='lg'
@@ -742,42 +664,7 @@ const MissionDetailPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
-									<Timeline>
-										{tasks?.map((item) => (
-											<div>
-												{item?.logs?.map((log) => (
-													<TimelineItem
-														className='align-items-center'
-														label={log.time}
-														color='primary'>
-														<span
-															className='text-success fw-bold'
-															style={{ fontSize: 14 }}>
-															{log?.user?.name}
-														</span>{' '}
-														đã chuyển trạng thái công việc{' '}
-														<span
-															className='text-danger fw-bold'
-															style={{ fontSize: 14 }}>
-															{`#${log?.task_id}`}
-														</span>{' '}
-														từ{' '}
-														<span
-															className='text-primary fw-bold'
-															style={{ fontSize: 14 }}>
-															{log?.prev_status}
-														</span>{' '}
-														sang{' '}
-														<span
-															className='text-info fw-bold'
-															style={{ fontSize: 14 }}>
-															{log?.next_status}
-														</span>
-													</TimelineItem>
-												))}
-											</div>
-										))}
-									</Timeline>
+									<RelatedActionCommon data={taskLogs?.[0]} />
 								</CardBody>
 							</Card>
 						</Card>
@@ -863,11 +750,6 @@ const MissionDetailPage = () => {
 																			{moment(
 																				`${item.estimate_date}`,
 																			).format('DD-MM-YYYY')}
-																			{/* {moment(
-																				`${item.estimate_date} ${item.estimate_time}`,
-																			).format(
-																				'DD-MM-YYYY, HH:mm',
-																			)} */}
 																		</span>
 																	</div>
 																</td>
@@ -879,11 +761,6 @@ const MissionDetailPage = () => {
 																			{moment(
 																				`${item.deadline_date}`,
 																			).format('DD-MM-YYYY')}
-																			{/* {moment(
-																				`${item.deadline_date} ${item.deadline_time}`,
-																			).format(
-																				'DD-MM-YYYY, HH:mm',
-																			)} */}
 																		</span>
 																	</div>
 																</td>
