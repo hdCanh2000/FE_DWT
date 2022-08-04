@@ -9,12 +9,12 @@ const TableCommon = ({ data, columns, actions, className, ...props }) => {
 				<tr>
 					{columns.map((column) => {
 						return (
-							<td
-								style={{ minWidth: `${column.minWidth}px` }}
+							<th
+								style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
 								key={column.key}
-								className={column.className}>
+								className={classNames(column.className)}>
 								{column.title}
-							</td>
+							</th>
 						);
 					})}
 					<td />
@@ -27,11 +27,15 @@ const TableCommon = ({ data, columns, actions, className, ...props }) => {
 							{columns.map((column) => {
 								const value = row[column.id];
 								if (column.render) {
-									return <td key={column.key}>{column.render(row, value)}</td>;
+									return (
+										<td key={column.key} style={{ fontSize: 14 }}>
+											{column.render(row, value)}
+										</td>
+									);
 								}
 								return (
 									<td
-										style={{ minWidth: `${column.minWidth}px` }}
+										style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
 										key={column.key}
 										className={column.className}>
 										{column.format ? column.format(value) : value}
