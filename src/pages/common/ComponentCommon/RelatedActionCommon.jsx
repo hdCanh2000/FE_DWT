@@ -65,10 +65,11 @@ const RelatedActionCommon = (props) => {
 					type={item?.type}
 					time={item?.time}
 					username={item?.user?.name}
-					id={item?.id}
+					id={item?.task_id}
 					taskName={item?.task_name}
 					prevStatus={item?.prev_status}
 					nextStatus={item?.next_status}
+					{...item}
 				/>
 			))}
 		</Timeline>

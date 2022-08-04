@@ -6,52 +6,85 @@ export const FORMAT_TASK_STATUS = (status) => {
 	let result = '';
 	switch (status) {
 		case 0:
-			result = 'Đang thực hiện';
+			result = 'Chờ chấp nhận';
 			break;
 		case 1:
-			result = 'Đã hoàn thành';
+			result = 'Đã chấp nhận';
 			break;
 		case 2:
-			result = 'Chờ duyệt';
+			result = 'Đang thực hiện';
 			break;
 		case 3:
-			result = 'Quá hạn/Huỷ';
+			result = 'Đã xong';
 			break;
 		case 4:
+			result = 'Đã hoàn thành';
+			break;
+		case 5:
 			result = 'Từ chối';
 			break;
+		case 6:
+			result = 'Quá hạn/Huỷ';
+			break;
+		case 7:
+			result = 'Đóng';
+			break;
+		case 8:
+			result = 'Tạm dừng';
+			break;
 		default:
-			result = 'Đang thực hiện';
+			result = 'Chờ chấp nhận';
 			break;
 	}
 	return result;
 };
 
 export const STATUS = {
-	PENDING: { value: 0, name: 'Đang thực hiện', color: COLORS.PRIMARY.name },
-	APPROVED: { value: 1, name: 'Đã hoàn thành', color: COLORS.SUCCESS.name },
-	CANCELED: { value: 2, name: 'Chờ duyệt', color: COLORS.DANGER.name },
-	FAILURE: { value: 3, name: 'Quá hạn/Huỷ', color: COLORS.DARK.name },
-	REJECTED: { value: 4, name: 'Từ chối', color: COLORS.WARNING.name },
+	PENDING: { value: 0, name: 'Chờ chấp nhận', code: 'pending', color: COLORS.DANGER.name },
+	ACCEPTED: { value: 1, name: 'Đã chấp nhận', code: 'accepted', color: COLORS.INFO.name },
+	INPROGRESS: {
+		value: 2,
+		name: 'Đang thực hiện',
+		code: 'inprogress',
+		color: COLORS.PRIMARY.name,
+	},
+	SOLVED: { value: 3, name: 'Đã xong', code: 'solved', color: COLORS.SUCCESS.name },
+	COMPLETED: { value: 4, name: 'Đã hoàn thành', code: 'completed', color: COLORS.SUCCESS.name },
+	REJECTED: { value: 5, name: 'Từ chối', code: 'rejectes', color: COLORS.DANGER.name },
+	FAILED: { value: 6, name: 'Quá hạn/Huỷ', code: 'failed', color: COLORS.DARK.name },
+	CLOSE: { value: 7, name: 'Đóng', code: 'Pending', color: COLORS.DARK.name },
+	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
 };
 
 export const formatColorStatus = (status) => {
 	let result = '';
 	switch (status) {
 		case 0:
-			result = 'primary';
-			break;
-		case 1:
-			result = 'success';
-			break;
-		case 2:
 			result = 'danger';
 			break;
+		case 1:
+			result = 'info';
+			break;
+		case 2:
+			result = 'primary';
+			break;
 		case 3:
-			result = 'dark';
+			result = 'success';
 			break;
 		case 4:
-			result = 'warning';
+			result = 'success';
+			break;
+		case 5:
+			result = 'danger';
+			break;
+		case 6:
+			result = 'dark';
+			break;
+		case 7:
+			result = 'dark';
+			break;
+		case 8:
+			result = 'info';
 			break;
 		default:
 			result = 'primary';
