@@ -409,6 +409,7 @@ const TaskDetailForm = ({
 		validateFieldForm('department', valueDepartment?.label);
 		validateFieldForm('user', valueUser?.label);
 	};
+	// eslint-disable-next-line no-console
 	return (
 		<Modal setIsOpen={setEditModalStatus} isOpen={editModalStatus} size='lg' isScrollable>
 			<Toaster />

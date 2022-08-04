@@ -57,6 +57,7 @@ const TaskDetailPage = () => {
 	const [editModalTaskStatus, setEditModalTaskStatus] = useState(false);
 	const [taskEdit, setTaskEdit] = useState({});
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
+	const [newWork, setNewWork] = React.useState([]);
 	const navigate = useNavigate();
 	const chartOptions = {
 		chart: {
@@ -125,9 +126,9 @@ const TaskDetailPage = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 	React.useEffect(() => {
+		setNewWork(task?.logs);
 		setSubTask(task.subtasks);
 	}, [task]);
-
 	// Handle
 	const handleOpenModal = (id, titles) => {
 		setEditModalStatus(true);
@@ -181,6 +182,22 @@ const TaskDetailPage = () => {
 		}
 	};
 	const handleUpdateStatus = async (statuss, data) => {
+		const newWorks = JSON.parse(JSON.stringify(newWork));
+		const newLogs = [
+			...newWorks,
+			{
+				user: {
+					id: task?.user?.id,
+					name: task?.user?.name,
+				},
+				type: 1,
+				prev_status: `${FORMAT_TASK_STATUS(data.status)}`,
+				next_status: `${FORMAT_TASK_STATUS(statuss)}`,
+				subtask_id: data.id,
+				subtask_name: data.name,
+				time: moment().format('YYYY/MM/DD hh:mm'),
+			},
+		];
 		const newSubTasks = task.subtasks.map((item) => {
 			return item.id === data.id
 				? {
@@ -192,6 +209,7 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
+			logs : newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
@@ -624,13 +642,6 @@ const TaskDetailPage = () => {
 																			<div className='fw-bold fs-5 mb-0'>
 																				{department?.name}
 																			</div>
-																			<div
-																				className='text-muted'
-																				style={{
-																					fontSize: 14,
-																				}}>
-																				{department?.slug}
-																			</div>
 																		</div>
 																	</div>
 																),
@@ -727,7 +738,7 @@ const TaskDetailPage = () => {
 													<CardLabel>
 														<CardTitle>
 															<Icon
-																icon='CalendarMinusFill'
+																icon='DoubleArrow'
 																color='success'
 																size='2x'
 															/>
@@ -819,9 +830,8 @@ const TaskDetailPage = () => {
 							</CardBody>
 						</Card>
 					</div>
-
-					<div className='col-lg-4 mb-5'>
-						<Card className='shadow-3d-info mb-0' style={{ height: '37%' }}>
+					<div className='col-lg-4 mb-5 shadow-3d-primary'>
+						<Card className=' mb-0' style={{ height: '37%' }}>
 							<CardHeader>
 								<CardLabel icon='CardList' iconColor='primary' size='2x'>
 									<CardTitle tag='h4' className='h5'>
@@ -830,8 +840,8 @@ const TaskDetailPage = () => {
 								</CardLabel>
 							</CardHeader>
 							<CardBody>
-								<div className='row g-2'>
-									<div className='col-12 mb-4'>
+								<div className='row'>
+									<div className='col-12 mb-2'>
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Icon icon='Pen' size='2x' color='primary' />
@@ -843,7 +853,7 @@ const TaskDetailPage = () => {
 											</div>
 										</div>
 									</div>
-									<div className='col-12 mb-4'>
+									<div className='col-12 mb-2'>
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Icon
@@ -860,7 +870,7 @@ const TaskDetailPage = () => {
 											</div>
 										</div>
 									</div>
-									<div className='col-12 mb-4'>
+									<div className='col-12 mb-2'>
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Icon
@@ -876,7 +886,7 @@ const TaskDetailPage = () => {
 											</div>
 										</div>
 									</div>
-									<div className='col-12 mb-4'>
+									<div className='col-12 mb-2'>
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Icon
@@ -897,7 +907,7 @@ const TaskDetailPage = () => {
 											</div>
 										</div>
 									</div>
-									<div className='col-12 mb-4'>
+									<div className='col-12 mb-2'>
 										<div className='d-flex align-items-center'>
 											<div className='flex-shrink-0'>
 												<Icon
@@ -980,26 +990,27 @@ const TaskDetailPage = () => {
 								</CardHeader>
 								<CardBody isScrollable>
 									<Timeline>
-										<TimelineItem
-											label={moment().add(-0.0, 'hours').format('LT')}
-											color='primary'>
-											<b style={{ color: 'green' }}>Trịnh Viết Đạt</b>&ensp;
-											đã cập nhật trạng thái của{' '}
-											<b style={{ color: 'red' }}>#1</b> từ{' '}
-											<b style={{ color: '#6C5DD3' }}>Đang làm</b>
-											&ensp;sang{' '}
-											<b style={{ color: 'blue' }}>Đã hoàn thành</b>
-										</TimelineItem>
-										<TimelineItem
-											label={moment().add(-0.0, 'hours').format('LT')}
-											color='primary'>
-											<b style={{ color: 'green' }}>Trịnh Viết Đạt</b>&ensp;
-											đã cập nhật trạng thái của{' '}
-											<b style={{ color: 'red' }}>#1</b> từ{' '}
-											<b style={{ color: '#6C5DD3' }}>Đang làm</b>
-											&ensp;sang{' '}
-											<b style={{ color: 'blue' }}>Đã hoàn thành</b>
-										</TimelineItem>
+										{task?.logs?.slice().reverse().map((item) => (
+											<TimelineItem
+												key={item.id}
+												label={item?.time}
+												color='primary'>
+												<b style={{ color: 'green' }}>{item?.user?.name}</b>
+												&ensp; đã cập nhật trạng thái của{' '}
+												<b style={{ color: 'red' }}>
+													#
+													{item?.subtask_id
+														? item?.subtask_id
+														: item?.task_id}
+												</b>{' '}
+												từ{' '}
+												<b style={{ color: '#6C5DD3' }}>
+													{item?.prev_status}
+												</b>
+												&ensp;sang{' '}
+												<b style={{ color: 'blue' }}>{item?.next_status}</b>
+											</TimelineItem>
+										))}
 									</Timeline>
 								</CardBody>
 							</Card>
@@ -1083,9 +1094,9 @@ const TaskDetailPage = () => {
 															item.status === 1 ||
 															item.status === 4,
 													)
-													.map((item, index) => (
+													.map((item) => (
 														<tr key={item.id}>
-															<td>#{index + 1}</td>
+															<td>#{item.id}</td>
 															<td>
 																<div>
 																	<div>
@@ -1367,6 +1378,8 @@ const TaskDetailPage = () => {
 					editModalStatus={editModalStatus}
 					id={parseInt(params?.id, 10)}
 					idEdit={idEdit}
+					newWork={newWork}
+					setNewWork={setNewWork}
 				/>
 				<TaskFormModal
 					show={editModalTaskStatus}
