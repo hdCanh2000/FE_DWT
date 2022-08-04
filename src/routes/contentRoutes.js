@@ -50,7 +50,7 @@ const presentation = [
 	 * Trang quản lý nhiệm vụ
 	 */
 	{
-		path: demoPages.mucTieu.subMenu.mission.path,
+		path: demoPages.mucTieu.path,
 		element: <TASK.MISSION />,
 		exact: true,
 	},

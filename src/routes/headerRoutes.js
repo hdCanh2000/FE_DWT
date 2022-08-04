@@ -11,7 +11,7 @@ const headers = [
 	{ path: dashboardMenu.dashboard.path, element: <DashboardHeader />, exact: true },
 	// quan ly muc tieu
 	{
-		path: demoPages.mucTieu.subMenu.mission.path,
+		path: demoPages.mucTieu.path,
 		element: null,
 		exact: true,
 	},

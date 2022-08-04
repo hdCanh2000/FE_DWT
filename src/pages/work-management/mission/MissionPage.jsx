@@ -289,7 +289,7 @@ const MissionPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.quanLyCongViec.subMenu.danhSach.text}>
+		<PageWrapper title={demoPages.mucTieu.text}>
 			<Page container='fluid'>
 				<div className='row mt-4 mb-4'>
 					<div className='col-12'>

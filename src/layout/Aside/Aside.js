@@ -1,32 +1,23 @@
 import React from 'react';
-import moment from 'moment';
 import { Link } from 'react-router-dom';
 import Navigation from '../Navigation/Navigation';
 import { demoPages } from '../../menu';
-import Card, {
-	CardHeader,
-	CardLabel,
-	CardTitle,
-	CardBody,
-	CardSubTitle,
-} from '../../components/bootstrap/Card';
-import Timeline, { TimelineItem } from '../../components/extras/Timeline';
-import Icon from '../../components/icon/Icon';
-import Popovers from '../../components/bootstrap/Popovers';
+import Card from '../../components/bootstrap/Card';
 import Logo from '../../assets/logos/logo.png';
 
 const Aside = () => {
 	return (
 		<>
-			<div className='aside-head'>
+			<div className='position-fixed aside-head top-0 left-0' style={{ maxWidth: 260 }}>
 				<Link to='/'>
 					<img src={Logo} alt='logo' />
 				</Link>
+				<Card className='mt-4' style={{ height: '100vh' }}>
+					<Navigation menu={demoPages} id='aside-demo-pages' />
+				</Card>
 			</div>
-			<Card>
-				<Navigation menu={demoPages} id='aside-demo-pages' />
-			</Card>
-			<Card style={{ minHeight: '80vh' }}>
+
+			{/* <Card style={{ minHeight: '80vh' }}>
 				<CardHeader>
 					<CardLabel icon='NotificationsActive' iconColor='warning'>
 						<CardTitle tag='h4' className='h5'>
@@ -86,7 +77,7 @@ const Aside = () => {
 						</TimelineItem>
 					</Timeline>
 				</CardBody>
-			</Card>
+			</Card> */}
 		</>
 	);
 };
