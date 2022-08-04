@@ -257,9 +257,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 					error: {
 						...key.error,
 						[event.target.name]:
-							event.target.value.length > 0
-								? null
-								: `${[event.target.name]} is required!`,
+							event.target.value.length > 0 ? null : `Vui lòng nhập đầu đủ thông tin`,
 					},
 				};
 			});

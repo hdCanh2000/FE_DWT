@@ -329,7 +329,7 @@ const SubTaskPage = () => {
 				</div>
 				<div className='row mb-4'>
 					<div className='col-lg-8'>
-						<Card className='shadow-3d-primary h-100 mb-4 pb-4'>
+						<Card className='shadow-3d-primary h-100 mb-0 pb-0'>
 							<CardHeader className='py-2'>
 								<CardLabel icon='Summarize' iconColor='success'>
 									<CardTitle tag='h4' className='h5'>
@@ -345,7 +345,7 @@ const SubTaskPage = () => {
 								</Button>
 							</CardHeader>
 							<CardBody className='py-2'>
-								<div className='row g-4'>
+								<div className='row h-100'>
 									<div className='col-md-5'>
 										<Card
 											className='bg-l25-primary transition-base rounded-2 mb-4'
@@ -403,7 +403,7 @@ const SubTaskPage = () => {
 										<CardInfoCommon
 											className='mb-4 pb-4'
 											shadow='lg'
-											style={{ minHeight: 300 }}
+											style={{ minHeight: 320 }}
 											title='Phòng ban phụ trách'
 											icon='LayoutTextWindow'
 											iconColor='info'
@@ -422,7 +422,7 @@ const SubTaskPage = () => {
 										<CardInfoCommon
 											className='mb-4 pb-4'
 											shadow='lg'
-											style={{ minHeight: 300 }}
+											style={{ minHeight: 320 }}
 											title='Nhân viên phụ trách'
 											icon='PersonCircle'
 											iconColor='info'
@@ -514,7 +514,7 @@ const SubTaskPage = () => {
 						</Card>
 					</div>
 					<div className='col-lg-4'>
-						<Card className='mb-4 h-100 shadow-3d-info'>
+						<Card className='mb-0 h-100 shadow-3d-info'>
 							<CardInfoCommon
 								className='mb-4'
 								shadow='lg'
@@ -593,7 +593,7 @@ const SubTaskPage = () => {
 									};
 								})}
 							/>
-							<Card className='h-100' shadow='lg'>
+							<Card className='h-100 mb-0' shadow='lg'>
 								<CardHeader className='py-2'>
 									<CardLabel icon='NotificationsActive' iconColor='warning'>
 										<CardTitle tag='h4' className='h5'>

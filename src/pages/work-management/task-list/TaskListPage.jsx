@@ -101,13 +101,17 @@ const Item = ({ id, name, teamName, percent, dueDate, keys = [] }) => {
 						<CardTitle>{name}</CardTitle>
 						<CardSubTitle>{teamName}</CardSubTitle>
 					</CardLabel>
-					<CardActions>
-						<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-							{dueDate}
-						</small>
-					</CardActions>
 				</CardHeader>
 				<CardBody className='pt-1 pb-4'>
+					<div className='col-md-12'>
+						<div className='d-flex align-items-center jusify-content-start'>
+							<small
+								style={{ fontSize: 14 }}
+								className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+								{dueDate}
+							</small>
+						</div>
+					</div>
 					<div className='row'>
 						{keys?.slice(0, 6)?.map((k, index) => (
 							// eslint-disable-next-line react/no-array-index-key
