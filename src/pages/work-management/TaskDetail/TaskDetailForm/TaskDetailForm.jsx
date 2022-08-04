@@ -45,6 +45,7 @@ const TaskDetailForm = ({
 	title,
 	setTask,
 	idEdit,
+	newWork,
 }) => {
 	// state
 	const [valueInput, setValueInput] = React.useState({});
@@ -55,6 +56,7 @@ const TaskDetailForm = ({
 	const [valueUser, setValueUser] = React.useState({});
 	const [usersRelated, setUsersRelated] = React.useState([]);
 	const [departmentRelated, setDepartmentRelated] = React.useState([]);
+	const [subtask, setSubTask] = React.useState();
 	const { addToast } = useToasts();
 	const PRIORITIES = [5, 4, 3, 2, 1];
 	const initError = {
@@ -113,6 +115,7 @@ const TaskDetailForm = ({
 		if (idEdit && title !== 'add') {
 			const value = task.subtasks.filter((item) => item.id === idEdit)[0];
 			setValueInput(value);
+			setSubTask(value);
 			setUsersRelated(
 				value?.users_related?.map((item) => {
 					return {
@@ -151,7 +154,6 @@ const TaskDetailForm = ({
 	}, [idEdit]);
 	// handle
 	const handleChange = (e) => {
-		// eslint-disable-next-line no-console
 		const { value, name } = e.target;
 		setValueInput({
 			...valueInput,
@@ -208,7 +210,7 @@ const TaskDetailForm = ({
 		});
 		setErrors(initError);
 		if (title === 'add') {
-			const subTaskValue = JSON.parse(JSON.stringify(task.subtasks));
+			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks));
 			subTaskValue.push({
 				...valueInput,
 				kpi_value: parseInt(valueInput?.kpi_value, 10),
@@ -246,12 +248,29 @@ const TaskDetailForm = ({
 				descriptionRef.current.focus();
 				return;
 			}
+			const newWorks = JSON.parse(JSON.stringify(newWork));
+			const newLogs = [
+				...newWorks,
+				{
+					user: {
+						id: task?.user?.id,
+						name: task?.user?.name,
+					},
+					type: 2,
+					prev_status: null,
+					next_status: `Thêm mới`,
+					subtask_id: task.subtasks.length + 1,
+					subtask_name: valueInput?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
 			const taskValue = JSON.parse(JSON.stringify(task));
 			const data = Object.assign(taskValue, {
 				subtasks: subTaskValue,
 				// eslint-disable-next-line no-unsafe-optional-chaining
 				current_kpi_value:
 					totalKpiSubtask(task?.subtasks) + parseInt(valueInput?.kpi_value, 10),
+				logs: newLogs,
 			});
 			try {
 				const respose = await updateSubtasks(id, data).then(
@@ -307,19 +326,36 @@ const TaskDetailForm = ({
 				descriptionRef.current.focus();
 				return;
 			}
+			const newWorks = JSON.parse(JSON.stringify(newWork));
+			const newLogs = [
+				...newWorks,
+				{
+					user: {
+						id: task?.user?.id,
+						name: task?.user?.name,
+					},
+					type: 2,
+					prev_status: null,
+					next_status: `Chỉnh sửa`,
+					subtask_id: idEdit,
+					subtask_name: subtask?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
 			const taskValue = JSON.parse(JSON.stringify(task));
 			const newData = Object.assign(taskValue, {
 				subtasks: newSubTasks,
+				logs: newLogs,
 				current_kpi_value: totalKpiSubtask(newSubTasks),
 			});
 			try {
 				const respose = await updateSubtasks(id, newData).then(
-					toast.success('Sửa đầu việc thành công !'),
+					toast.success(`Sửa đầu việc ${subtask?.name} thành công !`),
 				);
 				const result = await respose.data;
 				setTask(result);
 			} catch (error) {
-				toast.error('Sửa đầu việc thất bại !');
+				toast.error(`Sửa đầu việc ${subtask?.name} thất bại !`);
 			}
 		}
 		setEditModalStatus(false);
@@ -349,10 +385,10 @@ const TaskDetailForm = ({
 	const handleRemoveKeyField = (_e, index) => {
 		setKeysState((prev) => prev?.filter((state) => state !== prev[index]));
 	};
-	const totalKpiSubtask = (subtask) => {
-		if (_.isEmpty(subtask)) return 0;
+	const totalKpiSubtask = (subtasks) => {
+		if (_.isEmpty(subtasks)) return 0;
 		let totalKpi = 0;
-		subtask.forEach((item) => {
+		subtasks.forEach((item) => {
 			totalKpi += item.kpi_value;
 		});
 		return totalKpi;

@@ -34,7 +34,7 @@ import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
-import RelatedActionCommon from '../../common/ComponentCommon/RelatedActionCommon';
+import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
 
 const chartOptions = {
 	chart: {
@@ -128,11 +128,13 @@ const SubTaskPage = () => {
 	const { taskid, id } = params;
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirm, set0penConfirm] = React.useState(false);
+	const [newWork, setNewWork] = React.useState();
 	useEffect(() => {
 		async function fetchDataTaskById() {
 			const reponse = await getTaskById(taskid);
 			const result = await reponse.data;
 			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
+			setNewWork(result.logs);
 			setTask(result);
 			setSubtask({
 				...subtaskRes,
@@ -276,11 +278,28 @@ const SubTaskPage = () => {
 		set0penConfirm(false);
 	};
 	const handleDeleteSubTask = async (subtasks) => {
+		const newWorks = JSON.parse(JSON.stringify(newWork));
+		const newLogs = [
+			...newWorks,
+			{
+				user: {
+					id: task?.user?.id,
+					name: task?.user?.name,
+				},
+				type: 2,
+				prev_status: null,
+				next_status: `Xóa`,
+				subtask_id: subtasks.id,
+				subtask_name: subtasks.name,
+				time: moment().format('YYYY/MM/DD hh:mm'),
+			},
+		];
 		const newSubTasks = task?.subtasks?.filter((item) => item.id !== subtasks?.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
+			logs: newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(task?.id, newData);
@@ -602,7 +621,27 @@ const SubTaskPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
-									<RelatedActionCommon data={subtask?.logs} />
+									{subtask?.logs
+										?.slice()
+										.reverse()
+										.map((item) => (
+											<RelatedActionCommonItem
+												key={item?.id}
+												type={item?.type}
+												time={item?.time}
+												username={item?.user?.name}
+												id={
+													item?.step_id ? item?.step_id : item?.subtask_id
+												}
+												taskName={
+													item?.step_name
+														? item?.step_name
+														: item?.subtask_name
+												}
+												prevStatus={item?.prev_status}
+												nextStatus={item?.next_status}
+											/>
+										))}
 								</CardBody>
 							</Card>
 						</Card>
@@ -635,8 +674,9 @@ const SubTaskPage = () => {
 					task={task}
 					setEditModalStatus={setEditModalStatus}
 					editModalStatus={editModalStatus}
-					id={parseInt(params?.id, 10)}
+					id={subtask?.task_id}
 					idEdit={subtask.id}
+					newWork={newWork}
 				/>
 			</Page>
 		</PageWrapper>
