@@ -756,7 +756,6 @@ const MissionDetailPage = () => {
 										<CardInfoCommon
 											className='mb-4 pb-4 h-50'
 											shadow='lg'
-											// style={{ minHeight: 300 }}
 											title='Phòng ban phụ trách'
 											icon='LayoutTextWindow'
 											iconColor='info'

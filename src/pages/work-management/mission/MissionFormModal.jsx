@@ -107,7 +107,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				kpi_value: '',
 				start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 				end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-				status: 1,
+				status: 0,
 			});
 			setKeysState([]);
 			setDepartmentOption([]);
@@ -169,7 +169,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				key_value: null,
 			},
 		};
-		if (prevIsValid()) {
+		if (prevIsValid() && keysState?.length <= 4) {
 			setKeysState((prev) => [...prev, initKeyState]);
 		}
 	};
@@ -219,7 +219,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			kpi_value: '',
 			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			status: 1,
+			status: 0,
 		});
 		setKeysState([]);
 		setDepartmentOption([]);
@@ -234,6 +234,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				key_value: key.key_value,
 			};
 		});
+		data.status = 0;
 		data.kpi_value = parseInt(data.kpi_value, 10);
 		data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
 		const departmentClone = [...departmentOption];
@@ -264,7 +265,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			kpi_value: '',
 			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			status: 1,
+			status: 0,
 		});
 		setKeysState([]);
 		setDepartmentOption([]);
