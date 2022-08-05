@@ -75,7 +75,7 @@ const TaskDetailForm = ({
 	const initValueInput = {
 		task_id: id,
 		priority: 2,
-		status: 1,
+		status: 0,
 		percent: 0,
 		name: '',
 		description: '',

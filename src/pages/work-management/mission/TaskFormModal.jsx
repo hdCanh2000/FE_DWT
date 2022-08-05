@@ -231,7 +231,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				key_value: null,
 			},
 		};
-		if (prevIsValid()) {
+		if (prevIsValid() && keysState?.length <= 3) {
 			setKeysState((prev) => [...prev, initKeyState]);
 		}
 	};
@@ -324,6 +324,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 			};
 		});
 		data.subtasks = isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
+		data.logs = [];
 		data.department = {
 			id: departmentOption.id,
 			name: departmentOption.label,

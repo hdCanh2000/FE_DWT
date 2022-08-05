@@ -15,7 +15,7 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
-import { formatColorStatus, FORMAT_TASK_STATUS, STATUS } from '../../../utils/constants';
+import { formatColorStatus, FORMAT_TASK_STATUS, TASK_STATUS } from '../../../utils/constants';
 import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -41,6 +41,7 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
+import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 
 const chartOptions = {
 	chart: {
@@ -135,6 +136,14 @@ const SubTaskPage = () => {
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [newWork, setNewWork] = React.useState();
+	const [taskEdit, setTaskEdit] = useState({});
+	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+		title: '',
+		subTitle: '',
+		status: null,
+	});
+
 	useEffect(() => {
 		async function fetchDataTaskById() {
 			const reponse = await getTaskById(taskid);
@@ -222,18 +231,25 @@ const SubTaskPage = () => {
 		}
 	};
 
-	const handleClickChangeStatusSubtask = async (data, status) => {
-		if (status === 4 || status === 5 || status === 6 || status === 7) {
+	const checkStepCompleted = (data) => {
+		let total = 0;
+		if (data?.steps?.length === 0 || !data?.steps?.length) {
 			handleShowToast(
 				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
+				`Thao tác không thành công. Đầu việc ${data.name} chưa có bước hoàn thành!`,
 				'Error',
 				'danger',
 			);
+			return false;
 		}
-		if (data.status === 4 || data.status === 5 || data.status === 6 || data.status === 7) {
+		data?.steps?.forEach((step) => {
+			if (step?.status === 1) total += 1;
+		});
+		return total === data?.steps?.length;
+	};
+
+	const prevIsValidClickChangeStatus = (data, status) => {
+		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
 			handleShowToast(
 				`Cập nhật trạng thái!`,
 				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
@@ -242,39 +258,117 @@ const SubTaskPage = () => {
 				'Error',
 				'danger',
 			);
-		} else if (data.status === 2) {
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
 			handleShowToast(
-				`Báo đầu việc chờ duyệt!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đang chờ duyệt!`,
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} chưa được thực hiện!`,
 				'Error',
 				'danger',
 			);
-		} else {
-			try {
-				const taskClone = { ...task };
-				const subtaskClone = { ...data };
-				subtaskClone.status = status;
-				const subtaskSubmit = taskClone?.subtasks?.map((item) =>
-					item.id === data.id ? { ...subtaskClone } : item,
-				);
-				const taskSubmit = { ...taskClone };
-				taskSubmit.subtasks = subtaskSubmit;
-				const response = await updateStatusPendingSubtask(taskSubmit);
-				const result = await response.data;
-				const subtaskRes = result?.subtasks.filter(
-					(item) => item.id === parseInt(id, 10),
-				)[0];
-				setTask(result);
-				setSubtask(subtaskRes);
-				handleShowToast(
-					`Báo đầu việc chờ duyệt!`,
-					`Báo đầu việc ${subtaskRes.name} thành công!`,
-				);
-			} catch (error) {
-				setSubtask(subtask);
-			}
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 2 && (status === 1 || status === 2)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đang được thực hiện!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (
+			data.status === 3 &&
+			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+		) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 6 && status !== 2) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đã bị huỷ!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 8 && (status === 1 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đang tạm dừng!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (status === 3 && !checkStepCompleted(data)) {
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		return true;
+	};
+
+	const handleClickChangeStatusSubtask = async (status, data) => {
+		const checkValid = prevIsValidClickChangeStatus(data, status);
+		if (!checkValid) return;
+		try {
+			const taskClone = { ...task };
+			const subtaskClone = { ...data };
+			subtaskClone.status = status;
+			const subtaskSubmit = taskClone?.subtasks?.map((item) =>
+				item.id === data.id ? { ...subtaskClone } : item,
+			);
+			const taskSubmit = { ...taskClone };
+			taskSubmit.subtasks = subtaskSubmit;
+			const response = await updateStatusPendingSubtask(taskSubmit);
+			const result = await response.data;
+			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
+			setTask(result);
+			setSubtask(subtaskRes);
+			handleCloseConfirmStatusTask();
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Cập nhật trạng thái đầu việc ${subtaskRes.name} thành công!`,
+			);
+		} catch (error) {
+			setSubtask(subtask);
 		}
 	};
+
+	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+	// handleStatus(4, item)
+
+	const handleOpenConfirmStatusTask = (item, nextStatus) => {
+		setOpenConfirmModalStatus(true);
+		setTaskEdit({ ...item });
+		setInfoConfirmModalStatus({
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			subTitle: item?.name,
+			status: nextStatus,
+		});
+	};
+
+	const handleCloseConfirmStatusTask = () => {
+		setOpenConfirmModalStatus(false);
+		setTaskEdit(null);
+	};
+
 	// Số kpi của subtask đã được giao
 	const totalKpiSubtask = (newSubtask) => {
 		if (_.isEmpty(newSubtask)) return 0;
@@ -379,22 +473,25 @@ const SubTaskPage = () => {
 											color='danger'
 											icon='Report'
 											className='text-nowrap'>
-											Cập nhật trạng thái
+											Cập nhật trạng thái đầu việc
 										</Button>
 									</DropdownToggle>
 									<DropdownMenu>
-										{Object.keys(STATUS).map((key) => (
+										{Object.keys(TASK_STATUS).map((key) => (
 											<DropdownItem
 												key={key}
 												onClick={() =>
-													handleClickChangeStatusSubtask(
+													handleOpenConfirmStatusTask(
 														subtask,
-														STATUS[key].value,
+														TASK_STATUS[key].value,
 													)
 												}>
 												<div>
-													<Icon icon='Circle' color={STATUS[key].color} />
-													{STATUS[key].name}
+													<Icon
+														icon='Circle'
+														color={TASK_STATUS[key].color}
+													/>
+													{TASK_STATUS[key].name}
 												</div>
 											</DropdownItem>
 										))}
@@ -719,6 +816,15 @@ const SubTaskPage = () => {
 					id={subtask?.task_id}
 					idEdit={subtask.id}
 					newWork={newWork}
+				/>
+				<ModalConfirmCommon
+					show={openConfirmModalStatus}
+					onClose={handleCloseConfirmStatusTask}
+					onSubmit={handleClickChangeStatusSubtask}
+					item={taskEdit}
+					title={infoConfirmModalStatus.title}
+					subTitle={infoConfirmModalStatus.subTitle}
+					status={infoConfirmModalStatus.status}
 				/>
 			</Page>
 		</PageWrapper>

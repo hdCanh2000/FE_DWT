@@ -24,7 +24,7 @@ export const FORMAT_TASK_STATUS = (status) => {
 			result = 'Từ chối';
 			break;
 		case 6:
-			result = 'Quá hạn/Huỷ';
+			result = 'Huỷ';
 			break;
 		case 7:
 			result = 'Đóng';
@@ -48,15 +48,15 @@ export const STATUS = {
 		code: 'inprogress',
 		color: COLORS.PRIMARY.name,
 	},
-	SOLVED: { value: 3, name: 'Đã xong', code: 'solved', color: COLORS.SUCCESS.name },
+	SOLVED: { value: 3, name: 'Đã xong - Chờ duyệt', code: 'solved', color: COLORS.SUCCESS.name },
 	COMPLETED: { value: 4, name: 'Đã hoàn thành', code: 'completed', color: COLORS.SUCCESS.name },
 	REJECTED: { value: 5, name: 'Từ chối', code: 'rejectes', color: COLORS.DANGER.name },
-	FAILED: { value: 6, name: 'Quá hạn/Huỷ', code: 'failed', color: COLORS.DARK.name },
+	FAILED: { value: 6, name: 'Huỷ', code: 'failed', color: COLORS.DARK.name },
 	CLOSE: { value: 7, name: 'Đóng', code: 'Pending', color: COLORS.DARK.name },
 	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
 };
 
-export const SUBTASK_STATUS = {
+export const TASK_STATUS = {
 	ACCEPTED: { value: 1, name: 'Chấp nhận', code: 'accepted', color: COLORS.INFO.name },
 	INPROGRESS: {
 		value: 2,
@@ -64,8 +64,15 @@ export const SUBTASK_STATUS = {
 		code: 'inprogress',
 		color: COLORS.PRIMARY.name,
 	},
-	SOLVED: { value: 3, name: 'Đã xong', code: 'solved', color: COLORS.SUCCESS.name },
-	FAILED: { value: 6, name: 'Quá hạn/Huỷ', code: 'failed', color: COLORS.DARK.name },
+	SOLVED: { value: 3, name: 'Đã xong - Chờ duyệt', code: 'solved', color: COLORS.SUCCESS.name },
+	FAILED: { value: 6, name: 'Huỷ', code: 'failed', color: COLORS.DARK.name },
+	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
+};
+
+export const TASK_STATUS_MANAGE = {
+	PENDING: { value: 0, name: 'Chờ chấp nhận', code: 'pending', color: COLORS.DANGER.name },
+	FAILED: { value: 6, name: 'Huỷ', code: 'failed', color: COLORS.DARK.name },
+	CLOSE: { value: 7, name: 'Đóng', code: 'Pending', color: COLORS.DARK.name },
 	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
 };
 

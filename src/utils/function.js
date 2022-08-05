@@ -177,7 +177,7 @@ const calcKPICompleteOfTask = (task) => {
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
 	subtasks.forEach((subtask) => {
-		if (subtask?.status === 1) {
+		if (subtask?.status === 4) {
 			totalKPI += calcKPICompleteOfSubtask(subtask);
 		}
 	});
@@ -196,7 +196,7 @@ const calcKPICompleteOfMission = (mission, tasks) => {
 	if (isEmpty(tasks) || !isArray(tasks)) return 0;
 	let totalKPI = 0;
 	tasks.forEach((task) => {
-		if (task?.status === 1) {
+		if (task?.status === 4) {
 			totalKPI += calcKPICompleteOfTask(task);
 		}
 	});
