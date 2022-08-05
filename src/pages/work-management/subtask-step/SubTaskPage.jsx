@@ -15,7 +15,7 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
-import { FORMAT_TASK_STATUS } from '../../../utils/constants';
+import { formatColorStatus, FORMAT_TASK_STATUS, STATUS } from '../../../utils/constants';
 import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -35,6 +35,12 @@ import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
+import Icon from '../../../components/icon/Icon';
+import Dropdown, {
+	DropdownItem,
+	DropdownMenu,
+	DropdownToggle,
+} from '../../../components/bootstrap/Dropdown';
 
 const chartOptions = {
 	chart: {
@@ -216,11 +222,23 @@ const SubTaskPage = () => {
 		}
 	};
 
-	const handleClickChangeStatusPending = async (data) => {
-		if (data.status === 1) {
+	const handleClickChangeStatusSubtask = async (data, status) => {
+		if (status === 4 || status === 5 || status === 6 || status === 7) {
 			handleShowToast(
-				`Báo đầu việc chờ duyệt!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đã hoàn thành!`,
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+				'Error',
+				'danger',
+			);
+		}
+		if (data.status === 4 || data.status === 5 || data.status === 6 || data.status === 7) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
 				'Error',
 				'danger',
 			);
@@ -235,7 +253,7 @@ const SubTaskPage = () => {
 			try {
 				const taskClone = { ...task };
 				const subtaskClone = { ...data };
-				subtaskClone.status = 2;
+				subtaskClone.status = status;
 				const subtaskSubmit = taskClone?.subtasks?.map((item) =>
 					item.id === data.id ? { ...subtaskClone } : item,
 				);
@@ -355,13 +373,33 @@ const SubTaskPage = () => {
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
-								<Button
-									color='danger'
-									icon='Report'
-									isLight
-									onClick={() => handleClickChangeStatusPending(subtask)}>
-									Xác nhận hoàn thành
-								</Button>
+								<Dropdown>
+									<DropdownToggle hasIcon={false}>
+										<Button
+											color='danger'
+											icon='Report'
+											className='text-nowrap'>
+											Cập nhật trạng thái
+										</Button>
+									</DropdownToggle>
+									<DropdownMenu>
+										{Object.keys(STATUS).map((key) => (
+											<DropdownItem
+												key={key}
+												onClick={() =>
+													handleClickChangeStatusSubtask(
+														subtask,
+														STATUS[key].value,
+													)
+												}>
+												<div>
+													<Icon icon='Circle' color={STATUS[key].color} />
+													{STATUS[key].name}
+												</div>
+											</DropdownItem>
+										))}
+									</DropdownMenu>
+								</Dropdown>
 							</CardHeader>
 							<CardBody className='py-2'>
 								<div className='row h-100'>
@@ -374,7 +412,11 @@ const SubTaskPage = () => {
 													<CardTitle tag='h4' className='h5'>
 														Tiến độ thực hiện
 													</CardTitle>
-													<CardSubTitle tag='h4' className='h5'>
+													<CardSubTitle
+														tag='h4'
+														className={`h5 text-${formatColorStatus(
+															subtask?.status,
+														)}`}>
 														{FORMAT_TASK_STATUS(subtask?.status)}
 													</CardSubTitle>
 												</CardLabel>

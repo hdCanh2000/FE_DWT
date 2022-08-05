@@ -69,6 +69,7 @@ const RelatedActionCommon = (props) => {
 					taskName={item?.task_name}
 					prevStatus={item?.prev_status}
 					nextStatus={item?.next_status}
+					{...item}
 				/>
 			))}
 		</Timeline>
