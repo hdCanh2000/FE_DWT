@@ -350,10 +350,26 @@ const MissionPage = () => {
 												</span>
 											</CardSubTitle>
 											<CardSubTitle style={{ fontSize: 15 }}>
-												Số công việc:
-												<span className='text-danger fw-bold ps-2'>
-													{item?.tasks?.length || 0}
-												</span>
+												<div className='d-flex'>
+													<div className='me-2'>
+														Số công việc:
+														<span className='text-danger fw-bold ps-2'>
+															{item?.tasks?.length || 0}
+														</span>
+													</div>
+													<div className='me-2'>
+														Giá trị KPI:
+														<span className='text-danger fw-bold ps-2'>
+															{item?.kpi_value || 0}
+														</span>
+													</div>
+													<div>
+														KPI thực tế:
+														<span className='text-danger fw-bold ps-2'>
+															{item?.current_kpi_value || 0}
+														</span>
+													</div>
+												</div>
 											</CardSubTitle>
 										</CardLabel>
 										<CardActions>

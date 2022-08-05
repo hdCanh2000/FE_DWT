@@ -46,10 +46,10 @@ import Dropdown, {
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import {
-	STATUS,
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
+	TASK_STATUS_MANAGE,
 } from '../../../utils/constants';
 import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
@@ -60,6 +60,7 @@ import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
+import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 
 const chartOptions = {
 	chart: {
@@ -119,6 +120,12 @@ const MissionDetailPage = () => {
 	const [openConfirmMissionModal, setOpenConfirmMissionModal] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [missionEdit, setMissionEdit] = useState({});
+	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+		title: '',
+		subTitle: '',
+		status: null,
+	});
 	const params = useParams();
 	const navigate = useNavigate();
 	const { id } = params;
@@ -229,13 +236,15 @@ const MissionDetailPage = () => {
 						</Button>
 					</DropdownToggle>
 					<DropdownMenu>
-						{Object.keys(STATUS).map((key) => (
+						{Object.keys(TASK_STATUS_MANAGE).map((key) => (
 							<DropdownItem
 								key={key}
-								onClick={() => handleUpdateStatus(STATUS[key].value, item)}>
+								onClick={() =>
+									handleOpenConfirmStatusTask(item, TASK_STATUS_MANAGE[key].value)
+								}>
 								<div>
-									<Icon icon='Circle' color={STATUS[key].color} />
-									{STATUS[key].name}
+									<Icon icon='Circle' color={TASK_STATUS_MANAGE[key].color} />
+									{TASK_STATUS_MANAGE[key].name}
 								</div>
 							</DropdownItem>
 						))}
@@ -378,7 +387,7 @@ const MissionDetailPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Check'
-						onClick={() => handleUpdateStatus(1, item)}>
+						onClick={() => handleOpenConfirmStatusTask(item, 4)}>
 						Duyệt
 					</Button>
 					<Button
@@ -387,7 +396,7 @@ const MissionDetailPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleUpdateStatus(4, item)}>
+						onClick={() => handleOpenConfirmStatusTask(item, 5)}>
 						Từ chối
 					</Button>
 				</>
@@ -601,6 +610,8 @@ const MissionDetailPage = () => {
 	};
 
 	const handleUpdateStatus = async (status, data) => {
+		const checkValid = prevIsValidClickChangeStatus(data, status);
+		if (!checkValid) return;
 		try {
 			const newData = { ...data };
 			newData.status = status;
@@ -617,6 +628,90 @@ const MissionDetailPage = () => {
 			setTasks(tasks);
 			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 		}
+	};
+
+	const prevIsValidClickChangeStatus = (data, status) => {
+		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} chưa được thực hiện!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 2 && (status === 1 || status === 2)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} đang được thực hiện!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (
+			data.status === 3 &&
+			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+		) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 6 && status !== 2) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} đã bị huỷ!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 8 && (status === 1 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} đang tạm dừng!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		return true;
+	};
+
+	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+	// handleStatus(4, item)
+
+	const handleOpenConfirmStatusTask = (item, nextStatus) => {
+		setOpenConfirmModalStatus(true);
+		setItemEdit({ ...item });
+		setInfoConfirmModalStatus({
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			subTitle: item?.name,
+			status: nextStatus,
+		});
+	};
+
+	const handleCloseConfirmStatusTask = () => {
+		setOpenConfirmModalStatus(false);
+		setItemEdit(null);
 	};
 
 	return (
@@ -932,7 +1027,12 @@ const MissionDetailPage = () => {
 											(item) =>
 												item.status === 0 ||
 												item.status === 1 ||
-												item.status === 4,
+												item.status === 2 ||
+												item.status === 4 ||
+												item.status === 5 ||
+												item.status === 6 ||
+												item.status === 7 ||
+												item.status === 8,
 										)?.length || 0
 									})`}
 									className='mb-3'>
@@ -961,7 +1061,12 @@ const MissionDetailPage = () => {
 													(item) =>
 														item.status === 0 ||
 														item.status === 1 ||
-														item.status === 4,
+														item.status === 2 ||
+														item.status === 4 ||
+														item.status === 5 ||
+														item.status === 6 ||
+														item.status === 7 ||
+														item.status === 8,
 												)}
 											/>
 										</CardBody>
@@ -980,9 +1085,7 @@ const MissionDetailPage = () => {
 								<Tab
 									eventKey='ListPendingTask'
 									title={`Công việc chờ xác nhận (${
-										tasks.filter(
-											(item) => item.status === 2 || item.status === 3,
-										)?.length || 0
+										tasks.filter((item) => item.status === 3)?.length || 0
 									})`}
 									className='mb-3'>
 									<Card stretch>
@@ -999,14 +1102,9 @@ const MissionDetailPage = () => {
 											<TableCommon
 												className='table table-modern mb-0'
 												columns={columnsPending}
-												data={tasks.filter(
-													(item) =>
-														item.status === 2 || item.status === 3,
-												)}
+												data={tasks.filter((item) => item.status === 3)}
 											/>
-											{!tasks.filter(
-												(item) => item.status === 2 || item.status === 3,
-											)?.length && (
+											{!tasks.filter((item) => item.status === 3)?.length && (
 												<Alert
 													color='warning'
 													isLight
@@ -1047,6 +1145,15 @@ const MissionDetailPage = () => {
 					onClose={handleCloseEditMissionForm}
 					onSubmit={handleSubmitMissionForm}
 					item={missionEdit}
+				/>
+				<ModalConfirmCommon
+					show={openConfirmModalStatus}
+					onClose={handleCloseConfirmStatusTask}
+					onSubmit={handleUpdateStatus}
+					item={itemEdit}
+					title={infoConfirmModalStatus.title}
+					subTitle={infoConfirmModalStatus.subTitle}
+					status={infoConfirmModalStatus.status}
 				/>
 			</Page>
 		</PageWrapper>

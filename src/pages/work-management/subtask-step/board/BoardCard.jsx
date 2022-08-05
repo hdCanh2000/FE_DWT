@@ -35,7 +35,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 			status: parseInt(status, 10) || 0,
 			partner: card?.partner || '',
 		},
-		onSubmit: (values) => {
+		onSubmit: (values, { resetForm }) => {
 			const valuesClone = { ...values };
 			const newWorks = JSON.parse(JSON.stringify(subtask.logs ? subtask.logs : []));
 			const newLogs = [
@@ -65,6 +65,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 			);
 			onAddStep(subtaskClone);
 			setEditModalStatus(false);
+			resetForm();
 		},
 	});
 	useEffect(() => {
