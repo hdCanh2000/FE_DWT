@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
 
 const renderTextByType = (props) => {
-	const { type, username, id, prevStatus, nextStatus, taskName } = props;
+	const { type, username, prevStatus, nextStatus, taskName } = props;
 	if (type === 1) {
 		return (
 			<>
@@ -12,7 +12,7 @@ const renderTextByType = (props) => {
 				</span>{' '}
 				đã chuyển trạng thái công việc{' '}
 				<span className='text-danger fw-bold' style={{ fontSize: 14 }}>
-					{`#${id}`}
+					{`${taskName}`}
 				</span>{' '}
 				từ{' '}
 				<span className='text-primary fw-bold' style={{ fontSize: 14 }}>
@@ -65,7 +65,7 @@ const RelatedActionCommon = (props) => {
 					type={item?.type}
 					time={item?.time}
 					username={item?.user?.name}
-					id={item?.task_id}
+					id={item?.subtask_id ? item?.subtask_id : item?.task_id}
 					taskName={item?.task_name}
 					prevStatus={item?.prev_status}
 					nextStatus={item?.next_status}
@@ -84,4 +84,4 @@ RelatedActionCommon.defaultProps = {
 	data: [],
 };
 
-export default RelatedActionCommon;
+export default RelatedActionCommonItem;
