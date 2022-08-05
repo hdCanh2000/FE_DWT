@@ -34,7 +34,7 @@ import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
-import RelatedActionCommon from '../../common/ComponentCommon/RelatedActionCommon';
+import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
 import Icon from '../../../components/icon/Icon';
 import Dropdown, {
 	DropdownItem,

@@ -33,8 +33,8 @@ const Login = ({ isSignUp }) => {
 	const { darkModeStatus } = useDarkMode();
 	const [isNewUser] = useState(isSignUp);
 	const [account, setAccount] = useState({
-		login_username: '',
-		login_password: '',
+		username: '',
+		password: '',
 	});
 	const [errorMessage, setErrorMessage] = useState('');
 
@@ -51,12 +51,10 @@ const Login = ({ isSignUp }) => {
 		try {
 			const response = await login();
 			const result = await response.data;
-			if (
-				result.login_username === account.login_username &&
-				result.login_password === account.login_password
-			) {
+			if (result.username === account.username && result.password === account.password) {
 				localStorage.setItem('token', result.token);
-				localStorage.setItem('username', result.login_username);
+				localStorage.setItem('username', result.username);
+				localStorage.setItem('name', result.name);
 				navigate('/muc-tieu');
 			} else {
 				setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
@@ -138,7 +136,7 @@ const Login = ({ isSignUp }) => {
 										<>
 											<div className='col-12 mb-'>
 												<FormGroup
-													id='login_username'
+													id='username'
 													className='mb-3'
 													isFloating
 													label='Nhập tên tài khoản hoặc email'>
@@ -148,7 +146,7 @@ const Login = ({ isSignUp }) => {
 													/>
 												</FormGroup>
 												<FormGroup
-													id='login_password'
+													id='password'
 													className='mb-3'
 													isFloating
 													label='Password'>
