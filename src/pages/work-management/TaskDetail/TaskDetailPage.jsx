@@ -137,7 +137,7 @@ const TaskDetailPage = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 	React.useEffect(() => {
-		setNewWork(task?.logs);
+		setNewWork(task?.logs ? task.logs : []);
 	}, [task]);
 	// Handle
 	const handleOpenModal = (items, titles) => {
@@ -553,7 +553,9 @@ const TaskDetailPage = () => {
 														icon: 'TrendingFlat',
 														color: 'info',
 														children: (
-															<div className='fw-bold fs-5 mb-1'>
+															<div
+																className='fw-bold fs-5 mb-1'
+																key={department?.id}>
 																{department?.name}
 															</div>
 														),
@@ -573,7 +575,9 @@ const TaskDetailPage = () => {
 														icon: 'TrendingFlat',
 														color: 'info',
 														children: (
-															<div className='fw-bold fs-5 mb-1'>
+															<div
+																className='fw-bold fs-5 mb-1'
+																key={user?.id}>
 																{user?.name}
 															</div>
 														),
@@ -710,14 +714,14 @@ const TaskDetailPage = () => {
 											icon: 'DoneAll',
 											color: 'danger',
 											children: (
-												<>
+												<div key={key?.key_name}>
 													<div className='fw-bold fs-5 mb-1'>
 														{key?.key_value}
 													</div>
 													<div className='mt-n2' style={{ fontSize: 14 }}>
 														{key?.key_name}
 													</div>
-												</>
+												</div>
 											),
 										};
 									})}
@@ -798,7 +802,7 @@ const TaskDetailPage = () => {
 										<table className='table table-modern mb-0'>
 											<thead>
 												<tr>
-													<th>STT</th>
+													<th>ID</th>
 													<th>Tên đầu việc</th>
 													<th>Thời gian dự kiến</th>
 													<th>Hạn hoàn thành</th>
@@ -840,7 +844,7 @@ const TaskDetailPage = () => {
 													)
 													.map((item) => (
 														<tr key={item.id}>
-															<td>#{item.id}</td>
+															<td>{item.id}</td>
 															<td>
 																<div>
 																	<div>
@@ -857,13 +861,13 @@ const TaskDetailPage = () => {
 															</td>
 															<td>
 																{moment(
-																	`${item.estimate_date} ${item.estimate_time}`,
-																).format('DD-MM-YYYY, HH:mm')}
+																	`${item.estimate_date}`,
+																).format('DD-MM-YYYY')}
 															</td>
 															<td>
 																{moment(
-																	`${item.deadline_date} ${item.deadline_time}`,
-																).format('DD-MM-YYYY, HH:mm')}
+																	`${item.deadline_date}`,
+																).format('DD-MM-YYYY')}
 															</td>
 															<td>
 																{progressSubtask(item)} %
