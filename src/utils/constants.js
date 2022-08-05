@@ -9,7 +9,7 @@ export const FORMAT_TASK_STATUS = (status) => {
 			result = 'Chờ chấp nhận';
 			break;
 		case 1:
-			result = 'Đã chấp nhận';
+			result = 'Chấp nhận';
 			break;
 		case 2:
 			result = 'Đang thực hiện';
@@ -41,7 +41,7 @@ export const FORMAT_TASK_STATUS = (status) => {
 
 export const STATUS = {
 	PENDING: { value: 0, name: 'Chờ chấp nhận', code: 'pending', color: COLORS.DANGER.name },
-	ACCEPTED: { value: 1, name: 'Đã chấp nhận', code: 'accepted', color: COLORS.INFO.name },
+	ACCEPTED: { value: 1, name: 'Chấp nhận', code: 'accepted', color: COLORS.INFO.name },
 	INPROGRESS: {
 		value: 2,
 		name: 'Đang thực hiện',
@@ -53,6 +53,19 @@ export const STATUS = {
 	REJECTED: { value: 5, name: 'Từ chối', code: 'rejectes', color: COLORS.DANGER.name },
 	FAILED: { value: 6, name: 'Quá hạn/Huỷ', code: 'failed', color: COLORS.DARK.name },
 	CLOSE: { value: 7, name: 'Đóng', code: 'Pending', color: COLORS.DARK.name },
+	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
+};
+
+export const SUBTASK_STATUS = {
+	ACCEPTED: { value: 1, name: 'Chấp nhận', code: 'accepted', color: COLORS.INFO.name },
+	INPROGRESS: {
+		value: 2,
+		name: 'Đang thực hiện',
+		code: 'inprogress',
+		color: COLORS.PRIMARY.name,
+	},
+	SOLVED: { value: 3, name: 'Đã xong', code: 'solved', color: COLORS.SUCCESS.name },
+	FAILED: { value: 6, name: 'Quá hạn/Huỷ', code: 'failed', color: COLORS.DARK.name },
 	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
 };
 
