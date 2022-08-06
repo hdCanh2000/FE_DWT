@@ -179,7 +179,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				key_value: null,
 			},
 		};
-		if (prevIsValid() && keysState?.length <= 4) {
+		if (prevIsValid() && keysState?.length <= 3) {
 			setKeysState((prev) => [...prev, initKeyState]);
 		}
 	};

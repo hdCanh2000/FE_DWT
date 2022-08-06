@@ -28,10 +28,11 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import SubHeader, { SubHeaderLeft } from '../../../layout/SubHeader/SubHeader';
 import {
-	STATUS,
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
+	TASK_STATUS,
+	TASK_STATUS_MANAGE,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -48,6 +49,7 @@ import Toasts from '../../../components/bootstrap/Toasts';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
+import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 
 const TaskDetailPage = () => {
 	// State
@@ -65,6 +67,14 @@ const TaskDetailPage = () => {
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
 	const navigate = useNavigate();
 	const { addToast } = useToasts();
+	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+		title: '',
+		subTitle: '',
+		status: null,
+		type: 1,
+	});
+
 	const chartOptions = {
 		chart: {
 			type: 'donut',
@@ -73,13 +83,7 @@ const TaskDetailPage = () => {
 		stroke: {
 			width: 0,
 		},
-		labels: [
-			'Đang thực hiện',
-			'Chờ xét duyệt',
-			'Đã hoàn thành',
-			'Quá hạn / thất bại',
-			'Từ chối',
-		],
+		labels: ['Đang thực hiện', 'Chờ xác nhận', 'Đã hoàn thành', 'Huỷ', 'Từ chối'],
 		dataLabels: {
 			enabled: false,
 		},
@@ -144,9 +148,10 @@ const TaskDetailPage = () => {
 		setIdEdit(items.id);
 		setTitle(titles);
 	};
-	const handleShowToast = (titles, content) => {
+	// show toast
+	const handleShowToast = (titleToast, content, icon = 'Check2Circle', color = 'success') => {
 		addToast(
-			<Toasts title={titles} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+			<Toasts title={titleToast} icon={icon} iconColor={color} time='Now' isDismiss>
 				{content}
 			</Toasts>,
 			{
@@ -201,6 +206,8 @@ const TaskDetailPage = () => {
 		set0penConfirm(false);
 	};
 	const handleStatus = async (newStatus, items) => {
+		const checkValid = prevIsValidClickChangeStatus(items, newStatus);
+		if (!checkValid) return;
 		const newSubTasks = task.subtasks.map((item) => {
 			return item.id === items.id
 				? {
@@ -220,10 +227,12 @@ const TaskDetailPage = () => {
 			);
 			const result = await respose.data;
 			setTask(result);
+			handleCloseConfirmStatusTask();
 		} catch (error) {
 			toast.error('Cập nhật trạng thái thất bại !');
 		}
 	};
+	// eslint-disable-next-line no-unused-vars
 	const handleUpdateStatus = async (statuss, data) => {
 		// const newWorks = JSON.parse(JSON.stringify(newWork));
 		// const newLogs = [
@@ -356,7 +365,7 @@ const TaskDetailPage = () => {
 		let total = 0;
 		// eslint-disable-next-line consistent-return
 		subtasks.forEach((item) => {
-			if (item.status === 1) {
+			if (item.status === 4) {
 				total += 1;
 			}
 		});
@@ -376,7 +385,7 @@ const TaskDetailPage = () => {
 		if (_.isEmpty(newSubtask)) return 0;
 		let totalKpi = 0;
 		newSubtask.forEach((item) => {
-			totalKpi += item.kpi_value;
+			if (item.status === 4) totalKpi += item.kpi_value;
 		});
 		return totalKpi;
 	};
@@ -388,7 +397,7 @@ const TaskDetailPage = () => {
 		let total = 0;
 		// eslint-disable-next-line consistent-return
 		subtasks.forEach((item) => {
-			if (item.status === 2) {
+			if (item.status === 3) {
 				total += 1;
 			}
 		});
@@ -399,7 +408,7 @@ const TaskDetailPage = () => {
 		if (_.isEmpty(tasks)) return 0;
 		let total = 0;
 		tasks?.subtasks?.forEach((item) => {
-			if (item?.status === 0) {
+			if (item?.status === 2) {
 				total += 1;
 			}
 		});
@@ -418,18 +427,118 @@ const TaskDetailPage = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [task]);
 
-	const handleClickChangeStatusPending = async (data) => {
+	// --------------	  Xử lý chức năng thay đổi trạng thái	  	----------------
+	// --------------	  Handle change status task	  	----------------
+
+	const prevIsValidClickChangeStatus = (data, status) => {
+		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} chưa được thực hiện!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 2 && (status === 1 || status === 2)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} đang được thực hiện!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (
+			data.status === 3 &&
+			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+		) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 6 && status !== 2) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} đã bị huỷ!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		if (data.status === 8 && (status === 1 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Công việc ${data.name} đang tạm dừng!`,
+				'Error',
+				'danger',
+			);
+			return false;
+		}
+		return true;
+	};
+
+	const handleClickChangeStatusTask = async (status, data) => {
+		const checkValid = prevIsValidClickChangeStatus(data, status);
+		if (!checkValid) return;
 		try {
 			const taskClone = { ...data };
-			taskClone.status = 2;
+			taskClone.status = status;
 			const response = await updateStatusPendingTask(taskClone);
 			const result = await response.data;
 			setTask(result);
-			toast.success('Báo công việc chờ duyệt thành công!');
+			handleCloseConfirmStatusTask();
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Cập nhật trạng thái công việc ${result.name} thành công!`,
+			);
 		} catch (error) {
-			toast.error('Báo công việc không thành công. Vui lòng thử lại!');
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Xin vui lòng thử lại!`,
+				'Error',
+				'danger',
+			);
 		}
 	};
+
+	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+	// handleStatus(4, item)
+
+	const handleOpenConfirmStatusTask = (item, nextStatus, type = 1) => {
+		setOpenConfirmModalStatus(true);
+		setTaskEdit({ ...item });
+		setInfoConfirmModalStatus({
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			subTitle: item?.name,
+			status: nextStatus,
+			type, // 1 task, 2 subtask
+		});
+	};
+
+	const handleCloseConfirmStatusTask = () => {
+		setOpenConfirmModalStatus(false);
+		setTaskEdit(null);
+	};
+
 	return (
 		<PageWrapper title={task?.name}>
 			<SubHeader>
@@ -439,7 +548,7 @@ const TaskDetailPage = () => {
 					</Button>
 				</SubHeaderLeft>
 			</SubHeader>
-			<Page container='fluid'>
+			<Page container='fluid' className='overflow-hidden'>
 				<div className='row'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
@@ -475,13 +584,36 @@ const TaskDetailPage = () => {
 											Tổng kết
 										</CardTitle>
 									</CardLabel>
-									<Button
-										color='danger'
-										icon='Report'
-										isLight
-										onClick={() => handleClickChangeStatusPending(task)}>
-										Xác nhận hoàn thành
-									</Button>
+									<Dropdown>
+										<DropdownToggle hasIcon={false}>
+											<Button
+												color='danger'
+												icon='Report'
+												className='text-nowrap'>
+												Cập nhật trạng thái công việc
+											</Button>
+										</DropdownToggle>
+										<DropdownMenu>
+											{Object.keys(TASK_STATUS).map((key) => (
+												<DropdownItem
+													key={key}
+													onClick={() =>
+														handleOpenConfirmStatusTask(
+															task,
+															TASK_STATUS[key].value,
+														)
+													}>
+													<div>
+														<Icon
+															icon='Circle'
+															color={TASK_STATUS[key].color}
+														/>
+														{TASK_STATUS[key].name}
+													</div>
+												</DropdownItem>
+											))}
+										</DropdownMenu>
+									</Dropdown>
 								</CardHeader>
 								<CardBody className='py-2'>
 									<div className='row g-4'>
@@ -494,7 +626,11 @@ const TaskDetailPage = () => {
 														<CardTitle tag='h4' className='h5'>
 															Tiến độ thực hiện
 														</CardTitle>
-														<CardSubTitle tag='h4' className='h5'>
+														<CardSubTitle
+															tag='h4'
+															className={`h5 text-${formatColorStatus(
+																task?.status,
+															)}`}>
 															{FORMAT_TASK_STATUS(task.status)}
 														</CardSubTitle>
 													</CardLabel>
@@ -756,7 +892,7 @@ const TaskDetailPage = () => {
 					</div>
 
 					{/* Tổng kết */}
-					<Card style={{ width: '98.6%', marginLeft: '0.7%', marginTop: '4%' }}>
+					<Card>
 						<Tabs defaultActiveKey='DetailSubtask' id='uncontrolled-tab-example'>
 							<Tab
 								eventKey='DetailSubtask'
@@ -831,7 +967,12 @@ const TaskDetailPage = () => {
 														(item) =>
 															item.status === 0 ||
 															item.status === 1 ||
-															item.status === 4,
+															item.status === 2 ||
+															item.status === 4 ||
+															item.status === 5 ||
+															item.status === 6 ||
+															item.status === 7 ||
+															item.status === 8,
 													)
 													.map((item) => (
 														<tr key={item.id}>
@@ -904,37 +1045,37 @@ const TaskDetailPage = () => {
 																		</Button>
 																	</DropdownToggle>
 																	<DropdownMenu>
-																		{Object.keys(STATUS).map(
-																			(key) => (
-																				<DropdownItem
-																					key={key}
-																					onClick={() =>
-																						handleUpdateStatus(
-																							STATUS[
+																		{Object.keys(
+																			TASK_STATUS_MANAGE,
+																		).map((key) => (
+																			<DropdownItem
+																				key={key}
+																				onClick={() =>
+																					handleOpenConfirmStatusTask(
+																						item,
+																						TASK_STATUS_MANAGE[
+																							key
+																						].value,
+																						2,
+																					)
+																				}>
+																				<div>
+																					<Icon
+																						icon='Circle'
+																						color={
+																							TASK_STATUS_MANAGE[
 																								key
-																							].value,
-																							item,
-																						)
-																					}>
-																					<div>
-																						<Icon
-																							icon='Circle'
-																							color={
-																								STATUS[
-																									key
-																								]
-																									.color
-																							}
-																						/>
-																						{
-																							STATUS[
-																								key
-																							].name
+																							].color
 																						}
-																					</div>
-																				</DropdownItem>
-																			),
-																		)}
+																					/>
+																					{
+																						TASK_STATUS_MANAGE[
+																							key
+																						].name
+																					}
+																				</div>
+																			</DropdownItem>
+																		))}
 																	</DropdownMenu>
 																</Dropdown>
 															</td>
@@ -975,18 +1116,13 @@ const TaskDetailPage = () => {
 							<Tab
 								eventKey='SubmitSubtask'
 								title={`Đầu việc chờ xác nhận (${
-									task?.subtasks?.filter(
-										(item) => item.status === 2 || item.status === 3,
-									).length
+									task?.subtasks?.filter((item) => item.status === 3).length
 								})`}>
 								<CardHeader>
 									<CardLabel icon='ContactSupport' iconColor='secondary'>
 										<CardTitle tag='h4' className='h5'>
 											Đầu việc chờ xác nhận
 										</CardTitle>
-										{/* <CardSubTitle tag='h5' className='h6'>
-											Người kiểm duyệt : {task?.user?.name}
-										</CardSubTitle> */}
 									</CardLabel>
 								</CardHeader>
 								<CardBody
@@ -1007,10 +1143,8 @@ const TaskDetailPage = () => {
 												</tr>
 											</thead>
 											<tbody>
-												{task?.subtasks?.filter(
-													(item) =>
-														item.status === 2 || item.status === 3,
-												).length === 0 ? (
+												{task?.subtasks?.filter((item) => item.status === 3)
+													.length === 0 ? (
 													<tr>
 														<td colSpan='8'>
 															<Alert
@@ -1027,10 +1161,7 @@ const TaskDetailPage = () => {
 													''
 												)}
 												{task?.subtasks
-													?.filter(
-														(item) =>
-															item.status === 2 || item.status === 3,
-													)
+													?.filter((item) => item.status === 3)
 													.map((item) => (
 														<tr key={item.id}>
 															<td>
@@ -1075,7 +1206,11 @@ const TaskDetailPage = () => {
 																	isLight={darkModeStatus}
 																	className='text-nowrap mx-2'
 																	onClick={() =>
-																		handleStatus(1, item)
+																		handleOpenConfirmStatusTask(
+																			item,
+																			4,
+																			2,
+																		)
 																	}
 																	icon='Edit'>
 																	Xác nhận
@@ -1086,7 +1221,11 @@ const TaskDetailPage = () => {
 																	isLight={darkModeStatus}
 																	className='text-nowrap mx-2 '
 																	onClick={() =>
-																		handleStatus(4, item)
+																		handleOpenConfirmStatusTask(
+																			item,
+																			5,
+																			2,
+																		)
 																	}
 																	icon='Trash'>
 																	Từ chối
@@ -1131,6 +1270,19 @@ const TaskDetailPage = () => {
 					onConfirm={() => handleDeleteTask(taskEdit?.id)}
 					title='Xoá công việc'
 					content={`Xác nhận xoá công việc <strong>${taskEdit?.name}</strong> ?`}
+				/>
+				<ModalConfirmCommon
+					show={openConfirmModalStatus}
+					onClose={handleCloseConfirmStatusTask}
+					onSubmit={
+						infoConfirmModalStatus.type === 1
+							? handleClickChangeStatusTask
+							: handleStatus
+					}
+					item={taskEdit}
+					title={infoConfirmModalStatus.title}
+					subTitle={infoConfirmModalStatus.subTitle}
+					status={infoConfirmModalStatus.status}
 				/>
 			</Page>
 		</PageWrapper>

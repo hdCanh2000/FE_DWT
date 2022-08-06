@@ -15,7 +15,11 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
+<<<<<<< HEAD
 import { FORMAT_TASK_STATUS } from '../../../utils/constants';
+=======
+import { formatColorStatus, FORMAT_TASK_STATUS, TASK_STATUS } from '../../../utils/constants';
+>>>>>>> origin/development
 import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -35,6 +39,16 @@ import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
+<<<<<<< HEAD
+=======
+import Icon from '../../../components/icon/Icon';
+import Dropdown, {
+	DropdownItem,
+	DropdownMenu,
+	DropdownToggle,
+} from '../../../components/bootstrap/Dropdown';
+import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
+>>>>>>> origin/development
 
 const chartOptions = {
 	chart: {
@@ -129,6 +143,14 @@ const SubTaskPage = () => {
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [newWork, setNewWork] = React.useState();
+	const [taskEdit, setTaskEdit] = useState({});
+	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+		title: '',
+		subTitle: '',
+		status: null,
+	});
+
 	useEffect(() => {
 		async function fetchDataTaskById() {
 			const reponse = await getTaskById(taskid);
@@ -216,21 +238,52 @@ const SubTaskPage = () => {
 		}
 	};
 
+<<<<<<< HEAD
 	const handleClickChangeStatusPending = async (data) => {
 		if (data.status === 1) {
 			handleShowToast(
 				`Báo đầu việc chờ duyệt!`,
 				`Thao tác không thành công. Đầu việc ${data.name} đã hoàn thành!`,
-				'Error',
-				'danger',
-			);
-		} else if (data.status === 2) {
+=======
+	const checkStepCompleted = (data) => {
+		let total = 0;
+		if (data?.steps?.length === 0 || !data?.steps?.length) {
 			handleShowToast(
-				`Báo đầu việc chờ duyệt!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đang chờ duyệt!`,
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} chưa có bước hoàn thành!`,
 				'Error',
 				'danger',
 			);
+			return false;
+		}
+		data?.steps?.forEach((step) => {
+			if (step?.status === 1) total += 1;
+		});
+		return total === data?.steps?.length;
+	};
+
+	const prevIsValidClickChangeStatus = (data, status) => {
+		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+>>>>>>> origin/development
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} chưa được thực hiện!`,
+				'Error',
+				'danger',
+			);
+<<<<<<< HEAD
 		} else {
 			try {
 				const taskClone = { ...task };
@@ -255,8 +308,109 @@ const SubTaskPage = () => {
 			} catch (error) {
 				setSubtask(subtask);
 			}
+=======
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 2 && (status === 1 || status === 2)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đang được thực hiện!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (
+			data.status === 3 &&
+			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+		) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+					data.status,
+				)}!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 6 && status !== 2) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đã bị huỷ!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (data.status === 8 && (status === 1 || status === 8)) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đang tạm dừng!`,
+				'Error',
+				'danger',
+			);
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		if (status === 3 && !checkStepCompleted(data)) {
+			handleCloseConfirmStatusTask();
+			return false;
+		}
+		return true;
+	};
+
+	const handleClickChangeStatusSubtask = async (status, data) => {
+		const checkValid = prevIsValidClickChangeStatus(data, status);
+		if (!checkValid) return;
+		try {
+			const taskClone = { ...task };
+			const subtaskClone = { ...data };
+			subtaskClone.status = status;
+			const subtaskSubmit = taskClone?.subtasks?.map((item) =>
+				item.id === data.id ? { ...subtaskClone } : item,
+			);
+			const taskSubmit = { ...taskClone };
+			taskSubmit.subtasks = subtaskSubmit;
+			const response = await updateStatusPendingSubtask(taskSubmit);
+			const result = await response.data;
+			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
+			setTask(result);
+			setSubtask(subtaskRes);
+			handleCloseConfirmStatusTask();
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Cập nhật trạng thái đầu việc ${subtaskRes.name} thành công!`,
+			);
+		} catch (error) {
+			setSubtask(subtask);
+>>>>>>> origin/development
 		}
 	};
+
+	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+	// handleStatus(4, item)
+
+	const handleOpenConfirmStatusTask = (item, nextStatus) => {
+		setOpenConfirmModalStatus(true);
+		setTaskEdit({ ...item });
+		setInfoConfirmModalStatus({
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			subTitle: item?.name,
+			status: nextStatus,
+		});
+	};
+
+	const handleCloseConfirmStatusTask = () => {
+		setOpenConfirmModalStatus(false);
+		setTaskEdit(null);
+	};
+
 	// Số kpi của subtask đã được giao
 	const totalKpiSubtask = (newSubtask) => {
 		if (_.isEmpty(newSubtask)) return 0;
@@ -355,6 +509,7 @@ const SubTaskPage = () => {
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
+<<<<<<< HEAD
 								<Button
 									color='danger'
 									icon='Report'
@@ -362,6 +517,38 @@ const SubTaskPage = () => {
 									onClick={() => handleClickChangeStatusPending(subtask)}>
 									Xác nhận hoàn thành
 								</Button>
+=======
+								<Dropdown>
+									<DropdownToggle hasIcon={false}>
+										<Button
+											color='danger'
+											icon='Report'
+											className='text-nowrap'>
+											Cập nhật trạng thái đầu việc
+										</Button>
+									</DropdownToggle>
+									<DropdownMenu>
+										{Object.keys(TASK_STATUS).map((key) => (
+											<DropdownItem
+												key={key}
+												onClick={() =>
+													handleOpenConfirmStatusTask(
+														subtask,
+														TASK_STATUS[key].value,
+													)
+												}>
+												<div>
+													<Icon
+														icon='Circle'
+														color={TASK_STATUS[key].color}
+													/>
+													{TASK_STATUS[key].name}
+												</div>
+											</DropdownItem>
+										))}
+									</DropdownMenu>
+								</Dropdown>
+>>>>>>> origin/development
 							</CardHeader>
 							<CardBody className='py-2'>
 								<div className='row g-4'>
@@ -678,6 +865,15 @@ const SubTaskPage = () => {
 					id={subtask?.task_id}
 					idEdit={subtask.id}
 					newWork={newWork}
+				/>
+				<ModalConfirmCommon
+					show={openConfirmModalStatus}
+					onClose={handleCloseConfirmStatusTask}
+					onSubmit={handleClickChangeStatusSubtask}
+					item={taskEdit}
+					title={infoConfirmModalStatus.title}
+					subTitle={infoConfirmModalStatus.subTitle}
+					status={infoConfirmModalStatus.status}
 				/>
 			</Page>
 		</PageWrapper>
