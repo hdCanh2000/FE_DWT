@@ -43,6 +43,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		kpi_value: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
 	});
+	const [logsMision, setLogsMission] = React.useState([]);
 
 	const nameRef = useRef(null);
 	const kpiValueRef = useRef(null);
@@ -114,6 +115,15 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		}
 	}, [item?.id]);
 
+	// data logs mission
+	useEffect(() => {
+		if (item?.id) {
+			getMissionById(item?.id).then((res) => {
+				setLogsMission(res.data.logs);
+			});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [mission]);
 	useEffect(() => {
 		async function getDepartments() {
 			try {
@@ -226,38 +236,103 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		setErrors({});
 	};
 
+	const userLogin = window.localStorage.getItem('name');
 	const handleSubmit = () => {
-		const data = { ...mission };
-		data.keys = keysState.map((key) => {
-			return {
-				key_name: key.key_name,
-				key_value: key.key_value,
-			};
-		});
-		data.status = 0;
-		data.kpi_value = parseInt(data.kpi_value, 10);
-		data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
-		const departmentClone = [...departmentOption];
-		data.departments = departmentClone.map((department) => {
-			return {
-				id: department.id,
-				name: department.label,
-				slug: department.value,
-			};
-		});
-		validateForm();
-		if (!mission?.name) {
-			nameRef.current.focus();
-			return;
+		if (!mission?.id) {
+			const newWorks = JSON.parse(JSON.stringify(logsMision || []));
+			const newLogs = [
+				...newWorks,
+				{
+					id: 1,
+					user: userLogin,
+					type: 2,
+					prev_status: null,
+					next_status: `Thêm mới`,
+					mission_id: mission?.id,
+					mission_name: mission?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
+			const data = { ...mission, logs: newLogs };
+			data.keys = keysState.map((key) => {
+				return {
+					key_name: key.key_name,
+					key_value: key.key_value,
+				};
+			});
+			data.status = 0;
+			data.kpi_value = parseInt(data.kpi_value, 10);
+			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
+			const departmentClone = [...departmentOption];
+			data.departments = departmentClone.map((department) => {
+				return {
+					id: department.id,
+					name: department.label,
+					slug: department.value,
+				};
+			});
+			validateForm();
+			if (!mission?.name) {
+				nameRef.current.focus();
+				return;
+			}
+			if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
+				kpiValueRef.current.focus();
+				return;
+			}
+			if (!prevIsValid()) {
+				return;
+			}
+			onSubmit(data);
+		} else {
+			const newWorks = JSON.parse(JSON.stringify(logsMision || []));
+			const newLogs = [
+				...newWorks,
+				{
+					// eslint-disable-next-line no-unsafe-optional-chaining
+					id: mission?.logs?.length + 1 || 1,
+					user: userLogin,
+					type: 2,
+					prev_status: null,
+					next_status: `Chỉnh sửa`,
+					mission_id: mission?.id,
+					mission_name: mission?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
+			const data = { ...mission, logs: newLogs };
+			data.keys = keysState.map((key) => {
+				return {
+					key_name: key.key_name,
+					key_value: key.key_value,
+				};
+			});
+			data.status = 0;
+			data.kpi_value = parseInt(data.kpi_value, 10);
+			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
+			const departmentClone = [...departmentOption];
+			data.departments = departmentClone.map((department) => {
+				return {
+					id: department.id,
+					name: department.label,
+					slug: department.value,
+				};
+			});
+			validateForm();
+			if (!mission?.name) {
+				nameRef.current.focus();
+				return;
+			}
+			if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
+				kpiValueRef.current.focus();
+				return;
+			}
+			if (!prevIsValid()) {
+				return;
+			}
+			onSubmit(data);
 		}
-		if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
-			kpiValueRef.current.focus();
-			return;
-		}
-		if (!prevIsValid()) {
-			return;
-		}
-		onSubmit(data);
+
 		setMission({
 			id: null,
 			name: '',

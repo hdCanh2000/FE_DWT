@@ -52,6 +52,7 @@ import Popovers from '../../../components/bootstrap/Popovers';
 const TaskDetailPage = () => {
 	// State
 	const [task, setTask] = useState({});
+	// const [ allTask, setAllTask ] = React.useState([]);
 	const { darkModeStatus } = useDarkMode();
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [idEdit, setIdEdit] = useState(0);
@@ -62,7 +63,6 @@ const TaskDetailPage = () => {
 	const [editModalTaskStatus, setEditModalTaskStatus] = useState(false);
 	const [taskEdit, setTaskEdit] = useState({});
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
-	const [newWork, setNewWork] = React.useState([]);
 	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const chartOptions = {
@@ -126,19 +126,18 @@ const TaskDetailPage = () => {
 	React.useEffect(() => {
 		const fetchSubtasks = async (id) => {
 			const res = await getAllSubtasks(id);
-			// setTask(res.data);
+			console.log(res.data,'rés');
 			setTask({
 				...res.data,
-				departments: [res.data?.department]?.concat(res.data?.departments_related),
-				users: [res.data?.user]?.concat(res.data?.users_related),
+				departments: [],
+				// departments: [res.data?.department]?.concat(res.data?.departments_related),
+				users: [],
+				// users: [res.data?.user]?.concat(res.data?.users_related),
 			});
 		};
 		fetchSubtasks(parseInt(params?.id, 10));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-	React.useEffect(() => {
-		setNewWork(task?.logs ? task.logs : []);
-	}, [task]);
 	// Handle
 	const handleOpenModal = (items, titles) => {
 		setEditModalStatus(true);
@@ -156,28 +155,28 @@ const TaskDetailPage = () => {
 		);
 	};
 	const handleDelete = async (valueDelete) => {
-		const newWorks = JSON.parse(JSON.stringify(newWork));
-		const newLogs = [
-			...newWorks,
-			{
-				user: {
-					id: task?.user?.id,
-					name: task?.user?.name,
-				},
-				type: 2,
-				prev_status: null,
-				next_status: `Xóa`,
-				subtask_id: valueDelete.id,
-				subtask_name: valueDelete.name,
-				time: moment().format('YYYY/MM/DD hh:mm'),
-			},
-		];
+		// const newWorks = JSON.parse(JSON.stringify(newWork));
+		// const newLogs = [
+		// 	...newWorks,
+		// 	{
+		// 		user: {
+		// 			id: task?.user?.id,
+		// 			name: task?.user?.name,
+		// 		},
+		// 		type: 2,
+		// 		prev_status: null,
+		// 		next_status: `Xóa`,
+		// 		subtask_id: valueDelete.id,
+		// 		subtask_name: valueDelete.name,
+		// 		time: moment().format('YYYY/MM/DD hh:mm'),
+		// 	},
+		// ];
 		const newSubTasks = task?.subtasks.filter((item) => item.id !== valueDelete.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
-			logs: newLogs,
+			// logs: newLogs,
 		});
 
 		try {
@@ -226,22 +225,22 @@ const TaskDetailPage = () => {
 		}
 	};
 	const handleUpdateStatus = async (statuss, data) => {
-		const newWorks = JSON.parse(JSON.stringify(newWork));
-		const newLogs = [
-			...newWorks,
-			{
-				user: {
-					id: task?.user?.id,
-					name: task?.user?.name,
-				},
-				type: 1,
-				prev_status: `${FORMAT_TASK_STATUS(data.status)}`,
-				next_status: `${FORMAT_TASK_STATUS(statuss)}`,
-				subtask_id: data.id,
-				subtask_name: data.name,
-				time: moment().format('YYYY/MM/DD hh:mm'),
-			},
-		];
+		// const newWorks = JSON.parse(JSON.stringify(newWork));
+		// const newLogs = [
+		// 	...newWorks,
+		// 	{
+		// 		user: {
+		// 			id: task?.user?.id,
+		// 			name: task?.user?.name,
+		// 		},
+		// 		type: 1,
+		// 		prev_status: `${FORMAT_TASK_STATUS(data.status)}`,
+		// 		next_status: `${FORMAT_TASK_STATUS(statuss)}`,
+		// 		subtask_id: data.id,
+		// 		subtask_name: data.name,
+		// 		time: moment().format('YYYY/MM/DD hh:mm'),
+		// 	},
+		// ];
 		const newSubTasks = task.subtasks.map((item) => {
 			return item.id === data.id
 				? {
@@ -253,7 +252,7 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			logs: newLogs,
+			// logs: newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
@@ -743,17 +742,9 @@ const TaskDetailPage = () => {
 													key={item?.id}
 													type={item?.type}
 													time={item?.time}
-													username={item?.user?.name}
-													id={
-														item?.subtask_id
-															? item?.subtask_id
-															: item?.task_id
-													}
-													taskName={
-														item?.subtask_name
-															? item?.subtask_name
-															: item?.task_name
-													}
+													username={item?.user?.name?item?.user?.name:   item?.user}
+													id={item?.task_id || item?.subtask_id}
+													taskName={item?.task_name? item?.task_name:item?.subtask_name}
 													prevStatus={item?.prev_status}
 													nextStatus={item?.next_status}
 												/>
@@ -1126,8 +1117,7 @@ const TaskDetailPage = () => {
 					editModalStatus={editModalStatus}
 					id={parseInt(params?.id, 10)}
 					idEdit={idEdit}
-					newWork={newWork}
-					setNewWork={setNewWork}
+					// newWork={newWork}
 				/>
 				<TaskFormModal
 					show={editModalTaskStatus}

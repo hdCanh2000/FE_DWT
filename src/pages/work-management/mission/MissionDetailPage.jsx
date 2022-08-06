@@ -55,7 +55,7 @@ import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
 import '../TaskDetail/styleTaskDetail.scss';
 import MissionFormModal from './MissionFormModal';
-import RelatedActionCommon from '../../common/ComponentCommon/RelatedActionCommon';
+import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
@@ -112,7 +112,6 @@ const chartOptions = {
 const MissionDetailPage = () => {
 	const [mission, setMission] = useState({});
 	const [tasks, setTasks] = useState([]);
-	const [taskLogs, setTaskLogs] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [editModalMissionStatus, setEditModalMissionStatus] = useState(false);
@@ -409,7 +408,7 @@ const MissionDetailPage = () => {
 			const response = await getAllTaksByMissionID(id);
 			const result = await response.data;
 			setTasks(result);
-			setTaskLogs(result.filter((item) => item?.logs?.length > 0)?.map((item) => item.logs));
+			// setTaskLogs(result.filter((item) => item?.logs?.length > 0)?.map((item) => item.logs));
 		}
 		fetchDataTaskByMissionID();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -917,7 +916,24 @@ const MissionDetailPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
-									<RelatedActionCommon data={taskLogs?.[0]} />
+									{/* <RelatedActionCommonItem data={mission?.logs} /> */}
+									{mission?.logs
+										?.slice()
+										.reverse()
+										.map((item) => {
+											return (
+												<RelatedActionCommonItem
+													key={item?.id}
+													type={item?.type}
+													time={`${item?.time}`.format('DD-MM-YYY')}
+													username={item?.user}
+													id={item.mission_id}
+													taskName={item.mission_name}
+													prevStatus={item?.prev_status}
+													nextStatus={item?.next_status}
+												/>
+											);
+										})}
 								</CardBody>
 							</Card>
 						</Card>

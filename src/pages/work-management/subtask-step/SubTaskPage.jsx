@@ -15,7 +15,7 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
-import { formatColorStatus, FORMAT_TASK_STATUS, STATUS } from '../../../utils/constants';
+import { FORMAT_TASK_STATUS } from '../../../utils/constants';
 import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -35,12 +35,6 @@ import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
-import Icon from '../../../components/icon/Icon';
-import Dropdown, {
-	DropdownItem,
-	DropdownMenu,
-	DropdownToggle,
-} from '../../../components/bootstrap/Dropdown';
 
 const chartOptions = {
 	chart: {
@@ -222,23 +216,11 @@ const SubTaskPage = () => {
 		}
 	};
 
-	const handleClickChangeStatusSubtask = async (data, status) => {
-		if (status === 4 || status === 5 || status === 6 || status === 7) {
+	const handleClickChangeStatusPending = async (data) => {
+		if (data.status === 1) {
 			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-		}
-		if (data.status === 4 || data.status === 5 || data.status === 6 || data.status === 7) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
+				`Báo đầu việc chờ duyệt!`,
+				`Thao tác không thành công. Đầu việc ${data.name} đã hoàn thành!`,
 				'Error',
 				'danger',
 			);
@@ -253,7 +235,7 @@ const SubTaskPage = () => {
 			try {
 				const taskClone = { ...task };
 				const subtaskClone = { ...data };
-				subtaskClone.status = status;
+				subtaskClone.status = 2;
 				const subtaskSubmit = taskClone?.subtasks?.map((item) =>
 					item.id === data.id ? { ...subtaskClone } : item,
 				);
@@ -366,43 +348,23 @@ const SubTaskPage = () => {
 				</div>
 				<div className='row mb-4'>
 					<div className='col-lg-8'>
-						<Card className='shadow-3d-primary h-100 mb-0 pb-0'>
+						<Card className='shadow-3d-primary h-100 mb-4 pb-4'>
 							<CardHeader className='py-2'>
 								<CardLabel icon='Summarize' iconColor='success'>
 									<CardTitle tag='h4' className='h5'>
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
-								<Dropdown>
-									<DropdownToggle hasIcon={false}>
-										<Button
-											color='danger'
-											icon='Report'
-											className='text-nowrap'>
-											Cập nhật trạng thái
-										</Button>
-									</DropdownToggle>
-									<DropdownMenu>
-										{Object.keys(STATUS).map((key) => (
-											<DropdownItem
-												key={key}
-												onClick={() =>
-													handleClickChangeStatusSubtask(
-														subtask,
-														STATUS[key].value,
-													)
-												}>
-												<div>
-													<Icon icon='Circle' color={STATUS[key].color} />
-													{STATUS[key].name}
-												</div>
-											</DropdownItem>
-										))}
-									</DropdownMenu>
-								</Dropdown>
+								<Button
+									color='danger'
+									icon='Report'
+									isLight
+									onClick={() => handleClickChangeStatusPending(subtask)}>
+									Xác nhận hoàn thành
+								</Button>
 							</CardHeader>
 							<CardBody className='py-2'>
-								<div className='row h-100'>
+								<div className='row g-4'>
 									<div className='col-md-5'>
 										<Card
 											className='bg-l25-primary transition-base rounded-2 mb-4'
@@ -412,11 +374,7 @@ const SubTaskPage = () => {
 													<CardTitle tag='h4' className='h5'>
 														Tiến độ thực hiện
 													</CardTitle>
-													<CardSubTitle
-														tag='h4'
-														className={`h5 text-${formatColorStatus(
-															subtask?.status,
-														)}`}>
+													<CardSubTitle tag='h4' className='h5'>
 														{FORMAT_TASK_STATUS(subtask?.status)}
 													</CardSubTitle>
 												</CardLabel>
@@ -464,7 +422,7 @@ const SubTaskPage = () => {
 										<CardInfoCommon
 											className='mb-4 pb-4'
 											shadow='lg'
-											style={{ minHeight: 320 }}
+											style={{ minHeight: 300 }}
 											title='Phòng ban phụ trách'
 											icon='LayoutTextWindow'
 											iconColor='info'
@@ -483,7 +441,7 @@ const SubTaskPage = () => {
 										<CardInfoCommon
 											className='mb-4 pb-4'
 											shadow='lg'
-											style={{ minHeight: 320 }}
+											style={{ minHeight: 300 }}
 											title='Nhân viên phụ trách'
 											icon='PersonCircle'
 											iconColor='info'
@@ -575,7 +533,7 @@ const SubTaskPage = () => {
 						</Card>
 					</div>
 					<div className='col-lg-4'>
-						<Card className='mb-0 h-100 shadow-3d-info'>
+						<Card className='mb-4 h-100 shadow-3d-info'>
 							<CardInfoCommon
 								className='mb-4'
 								shadow='lg'
@@ -631,6 +589,7 @@ const SubTaskPage = () => {
 							/>
 							{/* Chỉ số key */}
 							<CardInfoCommon
+								isScrollable
 								className='transition-base w-100 rounded-2 mb-4'
 								shadow='lg'
 								style={{ minHeight: 250 }}
@@ -654,7 +613,7 @@ const SubTaskPage = () => {
 									};
 								})}
 							/>
-							<Card className='h-100 mb-0' shadow='lg'>
+							<Card className='h-100' shadow='lg'>
 								<CardHeader className='py-2'>
 									<CardLabel icon='NotificationsActive' iconColor='warning'>
 										<CardTitle tag='h4' className='h5'>

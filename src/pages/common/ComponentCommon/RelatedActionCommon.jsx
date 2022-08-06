@@ -64,7 +64,7 @@ const RelatedActionCommon = (props) => {
 					key={item?.id}
 					type={item?.type}
 					time={item?.time}
-					username={item?.user?.name}
+					username={item?.user}
 					id={item?.subtask_id ? item?.subtask_id : item?.task_id}
 					taskName={item?.task_name}
 					prevStatus={item?.prev_status}

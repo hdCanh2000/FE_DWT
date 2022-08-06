@@ -147,6 +147,14 @@ const MissionPage = () => {
 		(page) => navigate(`/muc-tieu/chi-tiet/${page}`),
 		[navigate],
 	);
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await getAllMission();
+			const result = await response.data;
+			setMissions(result);
+		};
+		fetchData();
+	}, []);
 	const handleClearValueForm = () => {
 		setItemEdit({
 			name: '',
@@ -203,7 +211,6 @@ const MissionPage = () => {
 			},
 		);
 	};
-
 	const handleSubmitMissionForm = async (data) => {
 		if (data.id) {
 			try {
@@ -239,15 +246,6 @@ const MissionPage = () => {
 			}
 		}
 	};
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await getAllMission();
-			const result = await response.data;
-			setMissions(result);
-		};
-		fetchData();
-	}, []);
 
 	const mergeObjToArray = (arr) => {
 		const output = [];
@@ -285,7 +283,6 @@ const MissionPage = () => {
 		};
 		fetchData();
 	}, [missions]);
-
 	useEffect(() => {
 		const fetchData = async () => {
 			const result = await getLatestTasks();
