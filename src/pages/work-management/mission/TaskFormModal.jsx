@@ -108,7 +108,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 					...res.data.department,
 					id: res.data.department.id,
 					label: res.data.department.name,
-					value: res.data.department.slug,
+					value: res.data.department.id,
 				});
 				setUserOption({
 					...res.data.user,
@@ -121,7 +121,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 						return {
 							id: department.id,
 							label: department.name,
-							value: department.slug,
+							value: department.id,
 						};
 					}),
 				);
@@ -148,8 +148,8 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				status: 0,
 			});
 			setKeysState([]);
-			setDepartmentOption({ label: '', value: '' });
-			setUserOption({ label: '', value: '' });
+			setDepartmentOption({});
+			setUserOption({});
 			setDepartmentRelatedOption([]);
 			setUserRelatedOption([]);
 		}
@@ -165,7 +165,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 						return {
 							id: department.id,
 							label: department.name,
-							value: department.slug,
+							value: department.id,
 						};
 					}),
 				);
@@ -404,7 +404,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												required
 												placeholder='Tên công việc'
 												size='lg'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.name?.errorMsg && (
@@ -420,7 +420,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												value={task.description || ''}
 												required
 												placeholder='Mô tả công việc'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										<FormGroup
@@ -436,7 +436,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												required
 												size='lg'
 												placeholder='Giá trị KPI'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.kpi_value?.errorMsg && (
@@ -450,7 +450,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												ref={priorityRef}
 												name='priority'
 												ariaLabel='Board select'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 												placeholder='Độ ưu tiên'
 												onChange={handleChange}
 												value={task?.priority}>
@@ -513,7 +513,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											label='Phòng ban liên quan'>
 											<SelectComponent
 												style={customStyles}
-												placeholder='Chọn phòng ban liên quan'
+												placeholder=''
 												defaultValue={departmentReplatedOption}
 												value={departmentReplatedOption}
 												onChange={setDepartmentRelatedOption}
@@ -531,7 +531,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											label='Nhân viên liên quan'>
 											<SelectComponent
 												style={customStyles}
-												placeholder='Chọn nhân viên liên quan'
+												placeholder=''
 												defaultValue={userReplatedOption}
 												value={userReplatedOption}
 												onChange={setUserRelatedOption}
@@ -558,7 +558,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 											<FormGroup
@@ -574,7 +574,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													value={task.estimate_time || '08:00'}
 													onChange={handleChange}
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
@@ -595,7 +595,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 											<FormGroup
@@ -611,7 +611,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													value={task.deadline_time || '08:00'}
 													onChange={handleChange}
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
@@ -644,7 +644,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 																name='key_name'
 																required
 																size='lg'
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: Doanh thu, đơn hàng, ...'
 															/>
 														</FormGroup>
@@ -667,7 +667,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 																name='key_value'
 																size='lg'
 																required
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
 															/>
 														</FormGroup>

@@ -70,7 +70,6 @@ export const TASK_STATUS = {
 };
 
 export const TASK_STATUS_MANAGE = {
-	PENDING: { value: 0, name: 'Chờ chấp nhận', code: 'pending', color: COLORS.DANGER.name },
 	FAILED: { value: 6, name: 'Huỷ', code: 'failed', color: COLORS.DARK.name },
 	CLOSE: { value: 7, name: 'Đóng', code: 'Pending', color: COLORS.DARK.name },
 	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
