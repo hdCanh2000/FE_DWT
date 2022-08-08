@@ -34,7 +34,9 @@ import {
 	calcKPICompleteOfMission,
 	calcProgressMission,
 	calcProgressTask,
+	calcTotalKPIOfTask,
 	calcTotalTaskByStatus,
+	calcUsedKPIValueOfMission,
 } from '../../../utils/function';
 import Button from '../../../components/bootstrap/Button';
 import MissionAlertConfirm from './MissionAlertConfirm';
@@ -65,12 +67,12 @@ import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon'
 const chartOptions = {
 	chart: {
 		type: 'donut',
-		height: 350,
+		height: 320,
 	},
 	stroke: {
 		width: 0,
 	},
-	labels: ['Đang thực hiện', 'Chờ xác nhận', 'Đã hoàn thành', 'Huỷ', 'Đóng'],
+	labels: ['Chờ chấp nhận', 'Đang thực hiện', 'Đã hoàn thành', 'Chờ xác nhận', 'Huỷ', 'Đóng'],
 	dataLabels: {
 		enabled: false,
 	},
@@ -124,6 +126,7 @@ const MissionDetailPage = () => {
 		title: '',
 		subTitle: '',
 		status: null,
+		isShowNote: false,
 	});
 	const params = useParams();
 	const navigate = useNavigate();
@@ -135,6 +138,7 @@ const MissionDetailPage = () => {
 			id: 'id',
 			key: 'id',
 			type: 'number',
+			align: 'right',
 		},
 		{
 			title: 'Tên công việc',
@@ -142,7 +146,7 @@ const MissionDetailPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`/quan-ly-cong-viec/cong-viec/${item.id}`}>
+				<Link className='text-underline' to={`/cong-viec/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -153,12 +157,14 @@ const MissionDetailPage = () => {
 			key: 'estimate_date',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
 		},
 		{
 			title: 'Hạn hoàn thành',
 			id: 'deadline_date',
 			key: 'deadline_date',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
 		},
 		{
 			title: 'Tiến độ',
@@ -180,18 +186,22 @@ const MissionDetailPage = () => {
 					/>
 				</div>
 			),
+			align: 'center',
 		},
 		{
 			title: 'Giá trị KPI',
 			id: 'kpi_value',
 			key: 'kpi_value',
 			type: 'number',
+			align: 'center',
 		},
 		{
 			title: 'KPI thực tế',
-			id: 'current_kpi_value',
-			key: 'current_kpi_value',
+			id: 'current_kpi',
+			key: 'current_kpi',
 			type: 'number',
+			render: (item) => <span>{calcTotalKPIOfTask(item)}</span>,
+			align: 'center',
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -217,6 +227,7 @@ const MissionDetailPage = () => {
 					</span>
 				</div>
 			),
+			align: 'center',
 		},
 		{
 			title: 'Trạng thái',
@@ -284,6 +295,7 @@ const MissionDetailPage = () => {
 			id: 'id',
 			key: 'id',
 			type: 'number',
+			align: 'right',
 		},
 		{
 			title: 'Tên công việc',
@@ -301,6 +313,7 @@ const MissionDetailPage = () => {
 			id: 'deadline_date',
 			key: 'deadline_date',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
 		},
 		{
 			title: 'Tiến độ',
@@ -321,18 +334,21 @@ const MissionDetailPage = () => {
 					/>
 				</div>
 			),
+			align: 'center',
 		},
 		{
 			title: 'Giá trị KPI',
 			id: 'kpi_value',
 			key: 'kpi_value',
 			type: 'number',
+			align: 'center',
 		},
 		{
 			title: 'KPI thực tế',
 			id: 'current_kpi_value',
 			key: 'current_kpi_value',
 			type: 'number',
+			align: 'center',
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -358,6 +374,7 @@ const MissionDetailPage = () => {
 					</span>
 				</div>
 			),
+			align: 'center',
 		},
 		{
 			title: 'Trạng thái',
@@ -619,6 +636,7 @@ const MissionDetailPage = () => {
 			setTasks(tasks.map((item) => (item.id === data.id ? { ...result } : item)));
 			handleClearValueForm();
 			handleCloseEditForm();
+			handleCloseConfirmStatusTask();
 			handleShowToast(
 				`Cập nhật công việc!`,
 				`Công việc ${result.name} được cập nhật thành công!`,
@@ -697,13 +715,14 @@ const MissionDetailPage = () => {
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
 
-	const handleOpenConfirmStatusTask = (item, nextStatus) => {
+	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
 		setOpenConfirmModalStatus(true);
 		setItemEdit({ ...item });
 		setInfoConfirmModalStatus({
 			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
 			subTitle: item?.name,
 			status: nextStatus,
+			isShowNote,
 		});
 	};
 
@@ -772,35 +791,28 @@ const MissionDetailPage = () => {
 											</CardHeader>
 											<CardBody>
 												<div className='d-flex align-items-center pb-3'>
-													<div className='flex-shrink-0'>
-														<Icon
-															icon='EmojiEmotions'
-															size='4x'
-															color='primary'
-														/>
-													</div>
-													<div className='flex-grow-1 ms-3'>
+													<div className='flex-grow-1'>
 														<div className='fw-bold fs-3 mb-0'>
-															{Math.round(
-																(calcTotalTaskByStatus(tasks, 4) *
-																	100) /
-																	tasks.length,
-															) || 0}
-															%
+															{calcProgressMission(mission, tasks)}%
+															<div>
+																<Progress
+																	isAutoColor
+																	value={calcProgressMission(
+																		mission,
+																		tasks,
+																	)}
+																	height={10}
+																/>
+															</div>
 														</div>
-														<div
-															style={{ fontSize: 14, color: '#000' }}>
-															<span
-																className='fw-bold text-danger'
-																style={{ fontSize: 15 }}>
-																{calcTotalTaskByStatus(tasks, 1)}
-															</span>{' '}
-															cv hoàn thành trên tổng{' '}
-															<span
-																className='fw-bold text-danger'
-																style={{ fontSize: 15 }}>
+														<div className='fs-5 mt-2'>
+															<span className='fw-bold text-danger fs-5 me-2'>
+																{calcTotalTaskByStatus(tasks, 4)}
+															</span>
+															cv hoàn thành trên tổng số
+															<span className='fw-bold text-danger fs-5 mx-2'>
 																{tasks?.length}
-															</span>{' '}
+															</span>
 															cv.
 														</div>
 													</div>
@@ -822,25 +834,22 @@ const MissionDetailPage = () => {
 													</div>
 													<div className='col col-sm-7'>
 														<div className='fw-bold fs-4 mb-10'>
+															{calcUsedKPIValueOfMission(
+																mission,
+																tasks,
+															)}
+														</div>
+														<div className='text-muted'>
+															KPI đã dùng
+														</div>
+														<div className='fw-bold fs-4 mb-10 mt-4'>
 															{calcKPICompleteOfMission(
 																mission,
 																tasks,
 															)}
-															/{mission?.current_kpi_value} ~
-															{calcProgressMission(mission, tasks)}%
 														</div>
 														<div className='text-muted'>
 															Kpi thực tế đã hoàn thành
-														</div>
-														<div>
-															<Progress
-																isAutoColor
-																value={calcProgressMission(
-																	mission,
-																	tasks,
-																)}
-																height={20}
-															/>
 														</div>
 													</div>
 												</div>
@@ -878,6 +887,7 @@ const MissionDetailPage = () => {
 											<CardBody className='py-2'>
 												{/* 	Report Component	 */}
 												<ReportCommon
+													col={4}
 													data={[
 														{
 															label: 'Số công việc',
@@ -896,6 +906,14 @@ const MissionDetailPage = () => {
 															value: calcTotalTaskByStatus(tasks, 3),
 														},
 														{
+															label: 'Chờ chấp nhận',
+															value: calcTotalTaskByStatus(tasks, 0),
+														},
+														{
+															label: 'Từ chối',
+															value: calcTotalTaskByStatus(tasks, 5),
+														},
+														{
 															label: 'Huỷ',
 															value: calcTotalTaskByStatus(tasks, 6),
 														},
@@ -910,9 +928,10 @@ const MissionDetailPage = () => {
 														<div className='col-xl-12 col-md-12'>
 															<Chart
 																series={[
+																	calcTotalTaskByStatus(tasks, 0),
 																	calcTotalTaskByStatus(tasks, 2),
-																	calcTotalTaskByStatus(tasks, 3),
 																	calcTotalTaskByStatus(tasks, 4),
+																	calcTotalTaskByStatus(tasks, 3),
 																	calcTotalTaskByStatus(tasks, 6),
 																	calcTotalTaskByStatus(tasks, 7),
 																]}
@@ -1044,17 +1063,7 @@ const MissionDetailPage = () => {
 								<Tab
 									eventKey='ListTask'
 									title={`Danh sách công việc (${
-										tasks.filter(
-											(item) =>
-												item.status === 0 ||
-												item.status === 1 ||
-												item.status === 2 ||
-												item.status === 4 ||
-												item.status === 5 ||
-												item.status === 6 ||
-												item.status === 7 ||
-												item.status === 8,
-										)?.length || 0
+										tasks.filter((item) => item.status !== 3)?.length || 0
 									})`}
 									className='mb-3'>
 									<Card>
@@ -1074,34 +1083,25 @@ const MissionDetailPage = () => {
 												</Button>
 											</CardActions>
 										</CardHeader>
-										<CardBody className='table-responsive'>
+										<div className='p-4'>
 											<TableCommon
 												className='table table-modern mb-0'
 												columns={columns}
-												data={tasks.filter(
-													(item) =>
-														item.status === 0 ||
-														item.status === 1 ||
-														item.status === 2 ||
-														item.status === 4 ||
-														item.status === 5 ||
-														item.status === 6 ||
-														item.status === 7 ||
-														item.status === 8,
-												)}
+												data={tasks.filter((item) => item.status !== 3)}
 											/>
-										</CardBody>
+										</div>
 									</Card>
-									{!tasks.filter((item) => item.status !== 2 || item.status !== 3)
-										?.length && (
-										<Alert
-											color='warning'
-											isLight
-											icon='Report'
-											className='mt-3'>
-											Không có công việc thuộc mục tiêu này!
-										</Alert>
-									)}
+									<div className='p-4'>
+										{!tasks.filter((item) => item.status !== 3)?.length && (
+											<Alert
+												color='warning'
+												isLight
+												icon='Report'
+												className='mt-3'>
+												Không có công việc đang chờ xác nhận!
+											</Alert>
+										)}
+									</div>
 								</Tab>
 								<Tab
 									eventKey='ListPendingTask'
@@ -1119,23 +1119,25 @@ const MissionDetailPage = () => {
 												</CardTitle>
 											</CardLabel>
 										</CardHeader>
-										<CardBody className='table-responsive'>
+										<div className='p-4'>
 											<TableCommon
 												className='table table-modern mb-0'
 												columns={columnsPending}
 												data={tasks.filter((item) => item.status === 3)}
 											/>
-											{!tasks.filter((item) => item.status === 3)?.length && (
-												<Alert
-													color='warning'
-													isLight
-													icon='Report'
-													className='mt-3'>
-													Không có công việc đang chờ xác nhận!
-												</Alert>
-											)}
-										</CardBody>
+										</div>
 									</Card>
+									<div className='p-4'>
+										{!tasks.filter((item) => item.status === 3)?.length && (
+											<Alert
+												color='warning'
+												isLight
+												icon='Report'
+												className='mt-3'>
+												Không có công việc đang chờ xác nhận!
+											</Alert>
+										)}
+									</div>
 								</Tab>
 							</Tabs>
 						</Card>
@@ -1172,6 +1174,7 @@ const MissionDetailPage = () => {
 					onClose={handleCloseConfirmStatusTask}
 					onSubmit={handleUpdateStatus}
 					item={itemEdit}
+					isShowNote={infoConfirmModalStatus.isShowNote}
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}

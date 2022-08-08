@@ -12,7 +12,25 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 							<th
 								style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
 								key={column.key}
-								className={classNames(column.className)}>
+								className={classNames(
+									column.className,
+									`text-${
+										// eslint-disable-next-line no-nested-ternary
+										column.align === 'right'
+											? 'right'
+											: column.align === 'center'
+											? 'center'
+											: 'left'
+									}`,
+								)}
+								align={
+									// eslint-disable-next-line no-nested-ternary
+									column.align === 'right'
+										? 'right'
+										: column.align === 'center'
+										? 'center'
+										: 'left'
+								}>
 								{column.title}
 							</th>
 						);
@@ -28,7 +46,25 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 								const value = row[column.id];
 								if (column.render) {
 									return (
-										<td key={column.key} style={{ fontSize: 14 }}>
+										<td
+											key={column.key}
+											align={
+												// eslint-disable-next-line no-nested-ternary
+												column.align === 'right'
+													? 'right'
+													: column.align === 'center'
+													? 'center'
+													: 'left'
+											}
+											className={`text-${
+												// eslint-disable-next-line no-nested-ternary
+												column.align === 'right'
+													? 'right'
+													: column.align === 'center'
+													? 'center'
+													: 'left'
+											}`}
+											style={{ fontSize: 14 }}>
 											{column.render(row, value)}
 										</td>
 									);
@@ -37,7 +73,25 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 									<td
 										style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
 										key={column.key}
-										className={column.className}>
+										className={classNames(
+											column.className,
+											`text-${
+												// eslint-disable-next-line no-nested-ternary
+												column.align === 'right'
+													? 'right'
+													: column.align === 'center'
+													? 'center'
+													: 'left'
+											}`,
+										)}
+										align={
+											// eslint-disable-next-line no-nested-ternary
+											column.align === 'right'
+												? 'right'
+												: column.align === 'center'
+												? 'center'
+												: 'left'
+										}>
 										{column.format ? column.format(value) : value}
 									</td>
 								);

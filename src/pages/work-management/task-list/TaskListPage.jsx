@@ -68,7 +68,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`/quan-ly-cong-viec/cong-viec/${id}`),
+		() => navigate(`/cong-viec/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -296,7 +296,7 @@ const TaskListPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.quanLyCongViec.subMenu.danhSach.text}>
+		<PageWrapper title={demoPages.quanLyCongViec.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
