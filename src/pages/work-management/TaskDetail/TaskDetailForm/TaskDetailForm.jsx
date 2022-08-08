@@ -283,7 +283,7 @@ const TaskDetailForm = ({
 			setValueInput(initValueInput);
 		} else {
 			const values = task?.subtasks?.filter((item) => item.id === idEdit);
-			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs));
+			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs || []));
 			const newLogs = [
 				...newWorks,
 				{

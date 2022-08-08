@@ -739,11 +739,11 @@ const TaskDetailPage = () => {
 													<div
 														className='fs-5'
 														style={{
-															'WebkitLineClamp': '2',
+															WebkitLineClamp: '2',
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
 															display: '-webkit-box',
-															'WebkitBoxOrient': 'vertical',
+															WebkitBoxOrient: 'vertical',
 														}}>
 														{task?.description}
 													</div>
@@ -816,7 +816,6 @@ const TaskDetailPage = () => {
 											?.slice()
 											.reverse()
 											.map((item) => {
-												console.log(item.id);
 												return (
 													<RelatedActionCommonItem
 														key={item?.id}

@@ -316,7 +316,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		const newLogs = [
 			...newWorks,
 			{
-				id: task?.id ? task.logs.length + 1 : 1,
+				id: task?.logs ? task.logs.length + 1 : 1,
 				user: person,
 				type: 2,
 				prev_status: null,
