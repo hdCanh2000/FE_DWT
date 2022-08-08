@@ -42,7 +42,7 @@ import MissionAlertConfirm from './MissionAlertConfirm';
 import MissionFormModal from './MissionFormModal';
 import Badge from '../../../components/bootstrap/Badge';
 import Progress from '../../../components/bootstrap/Progress';
-import { calcProgressMission, calcProgressTask } from '../../../utils/function';
+import { calcProgressMissionByTaskComplete, calcProgressTask } from '../../../utils/function';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 
@@ -71,8 +71,11 @@ const Item = ({
 					</CardLabel>
 				</CardHeader>
 				<CardBody>
-					<div className='col-md-12'>
-						<div className='d-flex align-items-center jusify-content-start'>
+					<div className='row g-2 align-items-center'>
+						<div className='col-auto mt-2'>
+							<span>Hạn hoàn thành:</span>
+						</div>
+						<div className='col-auto mt-2'>
 							<small
 								style={{ fontSize: 14 }}
 								className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
@@ -352,7 +355,7 @@ const MissionPage = () => {
 											<CardSubTitle style={{ fontSize: 15 }}>
 												<div className='d-flex'>
 													<div className='me-2'>
-														Số công việc:
+														Số CV:
 														<span className='text-danger fw-bold ps-2'>
 															{item?.tasks?.length || 0}
 														</span>
@@ -450,10 +453,17 @@ const MissionPage = () => {
 										</div>
 										<div className='row mt-4'>
 											<div className='col-md-12'>
-												{calcProgressMission(item, item?.tasks)}%
+												{calcProgressMissionByTaskComplete(
+													item,
+													item?.tasks,
+												)}
+												%
 												<Progress
 													isAutoColor
-													value={calcProgressMission(item, item?.tasks)}
+													value={calcProgressMissionByTaskComplete(
+														item,
+														item?.tasks,
+													)}
 													height={10}
 												/>
 											</div>
@@ -542,7 +552,7 @@ const MissionPage = () => {
 													<td align='center'>
 														<div className='d-flex align-items-center'>
 															<div className='flex-shrink-0 me-3'>
-																{calcProgressMission(
+																{calcProgressMissionByTaskComplete(
 																	item,
 																	item?.tasks,
 																)}
@@ -551,7 +561,7 @@ const MissionPage = () => {
 															<Progress
 																className='flex-grow-1'
 																isAutoColor
-																value={calcProgressMission(
+																value={calcProgressMissionByTaskComplete(
 																	item,
 																	item?.tasks,
 																)}

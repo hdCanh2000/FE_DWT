@@ -70,7 +70,7 @@ const chartOptions = {
 	stroke: {
 		width: 0,
 	},
-	labels: ['Đang thực hiện', 'Chờ duyệt', 'Đã hoàn thành', 'Quá hạn/Huỷ'],
+	labels: ['Đang thực hiện', 'Chờ xác nhận', 'Đã hoàn thành', 'Huỷ', 'Đóng'],
 	dataLabels: {
 		enabled: false,
 	},
@@ -600,7 +600,7 @@ const MissionDetailPage = () => {
 				handleCloseEditMissionForm();
 				handleShowToast(
 					`Cập nhật mục tiêu!`,
-					`mục tiêu ${result.name} được cập nhật thành công!`,
+					`Mục tiêu ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
 				setMission(mission);
@@ -697,7 +697,6 @@ const MissionDetailPage = () => {
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
-	// handleStatus(4, item)
 
 	const handleOpenConfirmStatusTask = (item, nextStatus) => {
 		setOpenConfirmModalStatus(true);
@@ -784,7 +783,7 @@ const MissionDetailPage = () => {
 													<div className='flex-grow-1 ms-3'>
 														<div className='fw-bold fs-3 mb-0'>
 															{Math.round(
-																(calcTotalTaskByStatus(tasks, 1) *
+																(calcTotalTaskByStatus(tasks, 4) *
 																	100) /
 																	tasks.length,
 															) || 0}
@@ -885,19 +884,23 @@ const MissionDetailPage = () => {
 														},
 														{
 															label: 'Đã hoàn thành',
-															value: calcTotalTaskByStatus(tasks, 1),
+															value: calcTotalTaskByStatus(tasks, 4),
 														},
 														{
 															label: 'Đang thực hiện',
-															value: calcTotalTaskByStatus(tasks, 0),
-														},
-														{
-															label: 'Chờ xét duyệt',
 															value: calcTotalTaskByStatus(tasks, 2),
 														},
 														{
-															label: 'Huỷ/Quá hạn',
+															label: 'Chờ xét duyệt',
 															value: calcTotalTaskByStatus(tasks, 3),
+														},
+														{
+															label: 'Huỷ',
+															value: calcTotalTaskByStatus(tasks, 6),
+														},
+														{
+															label: 'Đóng',
+															value: calcTotalTaskByStatus(tasks, 7),
 														},
 													]}
 												/>
@@ -906,10 +909,11 @@ const MissionDetailPage = () => {
 														<div className='col-xl-12 col-md-12'>
 															<Chart
 																series={[
-																	calcTotalTaskByStatus(tasks, 0),
 																	calcTotalTaskByStatus(tasks, 2),
-																	calcTotalTaskByStatus(tasks, 1),
 																	calcTotalTaskByStatus(tasks, 3),
+																	calcTotalTaskByStatus(tasks, 4),
+																	calcTotalTaskByStatus(tasks, 6),
+																	calcTotalTaskByStatus(tasks, 7),
 																]}
 																options={chartOptions}
 																type={chartOptions.chart.type}
