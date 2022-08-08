@@ -859,7 +859,9 @@ const MissionDetailPage = () => {
 													icon: 'TrendingFlat',
 													color: 'info',
 													children: (
-														<div className='fw-bold fs-5 mb-1'>
+														<div
+															key={department?.name}
+															className='fw-bold fs-5 mb-1'>
 															{department?.name}
 														</div>
 													),
@@ -942,11 +944,11 @@ const MissionDetailPage = () => {
 												<div
 													className='fs-5'
 													style={{
-														'-webkit-line-clamp': '2',
+														WebkitLineClamp: '2',
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
 														display: '-webkit-box',
-														'-webkit-box-orient': 'vertical',
+														WebkitBoxOrient: 'vertical',
 													}}>
 													{mission?.description}
 												</div>
@@ -979,6 +981,7 @@ const MissionDetailPage = () => {
 									},
 								]}
 							/>
+
 							<CardInfoCommon
 								className='transition-base w-100 rounded-2 mb-4 pb-4'
 								shadow='lg'
@@ -992,14 +995,14 @@ const MissionDetailPage = () => {
 										icon: 'DoneAll',
 										color: 'danger',
 										children: (
-											<>
+											<div>
 												<div className='fw-bold fs-5 mb-1'>
 													{key?.key_name}
 												</div>
 												<div className='mt-n2' style={{ fontSize: 14 }}>
 													{key?.key_value}
 												</div>
-											</>
+											</div>
 										),
 									};
 								})}
@@ -1014,22 +1017,19 @@ const MissionDetailPage = () => {
 									{mission?.logs
 										?.slice()
 										.reverse()
-										.map((item) => {
-											return (
-												<RelatedActionCommonItem
-													key={item?.id}
-													type={item?.type}
-													time={moment(`${item?.time}`).format(
-														'DD/MM/YYYY HH.mm',
-													)}
-													username={item?.user}
-													id={item.mission_id}
-													taskName={item.mission_name}
-													prevStatus={item?.prev_status}
-													nextStatus={item?.next_status}
-												/>
-											);
-										})}
+										.map((item) => (
+											<RelatedActionCommonItem
+												type={item?.type}
+												time={moment(`${item?.time}`).format(
+													'DD/MM/YYYY HH.mm',
+												)}
+												username={item?.user}
+												id={item.mission_id}
+												taskName={item.mission_name}
+												prevStatus={item?.prev_status}
+												nextStatus={item?.next_status}
+											/>
+										))}
 								</CardBody>
 							</Card>
 						</Card>
