@@ -994,10 +994,10 @@ const MissionDetailPage = () => {
 										children: (
 											<>
 												<div className='fw-bold fs-5 mb-1'>
-													{key?.key_value}
+													{key?.key_name}
 												</div>
 												<div className='mt-n2' style={{ fontSize: 14 }}>
-													{key?.key_name}
+													{key?.key_value}
 												</div>
 											</>
 										),
@@ -1011,7 +1011,6 @@ const MissionDetailPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
-									{/* <RelatedActionCommonItem data={mission?.logs} /> */}
 									{mission?.logs
 										?.slice()
 										.reverse()
