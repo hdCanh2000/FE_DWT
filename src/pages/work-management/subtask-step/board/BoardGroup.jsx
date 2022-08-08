@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useFormik } from 'formik';
+import moment from 'moment';
 import Card, {
 	CardActions,
 	CardBody,
@@ -38,10 +39,26 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 			status: groups.status,
 			partner: '',
 		},
-		// eslint-disable-next-line no-unused-vars
 		onSubmit: (values) => {
 			const valuesClone = { ...values };
-			const subtaskClone = { ...subtask };
+			const newWorks = JSON.parse(JSON.stringify(subtask?.logs ? subtask?.logs : []));
+			const newLogs = [
+				...newWorks,
+				{
+					user: {
+						id: subtask?.user?.id,
+						name: subtask?.user?.name,
+					},
+					type: 2,
+					prev_status: null,
+					next_status: `Thêm mới`,
+					// eslint-disable-next-line no-unsafe-optional-chaining
+					step_id: subtask?.steps?.length + 1,
+					step_name: values?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
+			const subtaskClone = { ...subtask, logs: newLogs };
 			const { steps } = subtaskClone;
 			const stepsClone = [...steps];
 			valuesClone.task_id = subtaskClone?.task_id;
@@ -89,7 +106,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 						</CardActions>
 					</CardHeader>
 					{!!_cardCount && (
-						<CardBody isScrollable={_cardCount > 3}>
+						<CardBody className='cursor-pointer' isScrollable={_cardCount > 3}>
 							{groups.cards.map((card) => (
 								<BoardCard
 									key={card.id}

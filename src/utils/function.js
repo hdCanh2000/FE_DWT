@@ -177,7 +177,9 @@ const calcKPICompleteOfTask = (task) => {
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
 	subtasks.forEach((subtask) => {
-		totalKPI += calcKPICompleteOfSubtask(subtask);
+		if (subtask?.status === 4) {
+			totalKPI += calcKPICompleteOfSubtask(subtask);
+		}
 	});
 	return totalKPI;
 };
@@ -185,7 +187,7 @@ const calcKPICompleteOfTask = (task) => {
 // tính % hoàn thành của 1 task (thông qua giá trị kpi)
 const calcProgressTask = (task) => {
 	const totalCompleteKPI = calcKPICompleteOfTask(task);
-	return Math.round((totalCompleteKPI * 100) / task.kpi_value) || 0;
+	return Math.round((totalCompleteKPI * 100) / task.current_kpi_value) || 0;
 };
 
 // tính tổng số kpi đã dùng của 1 mission
@@ -194,7 +196,9 @@ const calcKPICompleteOfMission = (mission, tasks) => {
 	if (isEmpty(tasks) || !isArray(tasks)) return 0;
 	let totalKPI = 0;
 	tasks.forEach((task) => {
-		totalKPI += calcKPICompleteOfTask(task);
+		if (task?.status === 4) {
+			totalKPI += calcKPICompleteOfTask(task);
+		}
 	});
 	return totalKPI;
 };
@@ -203,6 +207,12 @@ const calcProgressMission = (mission, tasks) => {
 	if (isEmpty(mission)) return 0;
 	const totalCompleteKPI = calcKPICompleteOfMission(mission, tasks);
 	return Math.round((totalCompleteKPI * 100) / mission.current_kpi_value) || 0;
+};
+
+const calcProgressMissionByTaskComplete = (mission, tasks) => {
+	if (isEmpty(mission)) return 0;
+	// eslint-disable-next-line no-unsafe-optional-chaining
+	return Math.round((calcTotalTaskByStatus(tasks, 4) * 100) / tasks?.length) || 0;
 };
 
 // ------------		  UPDATE FUNCTION CALC TOTAL & PROGRESS SUBTASK		-----------------
@@ -240,6 +250,8 @@ export {
 	calcProgressTask,
 	// tính % hoàn thành mission
 	calcProgressMission,
+	// tính % hoàn thành mission theo số task hoàn thành trên tổng số task
+	calcProgressMissionByTaskComplete,
 	// tính số kpi đã dùng của 1 task
 	calcKPICompleteOfTask,
 	// tính số kpi đã dùng của mission

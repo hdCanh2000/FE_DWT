@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { isArray } from 'lodash';
 import moment from 'moment';
 import { Button, Modal } from 'react-bootstrap';
-import { useParams } from 'react-router-dom';
 import SelectComponent from 'react-select';
 import styled from 'styled-components';
 import Card, {
@@ -38,7 +37,6 @@ const customStyles = {
 };
 
 const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
-	const params = useParams();
 	const [task, setTask] = useState({});
 	const [keysState, setKeysState] = useState([]);
 	const [departments, setDepartments] = useState([]);
@@ -110,7 +108,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 					...res.data.department,
 					id: res.data.department.id,
 					label: res.data.department.name,
-					value: res.data.department.slug,
+					value: res.data.department.id,
 				});
 				setUserOption({
 					...res.data.user,
@@ -123,7 +121,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 						return {
 							id: department.id,
 							label: department.name,
-							value: department.slug,
+							value: department.id,
 						};
 					}),
 				);
@@ -150,8 +148,8 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				status: 0,
 			});
 			setKeysState([]);
-			setDepartmentOption({ label: '', value: '' });
-			setUserOption({ label: '', value: '' });
+			setDepartmentOption({});
+			setUserOption({});
 			setDepartmentRelatedOption([]);
 			setUserRelatedOption([]);
 		}
@@ -167,7 +165,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 						return {
 							id: department.id,
 							label: department.name,
-							value: department.slug,
+							value: department.id,
 						};
 					}),
 				);
@@ -233,7 +231,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				key_value: null,
 			},
 		};
-		if (prevIsValid()) {
+		if (prevIsValid() && keysState?.length <= 3) {
 			setKeysState((prev) => [...prev, initKeyState]);
 		}
 	};
@@ -259,9 +257,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 					error: {
 						...key.error,
 						[event.target.name]:
-							event.target.value.length > 0
-								? null
-								: `${[event.target.name]} is required!`,
+							event.target.value.length > 0 ? null : `Vui lòng nhập đầu đủ thông tin`,
 					},
 				};
 			});
@@ -314,11 +310,27 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		setUserRelatedOption([]);
 		setErrors({});
 	};
-
+	const person = window.localStorage.getItem('name');
 	const handleSubmit = () => {
+		const newWorks = JSON.parse(JSON.stringify(task?.logs || []));
+		const newLogs = [
+			...newWorks,
+			{
+				id: task?.logs ? task.logs.length + 1 : 1,
+				user: person,
+				type: 2,
+				prev_status: null,
+				next_status: task?.id ? 'Chỉnh sửa' : 'Thêm mới',
+				task_id: task?.id,
+				task_name: task?.name,
+				time: moment().format('DD/MM/YYYY hh:mm'),
+			},
+		];
+
 		const data = { ...task };
-		data.mission_id = parseInt(params?.id, 10);
+		data.mission_id = parseInt(data?.mission_id, 10);
 		data.kpi_value = parseInt(task?.kpi_value, 10);
+		data.current_kpi_value = task.id ? task?.current_kpi_value : parseInt(task?.kpi_value, 10);
 		data.priority = parseInt(task?.priority, 10);
 		data.keys = keysState.map((key) => {
 			return {
@@ -327,6 +339,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 			};
 		});
 		data.subtasks = isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
+		data.logs = [];
 		data.department = {
 			id: departmentOption.id,
 			name: departmentOption.label,
@@ -373,7 +386,8 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		if (!prevIsValid()) {
 			return;
 		}
-		onSubmit(data);
+		const newData = { ...data, logs: newLogs };
+		onSubmit(newData);
 		handleClearForm();
 	};
 
@@ -406,7 +420,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												required
 												placeholder='Tên công việc'
 												size='lg'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.name?.errorMsg && (
@@ -422,7 +436,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												value={task.description || ''}
 												required
 												placeholder='Mô tả công việc'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										<FormGroup
@@ -438,7 +452,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												required
 												size='lg'
 												placeholder='Giá trị KPI'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.kpi_value?.errorMsg && (
@@ -452,7 +466,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												ref={priorityRef}
 												name='priority'
 												ariaLabel='Board select'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 												placeholder='Độ ưu tiên'
 												onChange={handleChange}
 												value={task?.priority}>
@@ -515,7 +529,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											label='Phòng ban liên quan'>
 											<SelectComponent
 												style={customStyles}
-												placeholder='Chọn phòng ban liên quan'
+												placeholder=''
 												defaultValue={departmentReplatedOption}
 												value={departmentReplatedOption}
 												onChange={setDepartmentRelatedOption}
@@ -533,7 +547,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 											label='Nhân viên liên quan'>
 											<SelectComponent
 												style={customStyles}
-												placeholder='Chọn nhân viên liên quan'
+												placeholder=''
 												defaultValue={userReplatedOption}
 												value={userReplatedOption}
 												onChange={setUserRelatedOption}
@@ -560,7 +574,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 											<FormGroup
@@ -576,7 +590,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													value={task.estimate_time || '08:00'}
 													onChange={handleChange}
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
@@ -597,7 +611,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 											<FormGroup
@@ -613,7 +627,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													value={task.deadline_time || '08:00'}
 													onChange={handleChange}
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
@@ -646,7 +660,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 																name='key_name'
 																required
 																size='lg'
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: Doanh thu, đơn hàng, ...'
 															/>
 														</FormGroup>
@@ -669,7 +683,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 																name='key_value'
 																size='lg'
 																required
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
 															/>
 														</FormGroup>

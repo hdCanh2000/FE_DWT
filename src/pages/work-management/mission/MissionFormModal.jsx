@@ -24,14 +24,14 @@ const ErrorText = styled.span`
 	margin-top: 5px;
 `;
 
-const customStyles = {
-	control: (provided) => ({
-		...provided,
-		padding: '4px',
-		fontSize: '18px',
-		borderRadius: '1.25rem',
-	}),
-};
+// const customStyles = {
+// 	control: (provided) => ({
+// 		...provided,
+// 		padding: '4px',
+// 		fontSize: '18px',
+// 		borderRadius: '1.25rem',
+// 	}),
+// };
 
 const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const [mission, setMission] = useState({});
@@ -43,6 +43,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		kpi_value: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
 	});
+	const [logsMision, setLogsMission] = React.useState([]);
 
 	const nameRef = useRef(null);
 	const kpiValueRef = useRef(null);
@@ -107,13 +108,22 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				kpi_value: '',
 				start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 				end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-				status: 1,
+				status: 0,
 			});
 			setKeysState([]);
 			setDepartmentOption([]);
 		}
 	}, [item?.id]);
 
+	// data logs mission
+	useEffect(() => {
+		if (item?.id) {
+			getMissionById(item?.id).then((res) => {
+				setLogsMission(res.data.logs);
+			});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [mission]);
 	useEffect(() => {
 		async function getDepartments() {
 			try {
@@ -169,7 +179,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				key_value: null,
 			},
 		};
-		if (prevIsValid()) {
+		if (prevIsValid() && keysState?.length <= 3) {
 			setKeysState((prev) => [...prev, initKeyState]);
 		}
 	};
@@ -197,7 +207,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 						[event.target.name]:
 							event.target.value.length > 0
 								? null
-								: `${[event.target.name]} is required!`,
+								: `Vui lòng nhập đầy đủ thông tin!`,
 					},
 				};
 			});
@@ -219,39 +229,110 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			kpi_value: '',
 			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			status: 1,
+			status: 0,
 		});
 		setKeysState([]);
 		setDepartmentOption([]);
 		setErrors({});
 	};
 
+	const userLogin = window.localStorage.getItem('name');
 	const handleSubmit = () => {
-		const data = { ...mission };
-		data.keys = keysState;
-		data.kpi_value = parseInt(data.kpi_value, 10);
-		data.current_kpi_value = 0;
-		const departmentClone = [...departmentOption];
-		data.departments = departmentClone.map((department) => {
-			return {
-				id: department.id,
-				name: department.label,
-				slug: department.value,
-			};
-		});
-		validateForm();
-		if (!mission?.name) {
-			nameRef.current.focus();
-			return;
+		if (!mission?.id) {
+			const newWorks = JSON.parse(JSON.stringify([]));
+			const newLogs = [
+				...newWorks,
+				{
+					id: 1,
+					user: userLogin,
+					type: 2,
+					prev_status: null,
+					next_status: `Thêm mới`,
+					mission_id: mission?.id,
+					mission_name: mission?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
+			const data = { ...mission, logs: newLogs };
+			data.keys = keysState.map((key) => {
+				return {
+					key_name: key.key_name,
+					key_value: key.key_value,
+				};
+			});
+			data.status = 0;
+			data.kpi_value = parseInt(data.kpi_value, 10);
+			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
+			const departmentClone = [...departmentOption];
+			data.departments = departmentClone.map((department) => {
+				return {
+					id: department.id,
+					name: department.label,
+					slug: department.value,
+				};
+			});
+			validateForm();
+			if (!mission?.name) {
+				nameRef.current.focus();
+				return;
+			}
+			if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
+				kpiValueRef.current.focus();
+				return;
+			}
+			if (!prevIsValid()) {
+				return;
+			}
+			onSubmit(data);
+		} else {
+			const newWorks = JSON.parse(JSON.stringify(logsMision || []));
+			const newLogs = [
+				...newWorks,
+				{
+					// eslint-disable-next-line no-unsafe-optional-chaining
+					id: mission?.logs?.length + 1,
+					user: userLogin,
+					type: 2,
+					prev_status: null,
+					next_status: `Chỉnh sửa`,
+					mission_id: mission?.id,
+					mission_name: mission?.name,
+					time: moment().format('YYYY/MM/DD HH:mm'),
+				},
+			];
+			const data = { ...mission, logs: newLogs };
+			data.keys = keysState.map((key) => {
+				return {
+					key_name: key.key_name,
+					key_value: key.key_value,
+				};
+			});
+			data.status = 0;
+			data.kpi_value = parseInt(data.kpi_value, 10);
+			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
+			const departmentClone = [...departmentOption];
+			data.departments = departmentClone.map((department) => {
+				return {
+					id: department.id,
+					name: department.label,
+					slug: department.value,
+				};
+			});
+			validateForm();
+			if (!mission?.name) {
+				nameRef.current.focus();
+				return;
+			}
+			if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
+				kpiValueRef.current.focus();
+				return;
+			}
+			if (!prevIsValid()) {
+				return;
+			}
+			onSubmit(data);
 		}
-		if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
-			kpiValueRef.current.focus();
-			return;
-		}
-		if (!prevIsValid()) {
-			return;
-		}
-		onSubmit(data);
+
 		setMission({
 			id: null,
 			name: '',
@@ -259,7 +340,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			kpi_value: '',
 			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			status: 1,
+			status: 0,
 		});
 		setKeysState([]);
 		setDepartmentOption([]);
@@ -294,7 +375,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												required
 												placeholder='Tên mục tiêu'
 												size='lg'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.name?.errorMsg && (
@@ -311,7 +392,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												required
 												size='lg'
 												placeholder='Mô tả mục tiêu'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										<FormGroup
@@ -327,7 +408,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												required
 												size='lg'
 												placeholder='Giá trị KPI'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.kpi_value?.errorMsg && (
@@ -338,7 +419,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											id='kpi_value'
 											label='Phòng ban phụ trách'>
 											<Select
-												styles={customStyles}
 												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
@@ -370,7 +450,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 											<FormGroup
@@ -389,7 +469,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
@@ -422,7 +502,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																name='key_name'
 																required
 																size='lg'
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: Doanh thu, đơn hàng, ...'
 															/>
 														</FormGroup>
@@ -445,7 +525,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																name='key_value'
 																size='lg'
 																required
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
 															/>
 														</FormGroup>

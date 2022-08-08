@@ -1,10 +1,12 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef } from 'react';
+import _, { parseInt } from 'lodash';
 import moment from 'moment';
 import toast, { Toaster } from 'react-hot-toast';
 import styled from 'styled-components';
-import Select from 'react-select';
+import SelectComponent from 'react-select';
+import { useToasts } from 'react-toast-notifications';
 import { updateSubtasks, getAllDepartments, getAllUser } from '../services';
 import Modal, {
 	ModalHeader,
@@ -12,12 +14,15 @@ import Modal, {
 	ModalTitle,
 	ModalFooter,
 } from '../../../../components/bootstrap/Modal';
+import Option from '../../../../components/bootstrap/Option';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
 import Textarea from '../../../../components/bootstrap/forms/Textarea';
 import Card, { CardBody } from '../../../../components/bootstrap/Card';
 import Button from '../../../../components/bootstrap/Button';
 import Icon from '../../../../components/icon/Icon';
+import Toasts from '../../../../components/bootstrap/Toasts';
+import Select from '../../../../components/bootstrap/forms/Select';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -40,7 +45,11 @@ const TaskDetailForm = ({
 	const [valueDepartment, setValueDepartment] = React.useState({});
 	const [user, setUser] = React.useState([]);
 	const [valueUser, setValueUser] = React.useState({});
-
+	const [usersRelated, setUsersRelated] = React.useState([]);
+	const [departmentRelated, setDepartmentRelated] = React.useState([]);
+	const [subtask, setSubTask] = React.useState();
+	const { addToast } = useToasts();
+	const PRIORITIES = [5, 4, 3, 2, 1];
 	const initError = {
 		name: { errorMsg: '' },
 		description: { errorMsg: '' },
@@ -61,10 +70,10 @@ const TaskDetailForm = ({
 		percent: 0,
 		name: '',
 		description: '',
-		estimate_date: moment().add(0, 'days').format('YYYY/MM/DD'),
-		estimate_time: '',
-		deadline_date: moment().add(0, 'days').format('YYYY/MM/DD'),
-		deadline_time: '',
+		estimate_date: '2022-12-01',
+		estimate_time: '08:00',
+		deadline_date: '2022-12-01',
+		deadline_time: '17:00',
 		kpi_value: 0,
 		keys: [],
 		steps: [],
@@ -88,24 +97,46 @@ const TaskDetailForm = ({
 					return {
 						id: item.id,
 						label: item.name,
-						value: item.slug,
+						value: item.id,
 					};
 				}),
 			);
 		});
 		setErrors(initError);
 		if (idEdit && title !== 'add') {
-			setValueInput(task.subtasks.filter((item) => item.id === idEdit)[0]);
+			const value = task.subtasks.filter((item) => item.id === idEdit)[0];
+			setValueInput(value);
+			setSubTask(value);
+			setUsersRelated(
+				value?.users_related?.map((item) => {
+					return {
+						id: item.id,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
+			setDepartmentRelated(
+				value?.departments_related?.map((item) => {
+					return {
+						id: item.id,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
 			setValueUser({
-				id: task.subtasks.filter((item) => item.id === idEdit)[0]?.user?.id,
-				label: task.subtasks.filter((item) => item.id === idEdit)[0]?.user?.name,
+				id: value?.user?.id,
+				label: value?.user?.name,
 			});
 			setValueDepartment({
-				id: task.subtasks.filter((item) => item.id === idEdit)[0]?.department?.id,
-				label: task.subtasks.filter((item) => item.id === idEdit)[0]?.department?.name,
+				id: value?.department?.id,
+				label: value?.department?.name,
 			});
-			setKeysState(task.subtasks.filter((item) => item.id === idEdit)[0]?.keys || []);
+			setKeysState(value?.keys || []);
 		} else {
+			setUsersRelated([]);
+			setDepartmentRelated([]);
 			setValueDepartment({});
 			setValueUser({});
 			setValueInput(initValueInput);
@@ -120,12 +151,48 @@ const TaskDetailForm = ({
 			[name]: value,
 		});
 	};
-	const handleSunmit = async () => {
+	const handleShowToast = (titles, content) => {
+		addToast(
+			<Toasts title={titles} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+	const person = window.localStorage.getItem('name');
+	const handleSubmit = async () => {
+		const valueUsers = usersRelated.map((item) => {
+			return {
+				id: item?.id,
+				name: item?.label,
+			};
+		});
+		const valueDepartments = departmentRelated.map((item) => {
+			return {
+				id: item?.id,
+				name: item?.label,
+			};
+		});
 		setErrors(initError);
 		if (title === 'add') {
-			const subTaskValue = JSON.parse(JSON.stringify(task.subtasks));
+			const newLogs = [
+				{
+					id: 1,
+					user: person,
+					type: 2,
+					prev_status: null,
+					next_status: `Thêm mới`,
+					subtask_id: task.subtasks.length + 1,
+					subtask_name: valueInput?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
+			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks));
 			subTaskValue.push({
 				...valueInput,
+				kpi_value: parseInt(valueInput?.kpi_value, 10),
 				keys: keysState,
 				user: {
 					id: valueUser.id,
@@ -135,7 +202,10 @@ const TaskDetailForm = ({
 					id: valueDepartment.id,
 					name: valueDepartment.label,
 				},
+				departments_related: valueDepartments,
+				users_related: valueUsers,
 				id: task.subtasks.length + 1,
+				logs: newLogs,
 			});
 			validateForm();
 			if (!valueInput?.name) {
@@ -159,22 +229,48 @@ const TaskDetailForm = ({
 				return;
 			}
 			const taskValue = JSON.parse(JSON.stringify(task));
-			const data = Object.assign(taskValue, { subtasks: subTaskValue });
+			const data = Object.assign(taskValue, {
+				subtasks: subTaskValue,
+				// eslint-disable-next-line no-unsafe-optional-chaining
+				current_kpi_value:
+					totalKpiSubtask(task?.subtasks) + parseInt(valueInput?.kpi_value, 10),
+			});
 			try {
 				const respose = await updateSubtasks(id, data).then(
-					toast.success('Create Task Success !'),
+					handleShowToast(
+						`Tạo đầu việc!`,
+						`Tạo đầu việc ${valueInput?.name} thành công!`,
+					),
 				);
 				const result = await respose.data;
 				setTask(result);
 			} catch (error) {
-				toast.error('Create Task Error !');
+				handleShowToast(`Tạo đầu việc!`, `Tạo đầu việc ${valueInput?.name} thất bại!`);
 			}
+			setValueInput(initValueInput);
 		} else {
+			const values = task?.subtasks?.filter((item) => item.id === idEdit);
+			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs || []));
+			const newLogs = [
+				...newWorks,
+				{
+					user: person,
+					type: 2,
+					prev_status: null,
+					next_status: `Chỉnh sửa`,
+					subtask_id: idEdit,
+					subtask_name: subtask?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
 			const newSubTasks = task.subtasks.map((item) => {
 				return item.id === idEdit
 					? {
 							...valueInput,
 							keys: keysState,
+							kpi_value: parseInt(valueInput?.kpi_value),
+							departments_related: valueDepartments,
+							users_related: valueUsers,
 							user: {
 								id: valueUser.id,
 								name: valueUser.label,
@@ -183,6 +279,7 @@ const TaskDetailForm = ({
 								id: valueDepartment.id,
 								name: valueDepartment.label,
 							},
+							logs: newLogs,
 					  }
 					: item;
 			});
@@ -207,16 +304,20 @@ const TaskDetailForm = ({
 				descriptionRef.current.focus();
 				return;
 			}
+
 			const taskValue = JSON.parse(JSON.stringify(task));
-			const newData = Object.assign(taskValue, { subtasks: newSubTasks });
+			const newData = Object.assign(taskValue, {
+				subtasks: newSubTasks,
+				current_kpi_value: totalKpiSubtask(newSubTasks),
+			});
 			try {
 				const respose = await updateSubtasks(id, newData).then(
-					toast.success('Edit Task Success !'),
+					toast.success(`Sửa đầu việc ${subtask?.name} thành công !`),
 				);
 				const result = await respose.data;
 				setTask(result);
 			} catch (error) {
-				toast.error('Edit Task Error !');
+				toast.error(`Sửa đầu việc ${subtask?.name} thất bại !`);
 			}
 		}
 		setEditModalStatus(false);
@@ -245,6 +346,14 @@ const TaskDetailForm = ({
 	};
 	const handleRemoveKeyField = (_e, index) => {
 		setKeysState((prev) => prev?.filter((state) => state !== prev[index]));
+	};
+	const totalKpiSubtask = (subtasks) => {
+		if (_.isEmpty(subtasks)) return 0;
+		let totalKpi = 0;
+		subtasks.forEach((item) => {
+			totalKpi += item.kpi_value;
+		});
+		return totalKpi;
 	};
 	const handleChangeKeysState = (index, event) => {
 		event.preventDefault();
@@ -324,7 +433,7 @@ const TaskDetailForm = ({
 					</div>
 					<div className='col-12'>
 						<FormGroup id='department' label='Phòng ban'>
-							<Select
+							<SelectComponent
 								defaultValue={valueDepartment}
 								value={valueDepartment}
 								onChange={setValueDepartment}
@@ -338,7 +447,7 @@ const TaskDetailForm = ({
 					</div>
 					<div className='col-12'>
 						<FormGroup id='user' label='Nhân viên phụ trách'>
-							<Select
+							<SelectComponent
 								defaultValue={valueUser}
 								value={valueUser}
 								onChange={setValueUser}
@@ -351,8 +460,57 @@ const TaskDetailForm = ({
 						)}
 					</div>
 					<div className='col-12'>
+						<FormGroup id='department' label='Phòng ban liên quan'>
+							<SelectComponent
+								isMulti
+								defaultValue={departmentRelated}
+								value={departmentRelated}
+								onChange={setDepartmentRelated}
+								options={department?.filter(
+									(item) => item.id !== valueDepartment.id,
+								)}
+								ref={departmentRef}
+							/>
+						</FormGroup>
+						{errors?.department?.errorMsg && (
+							<ErrorText>Vui lòng chọn phòng ban liên quan</ErrorText>
+						)}
+					</div>
+					<div className='col-12'>
+						<FormGroup id='user' label='Nhân viên liên quan'>
+							<SelectComponent
+								isMulti
+								defaultValue={usersRelated}
+								value={usersRelated}
+								onChange={setUsersRelated}
+								options={user?.filter((item) => item.id !== valueUser.id)}
+								ref={userRef}
+							/>
+						</FormGroup>
+						{errors?.user?.errorMsg && (
+							<ErrorText>Vui lòng chọn nhân viên liên quan</ErrorText>
+						)}
+					</div>
+					<div className='col-12'>
+						<FormGroup id='priority' label='Độ ưu tiên'>
+							<Select
+								name='priority'
+								placeholder='Độ ưu tiên'
+								onChange={handleChange}
+								value={valueInput?.priority}
+								defaultValue={2}>
+								{PRIORITIES.map((priority) => (
+									<Option key={priority} value={priority}>
+										{`Cấp ${priority}`}
+									</Option>
+								))}
+							</Select>
+						</FormGroup>
+					</div>
+					<div className='col-12'>
 						<FormGroup id='total_kpi_value' label='Mức điểm KPI' isFloating>
 							<Input
+								type='number'
 								placeholder='Mức điểm KPI'
 								value={valueInput.kpi_value || ''}
 								name='kpi_value'
@@ -517,7 +675,7 @@ const TaskDetailForm = ({
 					color='primary'
 					className='w-100'
 					type='submit'
-					onClick={() => handleSunmit(id)}>
+					onClick={() => handleSubmit(id)}>
 					Lưu đầu việc
 				</Button>
 			</ModalFooter>

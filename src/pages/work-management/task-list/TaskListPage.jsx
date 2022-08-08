@@ -1,3 +1,5 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react/prop-types */
 import classNames from 'classnames';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -35,7 +37,12 @@ import TaskFormModal from '../mission/TaskFormModal';
 import MissionAlertConfirm from '../mission/MissionAlertConfirm';
 import Progress from '../../../components/bootstrap/Progress';
 import ExpandRow from './ExpandRow';
-import { calculateProgressTaskBySteps } from '../../../utils/function';
+import { calcProgressTask } from '../../../utils/function';
+import Badge from '../../../components/bootstrap/Badge';
+
+const minWidth300 = {
+	minWidth: 300,
+};
 
 const minWidth200 = {
 	minWidth: 200,
@@ -49,30 +56,83 @@ const minWidth100 = {
 	minWidth: 100,
 };
 
-// eslint-disable-next-line react/prop-types
-const Item = ({ id, name, teamName, percent, dueDate }) => {
+const Item = ({
+	id,
+	name,
+	teamName,
+	percent,
+	dueDate,
+	departmentsRelated = [],
+	usersRelated = [],
+	...props
+}) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`../${demoPages.quanLyCongViec.subMenu.congViec.path}/${id}`),
+		() => navigate(`/quan-ly-cong-viec/cong-viec/${id}`),
 		[id, navigate],
 	);
 	return (
-		<div className='col-md-6 col-xl-4 col-sm-12'>
+		<div className='col-md-6 col-xl-4 col-sm-12' {...props}>
 			<Card stretch onClick={handleOnClickToProjectPage} className='cursor-pointer'>
 				<CardHeader>
 					<CardLabel icon='Ballot'>
 						<CardTitle>{name}</CardTitle>
-						<CardSubTitle>{teamName}</CardSubTitle>
+						<CardSubTitle>{`Phụ trách: ${teamName}`}</CardSubTitle>
 					</CardLabel>
-					<CardActions>
-						<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-							{dueDate}
-						</small>
-					</CardActions>
 				</CardHeader>
 				<CardBody>
-					<div className='row'>
-						<div className='col-md-6'>
+					<div className='row g-2 align-items-center'>
+						<div className='col-auto mt-2'>
+							<span>Hạn hoàn thành:</span>
+						</div>
+						<div className='col-auto mt-2'>
+							<small
+								style={{ fontSize: 14 }}
+								className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+								{moment(`${dueDate}`).format('DD-MM-YYYY')}
+							</small>
+						</div>
+					</div>
+					{departmentsRelated?.length > 0 && (
+						<div className='row g-2 align-items-center'>
+							<div className='col-auto mt-2'>
+								<span>Phòng ban:</span>
+							</div>
+							{departmentsRelated?.map((k, index) => (
+								// eslint-disable-next-line react/no-array-index-key
+								<div key={index} className='col-auto mt-2'>
+									<Badge
+										isLight
+										color='primary'
+										className='px-3 py-3'
+										style={{ fontSize: 14 }}>
+										{k?.name}
+									</Badge>
+								</div>
+							))}
+						</div>
+					)}
+					{usersRelated?.length > 0 && (
+						<div className='row g-2 mt-2 align-items-center'>
+							<div className='col-auto mt-2'>
+								<span>Nhân viên:</span>
+							</div>
+							{usersRelated?.map((k, index) => (
+								// eslint-disable-next-line react/no-array-index-key
+								<div key={index} className='col-auto mt-2'>
+									<Badge
+										isLight
+										color='danger'
+										className='px-3 py-3'
+										style={{ fontSize: 14 }}>
+										{k?.name}
+									</Badge>
+								</div>
+							))}
+						</div>
+					)}
+					<div className='row mt-2'>
+						<div className='col-md-12'>
 							{percent}%
 							<Progress isAutoColor value={percent} height={10} />
 						</div>
@@ -288,7 +348,7 @@ const TaskListPage = () => {
 										<thead>
 											<tr>
 												<th className='text-center'>STT</th>
-												<th className='text-center'>Tên công việc</th>
+												<th>Tên công việc</th>
 												<th className='text-center'>Số đầu việc</th>
 												<th className='text-center'>Phòng ban</th>
 												<th className='text-center'>Nhân viên</th>
@@ -308,7 +368,7 @@ const TaskListPage = () => {
 														<td>{index + 1}</td>
 														<td
 															className='cursor-pointer'
-															style={minWidth200}>
+															style={minWidth300}>
 															<Link
 																className='text-underline'
 																to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
@@ -520,18 +580,34 @@ const TaskListPage = () => {
 								{tasks.map((item) => {
 									return (
 										<Item
-											key={item.id}
-											id={item.id}
+											key={item?.id}
+											keys={item?.keys}
+											departmentsRelated={item?.departments_related}
+											usersRelated={item?.users_related}
+											id={item?.id}
 											name={item?.name}
-											teamName={item.departmnent?.name}
-											dueDate={`${item.deadline_date}`}
-											percent={
-												calculateProgressTaskBySteps(item?.subtasks) || 0
-											}
+											teamName={`${item?.department?.name} - ${item?.user?.name}`}
+											dueDate={`${item?.deadline_date}`}
+											percent={calcProgressTask(item) || 0}
 											data-tour='project-item'
 										/>
 									);
 								})}
+								<div className='col-md-12 col-xl-4 col-sm-12'>
+									<Card stretch>
+										<CardBody className='d-flex align-items-center justify-content-center'>
+											<Button
+												color='info'
+												size='lg'
+												isLight
+												className='w-100 h-100'
+												icon='AddCircle'
+												onClick={() => handleOpenEditForm(null)}>
+												Thêm công việc
+											</Button>
+										</CardBody>
+									</Card>
+								</div>
 							</div>
 						)}
 					</div>
@@ -555,407 +631,3 @@ const TaskListPage = () => {
 };
 
 export default TaskListPage;
-
-// import React, { useCallback, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-// import Page from '../../../layout/Page/Page';
-// import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-// import { demoPages } from '../../../menu';
-// import SubHeader, {
-// 	SubHeaderLeft,
-// 	SubHeaderRight,
-// 	SubheaderSeparator,
-// } from '../../../layout/SubHeader/SubHeader';
-// import Badge from '../../../components/bootstrap/Badge';
-// import CommonAvatarTeam from '../../../components/common/CommonAvatarTeam';
-// import CardAlert from '../../../components/CardAlert/CardAlert';
-// import Card, {
-// 	CardActions,
-// 	CardBody,
-// 	CardHeader,
-// 	CardLabel,
-// 	CardSubTitle,
-// 	CardTitle,
-// } from '../../../components/bootstrap/Card';
-// import Button from '../../../components/bootstrap/Button';
-// import Avatar, { AvatarGroup } from '../../../components/Avatar';
-// import USERS from '../../../common/data/userDummyData';
-// import Icon from '../../../components/icon/Icon';
-// import Progress from '../../../components/bootstrap/Progress';
-// import AddTaskForm from './AddTaskForm';
-
-// // eslint-disable-next-line react/prop-types
-// const Item = ({ name, teamName, attachCount, taskCount, percent, dueDate, ...props }) => {
-// 	const navigate = useNavigate();
-// 	const handleOnClickToProjectPage = useCallback(
-// 		() => navigate(`../${demoPages.projectManagement.subMenu.itemID.path}/1`),
-// 		[navigate],
-// 	);
-// 	return (
-// 		<div className='col-md-6 col-xl-4 col-sm-12' {...props}>
-// 			<Card stretch onClick={handleOnClickToProjectPage} className='cursor-pointer'>
-// 				<CardHeader>
-// 					<CardLabel icon='Ballot'>
-// 						<CardTitle>{name}</CardTitle>
-// 						<CardSubTitle>{teamName}</CardSubTitle>
-// 					</CardLabel>
-// 					<CardActions>
-// 						<small className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-// 							{dueDate}
-// 						</small>
-// 					</CardActions>
-// 				</CardHeader>
-// 				<CardBody>
-// 					<div className='row g-2 mb-3'>
-// 						<div className='col-auto'>
-// 							<Badge color='light' isLight>
-// 								<Icon icon='AttachFile' /> {attachCount}
-// 							</Badge>
-// 						</div>
-// 						<div className='col-auto'>
-// 							<Badge color='light' isLight>
-// 								<Icon icon='TaskAlt' /> {taskCount}
-// 							</Badge>
-// 						</div>
-// 					</div>
-// 					<div className='row'>
-// 						<div className='col-md-6'>
-// 							{percent}%
-// 							<Progress isAutoColor value={percent} height={10} />
-// 						</div>
-// 						<div className='col-md-6 d-flex justify-content-end'>
-// 							<AvatarGroup>
-// 								<Avatar
-// 									srcSet={USERS.GRACE.srcSet}
-// 									src={USERS.GRACE.src}
-// 									userName={`${USERS.GRACE.name} ${USERS.GRACE.surname}`}
-// 									color={USERS.GRACE.color}
-// 								/>
-// 								<Avatar
-// 									srcSet={USERS.SAM.srcSet}
-// 									src={USERS.SAM.src}
-// 									userName={`${USERS.SAM.name} ${USERS.SAM.surname}`}
-// 									color={USERS.SAM.color}
-// 								/>
-// 								<Avatar
-// 									srcSet={USERS.CHLOE.srcSet}
-// 									src={USERS.CHLOE.src}
-// 									userName={`${USERS.CHLOE.name} ${USERS.CHLOE.surname}`}
-// 									color={USERS.CHLOE.color}
-// 								/>
-
-// 								<Avatar
-// 									srcSet={USERS.JANE.srcSet}
-// 									src={USERS.JANE.src}
-// 									userName={`${USERS.JANE.name} ${USERS.JANE.surname}`}
-// 									color={USERS.JANE.color}
-// 								/>
-// 								<Avatar
-// 									srcSet={USERS.JOHN.srcSet}
-// 									src={USERS.JOHN.src}
-// 									userName={`${USERS.JOHN.name} ${USERS.JOHN.surname}`}
-// 									color={USERS.JOHN.color}
-// 								/>
-// 								<Avatar
-// 									srcSet={USERS.RYAN.srcSet}
-// 									src={USERS.RYAN.src}
-// 									userName={`${USERS.RYAN.name} ${USERS.RYAN.surname}`}
-// 									color={USERS.RYAN.color}
-// 								/>
-// 							</AvatarGroup>
-// 						</div>
-// 					</div>
-// 				</CardBody>
-// 			</Card>
-// 		</div>
-// 	);
-// };
-
-// const TaskListPage = () => {
-// 	const dataWork = [
-// 		{
-// 			id: 1,
-// 			label: 'Công việc của tôi',
-// 			number: null,
-// 			status: 1,
-// 		},
-// 		{
-// 			id: 2,
-// 			label: 'Công việc tôi giao',
-// 			number: null,
-// 			status: 2,
-// 		},
-// 		{
-// 			id: 3,
-// 			label: 'Công việc được giao',
-// 			number: null,
-// 			status: 3,
-// 		},
-// 		{
-// 			id: 4,
-// 			label: 'Công việc chờ duyệt',
-// 			number: null,
-// 			status: 4,
-// 		},
-// 	];
-
-// 	const [upcomingEventsEditOffcanvas, setUpcomingEventsEditOffcanvas] = useState(false);
-// 	const handleUpcomingEdit = () => {
-// 		setUpcomingEventsEditOffcanvas(!upcomingEventsEditOffcanvas);
-// 	};
-
-// 	return (
-// 		<PageWrapper title={demoPages.quanLyCongViec.subMenu.danhSach.text}>
-// 			<SubHeader>
-// 				<SubHeaderLeft>
-// 					<strong className='fs-5'>Chào Bảo</strong>
-// 					<SubheaderSeparator />
-// 					<span>
-// 						Bạn đang họp cùng{' '}
-// 						<Badge color='info' isLight>
-// 							2 phòng ban
-// 						</Badge>{' '}
-// 						với tổng cộng{' '}
-// 						<Badge color='success' isLight>
-// 							5 công việc
-// 						</Badge>
-// 						liên quan đến bạn.
-// 					</span>
-// 				</SubHeaderLeft>
-// 				<SubHeaderRight>
-// 					<CommonAvatarTeam>
-// 						<strong>Các thành viên</strong> đội bạn
-// 					</CommonAvatarTeam>
-// 				</SubHeaderRight>
-// 			</SubHeader>
-// 			<Page container='fluid'>
-// 				<div className='row'>
-// 					<div className='col-12'>
-// 						<div className='display-6 fw-bold py-3'>Danh sách công việc</div>
-// 					</div>
-// 					<div className='col-md-6 col-xl-4 col-sm-12'>
-// 						<Card stretch>
-// 							<CardHeader className='bg-transparent'>
-// 								<CardLabel>
-// 									<CardTitle tag='h4' className='h5'>
-// 										Phòng Digital Marketing
-// 									</CardTitle>
-// 									<CardSubTitle tag='h5' className='h6 text-muted'>
-// 										Có một cuộc họp vào lúc 12 giờ trưa.
-// 									</CardSubTitle>
-// 								</CardLabel>
-// 								<CardActions>
-// 									<Button
-// 										icon='ArrowForwardIos'
-// 										aria-label='Read More'
-// 										hoverShadow='default'
-// 										// color={darkModeStatus && 'dark'}
-// 										// onClick={handleOnClickToEmployeeListPage}
-// 									/>
-// 								</CardActions>
-// 							</CardHeader>
-// 							<CardBody>
-// 								<AvatarGroup>
-// 									<Avatar
-// 										srcSet={USERS.GRACE.srcSet}
-// 										src={USERS.GRACE.src}
-// 										userName={`${USERS.GRACE.name} ${USERS.GRACE.surname}`}
-// 										color={USERS.GRACE.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.SAM.srcSet}
-// 										src={USERS.SAM.src}
-// 										userName={`${USERS.SAM.name} ${USERS.SAM.surname}`}
-// 										color={USERS.SAM.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.CHLOE.srcSet}
-// 										src={USERS.CHLOE.src}
-// 										userName={`${USERS.CHLOE.name} ${USERS.CHLOE.surname}`}
-// 										color={USERS.CHLOE.color}
-// 									/>
-
-// 									<Avatar
-// 										srcSet={USERS.JANE.srcSet}
-// 										src={USERS.JANE.src}
-// 										userName={`${USERS.JANE.name} ${USERS.JANE.surname}`}
-// 										color={USERS.JANE.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.JOHN.srcSet}
-// 										src={USERS.JOHN.src}
-// 										userName={`${USERS.JOHN.name} ${USERS.JOHN.surname}`}
-// 										color={USERS.JOHN.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.RYAN.srcSet}
-// 										src={USERS.RYAN.src}
-// 										userName={`${USERS.RYAN.name} ${USERS.RYAN.surname}`}
-// 										color={USERS.RYAN.color}
-// 									/>
-// 								</AvatarGroup>
-// 							</CardBody>
-// 						</Card>
-// 					</div>
-// 					<div className='col-md-6 col-xl-4 col-sm-12'>
-// 						<Card stretch>
-// 							<CardHeader className='bg-transparent'>
-// 								<CardLabel>
-// 									<CardTitle tag='h4' className='h5'>
-// 										Phòng Brand Marketing
-// 									</CardTitle>
-// 									<CardSubTitle tag='h5' className='h6 text-muted'>
-// 										Có một cuộc họp vào lúc 12 giờ trưa.
-// 									</CardSubTitle>
-// 								</CardLabel>
-// 								<CardActions>
-// 									<Button
-// 										icon='ArrowForwardIos'
-// 										aria-label='Read More'
-// 										hoverShadow='default'
-// 										// color={darkModeStatus && 'dark'}
-// 										// onClick={handleOnClickToEmployeeListPage}
-// 									/>
-// 								</CardActions>
-// 							</CardHeader>
-// 							<CardBody>
-// 								<AvatarGroup>
-// 									<Avatar
-// 										srcSet={USERS.GRACE.srcSet}
-// 										src={USERS.GRACE.src}
-// 										userName={`${USERS.GRACE.name} ${USERS.GRACE.surname}`}
-// 										color={USERS.GRACE.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.SAM.srcSet}
-// 										src={USERS.SAM.src}
-// 										userName={`${USERS.SAM.name} ${USERS.SAM.surname}`}
-// 										color={USERS.SAM.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.CHLOE.srcSet}
-// 										src={USERS.CHLOE.src}
-// 										userName={`${USERS.CHLOE.name} ${USERS.CHLOE.surname}`}
-// 										color={USERS.CHLOE.color}
-// 									/>
-
-// 									<Avatar
-// 										srcSet={USERS.JANE.srcSet}
-// 										src={USERS.JANE.src}
-// 										userName={`${USERS.JANE.name} ${USERS.JANE.surname}`}
-// 										color={USERS.JANE.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.JOHN.srcSet}
-// 										src={USERS.JOHN.src}
-// 										userName={`${USERS.JOHN.name} ${USERS.JOHN.surname}`}
-// 										color={USERS.JOHN.color}
-// 									/>
-// 									<Avatar
-// 										srcSet={USERS.RYAN.srcSet}
-// 										src={USERS.RYAN.src}
-// 										userName={`${USERS.RYAN.name} ${USERS.RYAN.surname}`}
-// 										color={USERS.RYAN.color}
-// 									/>
-// 								</AvatarGroup>
-// 							</CardBody>
-// 						</Card>
-// 					</div>
-// 					<div className='col-md-12 col-xl-4 col-sm-12'>
-// 						<Card stretch>
-// 							<CardBody className='d-flex align-items-center justify-content-center'>
-// 								<Button
-// 									color='info'
-// 									size='lg'
-// 									isLight
-// 									className='w-100 h-100'
-// 									icon='AddCircle'
-// 									onClick={handleUpcomingEdit}>
-// 									Thêm mới
-// 								</Button>
-// 							</CardBody>
-// 						</Card>
-// 					</div>
-// 				</div>
-// 				<div className='row my-4'>
-// 					{dataWork.map((item) => {
-// 						return (
-// 							<div className='col-xl-3 col-md-6 col-sm-12' key={item.id}>
-// 								<CardAlert {...item} />
-// 							</div>
-// 						);
-// 					})}
-// 				</div>
-// 				<div className='row mt-3'>
-// 					<div className='col-12'>
-// 						<div className='display-6 fw-bold py-3'>Công việc phòng tôi</div>
-// 					</div>
-// 					<Item
-// 						name='Theme'
-// 						teamName='Facit Team'
-// 						dueDate='Còn 3 ngày nữa'
-// 						attachCount={6}
-// 						taskCount={24}
-// 						percent={65}
-// 						data-tour='project-item'
-// 					/>
-// 					<Item
-// 						name='Plugin'
-// 						teamName='Code Team'
-// 						dueDate='Còn 3 ngày nữa'
-// 						attachCount={1}
-// 						taskCount={4}
-// 						percent={70}
-// 					/>
-// 					<Item
-// 						name='Website'
-// 						teamName='Facit Team'
-// 						dueDate='Còn 3 ngày nữa'
-// 						attachCount={12}
-// 						taskCount={34}
-// 						percent={78}
-// 					/>
-// 					<Item
-// 						name='UI Design'
-// 						teamName='Omtanke Taem'
-// 						dueDate='Còn 3 ngày nữa'
-// 						attachCount={4}
-// 						taskCount={18}
-// 						percent={43}
-// 					/>
-// 					<Item
-// 						name='Theme'
-// 						teamName='Facit Theme'
-// 						dueDate='Còn 3 ngày nữa'
-// 						attachCount={2}
-// 						taskCount={12}
-// 						percent={30}
-// 					/>
-// 					<div className='col-md-12 col-xl-4 col-sm-12'>
-// 						<Card stretch>
-// 							<CardBody className='d-flex align-items-center justify-content-center'>
-// 								<Button
-// 									color='info'
-// 									size='lg'
-// 									isLight
-// 									className='w-100 h-100'
-// 									icon='AddCircle'
-// 									onClick={handleUpcomingEdit}>
-// 									Thêm mới
-// 								</Button>
-// 							</CardBody>
-// 						</Card>
-// 					</div>
-// 				</div>
-// 				<AddTaskForm
-// 					setUpcomingEventsEditOffcanvas={setUpcomingEventsEditOffcanvas}
-// 					upcomingEventsEditOffcanvas={upcomingEventsEditOffcanvas}
-// 					handleUpcomingEdit={handleUpcomingEdit}
-// 					titleModal='Thêm công việc'
-// 				/>
-// 			</Page>
-// 		</PageWrapper>
-// 	);
-// };
-
-// export default TaskListPage;
