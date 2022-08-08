@@ -56,7 +56,6 @@ const TaskDetailForm = ({
 	const [usersRelated, setUsersRelated] = React.useState([]);
 	const [departmentRelated, setDepartmentRelated] = React.useState([]);
 	const [subtask, setSubTask] = React.useState();
-	const [logs, setLogs] = React.useState([]);
 	const { addToast } = useToasts();
 	const PRIORITIES = [5, 4, 3, 2, 1];
 	const initError = {
@@ -112,9 +111,6 @@ const TaskDetailForm = ({
 			);
 		});
 		setErrors(initError);
-		const values = task?.subtasks?.filter((item) => item.id === idEdit);
-		console.log(values,'values?.data?.logs');
-		setLogs(values?.data?.logs);
 		if (idEdit && title !== 'add') {
 			const value = task.subtasks.filter((item) => item.id === idEdit)[0];
 			setValueInput(value);
@@ -198,6 +194,7 @@ const TaskDetailForm = ({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [task]);
+	const person = window.localStorage.getItem('name');
 	const handleSubmit = async () => {
 		const valueUsers = usersRelated.map((item) => {
 			return {
@@ -213,14 +210,10 @@ const TaskDetailForm = ({
 		});
 		setErrors(initError);
 		if (title === 'add') {
-			const newWorks = JSON.parse(JSON.stringify(logs || []));
 			const newLogs = [
-				...newWorks,
 				{
-					user: {
-						id: task?.user?.id,
-						name: task?.user?.name,
-					},
+					id: 1,
+					user: person,
 					type: 2,
 					prev_status: null,
 					next_status: `Thêm mới`,
@@ -229,7 +222,7 @@ const TaskDetailForm = ({
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
 			];
-			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks || []));
+			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks));
 			subTaskValue.push({
 				...valueInput,
 				kpi_value: parseInt(valueInput?.kpi_value, 10),
@@ -289,14 +282,12 @@ const TaskDetailForm = ({
 			}
 			setValueInput(initValueInput);
 		} else {
-			const newWorks = JSON.parse(JSON.stringify(logs || []));
+			const values = task?.subtasks?.filter((item) => item.id === idEdit);
+			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs));
 			const newLogs = [
 				...newWorks,
 				{
-					user: {
-						id: task?.user?.id,
-						name: task?.user?.name,
-					},
+					user: person,
 					type: 2,
 					prev_status: null,
 					next_status: `Chỉnh sửa`,

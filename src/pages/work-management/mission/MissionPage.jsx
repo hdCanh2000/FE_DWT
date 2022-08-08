@@ -255,7 +255,8 @@ const MissionPage = () => {
 			});
 			if (existing.length) {
 				const existingIndex = output.indexOf(existing[0]);
-				output[existingIndex].tasks = output[existingIndex].tasks.concat(item.task);
+				output[existingIndex].tasks = output[existingIndex].tasks
+				.concat(item.task);
 			} else {
 				if (typeof item.task === 'object') item.tasks = [item.task];
 				output.push(item);

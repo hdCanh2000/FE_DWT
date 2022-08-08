@@ -310,8 +310,23 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		setUserRelatedOption([]);
 		setErrors({});
 	};
-
+	const person = window.localStorage.getItem('name');
 	const handleSubmit = () => {
+		const newWorks = JSON.parse(JSON.stringify(task?.logs || []));
+		const newLogs = [
+			...newWorks,
+			{
+				id: task?.id ? task.logs.length + 1 : 1,
+				user: person,
+				type: 2,
+				prev_status: null,
+				next_status: task?.id ? 'Chỉnh sửa' : 'Thêm mới',
+				task_id: task?.id,
+				task_name: task?.name,
+				time: moment().format('DD/MM/YYYY hh:mm'),
+			},
+		];
+
 		const data = { ...task };
 		data.mission_id = parseInt(data?.mission_id, 10);
 		data.kpi_value = parseInt(task?.kpi_value, 10);
@@ -371,7 +386,8 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		if (!prevIsValid()) {
 			return;
 		}
-		onSubmit(data);
+		const newData = { ...data, logs: newLogs };
+		onSubmit(newData);
 		handleClearForm();
 	};
 

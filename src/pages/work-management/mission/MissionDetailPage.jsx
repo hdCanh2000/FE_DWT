@@ -1020,7 +1020,9 @@ const MissionDetailPage = () => {
 												<RelatedActionCommonItem
 													key={item?.id}
 													type={item?.type}
-													time={`${item?.time}`.format('DD-MM-YYY')}
+													time={moment(`${item?.time}`).format(
+														'DD/MM/YYYY HH.mm',
+													)}
 													username={item?.user}
 													id={item.mission_id}
 													taskName={item.mission_name}

@@ -54,7 +54,6 @@ import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon'
 const TaskDetailPage = () => {
 	// State
 	const [task, setTask] = useState({});
-	// const [ allTask, setAllTask ] = React.useState([]);
 	const { darkModeStatus } = useDarkMode();
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [idEdit, setIdEdit] = useState(0);
@@ -65,6 +64,7 @@ const TaskDetailPage = () => {
 	const [editModalTaskStatus, setEditModalTaskStatus] = useState(false);
 	const [taskEdit, setTaskEdit] = useState({});
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
+	const [newWork, setNewWork] = React.useState([]);
 	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
@@ -130,18 +130,19 @@ const TaskDetailPage = () => {
 	React.useEffect(() => {
 		const fetchSubtasks = async (id) => {
 			const res = await getAllSubtasks(id);
-			console.log(res.data,'rés');
+			setTask(res.data);
 			setTask({
 				...res.data,
-				departments: [],
-				// departments: [res.data?.department]?.concat(res.data?.departments_related),
-				users: [],
-				// users: [res.data?.user]?.concat(res.data?.users_related),
+				departments: [res.data?.department]?.concat(res.data?.departments_related),
+				users: [res.data?.user]?.concat(res.data?.users_related),
 			});
 		};
 		fetchSubtasks(parseInt(params?.id, 10));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+	React.useEffect(() => {
+		setNewWork(task?.logs);
+	}, [task]);
 	// Handle
 	const handleOpenModal = (items, titles) => {
 		setEditModalStatus(true);
@@ -160,28 +161,11 @@ const TaskDetailPage = () => {
 		);
 	};
 	const handleDelete = async (valueDelete) => {
-		// const newWorks = JSON.parse(JSON.stringify(newWork));
-		// const newLogs = [
-		// 	...newWorks,
-		// 	{
-		// 		user: {
-		// 			id: task?.user?.id,
-		// 			name: task?.user?.name,
-		// 		},
-		// 		type: 2,
-		// 		prev_status: null,
-		// 		next_status: `Xóa`,
-		// 		subtask_id: valueDelete.id,
-		// 		subtask_name: valueDelete.name,
-		// 		time: moment().format('YYYY/MM/DD hh:mm'),
-		// 	},
-		// ];
 		const newSubTasks = task?.subtasks.filter((item) => item.id !== valueDelete.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
-			// logs: newLogs,
 		});
 
 		try {
@@ -234,22 +218,22 @@ const TaskDetailPage = () => {
 	};
 	// eslint-disable-next-line no-unused-vars
 	const handleUpdateStatus = async (statuss, data) => {
-		// const newWorks = JSON.parse(JSON.stringify(newWork));
-		// const newLogs = [
-		// 	...newWorks,
-		// 	{
-		// 		user: {
-		// 			id: task?.user?.id,
-		// 			name: task?.user?.name,
-		// 		},
-		// 		type: 1,
-		// 		prev_status: `${FORMAT_TASK_STATUS(data.status)}`,
-		// 		next_status: `${FORMAT_TASK_STATUS(statuss)}`,
-		// 		subtask_id: data.id,
-		// 		subtask_name: data.name,
-		// 		time: moment().format('YYYY/MM/DD hh:mm'),
-		// 	},
-		// ];
+		const newWorks = JSON.parse(JSON.stringify(newWork));
+		const newLogs = [
+			...newWorks,
+			{
+				user: {
+					id: task?.user?.id,
+					name: task?.user?.name,
+				},
+				type: 1,
+				prev_status: `${FORMAT_TASK_STATUS(data.status)}`,
+				next_status: `${FORMAT_TASK_STATUS(statuss)}`,
+				subtask_id: data.id,
+				subtask_name: data.name,
+				time: moment().format('YYYY/MM/DD hh:mm'),
+			},
+		];
 		const newSubTasks = task.subtasks.map((item) => {
 			return item.id === data.id
 				? {
@@ -261,7 +245,7 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			// logs: newLogs,
+			logs: newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
@@ -688,9 +672,7 @@ const TaskDetailPage = () => {
 														icon: 'TrendingFlat',
 														color: 'info',
 														children: (
-															<div
-																className='fw-bold fs-5 mb-1'
-																key={department?.id}>
+															<div className='fw-bold fs-5 mb-1'>
 																{department?.name}
 															</div>
 														),
@@ -710,9 +692,7 @@ const TaskDetailPage = () => {
 														icon: 'TrendingFlat',
 														color: 'info',
 														children: (
-															<div
-																className='fw-bold fs-5 mb-1'
-																key={user?.id}>
+															<div className='fw-bold fs-5 mb-1'>
 																{user?.name}
 															</div>
 														),
@@ -726,7 +706,7 @@ const TaskDetailPage = () => {
 													<CardLabel
 														icon='DoubleArrow'
 														iconColor='success'>
-														<CardTitle>Thống kê đầu việc</CardTitle>
+														<CardTitle>Thống kê công việc</CardTitle>
 													</CardLabel>
 												</CardHeader>
 												<CardBody className='py-2'>
@@ -786,7 +766,7 @@ const TaskDetailPage = () => {
 									className='mb-4'
 									shadow='lg'
 									style={{ minHeight: 220 }}
-									title='Thông tin đầu việc'
+									title='Thông tin công việc'
 									icon='Stream'
 									iconColor='primary'
 									data={[
@@ -849,14 +829,14 @@ const TaskDetailPage = () => {
 											icon: 'DoneAll',
 											color: 'danger',
 											children: (
-												<div key={key?.key_name}>
+												<>
 													<div className='fw-bold fs-5 mb-1'>
 														{key?.key_value}
 													</div>
 													<div className='mt-n2' style={{ fontSize: 14 }}>
 														{key?.key_name}
 													</div>
-												</div>
+												</>
 											),
 										};
 									})}
@@ -878,9 +858,13 @@ const TaskDetailPage = () => {
 													key={item?.id}
 													type={item?.type}
 													time={item?.time}
-													username={item?.user?.name?item?.user?.name:   item?.user}
-													id={item?.task_id || item?.subtask_id}
-													taskName={item?.task_name? item?.task_name:item?.subtask_name}
+													username={
+														item?.user?.name
+															? item?.user?.name
+															: item?.user
+													}
+													id={item?.task_id}
+													taskName={item?.task_name}
 													prevStatus={item?.prev_status}
 													nextStatus={item?.next_status}
 												/>
@@ -929,7 +913,7 @@ const TaskDetailPage = () => {
 										<table className='table table-modern mb-0'>
 											<thead>
 												<tr>
-													<th>ID</th>
+													<th>STT</th>
 													<th>Tên đầu việc</th>
 													<th>Thời gian dự kiến</th>
 													<th>Hạn hoàn thành</th>
@@ -976,7 +960,7 @@ const TaskDetailPage = () => {
 													)
 													.map((item) => (
 														<tr key={item.id}>
-															<td>{item.id}</td>
+															<td>#{item.id}</td>
 															<td>
 																<div>
 																	<div>
@@ -993,13 +977,13 @@ const TaskDetailPage = () => {
 															</td>
 															<td>
 																{moment(
-																	`${item.estimate_date}`,
-																).format('DD-MM-YYYY')}
+																	`${item.estimate_date} ${item.estimate_time}`,
+																).format('DD-MM-YYYY, HH:mm')}
 															</td>
 															<td>
 																{moment(
-																	`${item.deadline_date}`,
-																).format('DD-MM-YYYY')}
+																	`${item.deadline_date} ${item.deadline_time}`,
+																).format('DD-MM-YYYY, HH:mm')}
 															</td>
 															<td>
 																{progressSubtask(item)} %
@@ -1256,7 +1240,8 @@ const TaskDetailPage = () => {
 					editModalStatus={editModalStatus}
 					id={parseInt(params?.id, 10)}
 					idEdit={idEdit}
-					// newWork={newWork}
+					newWork={newWork}
+					setNewWork={setNewWork}
 				/>
 				<TaskFormModal
 					show={editModalTaskStatus}

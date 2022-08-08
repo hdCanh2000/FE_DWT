@@ -15,11 +15,7 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
-<<<<<<< HEAD
-import { FORMAT_TASK_STATUS } from '../../../utils/constants';
-=======
 import { formatColorStatus, FORMAT_TASK_STATUS, TASK_STATUS } from '../../../utils/constants';
->>>>>>> origin/development
 import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -39,8 +35,6 @@ import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
-<<<<<<< HEAD
-=======
 import Icon from '../../../components/icon/Icon';
 import Dropdown, {
 	DropdownItem,
@@ -48,7 +42,6 @@ import Dropdown, {
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
->>>>>>> origin/development
 
 const chartOptions = {
 	chart: {
@@ -158,11 +151,6 @@ const SubTaskPage = () => {
 			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
 			setNewWork(result.logs);
 			setTask(result);
-			setSubtask({
-				...subtaskRes,
-				departments: [subtaskRes?.department]?.concat(subtaskRes?.departments_related),
-				users: [subtaskRes?.user]?.concat(subtaskRes?.users_related),
-			});
 			setBoardData(
 				boardData.map((item) => {
 					return {
@@ -187,7 +175,21 @@ const SubTaskPage = () => {
 		}
 		fetchDataTaskById();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [taskid, id]);
+	}, [taskid]);
+	useEffect(() => {
+		const fetch = async () => {
+			const reponse = await getTaskById(taskid);
+			const result = await reponse.data;
+			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
+			setSubtask({
+				...subtaskRes,
+				departments: [subtaskRes?.department]?.concat(subtaskRes?.departments_related),
+				users: [subtaskRes?.user]?.concat(subtaskRes?.users_related),
+			});
+		};
+		fetch();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [taskid, task]);
 
 	// show toast
 	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
@@ -238,13 +240,6 @@ const SubTaskPage = () => {
 		}
 	};
 
-<<<<<<< HEAD
-	const handleClickChangeStatusPending = async (data) => {
-		if (data.status === 1) {
-			handleShowToast(
-				`Báo đầu việc chờ duyệt!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đã hoàn thành!`,
-=======
 	const checkStepCompleted = (data) => {
 		let total = 0;
 		if (data?.steps?.length === 0 || !data?.steps?.length) {
@@ -269,7 +264,6 @@ const SubTaskPage = () => {
 				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
 					data.status,
 				)}!`,
->>>>>>> origin/development
 				'Error',
 				'danger',
 			);
@@ -283,32 +277,6 @@ const SubTaskPage = () => {
 				'Error',
 				'danger',
 			);
-<<<<<<< HEAD
-		} else {
-			try {
-				const taskClone = { ...task };
-				const subtaskClone = { ...data };
-				subtaskClone.status = 2;
-				const subtaskSubmit = taskClone?.subtasks?.map((item) =>
-					item.id === data.id ? { ...subtaskClone } : item,
-				);
-				const taskSubmit = { ...taskClone };
-				taskSubmit.subtasks = subtaskSubmit;
-				const response = await updateStatusPendingSubtask(taskSubmit);
-				const result = await response.data;
-				const subtaskRes = result?.subtasks.filter(
-					(item) => item.id === parseInt(id, 10),
-				)[0];
-				setTask(result);
-				setSubtask(subtaskRes);
-				handleShowToast(
-					`Báo đầu việc chờ duyệt!`,
-					`Báo đầu việc ${subtaskRes.name} thành công!`,
-				);
-			} catch (error) {
-				setSubtask(subtask);
-			}
-=======
 			handleCloseConfirmStatusTask();
 			return false;
 		}
@@ -388,7 +356,6 @@ const SubTaskPage = () => {
 			);
 		} catch (error) {
 			setSubtask(subtask);
->>>>>>> origin/development
 		}
 	};
 
@@ -432,28 +399,11 @@ const SubTaskPage = () => {
 		set0penConfirm(false);
 	};
 	const handleDeleteSubTask = async (subtasks) => {
-		const newWorks = JSON.parse(JSON.stringify(newWork));
-		const newLogs = [
-			...newWorks,
-			{
-				user: {
-					id: task?.user?.id,
-					name: task?.user?.name,
-				},
-				type: 2,
-				prev_status: null,
-				next_status: `Xóa`,
-				subtask_id: subtasks.id,
-				subtask_name: subtasks.name,
-				time: moment().format('YYYY/MM/DD hh:mm'),
-			},
-		];
 		const newSubTasks = task?.subtasks?.filter((item) => item.id !== subtasks?.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
-			logs: newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(task?.id, newData);
@@ -502,22 +452,13 @@ const SubTaskPage = () => {
 				</div>
 				<div className='row mb-4'>
 					<div className='col-lg-8'>
-						<Card className='shadow-3d-primary h-100 mb-4 pb-4'>
+						<Card className='shadow-3d-primary h-100 mb-0 pb-0'>
 							<CardHeader className='py-2'>
 								<CardLabel icon='Summarize' iconColor='success'>
 									<CardTitle tag='h4' className='h5'>
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
-<<<<<<< HEAD
-								<Button
-									color='danger'
-									icon='Report'
-									isLight
-									onClick={() => handleClickChangeStatusPending(subtask)}>
-									Xác nhận hoàn thành
-								</Button>
-=======
 								<Dropdown>
 									<DropdownToggle hasIcon={false}>
 										<Button
@@ -548,10 +489,9 @@ const SubTaskPage = () => {
 										))}
 									</DropdownMenu>
 								</Dropdown>
->>>>>>> origin/development
 							</CardHeader>
 							<CardBody className='py-2'>
-								<div className='row g-4'>
+								<div className='row h-100'>
 									<div className='col-md-5'>
 										<Card
 											className='bg-l25-primary transition-base rounded-2 mb-4'
@@ -561,7 +501,11 @@ const SubTaskPage = () => {
 													<CardTitle tag='h4' className='h5'>
 														Tiến độ thực hiện
 													</CardTitle>
-													<CardSubTitle tag='h4' className='h5'>
+													<CardSubTitle
+														tag='h4'
+														className={`h5 text-${formatColorStatus(
+															subtask?.status,
+														)}`}>
 														{FORMAT_TASK_STATUS(subtask?.status)}
 													</CardSubTitle>
 												</CardLabel>
@@ -609,7 +553,7 @@ const SubTaskPage = () => {
 										<CardInfoCommon
 											className='mb-4 pb-4'
 											shadow='lg'
-											style={{ minHeight: 300 }}
+											style={{ minHeight: 320 }}
 											title='Phòng ban phụ trách'
 											icon='LayoutTextWindow'
 											iconColor='info'
@@ -628,7 +572,7 @@ const SubTaskPage = () => {
 										<CardInfoCommon
 											className='mb-4 pb-4'
 											shadow='lg'
-											style={{ minHeight: 300 }}
+											style={{ minHeight: 320 }}
 											title='Nhân viên phụ trách'
 											icon='PersonCircle'
 											iconColor='info'
@@ -720,7 +664,7 @@ const SubTaskPage = () => {
 						</Card>
 					</div>
 					<div className='col-lg-4'>
-						<Card className='mb-4 h-100 shadow-3d-info'>
+						<Card className='mb-0 h-100 shadow-3d-info'>
 							<CardInfoCommon
 								className='mb-4'
 								shadow='lg'
@@ -776,7 +720,6 @@ const SubTaskPage = () => {
 							/>
 							{/* Chỉ số key */}
 							<CardInfoCommon
-								isScrollable
 								className='transition-base w-100 rounded-2 mb-4'
 								shadow='lg'
 								style={{ minHeight: 250 }}
@@ -800,7 +743,7 @@ const SubTaskPage = () => {
 									};
 								})}
 							/>
-							<Card className='h-100' shadow='lg'>
+							<Card className='h-100 mb-0' shadow='lg'>
 								<CardHeader className='py-2'>
 									<CardLabel icon='NotificationsActive' iconColor='warning'>
 										<CardTitle tag='h4' className='h5'>
@@ -816,16 +759,14 @@ const SubTaskPage = () => {
 											<RelatedActionCommonItem
 												key={item?.id}
 												type={item?.type}
-												time={item?.time}
-												username={item?.user?.name}
-												id={
-													item?.step_id ? item?.step_id : item?.subtask_id
+												time={moment(`${item?.time}`).format(
+													'DD/MM/YYYY HH:mm',
+												)}
+												username={
+													item?.user?.name ? item?.user?.name : item?.user
 												}
-												taskName={
-													item?.step_name
-														? item?.step_name
-														: item?.subtask_name
-												}
+												id={item?.subtask_id}
+												taskName={item?.subtask_name}
 												prevStatus={item?.prev_status}
 												nextStatus={item?.next_status}
 											/>

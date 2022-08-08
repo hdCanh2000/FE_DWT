@@ -239,7 +239,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const userLogin = window.localStorage.getItem('name');
 	const handleSubmit = () => {
 		if (!mission?.id) {
-			const newWorks = JSON.parse(JSON.stringify(logsMision || []));
+			const newWorks = JSON.parse(JSON.stringify([]));
 			const newLogs = [
 				...newWorks,
 				{
@@ -290,14 +290,14 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				...newWorks,
 				{
 					// eslint-disable-next-line no-unsafe-optional-chaining
-					id: mission?.logs?.length + 1 || 1,
+					id: mission?.logs?.length + 1,
 					user: userLogin,
 					type: 2,
 					prev_status: null,
 					next_status: `Chỉnh sửa`,
 					mission_id: mission?.id,
 					mission_name: mission?.name,
-					time: moment().format('YYYY/MM/DD hh:mm'),
+					time: moment().format('YYYY/MM/DD HH:mm'),
 				},
 			];
 			const data = { ...mission, logs: newLogs };
