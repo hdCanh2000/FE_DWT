@@ -24,14 +24,14 @@ const ErrorText = styled.span`
 	margin-top: 5px;
 `;
 
-const customStyles = {
-	control: (provided) => ({
-		...provided,
-		padding: '4px',
-		fontSize: '18px',
-		borderRadius: '1.25rem',
-	}),
-};
+// const customStyles = {
+// 	control: (provided) => ({
+// 		...provided,
+// 		padding: '4px',
+// 		fontSize: '18px',
+// 		borderRadius: '1.25rem',
+// 	}),
+// };
 
 const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const [mission, setMission] = useState({});
@@ -375,7 +375,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												required
 												placeholder='Tên mục tiêu'
 												size='lg'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.name?.errorMsg && (
@@ -392,7 +392,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												required
 												size='lg'
 												placeholder='Mô tả mục tiêu'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										<FormGroup
@@ -408,7 +408,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												required
 												size='lg'
 												placeholder='Giá trị KPI'
-												className='border border-2'
+												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.kpi_value?.errorMsg && (
@@ -419,7 +419,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											id='kpi_value'
 											label='Phòng ban phụ trách'>
 											<Select
-												styles={customStyles}
 												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
@@ -451,7 +450,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 											<FormGroup
@@ -470,7 +469,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													}
 													type='date'
 													size='lg'
-													className='border border-2'
+													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
@@ -503,7 +502,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																name='key_name'
 																required
 																size='lg'
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: Doanh thu, đơn hàng, ...'
 															/>
 														</FormGroup>
@@ -526,7 +525,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																name='key_value'
 																size='lg'
 																required
-																className='border border-2'
+																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
 															/>
 														</FormGroup>
