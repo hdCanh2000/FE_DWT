@@ -786,7 +786,6 @@ const TaskDetailPage = () => {
 									title='Chỉ số key'
 									icon='ShowChart'
 									iconColor='danger'
-									key={task?.keys}
 									data={task?.keys?.map((key) => {
 										return {
 											icon: 'DoneAll',
