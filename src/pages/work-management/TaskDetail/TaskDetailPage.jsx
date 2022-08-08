@@ -435,13 +435,14 @@ const TaskDetailPage = () => {
 		setDeletes({});
 		set0penConfirm(false);
 	};
+
 	const handleStatus = async (newStatus, items) => {
 		const checkValid = prevIsValidClickChangeStatus(items, newStatus);
 		if (!checkValid) return;
 		const newSubTasks = task.subtasks.map((item) => {
 			return item.id === items.id
 				? {
-						...item,
+						...items,
 						status: newStatus,
 				  }
 				: item;

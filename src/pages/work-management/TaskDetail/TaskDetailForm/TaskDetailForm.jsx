@@ -7,15 +7,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import styled from 'styled-components';
 import SelectComponent from 'react-select';
 import { useToasts } from 'react-toast-notifications';
-import {
-	updateSubtasks,
-	getAllDepartments,
-	getAllUser,
-	getTask,
-	getMission,
-	updateCurrentKpiMission,
-} from '../services';
-// updateCurrentKpiMission
+import { updateSubtasks, getAllDepartments, getAllUser } from '../services';
 import Modal, {
 	ModalHeader,
 	ModalBody,
@@ -169,31 +161,6 @@ const TaskDetailForm = ({
 			},
 		);
 	};
-	const handleChangeCurrentKpiMission = async () => {
-		let CurrentKpi = 0;
-		const newTask = await (await getTask()).data;
-		newTask?.forEach((item) => {
-			item?.subtasks?.forEach((res) => {
-				CurrentKpi += res.kpi_value;
-			});
-		});
-		const misson = await (await getMission()).data;
-		const newMission = misson?.map((item) => {
-			return item.id === task?.mission_id
-				? {
-						...item,
-						current_kpi_value: CurrentKpi,
-				  }
-				: item;
-		});
-		await updateCurrentKpiMission(task?.mission_id, newMission[0]);
-	};
-	React.useEffect(() => {
-		if (task.mission_id) {
-			handleChangeCurrentKpiMission();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [task]);
 	const person = window.localStorage.getItem('name');
 	const handleSubmit = async () => {
 		const valueUsers = usersRelated.map((item) => {
@@ -283,7 +250,7 @@ const TaskDetailForm = ({
 			setValueInput(initValueInput);
 		} else {
 			const values = task?.subtasks?.filter((item) => item.id === idEdit);
-			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs));
+			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs || []));
 			const newLogs = [
 				...newWorks,
 				{
