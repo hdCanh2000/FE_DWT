@@ -211,7 +211,8 @@ const calcProgressMission = (mission, tasks) => {
 
 const calcProgressMissionByTaskComplete = (mission, tasks) => {
 	if (isEmpty(mission)) return 0;
-	return Math.round((calcTotalTaskByStatus(tasks, 4) * 100) / tasks.length) || 0;
+	// eslint-disable-next-line no-unsafe-optional-chaining
+	return Math.round((calcTotalTaskByStatus(tasks, 4) * 100) / tasks?.length) || 0;
 };
 
 // ------------		  UPDATE FUNCTION CALC TOTAL & PROGRESS SUBTASK		-----------------

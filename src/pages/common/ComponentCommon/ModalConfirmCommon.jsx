@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
+import moment from 'moment';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -10,6 +11,7 @@ import Card, {
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
+import { FORMAT_TASK_STATUS } from '../../../utils/constants';
 
 const ModalConfirmCommon = ({
 	type,
@@ -22,10 +24,24 @@ const ModalConfirmCommon = ({
 	item,
 	...props
 }) => {
+	const person = window.localStorage.getItem('name');
 	const handleSubmit = () => {
-		onSubmit(status, item);
+		const newWorks = JSON.parse(JSON.stringify(item?.logs || []));
+		const newLogs = [
+			...newWorks,
+			{
+				user: person,
+				type: 1,
+				prev_status: FORMAT_TASK_STATUS(item?.status),
+				next_status: FORMAT_TASK_STATUS(status),
+				[item?.mission_id ? 'task_id' : 'subtask_id']: item?.id,
+				[item?.mission_id ? 'task_name' : 'subtask_name']: item?.name,
+				time: moment().format('YYYY/MM/DD hh:mm'),
+			},
+		];
+		const newItem = { ...item, logs: newLogs };
+		onSubmit(status, newItem);
 	};
-
 	return (
 		<Modal show={show} onHide={onClose} size='lg' scrollable centered {...props}>
 			<Modal.Header closeButton>

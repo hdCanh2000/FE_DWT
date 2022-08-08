@@ -40,7 +40,8 @@ const CardInfoCommon = ({
 										<Icon
 											icon={item?.icon || ''}
 											size={item.size || '2x'}
-											color={item?.color || 'primary'} />
+											color={item?.color || 'primary'}
+										/>
 									</div>
 									<div className='flex-grow-1 ps-3'>{item.children}</div>
 								</div>

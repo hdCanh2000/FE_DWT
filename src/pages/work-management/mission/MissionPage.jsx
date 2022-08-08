@@ -256,7 +256,7 @@ const MissionPage = () => {
 			const existing = output.filter((v) => {
 				return v.task.mission_id === item.task.mission_id;
 			});
-			if (existing.length) {
+			if (existing?.length) {
 				const existingIndex = output.indexOf(existing[0]);
 				output[existingIndex].tasks = output[existingIndex].tasks.concat(item.task);
 			} else {
