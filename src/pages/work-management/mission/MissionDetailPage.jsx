@@ -55,7 +55,7 @@ import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
 import '../TaskDetail/styleTaskDetail.scss';
 import MissionFormModal from './MissionFormModal';
-import RelatedActionCommon from '../../common/ComponentCommon/RelatedActionCommon';
+import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
@@ -113,7 +113,6 @@ const chartOptions = {
 const MissionDetailPage = () => {
 	const [mission, setMission] = useState({});
 	const [tasks, setTasks] = useState([]);
-	const [taskLogs, setTaskLogs] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [editModalMissionStatus, setEditModalMissionStatus] = useState(false);
@@ -418,7 +417,7 @@ const MissionDetailPage = () => {
 			const response = await getAllTaksByMissionID(id);
 			const result = await response.data;
 			setTasks(result);
-			setTaskLogs(result.filter((item) => item?.logs?.length > 0)?.map((item) => item.logs));
+			// setTaskLogs(result.filter((item) => item?.logs?.length > 0)?.map((item) => item.logs));
 		}
 		fetchDataTaskByMissionID();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -859,7 +858,9 @@ const MissionDetailPage = () => {
 													icon: 'TrendingFlat',
 													color: 'info',
 													children: (
-														<div className='fw-bold fs-5 mb-1'>
+														<div
+															key={department?.name}
+															className='fw-bold fs-5 mb-1'>
 															{department?.name}
 														</div>
 													),
@@ -947,11 +948,11 @@ const MissionDetailPage = () => {
 												<div
 													className='fs-5'
 													style={{
-														'-webkit-line-clamp': '2',
+														WebkitLineClamp: '2',
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
 														display: '-webkit-box',
-														'-webkit-box-orient': 'vertical',
+														WebkitBoxOrient: 'vertical',
 													}}>
 													{mission?.description}
 												</div>
@@ -984,6 +985,7 @@ const MissionDetailPage = () => {
 									},
 								]}
 							/>
+
 							<CardInfoCommon
 								className='transition-base w-100 rounded-2 mb-4 pb-4'
 								shadow='lg'
@@ -997,14 +999,14 @@ const MissionDetailPage = () => {
 										icon: 'DoneAll',
 										color: 'danger',
 										children: (
-											<>
+											<div>
 												<div className='fw-bold fs-5 mb-1'>
-													{key?.key_value}
-												</div>
-												<div className='mt-n2' style={{ fontSize: 14 }}>
 													{key?.key_name}
 												</div>
-											</>
+												<div className='mt-n2' style={{ fontSize: 14 }}>
+													{key?.key_value}
+												</div>
+											</div>
 										),
 									};
 								})}
@@ -1016,7 +1018,22 @@ const MissionDetailPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
-									<RelatedActionCommon data={taskLogs?.[0]} />
+									{mission?.logs
+										?.slice()
+										.reverse()
+										.map((item) => (
+											<RelatedActionCommonItem
+												type={item?.type}
+												time={moment(`${item?.time}`).format(
+													'DD/MM/YYYY HH.mm',
+												)}
+												username={item?.user}
+												id={item.mission_id}
+												taskName={item.mission_name}
+												prevStatus={item?.prev_status}
+												nextStatus={item?.next_status}
+											/>
+										))}
 								</CardBody>
 							</Card>
 						</Card>

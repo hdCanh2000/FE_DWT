@@ -28,6 +28,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	const { darkModeStatus } = useDarkMode();
 	const [users, setUsers] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
+	const person = window.localStorage.getItem('name');
 	const formik = useFormik({
 		initialValues: {
 			name: card?.name || '',
@@ -41,10 +42,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 			const newLogs = [
 				...newWorks,
 				{
-					user: {
-						id: subtask?.user?.id,
-						name: subtask?.user?.name,
-					},
+					user: person,
 					type: 2,
 					prev_status: null,
 					next_status: `Chỉnh sửa`,

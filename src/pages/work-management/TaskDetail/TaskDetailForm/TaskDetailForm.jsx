@@ -45,7 +45,6 @@ const TaskDetailForm = ({
 	title,
 	setTask,
 	idEdit,
-	newWork,
 }) => {
 	// state
 	const [valueInput, setValueInput] = React.useState({});
@@ -195,6 +194,7 @@ const TaskDetailForm = ({
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [task]);
+	const person = window.localStorage.getItem('name');
 	const handleSubmit = async () => {
 		const valueUsers = usersRelated.map((item) => {
 			return {
@@ -210,6 +210,18 @@ const TaskDetailForm = ({
 		});
 		setErrors(initError);
 		if (title === 'add') {
+			const newLogs = [
+				{
+					id: 1,
+					user: person,
+					type: 2,
+					prev_status: null,
+					next_status: `Thêm mới`,
+					subtask_id: task.subtasks.length + 1,
+					subtask_name: valueInput?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
 			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks));
 			subTaskValue.push({
 				...valueInput,
@@ -226,6 +238,7 @@ const TaskDetailForm = ({
 				departments_related: valueDepartments,
 				users_related: valueUsers,
 				id: task.subtasks.length + 1,
+				logs: newLogs,
 			});
 			validateForm();
 			if (!valueInput?.name) {
@@ -248,29 +261,12 @@ const TaskDetailForm = ({
 				descriptionRef.current.focus();
 				return;
 			}
-			const newWorks = JSON.parse(JSON.stringify(newWork));
-			const newLogs = [
-				...newWorks,
-				{
-					user: {
-						id: task?.user?.id,
-						name: task?.user?.name,
-					},
-					type: 2,
-					prev_status: null,
-					next_status: `Thêm mới`,
-					subtask_id: task.subtasks.length + 1,
-					subtask_name: valueInput?.name,
-					time: moment().format('YYYY/MM/DD hh:mm'),
-				},
-			];
 			const taskValue = JSON.parse(JSON.stringify(task));
 			const data = Object.assign(taskValue, {
 				subtasks: subTaskValue,
 				// eslint-disable-next-line no-unsafe-optional-chaining
 				current_kpi_value:
 					totalKpiSubtask(task?.subtasks) + parseInt(valueInput?.kpi_value, 10),
-				logs: newLogs,
 			});
 			try {
 				const respose = await updateSubtasks(id, data).then(
@@ -286,6 +282,20 @@ const TaskDetailForm = ({
 			}
 			setValueInput(initValueInput);
 		} else {
+			const values = task?.subtasks?.filter((item) => item.id === idEdit);
+			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs));
+			const newLogs = [
+				...newWorks,
+				{
+					user: person,
+					type: 2,
+					prev_status: null,
+					next_status: `Chỉnh sửa`,
+					subtask_id: idEdit,
+					subtask_name: subtask?.name,
+					time: moment().format('YYYY/MM/DD hh:mm'),
+				},
+			];
 			const newSubTasks = task.subtasks.map((item) => {
 				return item.id === idEdit
 					? {
@@ -302,6 +312,7 @@ const TaskDetailForm = ({
 								id: valueDepartment.id,
 								name: valueDepartment.label,
 							},
+							logs: newLogs,
 					  }
 					: item;
 			});
@@ -326,26 +337,10 @@ const TaskDetailForm = ({
 				descriptionRef.current.focus();
 				return;
 			}
-			const newWorks = JSON.parse(JSON.stringify(newWork));
-			const newLogs = [
-				...newWorks,
-				{
-					user: {
-						id: task?.user?.id,
-						name: task?.user?.name,
-					},
-					type: 2,
-					prev_status: null,
-					next_status: `Chỉnh sửa`,
-					subtask_id: idEdit,
-					subtask_name: subtask?.name,
-					time: moment().format('YYYY/MM/DD hh:mm'),
-				},
-			];
+
 			const taskValue = JSON.parse(JSON.stringify(task));
 			const newData = Object.assign(taskValue, {
 				subtasks: newSubTasks,
-				logs: newLogs,
 				current_kpi_value: totalKpiSubtask(newSubTasks),
 			});
 			try {

@@ -15,7 +15,7 @@ const ReportCommon = (props) => {
 			<CardBody>
 				<div className='row'>
 					{data?.map((item) => (
-						<div className='col-6'>
+						<div className='col-6' key={item.label}>
 							<div className='fw-bold fs-2 mb-10'>{item?.value}</div>
 							<div className='text-muted'>{item?.label}</div>
 						</div>

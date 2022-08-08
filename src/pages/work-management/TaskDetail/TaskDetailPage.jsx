@@ -1,3 +1,4 @@
+// eslint-disable react/no-array-index-key
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react';
@@ -130,7 +131,7 @@ const TaskDetailPage = () => {
 	React.useEffect(() => {
 		const fetchSubtasks = async (id) => {
 			const res = await getAllSubtasks(id);
-			// setTask(res.data);
+			setTask(res.data);
 			setTask({
 				...res.data,
 				departments: [res.data?.department]?.concat(res.data?.departments_related),
@@ -161,28 +162,11 @@ const TaskDetailPage = () => {
 		);
 	};
 	const handleDelete = async (valueDelete) => {
-		const newWorks = JSON.parse(JSON.stringify(newWork));
-		const newLogs = [
-			...newWorks,
-			{
-				user: {
-					id: task?.user?.id,
-					name: task?.user?.name,
-				},
-				type: 2,
-				prev_status: null,
-				next_status: `Xóa`,
-				subtask_id: valueDelete.id,
-				subtask_name: valueDelete.name,
-				time: moment().format('YYYY/MM/DD hh:mm'),
-			},
-		];
 		const newSubTasks = task?.subtasks.filter((item) => item.id !== valueDelete.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
-			logs: newLogs,
 		});
 
 		try {
@@ -234,46 +218,6 @@ const TaskDetailPage = () => {
 		}
 	};
 	// eslint-disable-next-line no-unused-vars
-	const handleUpdateStatus = async (statuss, data) => {
-		const newWorks = JSON.parse(JSON.stringify(newWork));
-		const newLogs = [
-			...newWorks,
-			{
-				user: {
-					id: task?.user?.id,
-					name: task?.user?.name,
-				},
-				type: 1,
-				prev_status: `${FORMAT_TASK_STATUS(data.status)}`,
-				next_status: `${FORMAT_TASK_STATUS(statuss)}`,
-				subtask_id: data.id,
-				subtask_name: data.name,
-				time: moment().format('YYYY/MM/DD hh:mm'),
-			},
-		];
-		const newSubTasks = task.subtasks.map((item) => {
-			return item.id === data.id
-				? {
-						...item,
-						status: statuss,
-				  }
-				: item;
-		});
-		const taskValue = JSON.parse(JSON.stringify(task));
-		const newData = Object.assign(taskValue, {
-			subtasks: newSubTasks,
-			logs: newLogs,
-		});
-		try {
-			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
-				toast.success('Thay đổi trạng thái thành công!'),
-			);
-			const result = await respose.data;
-			setTask(result);
-		} catch (error) {
-			toast.error('Thay đổi trạng thái thất bại !');
-		}
-	};
 
 	// ------------------	UPDATE AND DELETE TASK	-------------------
 	// form task modal
@@ -723,7 +667,7 @@ const TaskDetailPage = () => {
 													<CardLabel
 														icon='DoubleArrow'
 														iconColor='success'>
-														<CardTitle>Thống kê đầu việc</CardTitle>
+														<CardTitle>Thống kê công việc</CardTitle>
 													</CardLabel>
 												</CardHeader>
 												<CardBody className='py-2'>
@@ -783,7 +727,7 @@ const TaskDetailPage = () => {
 									className='mb-4'
 									shadow='lg'
 									style={{ minHeight: 220 }}
-									title='Thông tin đầu việc'
+									title='Thông tin công việc'
 									icon='Stream'
 									iconColor='primary'
 									data={[
@@ -795,11 +739,11 @@ const TaskDetailPage = () => {
 													<div
 														className='fs-5'
 														style={{
-															'-webkit-line-clamp': '2',
+															'WebkitLineClamp': '2',
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
 															display: '-webkit-box',
-															'-webkit-box-orient': 'vertical',
+															'WebkitBoxOrient': 'vertical',
 														}}>
 														{task?.description}
 													</div>
@@ -833,6 +777,7 @@ const TaskDetailPage = () => {
 									]}
 								/>
 								{/* Chỉ số key */}
+
 								<CardInfoCommon
 									isScrollable
 									className='transition-base w-100 rounded-2 mb-4'
@@ -846,14 +791,14 @@ const TaskDetailPage = () => {
 											icon: 'DoneAll',
 											color: 'danger',
 											children: (
-												<>
+												<div key={key?.key_name}>
 													<div className='fw-bold fs-5 mb-1'>
-														{key?.key_value}
-													</div>
-													<div className='mt-n2' style={{ fontSize: 14 }}>
 														{key?.key_name}
 													</div>
-												</>
+													<div className='mt-n2' style={{ fontSize: 14 }}>
+														{key?.key_value}
+													</div>
+												</div>
 											),
 										};
 									})}
@@ -870,26 +815,25 @@ const TaskDetailPage = () => {
 										{task?.logs
 											?.slice()
 											.reverse()
-											.map((item) => (
-												<RelatedActionCommonItem
-													key={item?.id}
-													type={item?.type}
-													time={item?.time}
-													username={item?.user?.name}
-													id={
-														item?.subtask_id
-															? item?.subtask_id
-															: item?.task_id
-													}
-													taskName={
-														item?.subtask_name
-															? item?.subtask_name
-															: item?.task_name
-													}
-													prevStatus={item?.prev_status}
-													nextStatus={item?.next_status}
-												/>
-											))}
+											.map((item) => {
+												console.log(item.id);
+												return (
+													<RelatedActionCommonItem
+														key={item?.id}
+														type={item?.type}
+														time={item?.time}
+														username={
+															item?.user?.name
+																? item?.user?.name
+																: item?.user
+														}
+														id={item?.task_id}
+														taskName={item?.task_name}
+														prevStatus={item?.prev_status}
+														nextStatus={item?.next_status}
+													/>
+												);
+											})}
 									</CardBody>
 								</Card>
 							</Card>

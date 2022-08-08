@@ -151,11 +151,6 @@ const SubTaskPage = () => {
 			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
 			setNewWork(result.logs);
 			setTask(result);
-			setSubtask({
-				...subtaskRes,
-				departments: [subtaskRes?.department]?.concat(subtaskRes?.departments_related),
-				users: [subtaskRes?.user]?.concat(subtaskRes?.users_related),
-			});
 			setBoardData(
 				boardData.map((item) => {
 					return {
@@ -180,7 +175,21 @@ const SubTaskPage = () => {
 		}
 		fetchDataTaskById();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [taskid, id]);
+	}, [taskid]);
+	useEffect(() => {
+		const fetch = async () => {
+			const reponse = await getTaskById(taskid);
+			const result = await reponse.data;
+			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
+			setSubtask({
+				...subtaskRes,
+				departments: [subtaskRes?.department]?.concat(subtaskRes?.departments_related),
+				users: [subtaskRes?.user]?.concat(subtaskRes?.users_related),
+			});
+		};
+		fetch();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [taskid, task]);
 
 	// show toast
 	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
@@ -390,28 +399,11 @@ const SubTaskPage = () => {
 		set0penConfirm(false);
 	};
 	const handleDeleteSubTask = async (subtasks) => {
-		const newWorks = JSON.parse(JSON.stringify(newWork));
-		const newLogs = [
-			...newWorks,
-			{
-				user: {
-					id: task?.user?.id,
-					name: task?.user?.name,
-				},
-				type: 2,
-				prev_status: null,
-				next_status: `Xóa`,
-				subtask_id: subtasks.id,
-				subtask_name: subtasks.name,
-				time: moment().format('YYYY/MM/DD hh:mm'),
-			},
-		];
 		const newSubTasks = task?.subtasks?.filter((item) => item.id !== subtasks?.id);
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
 			current_kpi_value: totalKpiSubtask(newSubTasks),
-			logs: newLogs,
 		});
 		try {
 			const respose = await updateSubtasks(task?.id, newData);
@@ -741,10 +733,10 @@ const SubTaskPage = () => {
 										children: (
 											<>
 												<div className='fw-bold fs-5 mb-1'>
-													{key?.key_value}
+													{key?.key_name}
 												</div>
 												<div className='mt-n2' style={{ fontSize: 14 }}>
-													{key?.key_name}
+													{key?.key_value}
 												</div>
 											</>
 										),
@@ -767,16 +759,14 @@ const SubTaskPage = () => {
 											<RelatedActionCommonItem
 												key={item?.id}
 												type={item?.type}
-												time={item?.time}
-												username={item?.user?.name}
-												id={
-													item?.step_id ? item?.step_id : item?.subtask_id
+												time={moment(`${item?.time}`).format(
+													'DD/MM/YYYY HH:mm',
+												)}
+												username={
+													item?.user?.name ? item?.user?.name : item?.user
 												}
-												taskName={
-													item?.step_name
-														? item?.step_name
-														: item?.subtask_name
-												}
+												id={item?.subtask_id}
+												taskName={item?.subtask_name}
 												prevStatus={item?.prev_status}
 												nextStatus={item?.next_status}
 											/>

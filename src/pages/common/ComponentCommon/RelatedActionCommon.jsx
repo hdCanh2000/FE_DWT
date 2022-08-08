@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import Timeline, { TimelineItem } from '../../../components/extras/Timeline';
+import { TimelineItem } from '../../../components/extras/Timeline';
 
 const renderTextByType = (props) => {
 	const { type, username, prevStatus, nextStatus, taskName } = props;
@@ -47,41 +46,12 @@ const renderTextByType = (props) => {
 
 const RelatedActionCommonItem = (props) => {
 	// eslint-disable-next-line react/prop-types
-	const { key, time } = props;
+	const { time } = props;
 	return (
-		<TimelineItem key={key} className='align-items-center' label={time} color='primary'>
+		<TimelineItem key={time} className='align-items-center' label={time} color='primary'>
 			{renderTextByType(props)}
 		</TimelineItem>
 	);
-};
-
-const RelatedActionCommon = (props) => {
-	const { data } = props;
-	return (
-		<Timeline>
-			{data?.map((item) => (
-				<RelatedActionCommonItem
-					key={item?.id}
-					type={item?.type}
-					time={item?.time}
-					username={item?.user?.name}
-					id={item?.subtask_id ? item?.subtask_id : item?.task_id}
-					taskName={item?.task_name}
-					prevStatus={item?.prev_status}
-					nextStatus={item?.next_status}
-					{...item}
-				/>
-			))}
-		</Timeline>
-	);
-};
-
-RelatedActionCommon.propTypes = {
-	// eslint-disable-next-line react/forbid-prop-types, react/require-default-props
-	data: PropTypes.array,
-};
-RelatedActionCommon.defaultProps = {
-	data: [],
 };
 
 export default RelatedActionCommonItem;

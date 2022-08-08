@@ -32,20 +32,21 @@ const CardInfoCommon = ({
 			</CardHeader>
 			<CardBody isScrollable={isScrollable} className='py-2'>
 				<div className='row g-2 ps-5 pe-4'>
-					{data?.map((item) => (
-						<div className='col-12 mb-2'>
-							<div className='d-flex align-items-center'>
-								<div className='flex-shrink-0'>
-									<Icon
-										icon={item?.icon || ''}
-										size={item.size || '2x'}
-										color={item?.color || 'primary'}
-									/>
+					{data?.map((item) => {
+						return (
+							<div className='col-12 mb-2' key={children?.key}>
+								<div className='d-flex align-items-center'>
+									<div className='flex-shrink-0'>
+										<Icon
+											icon={item?.icon || ''}
+											size={item.size || '2x'}
+											color={item?.color || 'primary'} />
+									</div>
+									<div className='flex-grow-1 ps-3'>{item.children}</div>
 								</div>
-								<div className='flex-grow-1 ps-3'>{item.children}</div>
 							</div>
-						</div>
-					))}
+						);
+					})}
 				</div>
 			</CardBody>
 		</Card>

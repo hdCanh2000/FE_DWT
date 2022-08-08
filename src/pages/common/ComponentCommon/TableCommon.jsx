@@ -2,7 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-const TableCommon = ({ data, columns, actions, className, ...props }) => {
+const TableCommon = ({ data, columns, className, ...props }) => {
 	return (
 		<table className={classNames(className)} {...props}>
 			<thead>
@@ -56,7 +56,6 @@ TableCommon.propTypes = {
 	data: PropTypes.array,
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
-	actions: PropTypes.node.isRequired,
 };
 TableCommon.defaultProps = {
 	className: null,

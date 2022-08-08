@@ -13,7 +13,6 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 
 const ModalConfirmCommon = ({
 	type,
-	children,
 	show,
 	title,
 	subTitle,
@@ -92,7 +91,6 @@ const ModalConfirmCommon = ({
 };
 
 ModalConfirmCommon.propTypes = {
-	children: PropTypes.node.isRequired,
 	className: PropTypes.string,
 	title: PropTypes.string,
 	subTitle: PropTypes.string,
