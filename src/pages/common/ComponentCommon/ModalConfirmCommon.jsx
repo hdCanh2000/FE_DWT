@@ -20,6 +20,7 @@ const ModalConfirmCommon = ({
 	onClose,
 	onSubmit,
 	item,
+	isShowNote,
 	...props
 }) => {
 	const handleSubmit = () => {
@@ -102,6 +103,7 @@ ModalConfirmCommon.propTypes = {
 	item: PropTypes.object,
 	onClose: PropTypes.func,
 	onSubmit: PropTypes.func,
+	isShowNote: PropTypes.bool,
 };
 ModalConfirmCommon.defaultProps = {
 	className: null,
@@ -114,6 +116,7 @@ ModalConfirmCommon.defaultProps = {
 	item: null,
 	onClose: null,
 	onSubmit: null,
+	isShowNote: false,
 };
 
 export default ModalConfirmCommon;

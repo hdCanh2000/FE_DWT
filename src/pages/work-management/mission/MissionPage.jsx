@@ -42,7 +42,7 @@ import MissionAlertConfirm from './MissionAlertConfirm';
 import MissionFormModal from './MissionFormModal';
 import Badge from '../../../components/bootstrap/Badge';
 import Progress from '../../../components/bootstrap/Progress';
-import { calcProgressMissionByTaskComplete, calcProgressTask } from '../../../utils/function';
+import { calcProgressMission, calcProgressTask } from '../../../utils/function';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 
@@ -450,17 +450,11 @@ const MissionPage = () => {
 										</div>
 										<div className='row mt-4'>
 											<div className='col-md-12'>
-												{calcProgressMissionByTaskComplete(
-													item,
-													item?.tasks,
-												)}
+												{calcProgressMission(item, item?.tasks)}
 												%
 												<Progress
 													isAutoColor
-													value={calcProgressMissionByTaskComplete(
-														item,
-														item?.tasks,
-													)}
+													value={calcProgressMission(item, item?.tasks)}
 													height={10}
 												/>
 											</div>
@@ -549,7 +543,7 @@ const MissionPage = () => {
 													<td align='center'>
 														<div className='d-flex align-items-center'>
 															<div className='flex-shrink-0 me-3'>
-																{calcProgressMissionByTaskComplete(
+																{calcProgressMission(
 																	item,
 																	item?.tasks,
 																)}
@@ -558,7 +552,7 @@ const MissionPage = () => {
 															<Progress
 																className='flex-grow-1'
 																isAutoColor
-																value={calcProgressMissionByTaskComplete(
+																value={calcProgressMission(
 																	item,
 																	item?.tasks,
 																)}

@@ -240,23 +240,6 @@ const SubTaskPage = () => {
 		}
 	};
 
-	const checkStepCompleted = (data) => {
-		let total = 0;
-		if (data?.steps?.length === 0 || !data?.steps?.length) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} chưa có bước hoàn thành!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		data?.steps?.forEach((step) => {
-			if (step?.status === 1) total += 1;
-		});
-		return total === data?.steps?.length;
-	};
-
 	const prevIsValidClickChangeStatus = (data, status) => {
 		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
 			handleShowToast(
@@ -322,10 +305,6 @@ const SubTaskPage = () => {
 				'Error',
 				'danger',
 			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (status === 3 && !checkStepCompleted(data)) {
 			handleCloseConfirmStatusTask();
 			return false;
 		}

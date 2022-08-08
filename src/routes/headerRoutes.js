@@ -1,8 +1,8 @@
 import React from 'react';
 import { dashboardMenu, demoPages, layoutMenu } from '../menu';
 import DashboardHeader from '../pages/common/Headers/DashboardHeader';
-import DefaultHeader from '../pages/common/Headers/DefaultHeader';
 import CommonHeader from '../pages/common/Headers/CommonHeader';
+import DefaultHeader from '../pages/common/Headers/DefaultHeader';
 
 const headers = [
 	{ path: layoutMenu.pageLayout.subMenu.onlySubheader.path, element: null, exact: true },
@@ -21,69 +21,49 @@ const headers = [
 		element: null,
 		exact: true,
 	},
+
 	// chi tiet cong viec
 	{
-		path: `/quan-ly-cong-viec/cong-viec/danh-sach/:id`,
-		element: null,
-		exact: true,
-	},
-	// chi tiet cong viec
-	{
-		path: `/quan-ly-cong-viec/cong-viec/:id`,
+		path: `/cong-viec/:id`,
 		element: null,
 		exact: true,
 	},
 	// chi tiết đầu việc -step
 	{
-		path: `/quan-ly-cong-viec/cong-viec-:taskid/dau-viec/:id`,
+		path: `/cong-viec-:taskid/dau-viec/:id`,
 		element: null,
-		exact: true,
-	},
-	// quan ly cong viec
-	{
-		path: demoPages.quanLyCongViec.subMenu.congViec.path,
-		element: <CommonHeader />,
 		exact: true,
 	},
 
 	// danh sach cong viec
 	{
-		path: demoPages.quanLyCongViec.subMenu.danhSach.path,
-		element: <CommonHeader />,
+		path: demoPages.quanLyCongViec.path,
+		element: null,
 		exact: true,
 	},
 
-	// quan ly dau viec
+	// quản lý phòng ban
 	{
-		path: demoPages.quanLyCongViec.subMenu.dauViec.path,
+		path: demoPages.phongBan.path,
 		element: <CommonHeader />,
 		exact: true,
 	},
-
-	// công việc phòng ban chi tiết - danh sách dạng bảng
+	// quản lý nhân viên
 	{
-		path: demoPages.quanLyCongViec.subMenu.danhSachCongViecPhongBan.path,
+		path: demoPages.nhanVien.path,
 		element: <CommonHeader />,
 		exact: true,
 	},
-
-	// công việc phòng ban chi tiết - danh sách chi tiết dạng cột
-	{
-		path: demoPages.quanLyCongViec.subMenu.chiTietCongViecPhongBan.path,
-		element: <CommonHeader />,
-		exact: true,
-	},
-
 	// công việc phòng ban chi tiết - cấu hình
 	{
 		path: demoPages.cauHinh.path,
-		element: <CommonHeader />,
+		element: null,
 		exact: true,
 	},
 	// công việc phòng ban chi tiết - báo cáo
 	{
 		path: demoPages.baoCao.path,
-		element: <CommonHeader />,
+		element: null,
 		exact: true,
 	},
 	{
