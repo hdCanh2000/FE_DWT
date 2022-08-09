@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
-import _ from 'lodash';
 import COLORS from '../../../common/data/enumColors';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -340,7 +339,6 @@ const SubTaskPage = () => {
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
-	// handleStatus(4, item)
 
 	const handleOpenConfirmStatusTask = (item, nextStatus) => {
 		setOpenConfirmModalStatus(true);
@@ -355,16 +353,6 @@ const SubTaskPage = () => {
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
 		setTaskEdit(null);
-	};
-
-	// Số kpi của subtask đã được giao
-	const totalKpiSubtask = (newSubtask) => {
-		if (_.isEmpty(newSubtask)) return 0;
-		let totalKpi = 0;
-		newSubtask.forEach((item) => {
-			totalKpi += item.kpi_value;
-		});
-		return totalKpi;
 	};
 
 	// edit task
@@ -382,7 +370,6 @@ const SubTaskPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			current_kpi_value: totalKpiSubtask(newSubTasks),
 		});
 		try {
 			const respose = await updateSubtasks(task?.id, newData);

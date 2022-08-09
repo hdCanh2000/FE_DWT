@@ -3,7 +3,13 @@
 import classNames from 'classnames';
 import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {
+	createSearchParams,
+	Link,
+	useLocation,
+	useNavigate,
+	useSearchParams,
+} from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Card, {
 	CardActions,
@@ -27,7 +33,7 @@ import {
 	formatColorPriority,
 	formatColorStatus,
 	FORMAT_TASK_STATUS,
-	STATUS,
+	TASK_STATUS_MANAGE,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -39,22 +45,6 @@ import Progress from '../../../components/bootstrap/Progress';
 import ExpandRow from './ExpandRow';
 import { calcProgressTask } from '../../../utils/function';
 import Badge from '../../../components/bootstrap/Badge';
-
-const minWidth300 = {
-	minWidth: 300,
-};
-
-const minWidth200 = {
-	minWidth: 200,
-};
-
-const minWidth150 = {
-	minWidth: 150,
-};
-
-const minWidth100 = {
-	minWidth: 100,
-};
 
 const Item = ({
 	id,
@@ -150,7 +140,9 @@ const TaskListPage = () => {
 	const [itemEdit, setItemEdit] = useState({});
 	const [expandedRows, setExpandedRows] = useState([]);
 	const [expandState, setExpandState] = useState({});
-	const [switchView, setSwitchView] = useState(1);
+	const [searchParams] = useSearchParams();
+	const navigate = useNavigate();
+	const location = useLocation();
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
@@ -295,6 +287,15 @@ const TaskListPage = () => {
 		}
 	};
 
+	const handleClickSwitchView = (view) => {
+		navigate({
+			pathname: location.pathname,
+			search: `?${createSearchParams({
+				view,
+			})}`,
+		});
+	};
+
 	return (
 		<PageWrapper title={demoPages.quanLyCongViec.text}>
 			<Page container='fluid'>
@@ -306,16 +307,16 @@ const TaskListPage = () => {
 								<Button
 									size='lg'
 									className='rounded-0'
-									color='info'
-									icon='CardList'
-									onClick={() => setSwitchView(1)}
+									color='primary'
+									icon='Table'
+									onClick={() => handleClickSwitchView(1)}
 								/>
 								<Button
 									size='lg'
 									className='rounded-0'
-									color='primary'
-									icon='Table'
-									onClick={() => setSwitchView(0)}
+									color='info'
+									icon='CardList'
+									onClick={() => handleClickSwitchView(2)}
 								/>
 							</div>
 						</div>
@@ -323,8 +324,9 @@ const TaskListPage = () => {
 				</div>
 				<div className='row'>
 					<div className='col-md-12' style={{ marginTop: 50 }}>
-						{switchView === 0 ? (
-							<Card style={{ minHeight: '80vh' }} stretch>
+						{parseInt(searchParams.get('view'), 10) === 1 ||
+						!searchParams.get('view') ? (
+							<Card>
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
 										<CardTitle>
@@ -341,7 +343,7 @@ const TaskListPage = () => {
 										</Button>
 									</CardActions>
 								</CardHeader>
-								<CardBody className='table-responsive' isScrollable>
+								<div className='p-4'>
 									<table
 										className='table table-modern mb-0'
 										style={{ fontSize: 14 }}>
@@ -352,7 +354,6 @@ const TaskListPage = () => {
 												<th className='text-center'>Số đầu việc</th>
 												<th className='text-center'>Phòng ban</th>
 												<th className='text-center'>Nhân viên</th>
-												<th className='text-center'>Thời gian dự tính</th>
 												<th className='text-center'>Hạn hoàn thành</th>
 												<th className='text-center'>Giá trị KPI</th>
 												<th className='text-center'>Độ ưu tiên</th>
@@ -366,16 +367,14 @@ const TaskListPage = () => {
 												<React.Fragment key={item.id}>
 													<tr>
 														<td>{index + 1}</td>
-														<td
-															className='cursor-pointer'
-															style={minWidth300}>
+														<td className='cursor-pointer'>
 															<Link
 																className='text-underline'
-																to={`/quan-ly-cong-viec/cong-viec/${item?.id}`}>
+																to={`/cong-viec/${item?.id}`}>
 																{item?.name}
 															</Link>
 														</td>
-														<td align='center' style={minWidth150}>
+														<td align='center'>
 															<Button
 																className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
 																onClick={(event) =>
@@ -397,54 +396,19 @@ const TaskListPage = () => {
 																</span>
 															</Button>
 														</td>
-														<td
-															style={minWidth200}
-															className='text-center'>
+														<td className='text-center'>
 															{item?.department?.name}
 														</td>
-														<td
-															style={minWidth200}
-															className='text-center'>
+														<td className='text-center'>
 															{item?.user?.name}
 														</td>
 														<td align='center'>
-															<div className='d-flex align-items-center'>
-																<span
-																	className='text-nowrap'
-																	style={{
-																		background: '#A25DDC',
-																		color: '#fff',
-																		padding:
-																			'5px 30px 5px 30px',
-																		borderRadius: '2rem',
-																	}}>
-																	{moment(
-																		`${item.estimate_date} ${item.estimate_time}`,
-																	).format('DD-MM-YYYY, HH:mm')}
-																</span>
-															</div>
+															{moment(`${item.deadline_date}`).format(
+																'DD-MM-YYYY',
+															)}
 														</td>
-														<td align='center'>
-															<div className='d-flex align-items-center'>
-																<span
-																	className='text-nowrap'
-																	style={{
-																		background: '#569CFB',
-																		color: '#fff',
-																		padding:
-																			'5px 30px 5px 30px',
-																		borderRadius: '2rem',
-																	}}>
-																	{moment(
-																		`${item.deadline_date} ${item.deadline_time}`,
-																	).format('DD-MM-YYYY, HH:mm')}
-																</span>
-															</div>
-														</td>
-														<td align='center' style={minWidth100}>
-															{item?.kpi_value}
-														</td>
-														<td style={minWidth100}>
+														<td align='center'>{item?.kpi_value}</td>
+														<td>
 															<div className='d-flex align-items-center'>
 																<span
 																	style={{
@@ -471,7 +435,7 @@ const TaskListPage = () => {
 																	<Button
 																		isLink
 																		color={formatColorStatus(
-																			item.status,
+																			item?.status,
 																		)}
 																		icon='Circle'
 																		className='text-nowrap'>
@@ -481,59 +445,66 @@ const TaskListPage = () => {
 																	</Button>
 																</DropdownToggle>
 																<DropdownMenu>
-																	{Object.keys(STATUS).map(
-																		(key) => (
-																			<DropdownItem
-																				key={key}
-																				onClick={() =>
-																					handleUpdateStatus(
-																						STATUS[key]
-																							.value,
-																						item,
-																					)
-																				}>
-																				<div>
-																					<Icon
-																						icon='Circle'
-																						color={
-																							STATUS[
-																								key
-																							].color
-																						}
-																					/>
-																					{
-																						STATUS[key]
-																							.name
+																	{Object.keys(
+																		TASK_STATUS_MANAGE,
+																	).map((key) => (
+																		<DropdownItem
+																			key={key}
+																			onClick={() =>
+																				handleUpdateStatus(
+																					TASK_STATUS_MANAGE[
+																						key
+																					].value,
+																					item,
+																				)
+																			}>
+																			<div>
+																				<Icon
+																					icon='Circle'
+																					color={
+																						TASK_STATUS_MANAGE[
+																							key
+																						].color
 																					}
-																				</div>
-																			</DropdownItem>
-																		),
-																	)}
+																				/>
+																				{
+																					TASK_STATUS_MANAGE[
+																						key
+																					].name
+																				}
+																			</div>
+																		</DropdownItem>
+																	))}
 																</DropdownMenu>
 															</Dropdown>
 														</td>
-														<td style={minWidth150}>
-															<div className='d-flex align-items-center'>
-																<div className='flex-shrink-0 me-3'>
-																	{`${75}%`}
-																</div>
+														<td>
+															<div className='d-flex align-items-center flex-column'>
+																<div className='flex-shrink-0 me-3'>{`${calcProgressTask(
+																	item,
+																)}%`}</div>
 																<Progress
 																	className='flex-grow-1'
 																	isAutoColor
-																	value={75}
+																	value={calcProgressTask(item)}
 																	style={{
 																		height: 10,
+																		width: '100%',
 																	}}
 																/>
 															</div>
 														</td>
-														<td style={minWidth200}>
+														<td>
 															<Button
 																isOutline={!darkModeStatus}
 																color='success'
 																isLight={darkModeStatus}
 																className='text-nowrap mx-2'
 																icon='Edit'
+																isDisable={
+																	item.status === 4 ||
+																	item.status === 7
+																}
 																onClick={() =>
 																	handleOpenEditForm(item)
 																}
@@ -551,11 +522,14 @@ const TaskListPage = () => {
 														</td>
 													</tr>
 													<tr>
-														<td colSpan='10'>
+														<td
+															colSpan='11'
+															style={{ paddingLeft: 50 }}>
 															{expandedRows.includes(item.id) && (
 																<ExpandRow
 																	key={item.id}
 																	subtasks={item.subtasks}
+																	taskId={item.id}
 																/>
 															)}
 														</td>
@@ -564,16 +538,12 @@ const TaskListPage = () => {
 											))}
 										</tbody>
 									</table>
-									{!tasks?.length && (
-										<Alert
-											color='warning'
-											isLight
-											icon='Report'
-											className='mt-3'>
-											Không có công việc thuộc mục tiêu này!
-										</Alert>
-									)}
-								</CardBody>
+								</div>
+								{!tasks?.length && (
+									<Alert color='warning' isLight icon='Report' className='mt-3'>
+										Không có công việc thuộc mục tiêu này!
+									</Alert>
+								)}
 							</Card>
 						) : (
 							<div className='row'>

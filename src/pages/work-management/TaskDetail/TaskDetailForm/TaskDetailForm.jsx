@@ -1,7 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef } from 'react';
-import _, { parseInt } from 'lodash';
+import { parseInt } from 'lodash';
 import moment from 'moment';
 import toast, { Toaster } from 'react-hot-toast';
 import styled from 'styled-components';
@@ -231,9 +231,6 @@ const TaskDetailForm = ({
 			const taskValue = JSON.parse(JSON.stringify(task));
 			const data = Object.assign(taskValue, {
 				subtasks: subTaskValue,
-				// eslint-disable-next-line no-unsafe-optional-chaining
-				current_kpi_value:
-					totalKpiSubtask(task?.subtasks) + parseInt(valueInput?.kpi_value, 10),
 			});
 			try {
 				const respose = await updateSubtasks(id, data).then(
@@ -308,7 +305,6 @@ const TaskDetailForm = ({
 			const taskValue = JSON.parse(JSON.stringify(task));
 			const newData = Object.assign(taskValue, {
 				subtasks: newSubTasks,
-				current_kpi_value: totalKpiSubtask(newSubTasks),
 			});
 			try {
 				const respose = await updateSubtasks(id, newData).then(
@@ -347,14 +343,7 @@ const TaskDetailForm = ({
 	const handleRemoveKeyField = (_e, index) => {
 		setKeysState((prev) => prev?.filter((state) => state !== prev[index]));
 	};
-	const totalKpiSubtask = (subtasks) => {
-		if (_.isEmpty(subtasks)) return 0;
-		let totalKpi = 0;
-		subtasks.forEach((item) => {
-			totalKpi += item.kpi_value;
-		});
-		return totalKpi;
-	};
+
 	const handleChangeKeysState = (index, event) => {
 		event.preventDefault();
 		event.persist();
