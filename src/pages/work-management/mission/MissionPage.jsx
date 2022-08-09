@@ -43,7 +43,11 @@ import MissionAlertConfirm from './MissionAlertConfirm';
 import MissionFormModal from './MissionFormModal';
 import Badge from '../../../components/bootstrap/Badge';
 import Progress from '../../../components/bootstrap/Progress';
-import { calcProgressMission, calcProgressTask } from '../../../utils/function';
+import {
+	calcProgressMission,
+	calcProgressTask,
+	calcTotalCurrentKPIOfMission,
+} from '../../../utils/function';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 
@@ -366,7 +370,10 @@ const MissionPage = () => {
 													<div>
 														KPI thực tế:
 														<span className='text-danger fw-bold ps-2'>
-															{item?.current_kpi_value || 0}
+															{calcTotalCurrentKPIOfMission(
+																item,
+																item?.tasks,
+															) || 0}
 														</span>
 													</div>
 												</div>
@@ -564,7 +571,10 @@ const MissionPage = () => {
 													</td>
 													<td align='center'>{item?.kpi_value}</td>
 													<td align='center'>
-														{item?.current_kpi_value}
+														{calcTotalCurrentKPIOfMission(
+															item,
+															item?.tasks,
+														)}
 													</td>
 													<td>
 														<Button

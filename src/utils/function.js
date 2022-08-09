@@ -35,6 +35,7 @@ const calcTotalStepCompleteOfSubTask = (subtask) => {
 // tính % hoàn thành của 1 subtask
 const calcProgressSubtask = (subtask) => {
 	if (isEmpty(subtask)) return 0;
+	if (subtask.status === 4 || subtask.status === 7) return 100;
 	const { steps } = subtask;
 	if (isEmpty(steps)) return 0;
 	return (
@@ -134,10 +135,30 @@ const calcTotalSubtaskByStatus = (task, status) => {
 };
 
 // ------------		  UPDATE FUNCTION CALC CURRENT KPI VALUE	-----------------
+// kpi thực tế của 1 task
+const calcTotalCurrentKPIOfTask = (task) => {
+	if (isEmpty(task)) return 0;
+	const { subtasks } = task;
+	if (isEmpty(subtasks) || !isArray(subtasks)) return 0;
+	let totalKPI = 0;
+	subtasks.forEach((subtask) => {
+		totalKPI += subtask.kpi_value;
+	});
+	return totalKPI;
+};
 
-// kpi thực tế của của 1 task
+// kpi thực tế của của 1 mission
+const calcTotalCurrentKPIOfMission = (mission, tasks) => {
+	if (isEmpty(mission)) return 0;
+	if (isEmpty(tasks) || !isArray(tasks)) return 0;
+	let totalKPI = 0;
+	tasks.forEach((task) => {
+		totalKPI += calcTotalCurrentKPIOfTask(task);
+	});
+	return totalKPI;
+};
 
-// kpi đã dùng của 1 mission ()
+// kpi đã dùng của 1 mission
 const calcUsedKPIValueOfMission = (mission, tasks) => {
 	if (isEmpty(mission)) return 0;
 	if (isEmpty(tasks) || !isArray(tasks)) return 0;
@@ -163,4 +184,5 @@ export {
 	calcTotalSubtaskByStatus,
 	calcTotalKPIOfTask,
 	calcUsedKPIValueOfMission,
+	calcTotalCurrentKPIOfMission,
 };

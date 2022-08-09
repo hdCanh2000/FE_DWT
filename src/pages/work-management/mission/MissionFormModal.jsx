@@ -262,7 +262,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			});
 			data.status = 0;
 			data.kpi_value = parseInt(data.kpi_value, 10);
-			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
 			const departmentClone = [...departmentOption];
 			data.departments = departmentClone.map((department) => {
 				return {
@@ -308,7 +307,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			});
 			data.status = 0;
 			data.kpi_value = parseInt(data.kpi_value, 10);
-			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
 			const departmentClone = [...departmentOption];
 			data.departments = departmentClone.map((department) => {
 				return {
