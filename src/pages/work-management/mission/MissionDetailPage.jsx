@@ -34,9 +34,9 @@ import {
 	calcKPICompleteOfMission,
 	calcProgressMission,
 	calcProgressTask,
+	calcTotalCurrentKPIOfMission,
 	calcTotalKPIOfTask,
 	calcTotalTaskByStatus,
-	calcUsedKPIValueOfMission,
 } from '../../../utils/function';
 import Button from '../../../components/bootstrap/Button';
 import MissionAlertConfirm from './MissionAlertConfirm';
@@ -274,6 +274,7 @@ const MissionDetailPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
+						isDisable={item.status === 4 || item.status === 7}
 						onClick={() => handleOpenEditForm(item)}
 					/>
 					<Button
@@ -345,9 +346,10 @@ const MissionDetailPage = () => {
 		},
 		{
 			title: 'KPI thực tế',
-			id: 'current_kpi_value',
-			key: 'current_kpi_value',
+			id: 'current_kpi',
+			key: 'current_kpi',
 			type: 'number',
+			render: (item) => <span>{calcTotalKPIOfTask(item)}</span>,
 			align: 'center',
 		},
 		{
@@ -504,15 +506,6 @@ const MissionDetailPage = () => {
 			await deleteTaskById(taskId);
 			const newState = [...tasks];
 			setTasks(newState.filter((item) => item.id !== taskId));
-			try {
-				const missionClone = { ...mission };
-				missionClone.current_kpi_value =
-					mission.current_kpi_value - itemEdit.current_kpi_value;
-				const newMission = await updateMissionById(missionClone);
-				setMission(newMission.data);
-			} catch (error) {
-				setMission(mission);
-			}
 			handleCloseConfirmModal();
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
@@ -583,7 +576,6 @@ const MissionDetailPage = () => {
 			try {
 				const response = await addNewTask({
 					...data,
-					current_kpi_value: 0,
 					mission_id: parseInt(params.id, 10),
 				});
 				const result = await response.data;
@@ -826,22 +818,16 @@ const MissionDetailPage = () => {
 															KPI được giao
 														</div>
 														<div className='fw-bold fs-4 mb-10 mt-4'>
-															{mission?.current_kpi_value}
+															{calcTotalCurrentKPIOfMission(
+																mission,
+																tasks,
+															)}
 														</div>
 														<div className='text-muted'>
 															KPI thực tế
 														</div>
 													</div>
 													<div className='col col-sm-7'>
-														<div className='fw-bold fs-4 mb-10'>
-															{calcUsedKPIValueOfMission(
-																mission,
-																tasks,
-															)}
-														</div>
-														<div className='text-muted'>
-															KPI đã dùng
-														</div>
 														<div className='fw-bold fs-4 mb-10 mt-4'>
 															{calcKPICompleteOfMission(
 																mission,

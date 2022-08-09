@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
-import _ from 'lodash';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import toast from 'react-hot-toast';
@@ -411,7 +410,6 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			current_kpi_value: totalKpiSubtask(newSubTasks),
 		});
 
 		try {
@@ -450,7 +448,6 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			current_kpi_value: totalKpiSubtask(newSubTasks),
 		});
 		try {
 			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
@@ -512,16 +509,6 @@ const TaskDetailPage = () => {
 				toast.error('Cập nhật công việc không thành công. Xin vui lòng thử lại!');
 			}
 		}
-	};
-
-	// Số kpi đã được giao
-	const totalKpiSubtask = (newSubtask) => {
-		if (_.isEmpty(newSubtask)) return 0;
-		let totalKpi = 0;
-		newSubtask.forEach((item) => {
-			if (item.status === 4) totalKpi += item.kpi_value;
-		});
-		return totalKpi;
 	};
 
 	React.useEffect(() => {

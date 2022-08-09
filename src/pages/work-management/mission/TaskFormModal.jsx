@@ -330,7 +330,6 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		const data = { ...task };
 		data.mission_id = parseInt(data?.mission_id, 10);
 		data.kpi_value = parseInt(task?.kpi_value, 10);
-		data.current_kpi_value = task.id ? task?.current_kpi_value : parseInt(task?.kpi_value, 10);
 		data.priority = parseInt(task?.priority, 10);
 		data.keys = keysState.map((key) => {
 			return {
