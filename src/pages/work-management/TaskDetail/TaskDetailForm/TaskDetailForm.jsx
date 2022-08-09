@@ -304,7 +304,6 @@ const TaskDetailForm = ({
 				descriptionRef.current.focus();
 				return;
 			}
-
 			const taskValue = JSON.parse(JSON.stringify(task));
 			const newData = Object.assign(taskValue, {
 				subtasks: newSubTasks,
@@ -327,7 +326,6 @@ const TaskDetailForm = ({
 			return true;
 		}
 		const someEmpty = keysState?.some((key) => key?.key_name === '' || key?.key_value === '');
-
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
 			keysState?.map((_key, index) => {
@@ -341,7 +339,6 @@ const TaskDetailForm = ({
 				setKeysState(allPrev);
 			});
 		}
-
 		return !someEmpty;
 	};
 	const handleRemoveKeyField = (_e, index) => {

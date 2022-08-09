@@ -1,15 +1,25 @@
 import React from 'react';
+
 import PropTypes from 'prop-types';
+
 import { Button, Modal } from 'react-bootstrap';
+
+import moment from 'moment';
+
 import Card, {
 	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
+
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
+
 import Input from '../../../components/bootstrap/forms/Input';
+
 import Textarea from '../../../components/bootstrap/forms/Textarea';
+
+import { FORMAT_TASK_STATUS } from '../../../utils/constants';
 
 const ModalConfirmCommon = ({
 	type,
@@ -19,12 +29,39 @@ const ModalConfirmCommon = ({
 	status,
 	onClose,
 	onSubmit,
+
 	item,
-	isShowNote,
+
 	...props
 }) => {
+	const person = window.localStorage.getItem('name');
+
 	const handleSubmit = () => {
-		onSubmit(status, item);
+		const newWorks = JSON.parse(JSON.stringify(item?.logs || []));
+
+		const newLogs = [
+			...newWorks,
+
+			{
+				user: person,
+
+				type: 1,
+
+				prev_status: FORMAT_TASK_STATUS(item?.status),
+
+				next_status: FORMAT_TASK_STATUS(status),
+
+				[item?.mission_id ? 'task_id' : 'subtask_id']: item?.id,
+
+				[item?.mission_id ? 'task_name' : 'subtask_name']: item?.name,
+
+				time: moment().format('YYYY/MM/DD hh:mm'),
+			},
+		];
+
+		const newItem = { ...item, logs: newLogs };
+
+		onSubmit(status, newItem);
 	};
 
 	return (
@@ -103,7 +140,6 @@ ModalConfirmCommon.propTypes = {
 	item: PropTypes.object,
 	onClose: PropTypes.func,
 	onSubmit: PropTypes.func,
-	isShowNote: PropTypes.bool,
 };
 ModalConfirmCommon.defaultProps = {
 	className: null,
@@ -116,7 +152,6 @@ ModalConfirmCommon.defaultProps = {
 	item: null,
 	onClose: null,
 	onSubmit: null,
-	isShowNote: false,
 };
 
 export default ModalConfirmCommon;
