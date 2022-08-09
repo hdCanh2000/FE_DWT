@@ -35,7 +35,6 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 							</th>
 						);
 					})}
-					<td />
 				</tr>
 			</thead>
 			<tbody>

@@ -54,6 +54,11 @@ const headers = [
 		element: <CommonHeader />,
 		exact: true,
 	},
+	{
+		path: `${demoPages.nhanVien.path}/:id`,
+		element: null,
+		exact: true,
+	},
 	// công việc phòng ban chi tiết - cấu hình
 	{
 		path: demoPages.cauHinh.path,

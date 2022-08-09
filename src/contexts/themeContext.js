@@ -74,7 +74,8 @@ export const ThemeContextProvider = ({ children }) => {
 	return <ThemeContext.Provider value={values}>{children}</ThemeContext.Provider>;
 };
 ThemeContextProvider.propTypes = {
-	children: PropTypes.node.isRequired,
+	// eslint-disable-next-line react/require-default-props
+	children: PropTypes.node,
 };
 
 export default ThemeContext;
