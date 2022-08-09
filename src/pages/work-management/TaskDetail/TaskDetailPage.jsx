@@ -267,7 +267,7 @@ const TaskDetailPage = () => {
 					<Button
 						isOutline={!darkModeStatus}
 						color='success'
-						isDisable={item?.status === 4 || item?.status === 7}
+						isDisable={item?.status === 4 || item?.status === 7 || item.status === 3}
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
@@ -1101,7 +1101,7 @@ const TaskDetailPage = () => {
 										data={task.subtasks?.filter((item) => item.status === 3)}
 									/>
 								</CardBody>
-								{!task?.subtask?.filter((item) => item.status === 3)?.length && (
+								{!task?.subtasks?.filter((item) => item.status === 3)?.length && (
 									<Alert color='warning' isLight icon='Report' className='mt-3'>
 										Không có công việc đang chờ xác nhận!
 									</Alert>
