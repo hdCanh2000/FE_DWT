@@ -274,7 +274,7 @@ const MissionDetailPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						isDisable={item.status === 4 || item.status === 7}
+						isDisable={item.status === 4 || item.status === 7 || item.status === 3}
 						onClick={() => handleOpenEditForm(item)}
 					/>
 					<Button

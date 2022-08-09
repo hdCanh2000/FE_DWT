@@ -18,7 +18,6 @@ import Option from '../../../../components/bootstrap/Option';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
 import Textarea from '../../../../components/bootstrap/forms/Textarea';
-import Card, { CardBody } from '../../../../components/bootstrap/Card';
 import Button from '../../../../components/bootstrap/Button';
 import Icon from '../../../../components/icon/Icon';
 import Toasts from '../../../../components/bootstrap/Toasts';
@@ -184,12 +183,13 @@ const TaskDetailForm = ({
 					type: 2,
 					prev_status: null,
 					next_status: `Thêm mới`,
-					subtask_id: task.subtasks.length + 1,
+					// eslint-disable-next-line no-unsafe-optional-chaining
+					subtask_id: task?.subtasks?.length + 1,
 					subtask_name: valueInput?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
 			];
-			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks));
+			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks || []));
 			subTaskValue.push({
 				...valueInput,
 				kpi_value: parseInt(valueInput?.kpi_value, 10),
@@ -204,7 +204,8 @@ const TaskDetailForm = ({
 				},
 				departments_related: valueDepartments,
 				users_related: valueUsers,
-				id: task.subtasks.length + 1,
+				// eslint-disable-next-line no-unsafe-optional-chaining
+				id: task?.subtasks?.length + 1,
 				logs: newLogs,
 			});
 			validateForm();
@@ -414,6 +415,7 @@ const TaskDetailForm = ({
 								value={valueInput.name || ''}
 								name='name'
 								ref={nameRef}
+								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
 						{errors?.name?.errorMsg && (
@@ -458,6 +460,7 @@ const TaskDetailForm = ({
 								options={department?.filter(
 									(item) => item.id !== valueDepartment.id,
 								)}
+								placeholder=''
 								ref={departmentRef}
 							/>
 						</FormGroup>
@@ -474,6 +477,7 @@ const TaskDetailForm = ({
 								onChange={setUsersRelated}
 								options={user?.filter((item) => item.id !== valueUser.id)}
 								ref={userRef}
+								placeholder=''
 							/>
 						</FormGroup>
 						{errors?.user?.errorMsg && (
@@ -485,6 +489,7 @@ const TaskDetailForm = ({
 							<Select
 								name='priority'
 								placeholder='Độ ưu tiên'
+								className='border border-2 rounded-0 shadow-none'
 								onChange={handleChange}
 								value={valueInput?.priority}
 								defaultValue={2}>
@@ -505,6 +510,7 @@ const TaskDetailForm = ({
 								name='kpi_value'
 								onChange={handleChange}
 								ref={kpiRef}
+								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
 						{errors?.kpi_value?.errorMsg && <ErrorText>Vui lòng nhập KPI</ErrorText>}
@@ -520,6 +526,7 @@ const TaskDetailForm = ({
 								}
 								name='estimate_date'
 								onChange={handleChange}
+								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
 					</div>
@@ -534,6 +541,7 @@ const TaskDetailForm = ({
 								value={valueInput.estimate_time || ''}
 								name='estimate_time'
 								onChange={handleChange}
+								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
 					</div>
@@ -548,6 +556,7 @@ const TaskDetailForm = ({
 								}
 								name='deadline_date'
 								onChange={handleChange}
+								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
 					</div>
@@ -559,28 +568,25 @@ const TaskDetailForm = ({
 								value={valueInput.deadline_time || ''}
 								name='deadline_time'
 								onChange={handleChange}
+								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
 					</div>
 					<div className='col-12'>
-						<Card isCompact className='mb-0'>
-							<CardBody>
-								<FormGroup id='description' label='Ghi chú mục tiêu' isFloating>
-									<Textarea
-										className='h-100'
-										rows={12}
-										placeholder='note'
-										value={valueInput.description}
-										name='description'
-										onChange={handleChange}
-										ref={descriptionRef}
-									/>
-								</FormGroup>
-								{errors?.description?.errorMsg && (
-									<ErrorText>Vui lòng nhập ghi chú</ErrorText>
-								)}
-							</CardBody>
-						</Card>
+						<FormGroup id='description' label='Ghi chú mục tiêu' isFloating>
+							<Textarea
+								className='h-100 border border-2 rounded-0 shadow-none'
+								rows={12}
+								placeholder='note'
+								value={valueInput.description}
+								name='description'
+								onChange={handleChange}
+								ref={descriptionRef}
+							/>
+						</FormGroup>
+						{errors?.description?.errorMsg && (
+							<ErrorText>Vui lòng nhập ghi chú</ErrorText>
+						)}
 					</div>
 					<div className='col-12'>
 						<FormGroup>

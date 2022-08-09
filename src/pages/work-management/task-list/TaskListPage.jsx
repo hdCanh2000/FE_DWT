@@ -1,7 +1,5 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-import classNames from 'classnames';
-import moment from 'moment';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
 	createSearchParams,
@@ -10,6 +8,9 @@ import {
 	useNavigate,
 	useSearchParams,
 } from 'react-router-dom';
+import classNames from 'classnames';
+import moment from 'moment';
+import { isEmpty } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import Card, {
 	CardActions,
@@ -19,11 +20,6 @@ import Card, {
 	CardSubTitle,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-import Dropdown, {
-	DropdownItem,
-	DropdownMenu,
-	DropdownToggle,
-} from '../../../components/bootstrap/Dropdown';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
@@ -33,7 +29,6 @@ import {
 	formatColorPriority,
 	formatColorStatus,
 	FORMAT_TASK_STATUS,
-	TASK_STATUS_MANAGE,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -45,6 +40,8 @@ import Progress from '../../../components/bootstrap/Progress';
 import ExpandRow from './ExpandRow';
 import { calcProgressTask } from '../../../utils/function';
 import Badge from '../../../components/bootstrap/Badge';
+import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
+import { getAllSubtasks } from '../TaskDetail/services';
 
 const Item = ({
 	id,
@@ -140,12 +137,32 @@ const TaskListPage = () => {
 	const [itemEdit, setItemEdit] = useState({});
 	const [expandedRows, setExpandedRows] = useState([]);
 	const [expandState, setExpandState] = useState({});
+	// handle expand subtask
+	const [task, setTask] = useState({});
+	const [editModalStatusExpand, setEditModalStatusExpand] = useState(false);
+	const [idEditExpand, setIdEditExpand] = useState(0);
+	const [newWorkExpand, setNewWorkExpand] = React.useState([]);
+	const [titleExpand, setTitleExpand] = useState();
+
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const location = useLocation();
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
+
+	// Handle
+	const handleOpenModalExpand = async (items, titles, taskId) => {
+		setEditModalStatusExpand(true);
+		setIdEditExpand(items?.id);
+		setTitleExpand(titles);
+		try {
+			const res = await getAllSubtasks(taskId);
+			setTask(res.data);
+		} catch (error) {
+			setTask({});
+		}
+	};
 
 	const handleEpandRow = (event, userId) => {
 		const currentExpandedRows = expandedRows;
@@ -267,25 +284,25 @@ const TaskListPage = () => {
 		}
 	};
 
-	const handleUpdateStatus = async (status, data) => {
-		try {
-			const newData = { ...data };
-			newData.status = status;
-			const response = await updateTaskByID(newData);
-			const result = await response.data;
-			const newTasks = [...tasks];
-			setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-			handleClearValueForm();
-			handleCloseEditForm();
-			handleShowToast(
-				`Cập nhật công việc!`,
-				`Công việc ${result.name} được cập nhật thành công!`,
-			);
-		} catch (error) {
-			setTasks(tasks);
-			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
-		}
-	};
+	// const handleUpdateStatus = async (status, data) => {
+	// 	try {
+	// 		const newData = { ...data };
+	// 		newData.status = status;
+	// 		const response = await updateTaskByID(newData);
+	// 		const result = await response.data;
+	// 		const newTasks = [...tasks];
+	// 		setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
+	// 		handleClearValueForm();
+	// 		handleCloseEditForm();
+	// 		handleShowToast(
+	// 			`Cập nhật công việc!`,
+	// 			`Công việc ${result.name} được cập nhật thành công!`,
+	// 		);
+	// 	} catch (error) {
+	// 		setTasks(tasks);
+	// 		handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+	// 	}
+	// };
 
 	const handleClickSwitchView = (view) => {
 		navigate({
@@ -430,53 +447,15 @@ const TaskListPage = () => {
 															</div>
 														</td>
 														<td>
-															<Dropdown>
-																<DropdownToggle hasIcon={false}>
-																	<Button
-																		isLink
-																		color={formatColorStatus(
-																			item?.status,
-																		)}
-																		icon='Circle'
-																		className='text-nowrap'>
-																		{FORMAT_TASK_STATUS(
-																			item.status,
-																		)}
-																	</Button>
-																</DropdownToggle>
-																<DropdownMenu>
-																	{Object.keys(
-																		TASK_STATUS_MANAGE,
-																	).map((key) => (
-																		<DropdownItem
-																			key={key}
-																			onClick={() =>
-																				handleUpdateStatus(
-																					TASK_STATUS_MANAGE[
-																						key
-																					].value,
-																					item,
-																				)
-																			}>
-																			<div>
-																				<Icon
-																					icon='Circle'
-																					color={
-																						TASK_STATUS_MANAGE[
-																							key
-																						].color
-																					}
-																				/>
-																				{
-																					TASK_STATUS_MANAGE[
-																						key
-																					].name
-																				}
-																			</div>
-																		</DropdownItem>
-																	))}
-																</DropdownMenu>
-															</Dropdown>
+															<Button
+																isLink
+																color={formatColorStatus(
+																	item.status,
+																)}
+																icon='Circle'
+																className='text-nowrap'>
+																{FORMAT_TASK_STATUS(item.status)}
+															</Button>
 														</td>
 														<td>
 															<div className='d-flex align-items-center flex-column'>
@@ -503,7 +482,8 @@ const TaskListPage = () => {
 																icon='Edit'
 																isDisable={
 																	item.status === 4 ||
-																	item.status === 7
+																	item.status === 7 ||
+																	item.status === 3
 																}
 																onClick={() =>
 																	handleOpenEditForm(item)
@@ -525,12 +505,38 @@ const TaskListPage = () => {
 														<td
 															colSpan='11'
 															style={{ paddingLeft: 50 }}>
-															{expandedRows.includes(item.id) && (
-																<ExpandRow
-																	key={item.id}
-																	subtasks={item.subtasks}
-																	taskId={item.id}
-																/>
+															{expandedRows.includes(item?.id) && (
+																<>
+																	<ExpandRow
+																		key={item.id}
+																		subtasks={
+																			!isEmpty(task)
+																				? task?.subtasks
+																				: item?.subtasks
+																		}
+																		taskId={item.id}
+																		onOpenModal={
+																			handleOpenModalExpand
+																		}
+																	/>
+																	<TaskDetailForm
+																		title={titleExpand}
+																		setTask={setTask}
+																		task={task}
+																		setEditModalStatus={
+																			setEditModalStatusExpand
+																		}
+																		editModalStatus={
+																			editModalStatusExpand
+																		}
+																		id={item.id}
+																		idEdit={idEditExpand}
+																		newWork={newWorkExpand}
+																		setNewWork={
+																			setNewWorkExpand
+																		}
+																	/>
+																</>
 															)}
 														</td>
 													</tr>
@@ -541,7 +547,7 @@ const TaskListPage = () => {
 								</div>
 								{!tasks?.length && (
 									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										Không có công việc thuộc mục tiêu này!
+										Không có công việc!
 									</Alert>
 								)}
 							</Card>
