@@ -912,7 +912,7 @@ const TaskDetailPage = () => {
 																	<div>
 																		<Link
 																			className='text-underline'
-																			to={`/quan-ly-cong-viec/cong-viec-${task?.id}/dau-viec/${item?.id}`}>
+																			to={`/cong-viec-${task?.id}/dau-viec/${item?.id}`}>
 																			{item.name}
 																		</Link>
 																	</div>

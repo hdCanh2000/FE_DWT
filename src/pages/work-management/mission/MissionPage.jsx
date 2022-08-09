@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 
 import React, { useCallback, useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
 	useNavigate,
 	Link,
@@ -58,7 +59,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`/quan-ly-cong-viec/cong-viec/${id}`),
+		() => navigate(`/cong-viec/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -235,7 +236,7 @@ const MissionPage = () => {
 			}
 		} else {
 			try {
-				const response = await addNewMission(data);
+				const response = await addNewMission({ ...data, id: uuidv4() });
 				const result = await response.data;
 				const newMissions = [...missions];
 				newMissions.push(result);
@@ -302,7 +303,6 @@ const MissionPage = () => {
 			})}`,
 		});
 	};
-
 	return (
 		<PageWrapper title={demoPages.mucTieu.text}>
 			<Page container='fluid'>
@@ -613,6 +613,8 @@ const MissionPage = () => {
 						<div className='display-6 fw-bold py-3'>Công việc mới cập nhật</div>
 					</div>
 					{latestTasks.map((item) => {
+						// eslint-disable-next-line no-lone-blocks
+						{console.log(item)}
 						return (
 							<Item
 								key={item?.id}
@@ -624,8 +626,7 @@ const MissionPage = () => {
 								teamName={`${item?.department?.name} - ${item?.user?.name}`}
 								dueDate={`${item?.deadline_date}`}
 								percent={calcProgressTask(item) || 0}
-								data-tour='project-item'
-							/>
+								data-tour='project-item' />
 						);
 					})}
 				</div>

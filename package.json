@@ -100,6 +100,7 @@
 		"react-use": "^17.3.2",
 		"styled-components": "^5.3.5",
 		"use-clipboard-copy": "^0.2.0",
+		"uuid": "^8.3.2",
 		"web-vitals": "^2.1.4"
 	},
 	"devDependencies": {

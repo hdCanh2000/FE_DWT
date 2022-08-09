@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 
 import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import Select from 'react-select';
@@ -248,7 +249,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					type: 2,
 					prev_status: null,
 					next_status: `Thêm mới`,
-					mission_id: mission?.id,
 					mission_name: mission?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
@@ -290,12 +290,11 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				...newWorks,
 				{
 					// eslint-disable-next-line no-unsafe-optional-chaining
-					id: mission?.logs?.length + 1,
+					id: uuidv4(),
 					user: userLogin,
 					type: 2,
 					prev_status: null,
 					next_status: `Chỉnh sửa`,
-					mission_id: mission?.id,
 					mission_name: mission?.name,
 					time: moment().format('YYYY/MM/DD HH:mm'),
 				},

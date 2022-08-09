@@ -1,6 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -525,7 +526,7 @@ const MissionDetailPage = () => {
 		try {
 			await deleteMissionById(missionId);
 			handleCloseConfirmModal();
-			navigate('/muc-tieu/danh-sach');
+			navigate('/muc-tieu');
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
 			handleCloseConfirmModal();
@@ -645,6 +646,7 @@ const MissionDetailPage = () => {
 			setTasks(tasks);
 			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 		}
+		setOpenConfirmMissionModal(false);
 	};
 
 	const prevIsValidClickChangeStatus = (data, status) => {
@@ -1042,6 +1044,7 @@ const MissionDetailPage = () => {
 										.reverse()
 										.map((item) => (
 											<RelatedActionCommonItem
+												key={uuidv4()}
 												type={item?.type}
 												time={moment(`${item?.time}`).format(
 													'DD/MM/YYYY HH.mm',
