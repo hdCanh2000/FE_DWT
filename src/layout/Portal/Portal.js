@@ -11,7 +11,7 @@ const Portal = ({ id, children }) => {
 	return ReactDOM.createPortal(children, mount);
 };
 Portal.propTypes = {
-	children: PropTypes.node.isRequired,
+	children: PropTypes.node,
 	id: PropTypes.string,
 };
 Portal.defaultProps = {

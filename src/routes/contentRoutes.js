@@ -28,6 +28,7 @@ const TASK = {
 const MANAGEMENT = {
 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
+	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 };
 
 const AUTH = {
@@ -148,6 +149,11 @@ const presentation = [
 	{
 		path: demoPages.nhanVien.path,
 		element: <MANAGEMENT.EMPLOYEE />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.nhanVien.path}/:id`,
+		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
 		exact: true,
 	},
 	{
