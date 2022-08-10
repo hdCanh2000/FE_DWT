@@ -13,6 +13,7 @@ import Input from '../../components/bootstrap/forms/Input';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Avatar from '../../components/Avatar';
 import { getUserById } from './services';
+import Textarea from '../../components/bootstrap/forms/Textarea';
 
 const EmployeePage = () => {
 	const navigate = useNavigate();
@@ -26,6 +27,8 @@ const EmployeePage = () => {
 			phone: user?.phone || '',
 			address: user?.address || '',
 			city: user?.city || '',
+			dateOfBirth: user?.dateOfBirth || '',
+			dateOfJoin: user?.dateOfJoin || '',
 			department: user?.department?.name || '',
 			active: true,
 		},
@@ -47,6 +50,8 @@ const EmployeePage = () => {
 					phone: data?.phone,
 					address: data?.address,
 					city: data?.city,
+					dateOfBirth: user?.dateOfBirth || '',
+					dateOfJoin: user?.dateOfJoin || '',
 					department: data?.department,
 				};
 			} catch (error) {
@@ -282,11 +287,9 @@ const EmployeePage = () => {
 													</FormGroup>
 												</div>
 												<div className='col-12'>
-													<FormGroup
-														id='address'
-														label='Địa chỉ'
-														isFloating>
-														<Input
+													<FormGroup id='address' label='Địa chỉ'>
+														<Textarea
+															rows={5}
 															placeholder='Địa chỉ'
 															onChange={formik.handleChange}
 															onBlur={formik.handleBlur}

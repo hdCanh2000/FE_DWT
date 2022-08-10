@@ -379,7 +379,7 @@ const DepartmentDetailPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columns}
-											data={department?.users}
+											data={department?.employees}
 										/>
 									</div>
 								</Card>

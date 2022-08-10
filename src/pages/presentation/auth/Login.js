@@ -33,7 +33,7 @@ const Login = ({ isSignUp }) => {
 	const { darkModeStatus } = useDarkMode();
 	const [isNewUser] = useState(isSignUp);
 	const [account, setAccount] = useState({
-		username: '',
+		email: '',
 		password: '',
 	});
 	const [errorMessage, setErrorMessage] = useState('');
@@ -49,16 +49,13 @@ const Login = ({ isSignUp }) => {
 	const navigate = useNavigate();
 	const handleOnClick = async () => {
 		try {
-			const response = await login();
+			const response = await login(account);
 			const result = await response.data;
-			if (result.username === account.username && result.password === account.password) {
-				localStorage.setItem('token', result.token);
-				localStorage.setItem('username', result.username);
-				localStorage.setItem('name', result.name);
-				navigate('/muc-tieu');
-			} else {
-				setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
-			}
+			localStorage.setItem('token', result.accessToken);
+			localStorage.setItem('email', result.user.email);
+			localStorage.setItem('name', result.user.name);
+			localStorage.setItem('roles', result.user.roles);
+			navigate('/muc-tieu');
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 		}
@@ -136,12 +133,12 @@ const Login = ({ isSignUp }) => {
 										<>
 											<div className='col-12 mb-'>
 												<FormGroup
-													id='username'
+													id='email'
 													className='mb-3'
 													isFloating
-													label='Nhập tên tài khoản hoặc email'>
+													label='Nhập email'>
 													<Input
-														autoComplete='username'
+														autoComplete='email'
 														onChange={handleChange}
 													/>
 												</FormGroup>

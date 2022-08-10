@@ -91,7 +91,7 @@ const DepartmentPage = () => {
 			type: 'number',
 			align: 'center',
 			isShow: false,
-			render: (item) => item?.users?.length || 0,
+			render: (item) => item?.employees?.length || 0,
 		},
 		{
 			title: 'Trạng thái',
@@ -192,7 +192,7 @@ const DepartmentPage = () => {
 				setDepartments(newDepartments);
 				handleClearValueForm();
 				hanleCloseForm();
-				handleShowToast(`Thêm phòng ban`, `phòng ban ${result.name} được thêm thành công!`);
+				handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
 			} catch (error) {
 				setDepartments(departments);
 				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);

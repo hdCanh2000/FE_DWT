@@ -39,7 +39,7 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 						<td>
 							<Link
 								className='text-underline'
-								to={`/cong-viec-${subTaskItem.task_id}/dau-viec/${subTaskItem?.id}`}>
+								to={`/cong-viec-${subTaskItem.taskId}/dau-viec/${subTaskItem?.id}`}>
 								{subTaskItem?.name}
 							</Link>
 						</td>
@@ -54,9 +54,9 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 							</Button>
 						</td>
 						<td className='text-center'>
-							{moment(`${subTaskItem.deadline_date}`).format('DD-MM-YYYY')}
+							{moment(`${subTaskItem.deadlineDate}`).format('DD-MM-YYYY')}
 						</td>
-						<td className='text-center'>{subTaskItem.kpi_value}</td>
+						<td className='text-center'>{subTaskItem.kpiValue}</td>
 						<td className='text-center' style={minWidth100}>
 							<div className='d-flex align-items-center'>
 								<div className='flex-shrink-0 me-3'>{`${calcProgressSubtask(
