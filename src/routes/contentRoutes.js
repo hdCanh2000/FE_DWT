@@ -27,6 +27,7 @@ const TASK = {
 
 const MANAGEMENT = {
 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
+	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 };
@@ -144,6 +145,11 @@ const presentation = [
 	{
 		path: demoPages.phongBan.path,
 		element: <MANAGEMENT.DEPARTMENT />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.phongBan.path}/:id`,
+		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
 		exact: true,
 	},
 	{

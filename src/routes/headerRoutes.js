@@ -48,6 +48,11 @@ const headers = [
 		element: <CommonHeader />,
 		exact: true,
 	},
+	{
+		path: `${demoPages.phongBan.path}/:id`,
+		element: null,
+		exact: true,
+	},
 	// quản lý nhân viên
 	{
 		path: demoPages.nhanVien.path,
