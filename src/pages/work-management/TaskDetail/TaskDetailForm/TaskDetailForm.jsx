@@ -52,7 +52,7 @@ const TaskDetailForm = ({
 	const initError = {
 		name: { errorMsg: '' },
 		description: { errorMsg: '' },
-		kpi_value: { errorMsg: '' },
+		kpiValue: { errorMsg: '' },
 		user: { errorMsg: '' },
 		department: { errorMsg: '' },
 	};
@@ -63,17 +63,17 @@ const TaskDetailForm = ({
 	const userRef = useRef(null);
 	const departmentRef = useRef(null);
 	const initValueInput = {
-		task_id: id,
+		taskId: id,
 		priority: 2,
 		status: 0,
 		percent: 0,
 		name: '',
 		description: '',
-		estimate_date: '2022-12-01',
-		estimate_time: '08:00',
-		deadline_date: '2022-12-01',
-		deadline_time: '17:00',
-		kpi_value: 0,
+		estimateDate: '2022-12-01',
+		estimateTime: '08:00',
+		deadlineDate: '2022-12-01',
+		deadlineTime: '17:00',
+		kpiValue: 0,
 		keys: [],
 		steps: [],
 	};
@@ -107,7 +107,7 @@ const TaskDetailForm = ({
 			setValueInput(value);
 			setSubTask(value);
 			setUsersRelated(
-				value?.users_related?.map((item) => {
+				value?.usersRelated?.map((item) => {
 					return {
 						id: item.id,
 						label: item.name,
@@ -116,7 +116,7 @@ const TaskDetailForm = ({
 				}),
 			);
 			setDepartmentRelated(
-				value?.departments_related?.map((item) => {
+				value?.departmentsRelated?.map((item) => {
 					return {
 						id: item.id,
 						label: item.name,
@@ -181,18 +181,18 @@ const TaskDetailForm = ({
 					id: 1,
 					user: person,
 					type: 2,
-					prev_status: null,
-					next_status: `Thêm mới`,
+					prevStatus: null,
+					nextStatus: `Thêm mới`,
 					// eslint-disable-next-line no-unsafe-optional-chaining
-					subtask_id: task?.subtasks?.length + 1,
-					subtask_name: valueInput?.name,
+					subtaskId: task?.subtasks?.length + 1,
+					subtaskName: valueInput?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
 			];
 			const subTaskValue = JSON.parse(JSON.stringify(task?.subtasks || []));
 			subTaskValue.push({
 				...valueInput,
-				kpi_value: parseInt(valueInput?.kpi_value, 10),
+				kpiValue: parseInt(valueInput?.kpiValue, 10),
 				keys: keysState,
 				user: {
 					id: valueUser.id,
@@ -202,8 +202,8 @@ const TaskDetailForm = ({
 					id: valueDepartment.id,
 					name: valueDepartment.label,
 				},
-				departments_related: valueDepartments,
-				users_related: valueUsers,
+				departmentsRelated: valueDepartments,
+				usersRelated: valueUsers,
 				// eslint-disable-next-line no-unsafe-optional-chaining
 				id: task?.subtasks?.length + 1,
 				logs: newLogs,
@@ -221,7 +221,7 @@ const TaskDetailForm = ({
 				userRef.current.focus();
 				return;
 			}
-			if (!valueInput?.kpi_value) {
+			if (!valueInput?.kpiValue) {
 				kpiRef.current.focus();
 				return;
 			}
@@ -254,10 +254,10 @@ const TaskDetailForm = ({
 				{
 					user: person,
 					type: 2,
-					prev_status: null,
-					next_status: `Chỉnh sửa`,
-					subtask_id: idEdit,
-					subtask_name: subtask?.name,
+					prevStatus: null,
+					nextStatus: `Chỉnh sửa`,
+					subtaskId: idEdit,
+					subtaskName: subtask?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
 			];
@@ -266,9 +266,9 @@ const TaskDetailForm = ({
 					? {
 							...valueInput,
 							keys: keysState,
-							kpi_value: parseInt(valueInput?.kpi_value),
-							departments_related: valueDepartments,
-							users_related: valueUsers,
+							kpiValue: parseInt(valueInput?.kpiValue),
+							departmentsRelated: valueDepartments,
+							usersRelated: valueUsers,
 							user: {
 								id: valueUser.id,
 								name: valueUser.label,
@@ -294,7 +294,7 @@ const TaskDetailForm = ({
 				userRef.current.focus();
 				return;
 			}
-			if (!valueInput?.kpi_value) {
+			if (!valueInput?.kpiValue) {
 				kpiRef.current.focus();
 				return;
 			}
@@ -323,17 +323,17 @@ const TaskDetailForm = ({
 		if (keysState?.length === 0 || !keysState) {
 			return true;
 		}
-		const someEmpty = keysState?.some((key) => key?.key_name === '' || key?.key_value === '');
+		const someEmpty = keysState?.some((key) => key?.keyName === '' || key?.keyValue === '');
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
 			keysState?.map((_key, index) => {
 				const allPrev = [...keysState] || [];
-				if (keysState[index]?.key_name === '') {
-					allPrev[index].error.key_name = 'Nhập tên chỉ số key!';
+				if (keysState[index]?.keyName === '') {
+					allPrev[index].error.keyName = 'Nhập tên chỉ số key!';
 				}
-				if (keysState[index]?.key_value === '') {
-					allPrev[index].error.key_value = 'Nhập giá trị key!';
+				if (keysState[index]?.keyValue === '') {
+					allPrev[index].error.keyValue = 'Nhập giá trị key!';
 				}
 				setKeysState(allPrev);
 			});
@@ -367,11 +367,11 @@ const TaskDetailForm = ({
 	};
 	const handleAddFieldKey = () => {
 		const initKeyState = {
-			key_name: '',
-			key_value: '',
+			keyName: '',
+			keyValue: '',
 			error: {
-				key_name: null,
-				key_value: null,
+				keyName: null,
+				keyValue: null,
 			},
 		};
 		if (prevIsValid()) {
@@ -393,7 +393,7 @@ const TaskDetailForm = ({
 	const validateForm = () => {
 		validateFieldForm('name', valueInput?.name);
 		validateFieldForm('description', valueInput?.description);
-		validateFieldForm('kpi_value', valueInput?.kpi_value);
+		validateFieldForm('kpiValue', valueInput?.kpiValue);
 		validateFieldForm('department', valueDepartment?.label);
 		validateFieldForm('user', valueUser?.label);
 	};
@@ -502,18 +502,18 @@ const TaskDetailForm = ({
 						</FormGroup>
 					</div>
 					<div className='col-12'>
-						<FormGroup id='total_kpi_value' label='Mức điểm KPI' isFloating>
+						<FormGroup id='kpiValue' label='Mức điểm KPI' isFloating>
 							<Input
 								type='number'
 								placeholder='Mức điểm KPI'
-								value={valueInput.kpi_value || ''}
-								name='kpi_value'
+								value={valueInput.kpiValue || ''}
+								name='kpiValue'
 								onChange={handleChange}
 								ref={kpiRef}
 								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
-						{errors?.kpi_value?.errorMsg && <ErrorText>Vui lòng nhập KPI</ErrorText>}
+						{errors?.kpiValue?.errorMsg && <ErrorText>Vui lòng nhập KPI</ErrorText>}
 					</div>
 					<div className='col-6'>
 						<FormGroup id='estimateDate' label='Ngày hoàn thành ước tính' isFloating>
@@ -521,10 +521,10 @@ const TaskDetailForm = ({
 								placeholder='Ngày hoàn thành ước tính'
 								type='date'
 								value={
-									valueInput.estimate_date ||
+									valueInput.estimateDate ||
 									moment().add(0, 'days').format('YYYY/MM/DD')
 								}
-								name='estimate_date'
+								name='estimateDate'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -538,8 +538,8 @@ const TaskDetailForm = ({
 							<Input
 								placeholder='Thời gian hoàn thành ước tính'
 								type='time'
-								value={valueInput.estimate_time || ''}
-								name='estimate_time'
+								value={valueInput.estimateTime || ''}
+								name='estimateTime'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -551,10 +551,10 @@ const TaskDetailForm = ({
 								placeholder='Hạn ngày hoàn thành'
 								type='date'
 								value={
-									valueInput.deadline_date ||
+									valueInput.deadlineDate ||
 									moment().add(0, 'days').format('YYYY/MM/DD')
 								}
-								name='deadline_date'
+								name='deadlineDate'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -565,8 +565,8 @@ const TaskDetailForm = ({
 							<Input
 								placeholder='Hạn thời gian hoàn thành'
 								type='time'
-								value={valueInput.deadline_time || ''}
-								name='deadline_time'
+								value={valueInput.deadlineTime || ''}
+								name='deadlineTime'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -617,32 +617,32 @@ const TaskDetailForm = ({
 											label='Tên chỉ số key'>
 											<Input
 												onChange={(e) => handleChangeKeysState(index, e)}
-												value={item?.key_name || ''}
-												name='key_name'
+												value={item?.keyName || ''}
+												name='keyName'
 												required
 												size='lg'
 												className='border border-2'
 												placeholder='VD: Doanh thu, đơn hàng, ...'
 											/>
 										</FormGroup>
-										{item.error?.key_name && (
-											<ErrorText>{item.error?.key_name}</ErrorText>
+										{item.error?.keyName && (
+											<ErrorText>{item.error?.keyName}</ErrorText>
 										)}
 									</div>
 									<div style={{ width: '45%', marginLeft: 10 }}>
 										<FormGroup className='ml-2' id='name' label='Giá trị key'>
 											<Input
 												onChange={(e) => handleChangeKeysState(index, e)}
-												value={item?.key_value || ''}
-												name='key_value'
+												value={item?.keyValue || ''}
+												name='keyValue'
 												size='lg'
 												required
 												className='border border-2'
 												placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
 											/>
 										</FormGroup>
-										{item.error?.key_value && (
-											<ErrorText>{item.error?.key_value}</ErrorText>
+										{item.error?.keyValue && (
+											<ErrorText>{item.error?.keyValue}</ErrorText>
 										)}
 									</div>
 									<FormGroup>

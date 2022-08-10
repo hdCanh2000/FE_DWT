@@ -62,7 +62,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`/quan-ly-cong-viec/cong-viec/${id}`),
+		() => navigate(`/cong-viec/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -166,9 +166,9 @@ const MissionPage = () => {
 		setItemEdit({
 			name: '',
 			description: '',
-			kpi_value: '',
-			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+			kpiValue: '',
+			startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
+			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
 			status: 1,
 		});
 	};
@@ -258,7 +258,7 @@ const MissionPage = () => {
 		const output = [];
 		arr.forEach((item) => {
 			const existing = output.filter((v) => {
-				return v.task.mission_id === item.task.mission_id;
+				return v.task.missionId === item.task.missionId;
 			});
 			if (existing?.length) {
 				const existingIndex = output.indexOf(existing[0]);
@@ -278,7 +278,7 @@ const MissionPage = () => {
 			const kq = [];
 			missions?.forEach((mission) => {
 				result?.forEach((task) => {
-					if (mission.id === task.mission_id) {
+					if (mission.id === task.missionId) {
 						kq.push({
 							...mission,
 							task,
@@ -293,7 +293,7 @@ const MissionPage = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			const result = await getLatestTasks();
-			setLatestTasks(result.data);
+			setLatestTasks(result.data?.data);
 		};
 		fetchData();
 	}, []);
@@ -364,7 +364,7 @@ const MissionPage = () => {
 													<div className='me-2'>
 														Giá trị KPI:
 														<span className='text-danger fw-bold ps-2'>
-															{item?.kpi_value || 0}
+															{item?.kpiValue || 0}
 														</span>
 													</div>
 													<div>
@@ -424,7 +424,7 @@ const MissionPage = () => {
 													<small
 														style={{ fontSize: 14 }}
 														className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-														{moment(`${item?.start_time}`).format(
+														{moment(`${item?.startTime}`).format(
 															'DD-MM-YYYY',
 														)}
 													</small>
@@ -434,7 +434,7 @@ const MissionPage = () => {
 													<small
 														style={{ fontSize: 14 }}
 														className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-														{moment(`${item?.end_time}`).format(
+														{moment(`${item?.endTime}`).format(
 															'DD-MM-YYYY',
 														)}
 													</small>
@@ -536,14 +536,14 @@ const MissionPage = () => {
 													<td align='center'>
 														<div className='d-flex align-items-center'>
 															<span className='text-nowrap'>
-																{item?.start_time}
+																{item?.startTime}
 															</span>
 														</div>
 													</td>
 													<td align='center'>
 														<div className='d-flex align-items-center'>
 															<span className='text-nowrap'>
-																{item?.end_time}
+																{item?.endTime}
 															</span>
 														</div>
 													</td>
@@ -569,7 +569,7 @@ const MissionPage = () => {
 															/>
 														</div>
 													</td>
-													<td align='center'>{item?.kpi_value}</td>
+													<td align='center'>{item?.kpiValue}</td>
 													<td align='center'>
 														{calcTotalCurrentKPIOfMission(
 															item,
@@ -622,17 +622,17 @@ const MissionPage = () => {
 					<div className='col-12'>
 						<div className='display-6 fw-bold py-3'>Công việc mới cập nhật</div>
 					</div>
-					{latestTasks.map((item) => {
+					{latestTasks?.map((item) => {
 						return (
 							<Item
 								key={item?.id}
 								keys={item?.keys}
-								departmentsRelated={item?.departments_related}
-								usersRelated={item?.users_related}
+								departmentsRelated={item?.departmentsRelated}
+								usersRelated={item?.usersRelated}
 								id={item?.id}
 								name={item?.name}
 								teamName={`${item?.department?.name} - ${item?.user?.name}`}
-								dueDate={`${item?.deadline_date}`}
+								dueDate={`${item?.deadlineDate}`}
 								percent={calcProgressTask(item) || 0}
 								data-tour='project-item'
 							/>

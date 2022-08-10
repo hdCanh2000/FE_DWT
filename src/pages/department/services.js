@@ -3,14 +3,14 @@ import axiosClient from '../../utils/axiosClient';
 const getAllDepartmentWithUser = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/departments?_embed=users',
+		url: '/departments?_embed=employees',
 	});
 };
 
 const getDepartmentByIdWithUser = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/departments/${id}?_embed=users`,
+		url: `/departments/${id}?_embed=employees`,
 	});
 };
 

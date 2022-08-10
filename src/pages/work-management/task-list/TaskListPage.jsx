@@ -185,11 +185,11 @@ const TaskListPage = () => {
 			id: null,
 			name: '',
 			description: '',
-			kpi_value: '',
-			estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
-			estimate_time: '08:00',
-			deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
-			deadline_time: '08:00',
+			kpiValue: '',
+			estimateDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			estimateTime: '08:00',
+			deadlineDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			deadlineTime: '08:00',
 			status: 0,
 		});
 	};
@@ -420,11 +420,11 @@ const TaskListPage = () => {
 															{item?.user?.name}
 														</td>
 														<td align='center'>
-															{moment(`${item.deadline_date}`).format(
+															{moment(`${item.deadlineDate}`).format(
 																'DD-MM-YYYY',
 															)}
 														</td>
-														<td align='center'>{item?.kpi_value}</td>
+														<td align='center'>{item?.kpiValue}</td>
 														<td>
 															<div className='d-flex align-items-center'>
 																<span
@@ -558,12 +558,12 @@ const TaskListPage = () => {
 										<Item
 											key={item?.id}
 											keys={item?.keys}
-											departmentsRelated={item?.departments_related}
-											usersRelated={item?.users_related}
+											departmentsRelated={item?.departmentsRelated}
+											usersRelated={item?.usersRelated}
 											id={item?.id}
 											name={item?.name}
 											teamName={`${item?.department?.name} - ${item?.user?.name}`}
-											dueDate={`${item?.deadline_date}`}
+											dueDate={`${item?.deadlineDate}`}
 											percent={calcProgressTask(item) || 0}
 											data-tour='project-item'
 										/>

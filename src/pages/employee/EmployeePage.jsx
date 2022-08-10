@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -12,12 +13,16 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
+import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { getAllDepartments, getAllUser } from '../work-management/mission/services';
+import { getAllDepartments } from '../work-management/mission/services';
+import { addEmployee, getAllEmployee, updateEmployee } from './services';
+import Popovers from '../../components/bootstrap/Popovers';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const { addToast } = useToasts();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [options, setOptions] = useState([]);
@@ -35,7 +40,7 @@ const EmployeePage = () => {
 						return {
 							id: department?.id,
 							text: department?.name,
-							value: department?.slug,
+							value: department?.id,
 						};
 					}),
 				);
@@ -46,17 +51,18 @@ const EmployeePage = () => {
 		getDepartments();
 	}, []);
 
-	useEffect(() => {
-		async function getDepartments() {
-			try {
-				const response = await getAllUser();
-				const data = await response.data;
-				setUsers(data);
-			} catch (error) {
-				setUsers([]);
-			}
+	async function getAllEmployees() {
+		try {
+			const response = await getAllEmployee();
+			const data = await response.data;
+			setUsers(data);
+		} catch (error) {
+			setUsers([]);
 		}
-		getDepartments();
+	}
+
+	useEffect(() => {
+		getAllEmployees();
 	}, []);
 
 	const columns = [
@@ -77,6 +83,14 @@ const EmployeePage = () => {
 			isShow: true,
 		},
 		{
+			title: 'Mã NV',
+			id: 'code',
+			key: 'code',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+		},
+		{
 			title: 'Ngày sinh',
 			id: 'dateOfBirth',
 			key: 'dateOfBirth',
@@ -86,7 +100,7 @@ const EmployeePage = () => {
 			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
-			title: 'Ngày gia nhập',
+			title: 'Ngày tham gia',
 			id: 'dateOfJoin',
 			key: 'dateOfJoin',
 			type: 'date',
@@ -96,8 +110,8 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Phòng ban',
-			id: 'department',
-			key: 'department',
+			id: 'departmentId',
+			key: 'departmentId',
 			type: 'select',
 			align: 'left',
 			isShow: true,
@@ -112,7 +126,7 @@ const EmployeePage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Số điện thoại',
+			title: 'SĐT',
 			id: 'phone',
 			key: 'phone',
 			type: 'text',
@@ -120,17 +134,49 @@ const EmployeePage = () => {
 			isShow: true,
 		},
 		{
+			title: 'Địa chỉ',
+			id: 'address',
+			key: 'address',
+			type: 'textarea',
+			align: 'left',
+			isShow: true,
+			render: (item) => (
+				<Popovers desc={item?.address} trigger='hover'>
+					<div
+						style={{
+							maxWidth: 150,
+							WebkitLineClamp: '2',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							display: '-webkit-box',
+							WebkitBoxOrient: 'vertical',
+						}}>
+						{item?.address}
+					</div>
+				</Popovers>
+			),
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<>
+				<div className='d-flex align-items-center'>
 					<Button
 						isOutline={!darkModeStatus}
 						color='success'
 						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
+						className='text-nowrap mx-1'
 						icon='Edit'
 						onClick={() => handleOpenActionForm(item)}
 					/>
@@ -138,11 +184,11 @@ const EmployeePage = () => {
 						isOutline={!darkModeStatus}
 						color='primary'
 						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
+						className='text-nowrap mx-1'
 						icon='ArrowForward'
 						onClick={() => navigate(`/nhan-vien/${item.id}`)}
 					/>
-				</>
+				</div>
 			),
 			isShow: false,
 		},
@@ -158,8 +204,77 @@ const EmployeePage = () => {
 		setItemEdit(null);
 	};
 
-	const handleSubmitForm = (e) => {
-		e.preventDefault();
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+
+	const handleClearValueForm = () => {
+		setItemEdit(null);
+	};
+
+	const handleSubmitForm = async (data) => {
+		const dataSubmit = {
+			id: data?.id,
+			name: data.name,
+			departmentId: parseInt(data.departmentId, 10),
+			code: data.code,
+			email: data.email,
+			password: '123456',
+			dateOfBirth: data.dateOfBirth,
+			dateOfJoin: data.dateOfJoin,
+			phone: data.phone,
+			address: data.address,
+			status: Number(data.status),
+		};
+		if (data.id) {
+			try {
+				const response = await updateEmployee(dataSubmit);
+				const result = await response.data;
+				const newUsers = [...users];
+				setUsers(newUsers.map((item) => (item.id === data.id ? { ...result } : item)));
+				handleClearValueForm();
+				hanleCloseForm();
+				getAllEmployees();
+				setTimeout(() => {
+					window.location.reload();
+				}, 500);
+				handleShowToast(
+					`Cập nhật nhân viên!`,
+					`Nhân viên ${result?.name} được cập nhật thành công!`,
+				);
+			} catch (error) {
+				setUsers(users);
+				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+			}
+		} else {
+			try {
+				const response = await addEmployee(dataSubmit);
+				const result = await response.data;
+				const newUsers = [...users];
+				newUsers.push(result);
+				setUsers(newUsers);
+				handleClearValueForm();
+				hanleCloseForm();
+				getAllEmployees();
+				setTimeout(() => {
+					window.location.reload();
+				}, 500);
+				handleShowToast(
+					`Thêm nhân viên`,
+					`Nhân viên ${result?.user?.name} được thêm thành công!`,
+				);
+			} catch (error) {
+				setUsers(users);
+				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
+			}
+		}
 	};
 
 	return (

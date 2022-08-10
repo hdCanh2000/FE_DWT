@@ -48,7 +48,7 @@ const calcProgressSubtask = (subtask) => {
 // tính số kpi đã dùng cho 1 subtask
 const calcKPICompleteOfSubtask = (subtask) => {
 	const percentComplete = calcProgressSubtask(subtask);
-	return Math.round((percentComplete / 100) * subtask.kpi_value);
+	return Math.round((percentComplete / 100) * subtask.kpiValue);
 };
 
 // tính tổng số kpi của 1 task theo subtask
@@ -57,7 +57,7 @@ const calcTotalKPIOfTask = (task) => {
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
 	subtasks.forEach((subtask) => {
-		totalKPI += subtask.kpi_value;
+		totalKPI += subtask.kpiValue;
 	});
 	return totalKPI;
 };
@@ -81,7 +81,7 @@ const calcProgressTask = (task) => {
 	if (task?.status === 4) {
 		return 100;
 	}
-	return Math.round((totalCompleteKPI * 100) / task.kpi_value) || 0;
+	return Math.round((totalCompleteKPI * 100) / task.kpiValue) || 0;
 };
 
 // tính tổng số kpi đã dùng của 1 mission
@@ -100,7 +100,7 @@ const calcKPICompleteOfMission = (mission, tasks) => {
 const calcProgressMission = (mission, tasks) => {
 	if (isEmpty(mission)) return 0;
 	const totalCompleteKPI = calcKPICompleteOfMission(mission, tasks);
-	return Math.round((totalCompleteKPI * 100) / mission.kpi_value) || 0;
+	return Math.round((totalCompleteKPI * 100) / mission.kpiValue) || 0;
 };
 
 const calcProgressMissionByTaskComplete = (mission, tasks) => {
@@ -142,7 +142,7 @@ const calcTotalCurrentKPIOfTask = (task) => {
 	if (isEmpty(subtasks) || !isArray(subtasks)) return 0;
 	let totalKPI = 0;
 	subtasks.forEach((subtask) => {
-		totalKPI += subtask.kpi_value;
+		totalKPI += subtask.kpiValue;
 	});
 	return totalKPI;
 };
@@ -164,7 +164,7 @@ const calcUsedKPIValueOfMission = (mission, tasks) => {
 	if (isEmpty(tasks) || !isArray(tasks)) return 0;
 	let totalKPI = 0;
 	tasks.forEach((task) => {
-		totalKPI += task.kpi_value;
+		totalKPI += task.kpiValue;
 	});
 	return totalKPI;
 };

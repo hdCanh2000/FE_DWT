@@ -50,19 +50,19 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 						name: subtask?.user?.name,
 					},
 					type: 2,
-					prev_status: null,
-					next_status: `Thêm mới`,
+					prevStatus: null,
+					nextStatus: `Thêm mới`,
 					// eslint-disable-next-line no-unsafe-optional-chaining
-					step_id: subtask?.steps?.length + 1,
-					step_name: values?.name,
+					stepId: subtask?.steps?.length + 1,
+					stepName: values?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
 			];
 			const subtaskClone = { ...subtask, logs: newLogs };
 			const { steps } = subtaskClone;
 			const stepsClone = [...steps];
-			valuesClone.task_id = subtaskClone?.task_id;
-			valuesClone.subtask_id = subtaskClone?.id;
+			valuesClone.taskId = subtaskClone?.taskId;
+			valuesClone.subtaskId = subtaskClone?.id;
 			valuesClone.id = steps.length + 1;
 			valuesClone.status = parseInt(values.status, 10);
 			stepsClone.push(valuesClone);

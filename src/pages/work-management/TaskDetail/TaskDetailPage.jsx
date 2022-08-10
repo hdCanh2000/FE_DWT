@@ -157,16 +157,16 @@ const TaskDetailPage = () => {
 		},
 		{
 			title: 'Thời gian dự kiến',
-			id: 'estimate_date',
-			key: 'estimate_date',
+			id: 'estimateDate',
+			key: 'estimateDate',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
 		},
 		{
 			title: 'Hạn hoàn thành',
-			id: 'deadline_date',
-			key: 'deadline_date',
+			id: 'deadlineDate',
+			key: 'deadlineDate',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
 		},
@@ -194,8 +194,8 @@ const TaskDetailPage = () => {
 		},
 		{
 			title: 'Giá trị KPI',
-			id: 'kpi_value',
-			key: 'kpi_value',
+			id: 'kpiValue',
+			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
 		},
@@ -289,8 +289,8 @@ const TaskDetailPage = () => {
 	const columnsPending = [
 		{
 			title: 'Ngày dự kiến',
-			id: 'estimate_date',
-			key: 'estimate_date',
+			id: 'estimateDate',
+			key: 'estimateDate',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
@@ -317,14 +317,14 @@ const TaskDetailPage = () => {
 		},
 		{
 			title: 'Hạn hoàn thành',
-			id: 'deadline_date',
-			key: 'deadline_date',
+			id: 'deadlineDate',
+			key: 'deadlineDate',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
 			title: 'KPI',
-			id: 'kpi_value',
-			key: 'kpi_value',
+			id: 'kpiValue',
+			key: 'kpiValue',
 			type: 'number',
 		},
 		{
@@ -378,8 +378,8 @@ const TaskDetailPage = () => {
 			setTask(res.data);
 			setTask({
 				...res.data,
-				departments: [res.data?.department]?.concat(res.data?.departments_related),
-				users: [res.data?.user]?.concat(res.data?.users_related),
+				departments: [res.data?.department]?.concat(res.data?.departmentsRelated),
+				users: [res.data?.user]?.concat(res.data?.usersRelated),
 			});
 		};
 		fetchSubtasks(parseInt(params?.id, 10));
@@ -769,7 +769,7 @@ const TaskDetailPage = () => {
 													<div className='row d-flex align-items-end pb-3'>
 														<div className='col col-sm-5 text-start'>
 															<div className='fw-bold fs-4 mb-10'>
-																{task?.kpi_value}
+																{task?.kpiValue}
 															</div>
 															<div className='text-muted'>
 																KPI được giao
@@ -961,7 +961,7 @@ const TaskDetailPage = () => {
 												<div className='fs-5'>
 													<span className='me-2'>Thời gian dự kiến:</span>
 													{moment(
-														`${task?.estimate_date} ${task.estimate_time}`,
+														`${task?.estimateDate} ${task.estimateTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
 												</div>
 											),
@@ -973,7 +973,7 @@ const TaskDetailPage = () => {
 												<div className='fs-5'>
 													<span className='me-2'>Hạn hoàn thành:</span>
 													{moment(
-														`${task?.deadline_date} ${task.deadline_time}`,
+														`${task?.deadlineDate} ${task.deadlineTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
 												</div>
 											),
@@ -995,12 +995,12 @@ const TaskDetailPage = () => {
 											icon: 'DoneAll',
 											color: 'danger',
 											children: (
-												<div key={key?.key_name}>
+												<div key={key?.keyName}>
 													<div className='fw-bold fs-5 mb-1'>
-														{key?.key_name}
+														{key?.keyName}
 													</div>
 													<div className='mt-n2' style={{ fontSize: 14 }}>
-														{key?.key_value}
+														{key?.keyValue}
 													</div>
 												</div>
 											),
@@ -1030,10 +1030,10 @@ const TaskDetailPage = () => {
 																? item?.user?.name
 																: item?.user
 														}
-														id={item?.task_id}
-														taskName={item?.task_name}
-														prevStatus={item?.prev_status}
-														nextStatus={item?.next_status}
+														id={item?.taskId}
+														taskName={item?.taskName}
+														prevStatus={item?.prevStatus}
+														nextStatus={item?.nextStatus}
 													/>
 												);
 											})}

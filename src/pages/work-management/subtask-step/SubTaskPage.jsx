@@ -182,8 +182,8 @@ const SubTaskPage = () => {
 			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
 			setSubtask({
 				...subtaskRes,
-				departments: [subtaskRes?.department]?.concat(subtaskRes?.departments_related),
-				users: [subtaskRes?.user]?.concat(subtaskRes?.users_related),
+				departments: [subtaskRes?.department]?.concat(subtaskRes?.departmentsRelated),
+				users: [subtaskRes?.user]?.concat(subtaskRes?.usersRelated),
 			});
 		};
 		fetch();
@@ -499,7 +499,7 @@ const SubTaskPage = () => {
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col col-sm-6 text-start'>
 														<div className='fw-bold fs-4 mb-10'>
-															{subtask.kpi_value}
+															{subtask.kpiValue}
 														</div>
 														<div className='text-muted'>
 															Giá trị KPI
@@ -665,7 +665,7 @@ const SubTaskPage = () => {
 											<div className='fs-5'>
 												<span className='me-2'>Thời gian dự kiến:</span>
 												{moment(
-													`${subtask?.estimate_date} ${subtask.estimate_time}`,
+													`${subtask?.estimateDate} ${subtask.estimateTime}`,
 												).format('DD-MM-YYYY, HH:mm')}
 											</div>
 										),
@@ -677,7 +677,7 @@ const SubTaskPage = () => {
 											<div className='fs-5'>
 												<span className='me-2'>Hạn hoàn thành:</span>
 												{moment(
-													`${subtask?.deadline_date} ${subtask.deadline_time}`,
+													`${subtask?.deadlineDate} ${subtask.deadlineTime}`,
 												).format('DD-MM-YYYY, HH:mm')}
 											</div>
 										),
@@ -699,10 +699,10 @@ const SubTaskPage = () => {
 										children: (
 											<>
 												<div className='fw-bold fs-5 mb-1'>
-													{key?.key_name}
+													{key?.keyName}
 												</div>
 												<div className='mt-n2' style={{ fontSize: 14 }}>
-													{key?.key_value}
+													{key?.keyValue}
 												</div>
 											</>
 										),
@@ -731,10 +731,10 @@ const SubTaskPage = () => {
 												username={
 													item?.user?.name ? item?.user?.name : item?.user
 												}
-												id={item?.subtask_id}
-												taskName={item?.subtask_name}
-												prevStatus={item?.prev_status}
-												nextStatus={item?.next_status}
+												id={item?.subtaskId}
+												taskName={item?.subtaskName}
+												prevStatus={item?.prevStatus}
+												nextStatus={item?.nextStatus}
 											/>
 										))}
 								</CardBody>
@@ -769,7 +769,7 @@ const SubTaskPage = () => {
 					task={task}
 					setEditModalStatus={setEditModalStatus}
 					editModalStatus={editModalStatus}
-					id={subtask?.task_id}
+					id={subtask?.taskId}
 					idEdit={subtask.id}
 					newWork={newWork}
 				/>
