@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -32,9 +33,9 @@ const EmployeePage = () => {
 				setOptions(
 					data.map((department) => {
 						return {
-							id: department.id,
-							text: department.name,
-							value: department.slug,
+							id: department?.id,
+							text: department?.name,
+							value: department?.slug,
 						};
 					}),
 				);
@@ -82,6 +83,7 @@ const EmployeePage = () => {
 			type: 'date',
 			align: 'center',
 			isShow: true,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
 			title: 'Ngày gia nhập',
@@ -90,6 +92,7 @@ const EmployeePage = () => {
 			type: 'date',
 			align: 'center',
 			isShow: true,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
 			title: 'Phòng ban',
@@ -98,7 +101,7 @@ const EmployeePage = () => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item.department.name}</span>,
+			render: (item) => <span>{item?.department?.name}</span>,
 		},
 		{
 			title: 'Email',

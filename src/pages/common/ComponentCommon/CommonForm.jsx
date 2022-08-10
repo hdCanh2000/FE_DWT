@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import { Button, Modal } from 'react-bootstrap';
-import validate from '../../employee/validate';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Select from '../../../components/bootstrap/forms/Select';
+import Textarea from '../../../components/bootstrap/forms/Textarea';
+import Checks from '../../../components/bootstrap/forms/Checks';
 
 const CommonForm = ({
 	className,
@@ -17,21 +18,11 @@ const CommonForm = ({
 	label,
 	fields,
 	options,
+	validate,
 	...props
 }) => {
 	const formik = useFormik({
-		initialValues: {
-			code: item?.code || '',
-			name: item?.name || '',
-			email: item?.email || '',
-			phone: item?.phone || '',
-			address: item?.address || '',
-			department: item?.department?.slug || '',
-			password: '',
-			confirmPassword: '',
-			city: '',
-			active: true,
-		},
+		initialValues: { ...item },
 		enableReinitialize: true,
 		validate,
 		onSubmit: (values, { resetForm }) => {
@@ -51,8 +42,8 @@ const CommonForm = ({
 			<Modal.Header closeButton className='p-4'>
 				<Modal.Title>{label}</Modal.Title>
 			</Modal.Header>
-			<form>
-				<Modal.Body className='px-4'>
+			<Modal.Body className='px-4'>
+				<form>
 					<div className='row'>
 						<div className='col-md-12'>
 							<div className='row g-4'>
@@ -69,6 +60,7 @@ const CommonForm = ({
 													placeholder={`Chọn ${field.title}`}
 													list={options}
 													required
+													name={field.id}
 													className='border border-2 rounded-0 shadow-none'
 													onChange={formik.handleChange}
 													onBlur={formik.handleBlur}
@@ -80,6 +72,52 @@ const CommonForm = ({
 									}
 									if (!field.isShow) {
 										return '';
+									}
+									if (field.type === 'textarea') {
+										return (
+											<FormGroup
+												key={field.id}
+												className='col-12'
+												id={field.id}
+												label={field.title}>
+												<Textarea
+													rows={5}
+													ariaLabel={field.title}
+													placeholder={`Nhập ${field.title}`}
+													list={options}
+													required
+													size='lg'
+													name={field.id}
+													className='border border-2 rounded-0 shadow-none'
+													onChange={formik.handleChange}
+													onBlur={formik.handleBlur}
+													value={formik.values[field.id]}
+													isValid={formik.isValid}
+												/>
+											</FormGroup>
+										);
+									}
+									if (field.type === 'switch') {
+										return (
+											<FormGroup
+												key={field.id}
+												className='col-12'
+												id={field.id}
+												label={field.title}>
+												<Checks
+													id={field.id}
+													type='switch'
+													size='lg'
+													label={
+														Number(formik.values[field.id]) === 1
+															? 'Đang hoạt động'
+															: 'Không hoạt động'
+													}
+													onChange={formik.handleChange}
+													checked={formik.values[field.id]}
+												/>
+											</FormGroup>
+										);
 									}
 									return (
 										<FormGroup
@@ -107,16 +145,16 @@ const CommonForm = ({
 							</div>
 						</div>
 					</div>
-				</Modal.Body>
-				<Modal.Footer className='p-4'>
-					<Button size='lg' variant='secondary' onClick={onClose}>
-						Đóng
-					</Button>
-					<Button size='lg' variant='primary' type='submit' onClick={handleSubmit}>
-						Xác nhận
-					</Button>
-				</Modal.Footer>
-			</form>
+				</form>
+			</Modal.Body>
+			<Modal.Footer className='p-4'>
+				<Button size='lg' variant='secondary' onClick={onClose}>
+					Đóng
+				</Button>
+				<Button size='lg' variant='primary' type='submit' onClick={formik.handleSubmit}>
+					Xác nhận
+				</Button>
+			</Modal.Footer>
 		</Modal>
 	);
 };
@@ -132,6 +170,7 @@ CommonForm.propTypes = {
 	item: PropTypes.object,
 	// eslint-disable-next-line react/forbid-prop-types
 	fields: PropTypes.array,
+	validate: PropTypes.func,
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
@@ -142,6 +181,7 @@ CommonForm.defaultProps = {
 	columns: [],
 	options: [],
 	fields: [],
+	validate: null,
 	item: null,
 	onClose: null,
 	handleSubmit: null,
