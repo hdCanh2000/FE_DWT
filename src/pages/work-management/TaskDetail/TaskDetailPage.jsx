@@ -31,9 +31,9 @@ import {
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
-	TASK_STATUS,
 	renderStatusTask,
 	STATUS,
+	renderStatus,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -448,8 +448,8 @@ const TaskDetailPage = () => {
 	};
 
 	const handleStatus = async (newStatus, items) => {
-		const checkValid = prevIsValidClickChangeStatus(items, newStatus);
-		if (!checkValid) return;
+		// const checkValid = prevIsValidClickChangeStatus(items, newStatus);
+		// if (!checkValid) return;
 		const newSubTasks = task.subtasks.map((item) => {
 			return item.id === items.id
 				? {
@@ -543,74 +543,74 @@ const TaskDetailPage = () => {
 	// --------------	  Xử lý chức năng thay đổi trạng thái	  	----------------
 	// --------------	  Handle change status task	  	----------------
 
-	const prevIsValidClickChangeStatus = (data, status) => {
-		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 1 && (status === 1 || status === 3 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} chưa được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 2 && (status === 1 || status === 2)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} đang được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (
-			data.status === 3 &&
-			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
-		) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 6 && status !== 2) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} đã bị huỷ!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 8 && (status === 1 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} đang tạm dừng!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		return true;
-	};
+	// const prevIsValidClickChangeStatus = (data, status) => {
+	// 	if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 1 && (status === 1 || status === 3 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} chưa được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 2 && (status === 1 || status === 2)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} đang được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (
+	// 		data.status === 3 &&
+	// 		(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+	// 	) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 6 && status !== 2) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} đã bị huỷ!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 8 && (status === 1 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} đang tạm dừng!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	return true;
+	// };
 
 	const handleClickChangeStatusTask = async (status, data) => {
-		const checkValid = prevIsValidClickChangeStatus(data, status);
-		if (!checkValid) return;
+		// const checkValid = prevIsValidClickChangeStatus(data, status);
+		// if (!checkValid) return;
 		try {
 			const taskClone = { ...data };
 			taskClone.status = status;
@@ -719,24 +719,26 @@ const TaskDetailPage = () => {
 												</Button>
 											</DropdownToggle>
 											<DropdownMenu>
-												{Object.keys(TASK_STATUS).map((key) => (
-													<DropdownItem
-														key={key}
-														onClick={() =>
-															handleOpenConfirmStatusTask(
-																task,
-																TASK_STATUS[key].value,
-															)
-														}>
-														<div>
-															<Icon
-																icon='Circle'
-																color={TASK_STATUS[key].color}
-															/>
-															{TASK_STATUS[key].name}
-														</div>
-													</DropdownItem>
-												))}
+												{Object.keys(renderStatus(task?.status)).map(
+													(key) => (
+														<DropdownItem
+															key={key}
+															onClick={() =>
+																handleOpenConfirmStatusTask(
+																	task,
+																	STATUS[key].value,
+																)
+															}>
+															<div>
+																<Icon
+																	icon='Circle'
+																	color={STATUS[key].color}
+																/>
+																{STATUS[key].name}
+															</div>
+														</DropdownItem>
+													),
+												)}
 											</DropdownMenu>
 										</Dropdown>
 										<Button

@@ -232,6 +232,7 @@ const EmployeePage = () => {
 			phone: data.phone,
 			address: data.address,
 			status: Number(data.status),
+			roles: ['user'],
 		};
 		if (data.id) {
 			try {

@@ -34,6 +34,8 @@ const ModalConfirmCommon = ({
 			const data = { ...item };
 			if (values.note && values.note.length > 0) {
 				data.notes = [...data.notes, { note: values.note, time: Date.now() }];
+			} else {
+				data.notes = item.notes;
 			}
 			data.kpiValue = values.kpiValue;
 			onSubmit(status, data);

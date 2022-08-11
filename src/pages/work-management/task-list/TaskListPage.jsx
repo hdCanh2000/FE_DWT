@@ -29,6 +29,8 @@ import {
 	formatColorPriority,
 	formatColorStatus,
 	FORMAT_TASK_STATUS,
+	renderStatusTask,
+	STATUS,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -42,6 +44,12 @@ import { calcProgressTask } from '../../../utils/function';
 import Badge from '../../../components/bootstrap/Badge';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import { getAllSubtasks } from '../TaskDetail/services';
+import Dropdown, {
+	DropdownItem,
+	DropdownMenu,
+	DropdownToggle,
+} from '../../../components/bootstrap/Dropdown';
+import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 
 const Item = ({
 	id,
@@ -143,6 +151,14 @@ const TaskListPage = () => {
 	const [idEditExpand, setIdEditExpand] = useState(0);
 	const [newWorkExpand, setNewWorkExpand] = React.useState([]);
 	const [titleExpand, setTitleExpand] = useState();
+
+	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+		title: '',
+		subTitle: '',
+		status: null,
+		isShowNote: false,
+	});
 
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
@@ -284,25 +300,26 @@ const TaskListPage = () => {
 		}
 	};
 
-	// const handleUpdateStatus = async (status, data) => {
-	// 	try {
-	// 		const newData = { ...data };
-	// 		newData.status = status;
-	// 		const response = await updateTaskByID(newData);
-	// 		const result = await response.data;
-	// 		const newTasks = [...tasks];
-	// 		setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-	// 		handleClearValueForm();
-	// 		handleCloseEditForm();
-	// 		handleShowToast(
-	// 			`Cập nhật công việc!`,
-	// 			`Công việc ${result.name} được cập nhật thành công!`,
-	// 		);
-	// 	} catch (error) {
-	// 		setTasks(tasks);
-	// 		handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
-	// 	}
-	// };
+	const handleUpdateStatus = async (status, data) => {
+		try {
+			const newData = { ...data };
+			newData.status = status;
+			const response = await updateTaskByID(newData);
+			const result = await response.data;
+			const newTasks = [...tasks];
+			setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
+			handleClearValueForm();
+			handleCloseEditForm();
+			handleCloseConfirmStatusTask();
+			handleShowToast(
+				`Cập nhật công việc!`,
+				`Công việc ${result.name} được cập nhật thành công!`,
+			);
+		} catch (error) {
+			setTasks(tasks);
+			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+		}
+	};
 
 	const handleClickSwitchView = (view) => {
 		navigate({
@@ -311,6 +328,25 @@ const TaskListPage = () => {
 				view,
 			})}`,
 		});
+	};
+
+	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+
+	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
+		setOpenConfirmModalStatus(true);
+		setItemEdit({ ...item });
+		setInfoConfirmModalStatus({
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			subTitle: item?.name,
+			status: nextStatus,
+			isShowNote,
+		});
+	};
+
+	const handleCloseConfirmStatusTask = () => {
+		setOpenConfirmModalStatus(false);
+		setItemEdit(null);
 	};
 
 	return (
@@ -447,15 +483,49 @@ const TaskListPage = () => {
 															</div>
 														</td>
 														<td>
-															<Button
-																isLink
-																color={formatColorStatus(
-																	item.status,
-																)}
-																icon='Circle'
-																className='text-nowrap'>
-																{FORMAT_TASK_STATUS(item.status)}
-															</Button>
+															<Dropdown>
+																<DropdownToggle hasIcon={false}>
+																	<Button
+																		isLink
+																		color={formatColorStatus(
+																			item.status,
+																		)}
+																		icon='Circle'
+																		className='text-nowrap'>
+																		{FORMAT_TASK_STATUS(
+																			item.status,
+																		)}
+																	</Button>
+																</DropdownToggle>
+																<DropdownMenu>
+																	{Object.keys(
+																		renderStatusTask(
+																			item.status,
+																		),
+																	).map((key) => (
+																		<DropdownItem
+																			key={key}
+																			onClick={() =>
+																				handleOpenConfirmStatusTask(
+																					item,
+																					STATUS[key]
+																						.value,
+																				)
+																			}>
+																			<div>
+																				<Icon
+																					icon='Circle'
+																					color={
+																						STATUS[key]
+																							.color
+																					}
+																				/>
+																				{STATUS[key].name}
+																			</div>
+																		</DropdownItem>
+																	))}
+																</DropdownMenu>
+															</Dropdown>
 														</td>
 														<td>
 															<div className='d-flex align-items-center flex-column'>
@@ -600,6 +670,16 @@ const TaskListPage = () => {
 					onClose={handleCloseEditForm}
 					onSubmit={handleSubmitTaskForm}
 					item={itemEdit}
+				/>
+				<ModalConfirmCommon
+					show={openConfirmModalStatus}
+					onClose={handleCloseConfirmStatusTask}
+					onSubmit={handleUpdateStatus}
+					item={itemEdit}
+					isShowNote={infoConfirmModalStatus.isShowNote}
+					title={infoConfirmModalStatus.title}
+					subTitle={infoConfirmModalStatus.subTitle}
+					status={infoConfirmModalStatus.status}
 				/>
 			</Page>
 		</PageWrapper>

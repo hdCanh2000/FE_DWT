@@ -15,7 +15,12 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
-import { formatColorStatus, FORMAT_TASK_STATUS, TASK_STATUS } from '../../../utils/constants';
+import {
+	formatColorStatus,
+	FORMAT_TASK_STATUS,
+	renderStatus,
+	STATUS,
+} from '../../../utils/constants';
 import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -242,80 +247,80 @@ const SubTaskPage = () => {
 		}
 	};
 
-	const prevIsValidClickChangeStatus = (data, status) => {
-		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} chưa được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 2 && (status === 1 || status === 2)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đang được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (
-			data.status === 3 &&
-			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
-		) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 6 && status !== 2) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đã bị huỷ!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 8 && (status === 1 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đang tạm dừng!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		return true;
-	};
+	// const prevIsValidClickChangeStatus = (data, status) => {
+	// 	if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} chưa được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 2 && (status === 1 || status === 2)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} đang được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (
+	// 		data.status === 3 &&
+	// 		(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+	// 	) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 6 && status !== 2) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} đã bị huỷ!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 8 && (status === 1 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} đang tạm dừng!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	return true;
+	// };
 
 	const handleClickChangeStatusSubtask = async (status, data) => {
-		const checkValid = prevIsValidClickChangeStatus(data, status);
-		if (!checkValid) return;
+		// const checkValid = prevIsValidClickChangeStatus(data, status);
+		// if (!checkValid) return;
 		try {
 			const taskClone = { ...task };
 			const subtaskClone = { ...data };
@@ -448,24 +453,26 @@ const SubTaskPage = () => {
 											</Button>
 										</DropdownToggle>
 										<DropdownMenu>
-											{Object.keys(TASK_STATUS).map((key) => (
-												<DropdownItem
-													key={key}
-													onClick={() =>
-														handleOpenConfirmStatusTask(
-															subtask,
-															TASK_STATUS[key].value,
-														)
-													}>
-													<div>
-														<Icon
-															icon='Circle'
-															color={TASK_STATUS[key].color}
-														/>
-														{TASK_STATUS[key].name}
-													</div>
-												</DropdownItem>
-											))}
+											{Object.keys(renderStatus(subtask?.status)).map(
+												(key) => (
+													<DropdownItem
+														key={key}
+														onClick={() =>
+															handleOpenConfirmStatusTask(
+																subtask,
+																STATUS[key].value,
+															)
+														}>
+														<div>
+															<Icon
+																icon='Circle'
+																color={STATUS[key].color}
+															/>
+															{STATUS[key].name}
+														</div>
+													</DropdownItem>
+												),
+											)}
 										</DropdownMenu>
 									</Dropdown>
 									<Button
