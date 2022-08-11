@@ -313,6 +313,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	const person = window.localStorage.getItem('name');
 	const handleSubmit = () => {
 		const newWorks = JSON.parse(JSON.stringify(task?.logs || []));
+		const newNotes = JSON.parse(JSON.stringify(task?.notes || []));
 		const newLogs = [
 			...newWorks,
 			{
@@ -340,6 +341,10 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		data.subtasks = isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
 		data.logs = [];
 		data.departmentId = departmentOption.id;
+		data.department = {
+			id: departmentOption.id,
+			name: departmentOption.label,
+		};
 		data.departmentsRelated = departmentReplatedOption.map((department) => {
 			return {
 				id: department.id,
@@ -347,6 +352,10 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 			};
 		});
 		data.userId = userOption.value;
+		data.user = {
+			id: userOption.id,
+			name: userOption.label,
+		};
 		data.usersRelated = userReplatedOption.map((user) => {
 			return {
 				id: user.id,
@@ -377,7 +386,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		if (!prevIsValid()) {
 			return;
 		}
-		const newData = { ...data, logs: newLogs };
+		const newData = { ...data, logs: newLogs, notes: newNotes };
 		onSubmit(newData);
 		handleClearForm();
 	};

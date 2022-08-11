@@ -207,6 +207,7 @@ const TaskDetailForm = ({
 				// eslint-disable-next-line no-unsafe-optional-chaining
 				id: task?.subtasks?.length + 1,
 				logs: newLogs,
+				notes: [],
 			});
 			validateForm();
 			if (!valueInput?.name) {
@@ -249,6 +250,7 @@ const TaskDetailForm = ({
 		} else {
 			const values = task?.subtasks?.filter((item) => item.id === idEdit);
 			const newWorks = JSON.parse(JSON.stringify(values[0]?.logs || []));
+			const newNotes = JSON.parse(JSON.stringify(values[0]?.notes || []));
 			const newLogs = [
 				...newWorks,
 				{
@@ -278,6 +280,7 @@ const TaskDetailForm = ({
 								name: valueDepartment.label,
 							},
 							logs: newLogs,
+							notes: newNotes,
 					  }
 					: item;
 			});

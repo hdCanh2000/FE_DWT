@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useFormik } from 'formik';
 import { Button, Modal } from 'react-bootstrap';
 import Card, {
 	CardBody,
@@ -23,9 +24,22 @@ const ModalConfirmCommon = ({
 	isShowNote,
 	...props
 }) => {
-	const handleSubmit = () => {
-		onSubmit(status, item);
-	};
+	const formik = useFormik({
+		initialValues: {
+			note: '',
+			kpiValue: item?.kpiValue || '',
+		},
+		enableReinitialize: true,
+		onSubmit: (values, { resetForm }) => {
+			const data = { ...item };
+			if (values.note && values.note.length > 0) {
+				data.notes = [...data.notes, { note: values.note, time: Date.now() }];
+			}
+			data.kpiValue = values.kpiValue;
+			onSubmit(status, data);
+			resetForm();
+		},
+	});
 
 	return (
 		<Modal show={show} onHide={onClose} size='lg' scrollable centered {...props}>
@@ -47,31 +61,40 @@ const ModalConfirmCommon = ({
 										{status === 4 && (
 											<FormGroup
 												className='col-12'
-												id='kpi_value'
+												id='kpiValue'
 												label='Giá trị đánh giá'>
 												<Input
 													type='number'
-													name='kpi_value'
+													name='kpiValue'
 													required
 													size='lg'
 													placeholder='Giá trị KPI đánh giá'
 													className='border border-2'
+													onBlur={formik.handleBlur}
+													onChange={formik.handleChange}
+													isValid={formik.isValid}
+													isTouched={formik.touched.kpiValue}
+													value={formik.values.kpiValue}
 												/>
 											</FormGroup>
 										)}
-										<FormGroup
-											className='col-12'
-											id='description'
-											label='Ghi chú'>
-											<Textarea
-												name='description'
-												required
-												size='lg'
-												placeholder='Ghi chú'
-												rows={4}
-												className='border border-2'
-											/>
-										</FormGroup>
+										{(status === 4 || status === 5 || status === 6) && (
+											<FormGroup className='col-12' id='note' label='Ghi chú'>
+												<Textarea
+													name='note'
+													required
+													size='lg'
+													placeholder='Ghi chú'
+													rows={4}
+													className='border border-2'
+													onBlur={formik.handleBlur}
+													onChange={formik.handleChange}
+													isValid={formik.isValid}
+													isTouched={formik.touched.note}
+													value={formik.values.note}
+												/>
+											</FormGroup>
+										)}
 									</div>
 								</CardBody>
 							</Card>
@@ -83,7 +106,7 @@ const ModalConfirmCommon = ({
 				<Button variant='secondary' onClick={onClose}>
 					Đóng
 				</Button>
-				<Button variant='primary' onClick={handleSubmit}>
+				<Button variant='primary' type='submit' onClick={formik.handleSubmit}>
 					Xác nhận
 				</Button>
 			</Modal.Footer>

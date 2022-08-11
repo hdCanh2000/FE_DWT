@@ -7,6 +7,7 @@ import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Board from './board/Board';
 import Card, {
+	CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
@@ -41,6 +42,7 @@ import Dropdown, {
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
+import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
 
 const chartOptions = {
 	chart: {
@@ -137,6 +139,7 @@ const SubTaskPage = () => {
 	const [newWork, setNewWork] = React.useState();
 	const [taskEdit, setTaskEdit] = useState({});
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [openListInfoModal, setOpenListInfoModal] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
 		title: '',
 		subTitle: '',
@@ -337,6 +340,15 @@ const SubTaskPage = () => {
 		}
 	};
 
+	// Modal hiển thị thông tin note
+	const handleOpenListInfoModal = () => {
+		setOpenListInfoModal(true);
+	};
+
+	const handleCloseListInfoModal = () => {
+		setOpenListInfoModal(false);
+	};
+
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
 
@@ -425,36 +437,46 @@ const SubTaskPage = () => {
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
-								<Dropdown>
-									<DropdownToggle hasIcon={false}>
-										<Button
-											color='danger'
-											icon='Report'
-											className='text-nowrap'>
-											Cập nhật trạng thái đầu việc
-										</Button>
-									</DropdownToggle>
-									<DropdownMenu>
-										{Object.keys(TASK_STATUS).map((key) => (
-											<DropdownItem
-												key={key}
-												onClick={() =>
-													handleOpenConfirmStatusTask(
-														subtask,
-														TASK_STATUS[key].value,
-													)
-												}>
-												<div>
-													<Icon
-														icon='Circle'
-														color={TASK_STATUS[key].color}
-													/>
-													{TASK_STATUS[key].name}
-												</div>
-											</DropdownItem>
-										))}
-									</DropdownMenu>
-								</Dropdown>
+								<CardActions className='d-flex'>
+									<Dropdown>
+										<DropdownToggle hasIcon={false}>
+											<Button
+												color='danger'
+												icon='Report'
+												className='text-nowrap'>
+												Cập nhật trạng thái đầu việc
+											</Button>
+										</DropdownToggle>
+										<DropdownMenu>
+											{Object.keys(TASK_STATUS).map((key) => (
+												<DropdownItem
+													key={key}
+													onClick={() =>
+														handleOpenConfirmStatusTask(
+															subtask,
+															TASK_STATUS[key].value,
+														)
+													}>
+													<div>
+														<Icon
+															icon='Circle'
+															color={TASK_STATUS[key].color}
+														/>
+														{TASK_STATUS[key].name}
+													</div>
+												</DropdownItem>
+											))}
+										</DropdownMenu>
+									</Dropdown>
+									<Button
+										isOutline={!darkModeStatus}
+										color='dark'
+										isLight={darkModeStatus}
+										className='text-nowrap mx-2 shadow-none'
+										icon='Info'
+										onClick={() => handleOpenListInfoModal()}
+									/>
+								</CardActions>
 							</CardHeader>
 							<CardBody className='py-2'>
 								<div className='row h-100'>
@@ -781,6 +803,38 @@ const SubTaskPage = () => {
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}
+				/>
+				<ModalShowListCommon
+					show={openListInfoModal}
+					onClose={handleCloseListInfoModal}
+					title='Thông tin ghi chú'
+					columns={[
+						{
+							title: 'Ghi chú',
+							id: 'note',
+							key: 'note',
+							type: 'text',
+							align: 'left',
+							render: (item) => <span className='fs-5'>{item.note}</span>,
+						},
+						{
+							title: 'Ngày ghi chú',
+							id: 'time',
+							key: 'time',
+							type: 'text',
+							align: 'center',
+							render: (item) => (
+								<span className='fs-5'>
+									{new Date(item.time).toLocaleDateString()}
+								</span>
+							),
+						},
+					]}
+					data={
+						subtask?.notes
+							?.sort((a, b) => b.time - a.time)
+							?.filter((note) => note.note !== '') || []
+					}
 				/>
 			</Page>
 		</PageWrapper>

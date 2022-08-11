@@ -90,9 +90,9 @@ const calcKPICompleteOfMission = (mission, tasks) => {
 	if (isEmpty(tasks) || !isArray(tasks)) return 0;
 	let totalKPI = 0;
 	tasks.forEach((task) => {
-		if (task?.status === 4 || task?.status === 7) {
-			totalKPI += calcKPICompleteOfTask(task);
-		}
+		// if (task?.status === 4 || task?.status === 7) {
+		totalKPI += calcKPICompleteOfTask(task);
+		// }
 	});
 	return totalKPI;
 };
