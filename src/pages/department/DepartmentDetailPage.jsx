@@ -25,6 +25,7 @@ import CommonForm from '../common/ComponentCommon/CommonForm';
 import validate from './validate';
 import Checks from '../../components/bootstrap/forms/Checks';
 import { addEmployee, updateEmployee } from '../employee/services';
+import Popovers from '../../components/bootstrap/Popovers';
 
 const DepartmentDetailPage = () => {
 	const navigate = useNavigate();
@@ -47,6 +48,14 @@ const DepartmentDetailPage = () => {
 			title: 'Họ và tên',
 			id: 'name',
 			key: 'name',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+		},
+		{
+			title: 'Mã NV',
+			id: 'code',
+			key: 'code',
 			type: 'text',
 			align: 'left',
 			isShow: true,
@@ -84,6 +93,29 @@ const DepartmentDetailPage = () => {
 			type: 'text',
 			align: 'center',
 			isShow: true,
+		},
+		{
+			title: 'Địa chỉ',
+			id: 'address',
+			key: 'address',
+			type: 'textarea',
+			align: 'left',
+			isShow: true,
+			render: (item) => (
+				<Popovers desc={item?.address} trigger='hover'>
+					<div
+						style={{
+							maxWidth: 150,
+							WebkitLineClamp: '2',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							display: '-webkit-box',
+							WebkitBoxOrient: 'vertical',
+						}}>
+						{item?.address}
+					</div>
+				</Popovers>
+			),
 		},
 		{
 			title: 'Trạng thái',

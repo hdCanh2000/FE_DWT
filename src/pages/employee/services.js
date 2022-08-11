@@ -18,7 +18,7 @@ const getUserById = (id) => {
 const addEmployee = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/register`,
+		url: `/users`,
 		data,
 	});
 };
@@ -30,21 +30,5 @@ const updateEmployee = (data) => {
 		data,
 	});
 };
-
-// const addUser = (data) => {
-// 	return axiosClient({
-// 		method: 'POST',
-// 		url: `/users`,
-// 		data,
-// 	});
-// };
-
-// const updateUser = (data) => {
-// 	return axiosClient({
-// 		method: 'PUT',
-// 		url: `/users/${data.id}`,
-// 		data,
-// 	});
-// };
 
 export { getAllEmployee, getUserById, addEmployee, updateEmployee };
