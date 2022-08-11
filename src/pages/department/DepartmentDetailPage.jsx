@@ -24,6 +24,7 @@ import TableCommon from '../common/ComponentCommon/TableCommon';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import validate from './validate';
 import Checks from '../../components/bootstrap/forms/Checks';
+import { addEmployee, updateEmployee } from '../employee/services';
 
 const DepartmentDetailPage = () => {
 	const navigate = useNavigate();
@@ -83,6 +84,15 @@ const DepartmentDetailPage = () => {
 			type: 'text',
 			align: 'center',
 			isShow: true,
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
 		},
 		{
 			title: 'Hành động',
@@ -164,6 +174,65 @@ const DepartmentDetailPage = () => {
 		} catch (error) {
 			setDepartment(department);
 			handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+		}
+	};
+
+	const handleSubmitEmployeeForm = async (data) => {
+		const dataSubmit = {
+			id: data?.id,
+			name: data.name,
+			departmentId: parseInt(params.id, 10),
+			code: data.code,
+			email: data.email,
+			password: '123456',
+			dateOfBirth: data.dateOfBirth,
+			dateOfJoin: data.dateOfJoin,
+			phone: data.phone,
+			address: data.address,
+			status: Number(data.status),
+			roles: ['user'],
+		};
+		if (data.id) {
+			try {
+				const response = await updateEmployee(dataSubmit);
+				const result = await response.data;
+				// const newUsers = [...users];
+				// setUsers(newUsers.map((item) => (item.id === data.id ? { ...result } : item)));
+				// handleClearValueForm();
+				// hanleCloseForm();
+				// getAllEmployees();
+				setTimeout(() => {
+					window.location.reload();
+				}, 500);
+				handleShowToast(
+					`Cập nhật nhân viên!`,
+					`Nhân viên ${result?.name} được cập nhật thành công!`,
+				);
+			} catch (error) {
+				// setUsers(users);
+				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+			}
+		} else {
+			try {
+				const response = await addEmployee(dataSubmit);
+				const result = await response.data;
+				// const newUsers = [...users];
+				// newUsers.push(result);
+				// setUsers(newUsers);
+				// handleClearValueForm();
+				// hanleCloseForm();
+				// getAllEmployees();
+				setTimeout(() => {
+					window.location.reload();
+				}, 500);
+				handleShowToast(
+					`Thêm nhân viên`,
+					`Nhân viên ${result?.user?.name} được thêm thành công!`,
+				);
+			} catch (error) {
+				// setUsers(users);
+				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
+			}
 		}
 	};
 
@@ -379,7 +448,7 @@ const DepartmentDetailPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columns}
-											data={department?.employees}
+											data={department?.users}
 										/>
 									</div>
 								</Card>
@@ -390,7 +459,7 @@ const DepartmentDetailPage = () => {
 				<CommonForm
 					show={openForm}
 					onClose={hanleCloseForm}
-					handleSubmit={handleSubmitForm}
+					handleSubmit={handleSubmitEmployeeForm}
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}

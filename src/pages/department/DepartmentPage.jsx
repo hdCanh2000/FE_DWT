@@ -91,7 +91,7 @@ const DepartmentPage = () => {
 			type: 'number',
 			align: 'center',
 			isShow: false,
-			render: (item) => item?.employees?.length || 0,
+			render: (item) => item?.users?.length || 0,
 		},
 		{
 			title: 'Trạng thái',
