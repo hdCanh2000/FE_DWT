@@ -417,6 +417,7 @@ const TaskDetailForm = ({
 								placeholder='Tên đầu việc'
 								value={valueInput.name || ''}
 								name='name'
+								ariaLabel='name'
 								ref={nameRef}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -512,6 +513,7 @@ const TaskDetailForm = ({
 								value={valueInput.kpiValue || ''}
 								name='kpiValue'
 								onChange={handleChange}
+								ariaLabel='kpiValue'
 								ref={kpiRef}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -528,6 +530,7 @@ const TaskDetailForm = ({
 									moment().add(0, 'days').format('YYYY/MM/DD')
 								}
 								name='estimateDate'
+								ariaLabel='estimateDate'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -543,6 +546,7 @@ const TaskDetailForm = ({
 								type='time'
 								value={valueInput.estimateTime || ''}
 								name='estimateTime'
+								ariaLabel='estimateTime'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -558,6 +562,7 @@ const TaskDetailForm = ({
 									moment().add(0, 'days').format('YYYY/MM/DD')
 								}
 								name='deadlineDate'
+								ariaLabel='deadlineDate'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -570,6 +575,7 @@ const TaskDetailForm = ({
 								type='time'
 								value={valueInput.deadlineTime || ''}
 								name='deadlineTime'
+								ariaLabel='deadlineTime'
 								onChange={handleChange}
 								className='border border-2 rounded-0 shadow-none'
 							/>
@@ -583,6 +589,7 @@ const TaskDetailForm = ({
 								placeholder='note'
 								value={valueInput.description}
 								name='description'
+								ariaLabel='description'
 								onChange={handleChange}
 								ref={descriptionRef}
 							/>

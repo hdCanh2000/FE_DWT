@@ -78,7 +78,10 @@ const ModalConfirmCommon = ({
 												/>
 											</FormGroup>
 										)}
-										{(status === 4 || status === 5 || status === 6) && (
+										{(status === 4 ||
+											status === 5 ||
+											status === 6 ||
+											status === 8) && (
 											<FormGroup className='col-12' id='note' label='Ghi chú'>
 												<Textarea
 													name='note'

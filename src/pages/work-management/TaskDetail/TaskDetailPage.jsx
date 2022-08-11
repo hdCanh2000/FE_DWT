@@ -32,7 +32,8 @@ import {
 	formatColorStatus,
 	formatColorPriority,
 	TASK_STATUS,
-	TASK_STATUS_MANAGE,
+	renderStatusTask,
+	STATUS,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -96,7 +97,15 @@ const TaskDetailPage = () => {
 		stroke: {
 			width: 0,
 		},
-		labels: ['Chờ chấp nhận', 'Đang thực hiện', 'Đã hoàn thành', 'Chờ xác nhận', 'Huỷ', 'Đóng'],
+		labels: [
+			'Chờ chấp nhận',
+			'Đang thực hiện',
+			'Đã hoàn thành',
+			'Chờ xác nhận',
+			'Huỷ',
+			'Đóng',
+			'Tạm dừng',
+		],
 		dataLabels: {
 			enabled: false,
 		},
@@ -136,7 +145,7 @@ const TaskDetailPage = () => {
 		},
 	};
 	const [state, setState] = React.useState({
-		series: [0, 0, 0, 0],
+		series: [0, 0, 0, 0, 0, 0, 0],
 		options: chartOptions,
 	});
 
@@ -246,19 +255,15 @@ const TaskDetailPage = () => {
 						</Button>
 					</DropdownToggle>
 					<DropdownMenu>
-						{Object.keys(TASK_STATUS_MANAGE).map((key) => (
+						{Object.keys(renderStatusTask(item.status)).map((key) => (
 							<DropdownItem
 								key={key}
 								onClick={() =>
-									handleOpenConfirmStatusTask(
-										item,
-										TASK_STATUS_MANAGE[key].value,
-										2,
-									)
+									handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
 								}>
 								<div>
-									<Icon icon='Circle' color={TASK_STATUS_MANAGE[key].color} />
-									{TASK_STATUS_MANAGE[key].name}
+									<Icon icon='Circle' color={STATUS[key].color} />
+									{STATUS[key].name}
 								</div>
 							</DropdownItem>
 						))}
@@ -528,6 +533,7 @@ const TaskDetailPage = () => {
 				calcTotalSubtaskByStatus(task, 3),
 				calcTotalSubtaskByStatus(task, 6),
 				calcTotalSubtaskByStatus(task, 7),
+				calcTotalSubtaskByStatus(task, 8),
 			],
 			options: chartOptions,
 		});
@@ -870,6 +876,7 @@ const TaskDetailPage = () => {
 												</CardHeader>
 												<CardBody className='py-2'>
 													<ReportCommon
+														col={4}
 														data={[
 															{
 																label: 'Tổng số đầu việc',
@@ -922,6 +929,13 @@ const TaskDetailPage = () => {
 																value: calcTotalSubtaskByStatus(
 																	task,
 																	7,
+																),
+															},
+															{
+																label: 'Tạm dừng',
+																value: calcTotalSubtaskByStatus(
+																	task,
+																	8,
 																),
 															},
 														]}

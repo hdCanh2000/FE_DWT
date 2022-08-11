@@ -81,6 +81,7 @@ const App = () => {
 				localStorage.removeItem('email');
 				localStorage.removeItem('name');
 				localStorage.removeItem('roles');
+				window.location.reload();
 				navigate('/dang-nhap');
 			}
 		}
