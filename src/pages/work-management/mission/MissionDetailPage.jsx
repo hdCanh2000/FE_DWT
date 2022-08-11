@@ -51,7 +51,8 @@ import {
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
-	TASK_STATUS_MANAGE,
+	STATUS,
+	renderStatusTask,
 } from '../../../utils/constants';
 import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
@@ -246,15 +247,15 @@ const MissionDetailPage = () => {
 						</Button>
 					</DropdownToggle>
 					<DropdownMenu>
-						{Object.keys(TASK_STATUS_MANAGE).map((key) => (
+						{Object.keys(renderStatusTask(item.status)).map((key) => (
 							<DropdownItem
 								key={key}
 								onClick={() =>
-									handleOpenConfirmStatusTask(item, TASK_STATUS_MANAGE[key].value)
+									handleOpenConfirmStatusTask(item, STATUS[key].value)
 								}>
 								<div>
-									<Icon icon='Circle' color={TASK_STATUS_MANAGE[key].color} />
-									{TASK_STATUS_MANAGE[key].name}
+									<Icon icon='Circle' color={STATUS[key].color} />
+									{STATUS[key].name}
 								</div>
 							</DropdownItem>
 						))}
@@ -907,6 +908,10 @@ const MissionDetailPage = () => {
 															label: 'Đóng',
 															value: calcTotalTaskByStatus(tasks, 7),
 														},
+														{
+															label: 'Tạm dừng',
+															value: calcTotalTaskByStatus(tasks, 8),
+														},
 													]}
 												/>
 												{tasks?.length > 0 ? (
@@ -920,6 +925,7 @@ const MissionDetailPage = () => {
 																	calcTotalTaskByStatus(tasks, 3),
 																	calcTotalTaskByStatus(tasks, 6),
 																	calcTotalTaskByStatus(tasks, 7),
+																	calcTotalTaskByStatus(tasks, 8),
 																]}
 																options={chartOptions}
 																type={chartOptions.chart.type}

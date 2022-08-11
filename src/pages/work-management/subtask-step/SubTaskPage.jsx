@@ -669,11 +669,11 @@ const SubTaskPage = () => {
 												<div
 													className='fs-5'
 													style={{
-														'-webkit-line-clamp': '2',
+														WebkitLineClamp: 2,
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
 														display: '-webkit-box',
-														'-webkit-box-orient': 'vertical',
+														WebkitBoxOrient: 'vertical',
 													}}>
 													{subtask?.description}
 												</div>
