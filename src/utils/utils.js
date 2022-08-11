@@ -30,3 +30,16 @@ export const generateItems = (count, creator) => {
 	}
 	return result;
 };
+
+export const formatDateFromMiliseconds = (data) => {
+	const d = new Date(data);
+	let result = '';
+	const year = d.getFullYear();
+	let month = d.getMonth() + 1;
+	if (month < 10) month = `0${month}`;
+	const date = d.getDate();
+	const hours = d.getHours();
+	const minutes = d.getMinutes();
+	result += `${date}/${month}/${year}, ${hours}:${minutes}`;
+	return result;
+};

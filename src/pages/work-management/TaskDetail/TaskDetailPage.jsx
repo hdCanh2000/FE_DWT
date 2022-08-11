@@ -19,6 +19,7 @@ import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Card, {
+	CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
@@ -58,6 +59,8 @@ import {
 } from '../../../utils/function';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import Alert from '../../../components/bootstrap/Alert';
+import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
+import { formatDateFromMiliseconds } from '../../../utils/utils';
 
 const TaskDetailPage = () => {
 	// State
@@ -76,6 +79,7 @@ const TaskDetailPage = () => {
 	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [openListInfoModal, setOpenListInfoModal] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
 		title: '',
 		subTitle: '',
@@ -246,7 +250,11 @@ const TaskDetailPage = () => {
 							<DropdownItem
 								key={key}
 								onClick={() =>
-									handleOpenConfirmStatusTask(item, TASK_STATUS_MANAGE[key].value)
+									handleOpenConfirmStatusTask(
+										item,
+										TASK_STATUS_MANAGE[key].value,
+										2,
+									)
 								}>
 								<div>
 									<Icon icon='Circle' color={TASK_STATUS_MANAGE[key].color} />
@@ -259,7 +267,7 @@ const TaskDetailPage = () => {
 			),
 		},
 		{
-			title: '',
+			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			render: (item) => (
@@ -541,7 +549,7 @@ const TaskDetailPage = () => {
 			);
 			return false;
 		}
-		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
+		if (data.status === 1 && (status === 1 || status === 3 || status === 8)) {
 			handleShowToast(
 				`Cập nhật trạng thái!`,
 				`Thao tác không thành công. Công việc ${data.name} chưa được thực hiện!`,
@@ -639,6 +647,15 @@ const TaskDetailPage = () => {
 		setTaskEdit(null);
 	};
 
+	// Modal hiển thị thông tin note
+	const handleOpenListInfoModal = () => {
+		setOpenListInfoModal(true);
+	};
+
+	const handleCloseListInfoModal = () => {
+		setOpenListInfoModal(false);
+	};
+
 	return (
 		<PageWrapper title={task?.name}>
 			<SubHeader>
@@ -685,36 +702,46 @@ const TaskDetailPage = () => {
 											Tổng kết
 										</CardTitle>
 									</CardLabel>
-									<Dropdown>
-										<DropdownToggle hasIcon={false}>
-											<Button
-												color='danger'
-												icon='Report'
-												className='text-nowrap'>
-												Cập nhật trạng thái công việc
-											</Button>
-										</DropdownToggle>
-										<DropdownMenu>
-											{Object.keys(TASK_STATUS).map((key) => (
-												<DropdownItem
-													key={key}
-													onClick={() =>
-														handleOpenConfirmStatusTask(
-															task,
-															TASK_STATUS[key].value,
-														)
-													}>
-													<div>
-														<Icon
-															icon='Circle'
-															color={TASK_STATUS[key].color}
-														/>
-														{TASK_STATUS[key].name}
-													</div>
-												</DropdownItem>
-											))}
-										</DropdownMenu>
-									</Dropdown>
+									<CardActions className='d-flex'>
+										<Dropdown>
+											<DropdownToggle hasIcon={false}>
+												<Button
+													color='danger'
+													icon='Report'
+													className='text-nowrap'>
+													Cập nhật trạng thái công việc
+												</Button>
+											</DropdownToggle>
+											<DropdownMenu>
+												{Object.keys(TASK_STATUS).map((key) => (
+													<DropdownItem
+														key={key}
+														onClick={() =>
+															handleOpenConfirmStatusTask(
+																task,
+																TASK_STATUS[key].value,
+															)
+														}>
+														<div>
+															<Icon
+																icon='Circle'
+																color={TASK_STATUS[key].color}
+															/>
+															{TASK_STATUS[key].name}
+														</div>
+													</DropdownItem>
+												))}
+											</DropdownMenu>
+										</Dropdown>
+										<Button
+											isOutline={!darkModeStatus}
+											color='dark'
+											isLight={darkModeStatus}
+											className='text-nowrap mx-2 shadow-none'
+											icon='Info'
+											onClick={() => handleOpenListInfoModal()}
+										/>
+									</CardActions>
 								</CardHeader>
 								<CardBody className='py-2'>
 									<div className='row g-4'>
@@ -1069,18 +1096,25 @@ const TaskDetailPage = () => {
 										Thêm đầu việc
 									</Button>
 								</CardHeader>
-								<CardBody className='table-responsive'>
+								<div className='p-4'>
 									<TableCommon
 										className='table table-modern mb-0'
 										columns={columns}
 										data={task.subtasks?.filter((item) => item.status !== 3)}
 									/>
-								</CardBody>
-								{!task.subtasks?.filter((item) => item.status !== 3)?.length && (
-									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										Không có công việc thuộc mục tiêu này!
-									</Alert>
-								)}
+								</div>
+								<div className='p-4'>
+									{!task.subtasks?.filter((item) => item.status !== 3)
+										?.length && (
+										<Alert
+											color='warning'
+											isLight
+											icon='Report'
+											className='mt-3'>
+											Không có công việc thuộc mục tiêu này!
+										</Alert>
+									)}
+								</div>
 							</Tab>
 							<Tab
 								eventKey='SubmitSubtask'
@@ -1094,18 +1128,25 @@ const TaskDetailPage = () => {
 										</CardTitle>
 									</CardLabel>
 								</CardHeader>
-								<CardBody className='table-responsive'>
+								<div className='p-4'>
 									<TableCommon
 										className='table table-modern mb-0'
 										columns={columnsPending}
 										data={task.subtasks?.filter((item) => item.status === 3)}
 									/>
-								</CardBody>
-								{!task?.subtasks?.filter((item) => item.status === 3)?.length && (
-									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										Không có công việc đang chờ xác nhận!
-									</Alert>
-								)}
+								</div>
+								<div className='p-4'>
+									{!task?.subtasks?.filter((item) => item.status === 3)
+										?.length && (
+										<Alert
+											color='warning'
+											isLight
+											icon='Report'
+											className='mt-3'>
+											Không có công việc đang chờ xác nhận!
+										</Alert>
+									)}
+								</div>
 							</Tab>
 						</Tabs>
 					</Card>
@@ -1154,6 +1195,36 @@ const TaskDetailPage = () => {
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}
+				/>
+				<ModalShowListCommon
+					show={openListInfoModal}
+					onClose={handleCloseListInfoModal}
+					title='Thông tin ghi chú'
+					columns={[
+						{
+							title: 'Ghi chú',
+							id: 'note',
+							key: 'note',
+							type: 'text',
+							align: 'left',
+							render: (item) => <span className='fs-5'>{item.note}</span>,
+						},
+						{
+							title: 'Ngày ghi chú',
+							id: 'time',
+							key: 'time',
+							type: 'text',
+							align: 'center',
+							render: (item) => (
+								<span className='fs-5'>{formatDateFromMiliseconds(item.time)}</span>
+							),
+						},
+					]}
+					data={
+						task?.notes
+							?.sort((a, b) => b.time - a.time)
+							?.filter((note) => note.note !== '') || []
+					}
 				/>
 			</Page>
 		</PageWrapper>
