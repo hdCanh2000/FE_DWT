@@ -1,25 +1,16 @@
 import React from 'react';
-
 import PropTypes from 'prop-types';
-
+import { useFormik } from 'formik';
 import { Button, Modal } from 'react-bootstrap';
-
-import moment from 'moment';
-
 import Card, {
 	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
-
 import Input from '../../../components/bootstrap/forms/Input';
-
 import Textarea from '../../../components/bootstrap/forms/Textarea';
-
-import { FORMAT_TASK_STATUS } from '../../../utils/constants';
 
 const ModalConfirmCommon = ({
 	type,
@@ -29,40 +20,28 @@ const ModalConfirmCommon = ({
 	status,
 	onClose,
 	onSubmit,
-
 	item,
-
+	isShowNote,
 	...props
 }) => {
-	const person = window.localStorage.getItem('name');
-
-	const handleSubmit = () => {
-		const newWorks = JSON.parse(JSON.stringify(item?.logs || []));
-
-		const newLogs = [
-			...newWorks,
-
-			{
-				user: person,
-
-				type: 1,
-
-				prev_status: FORMAT_TASK_STATUS(item?.status),
-
-				next_status: FORMAT_TASK_STATUS(status),
-
-				[item?.mission_id ? 'task_id' : 'subtask_id']: item?.id,
-
-				[item?.mission_id ? 'task_name' : 'subtask_name']: item?.name,
-
-				time: moment().format('YYYY/MM/DD hh:mm'),
-			},
-		];
-
-		const newItem = { ...item, logs: newLogs };
-
-		onSubmit(status, newItem);
-	};
+	const formik = useFormik({
+		initialValues: {
+			note: '',
+			kpiValue: item?.kpiValue || '',
+		},
+		enableReinitialize: true,
+		onSubmit: (values, { resetForm }) => {
+			const data = { ...item };
+			if (values.note && values.note.length > 0) {
+				data.notes = [...data.notes, { note: values.note, time: Date.now() }];
+			} else {
+				data.notes = item.notes;
+			}
+			data.kpiValue = values.kpiValue;
+			onSubmit(status, data);
+			resetForm();
+		},
+	});
 
 	return (
 		<Modal show={show} onHide={onClose} size='lg' scrollable centered {...props}>
@@ -84,31 +63,43 @@ const ModalConfirmCommon = ({
 										{status === 4 && (
 											<FormGroup
 												className='col-12'
-												id='kpi_value'
+												id='kpiValue'
 												label='Giá trị đánh giá'>
 												<Input
 													type='number'
-													name='kpi_value'
+													name='kpiValue'
 													required
 													size='lg'
 													placeholder='Giá trị KPI đánh giá'
 													className='border border-2'
+													onBlur={formik.handleBlur}
+													onChange={formik.handleChange}
+													isValid={formik.isValid}
+													isTouched={formik.touched.kpiValue}
+													value={formik.values.kpiValue}
 												/>
 											</FormGroup>
 										)}
-										<FormGroup
-											className='col-12'
-											id='description'
-											label='Ghi chú'>
-											<Textarea
-												name='description'
-												required
-												size='lg'
-												placeholder='Ghi chú'
-												rows={4}
-												className='border border-2'
-											/>
-										</FormGroup>
+										{(status === 4 ||
+											status === 5 ||
+											status === 6 ||
+											status === 8) && (
+											<FormGroup className='col-12' id='note' label='Ghi chú'>
+												<Textarea
+													name='note'
+													required
+													size='lg'
+													placeholder='Ghi chú'
+													rows={4}
+													className='border border-2'
+													onBlur={formik.handleBlur}
+													onChange={formik.handleChange}
+													isValid={formik.isValid}
+													isTouched={formik.touched.note}
+													value={formik.values.note}
+												/>
+											</FormGroup>
+										)}
 									</div>
 								</CardBody>
 							</Card>
@@ -120,7 +111,7 @@ const ModalConfirmCommon = ({
 				<Button variant='secondary' onClick={onClose}>
 					Đóng
 				</Button>
-				<Button variant='primary' onClick={handleSubmit}>
+				<Button variant='primary' type='submit' onClick={formik.handleSubmit}>
 					Xác nhận
 				</Button>
 			</Modal.Footer>
@@ -140,6 +131,7 @@ ModalConfirmCommon.propTypes = {
 	item: PropTypes.object,
 	onClose: PropTypes.func,
 	onSubmit: PropTypes.func,
+	isShowNote: PropTypes.bool,
 };
 ModalConfirmCommon.defaultProps = {
 	className: null,
@@ -152,6 +144,7 @@ ModalConfirmCommon.defaultProps = {
 	item: null,
 	onClose: null,
 	onSubmit: null,
+	isShowNote: false,
 };
 
 export default ModalConfirmCommon;

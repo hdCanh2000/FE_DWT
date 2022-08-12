@@ -172,7 +172,7 @@ Checks.propTypes = {
 	label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 	// eslint-disable-next-line react/require-default-props
 	value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-	checked: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+	checked: PropTypes.oneOfType([PropTypes.string, PropTypes.bool, PropTypes.number]),
 	disabled: PropTypes.bool,
 	isInline: PropTypes.bool,
 	isFormCheckInput: PropTypes.bool,
@@ -196,7 +196,7 @@ Checks.defaultProps = {
 	name: null,
 	type: 'checkbox',
 	label: null,
-	checked: false,
+	checked: 0,
 	disabled: false,
 	isInline: false,
 	isFormCheckInput: false,

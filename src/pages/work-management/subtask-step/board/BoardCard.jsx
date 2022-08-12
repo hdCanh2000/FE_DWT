@@ -44,18 +44,18 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 				{
 					user: person,
 					type: 2,
-					prev_status: null,
-					next_status: `Chỉnh sửa`,
-					step_id: card?.step_id,
-					step_name: card?.name,
+					prevStatus: null,
+					nextStatus: `Chỉnh sửa`,
+					stepId: card?.stepId,
+					stepName: card?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
 			];
 			const subtaskClone = { ...subtask, logs: newLogs };
 			const { steps } = subtaskClone;
 			const stepsClone = [...steps];
-			valuesClone.task_id = subtaskClone?.task_id;
-			valuesClone.subtask_id = subtaskClone?.id;
+			valuesClone.taskId = subtaskClone?.taskId;
+			valuesClone.subtaskId = subtaskClone?.id;
 			valuesClone.id = card.id;
 			valuesClone.status = parseInt(values.status, 10);
 			subtaskClone.steps = stepsClone.map((item) =>

@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useLayoutEffect, useRef } from 'react';
 import { ThemeProvider } from 'react-jss';
 import { ReactNotifications } from 'react-notifications-component';
 import { useFullscreen } from 'react-use';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import jwtDecode from 'jwt-decode';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { ToastProvider } from 'react-toast-notifications';
 import { TourProvider } from '@reactour/tour';
 import ThemeContext from '../contexts/themeContext';
-
 import Aside from '../layout/Aside/Aside';
 import Wrapper from '../layout/Wrapper/Wrapper';
 import Portal from '../layout/Portal/Portal';
@@ -18,6 +18,7 @@ import { getOS } from '../helpers/helpers';
 const App = () => {
 	getOS();
 	const location = useLocation();
+	const navigate = useNavigate();
 	/**
 	 * Dark Mode
 	 */
@@ -69,6 +70,22 @@ const App = () => {
 			document.body.classList.remove('modern-design');
 		}
 	});
+
+	const token = localStorage.getItem('token');
+
+	useEffect(() => {
+		if (token) {
+			const decoded = jwtDecode(token);
+			if (Date.now() / 1000 > decoded.exp) {
+				localStorage.removeItem('token');
+				localStorage.removeItem('email');
+				localStorage.removeItem('name');
+				localStorage.removeItem('roles');
+				window.location.reload();
+				navigate('/dang-nhap');
+			}
+		}
+	}, [navigate, token]);
 
 	return (
 		<ThemeProvider theme={theme}>

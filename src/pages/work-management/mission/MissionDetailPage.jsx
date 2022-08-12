@@ -52,7 +52,8 @@ import {
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
-	TASK_STATUS_MANAGE,
+	STATUS,
+	renderStatusTask,
 } from '../../../utils/constants';
 import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
@@ -154,16 +155,16 @@ const MissionDetailPage = () => {
 		},
 		{
 			title: 'Thời gian dự kiến',
-			id: 'estimate_date',
-			key: 'estimate_date',
+			id: 'estimateDate',
+			key: 'estimateDate',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
 		},
 		{
 			title: 'Hạn hoàn thành',
-			id: 'deadline_date',
-			key: 'deadline_date',
+			id: 'deadlineDate',
+			key: 'deadlineDate',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
 		},
@@ -191,15 +192,15 @@ const MissionDetailPage = () => {
 		},
 		{
 			title: 'Giá trị KPI',
-			id: 'kpi_value',
-			key: 'kpi_value',
+			id: 'kpiValue',
+			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
 		},
 		{
 			title: 'KPI thực tế',
-			id: 'current_kpi',
-			key: 'current_kpi',
+			id: 'currentKpi',
+			key: 'currentKpi',
 			type: 'number',
 			render: (item) => <span>{calcTotalKPIOfTask(item)}</span>,
 			align: 'center',
@@ -247,15 +248,15 @@ const MissionDetailPage = () => {
 						</Button>
 					</DropdownToggle>
 					<DropdownMenu>
-						{Object.keys(TASK_STATUS_MANAGE).map((key) => (
+						{Object.keys(renderStatusTask(item.status)).map((key) => (
 							<DropdownItem
 								key={uuidv4()}
 								onClick={() =>
-									handleOpenConfirmStatusTask(item, TASK_STATUS_MANAGE[key].value)
+									handleOpenConfirmStatusTask(item, STATUS[key].value)
 								}>
 								<div>
-									<Icon icon='Circle' color={TASK_STATUS_MANAGE[key].color} />
-									{TASK_STATUS_MANAGE[key].name}
+									<Icon icon='Circle' color={STATUS[key].color} />
+									{STATUS[key].name}
 								</div>
 							</DropdownItem>
 						))}
@@ -312,8 +313,8 @@ const MissionDetailPage = () => {
 		},
 		{
 			title: 'Hạn hoàn thành',
-			id: 'deadline_date',
-			key: 'deadline_date',
+			id: 'deadlineDate',
+			key: 'deadlineDate',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
 		},
@@ -340,15 +341,15 @@ const MissionDetailPage = () => {
 		},
 		{
 			title: 'Giá trị KPI',
-			id: 'kpi_value',
-			key: 'kpi_value',
+			id: 'kpiValue',
+			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
 		},
 		{
 			title: 'KPI thực tế',
-			id: 'current_kpi',
-			key: 'current_kpi',
+			id: 'currentKpi',
+			key: 'currentKpi',
 			type: 'number',
 			render: (item) => <span>{calcTotalKPIOfTask(item)}</span>,
 			align: 'center',
@@ -451,19 +452,19 @@ const MissionDetailPage = () => {
 			id: null,
 			name: '',
 			description: '',
-			kpi_value: '',
-			estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
-			estimate_time: '08:00',
-			deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
-			deadline_time: '08:00',
+			kpiValue: '',
+			estimateDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			estimateTime: '08:00',
+			deadlineDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			deadlineTime: '08:00',
 			status: 0,
 		});
 		setMissionEdit({
 			name: '',
 			description: '',
-			kpi_value: '',
-			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+			kpiValue: '',
+			startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
+			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
 			status: 1,
 		});
 	};
@@ -577,7 +578,7 @@ const MissionDetailPage = () => {
 			try {
 				const response = await addNewTask({
 					...data,
-					mission_id: parseInt(params.id, 10),
+					missionId: parseInt(params.id, 10),
 				});
 				const result = await response.data;
 				const newTasks = [...tasks];
@@ -814,7 +815,7 @@ const MissionDetailPage = () => {
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col col-sm-5 text-start'>
 														<div className='fw-bold fs-4 mb-10'>
-															{mission?.kpi_value}
+															{mission?.kpiValue}
 														</div>
 														<div className='text-muted'>
 															KPI được giao
@@ -909,6 +910,10 @@ const MissionDetailPage = () => {
 															label: 'Đóng',
 															value: calcTotalTaskByStatus(tasks, 7),
 														},
+														{
+															label: 'Tạm dừng',
+															value: calcTotalTaskByStatus(tasks, 8),
+														},
 													]}
 												/>
 												{tasks?.length > 0 ? (
@@ -922,6 +927,7 @@ const MissionDetailPage = () => {
 																	calcTotalTaskByStatus(tasks, 3),
 																	calcTotalTaskByStatus(tasks, 6),
 																	calcTotalTaskByStatus(tasks, 7),
+																	calcTotalTaskByStatus(tasks, 8),
 																]}
 																options={chartOptions}
 																type={chartOptions.chart.type}
@@ -972,7 +978,7 @@ const MissionDetailPage = () => {
 										children: (
 											<div className='fs-5'>
 												<span className='me-2'>Ngày bắt đầu:</span>
-												{moment(`${mission?.start_time}`).format(
+												{moment(`${mission?.startTime}`).format(
 													'DD-MM-YYYY',
 												)}
 											</div>
@@ -984,9 +990,7 @@ const MissionDetailPage = () => {
 										children: (
 											<div className='fs-5'>
 												<span className='me-2'>Ngày kết thúc:</span>
-												{moment(`${mission?.end_time}`).format(
-													'DD-MM-YYYY',
-												)}
+												{moment(`${mission?.endTime}`).format('DD-MM-YYYY')}
 											</div>
 										),
 									},
@@ -1008,10 +1012,10 @@ const MissionDetailPage = () => {
 										children: (
 											<div key={uuidv4()}>
 												<div className='fw-bold fs-5 mb-1'>
-													{key?.key_name}
+													{key?.keyName}
 												</div>
 												<div className='mt-n2' style={{ fontSize: 14 }}>
-													{key?.key_value}
+													{key?.keyValue}
 												</div>
 											</div>
 										),
@@ -1036,10 +1040,10 @@ const MissionDetailPage = () => {
 													'DD/MM/YYYY HH.mm',
 												)}
 												username={item?.user}
-												id={item.mission_id}
-												taskName={item.mission_name}
-												prevStatus={item?.prev_status}
-												nextStatus={item?.next_status}
+												id={item.missionId}
+												taskName={item.missionName}
+												prevStatus={item?.prevStatus}
+												nextStatus={item?.nextStatus}
 											/>
 										))}
 								</CardBody>

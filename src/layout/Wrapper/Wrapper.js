@@ -23,7 +23,8 @@ export const WrapperContainer = ({ children, className, ...props }) => {
 	);
 };
 WrapperContainer.propTypes = {
-	children: PropTypes.node.isRequired,
+	// eslint-disable-next-line react/require-default-props
+	children: PropTypes.node,
 	className: PropTypes.string,
 };
 WrapperContainer.defaultProps = {

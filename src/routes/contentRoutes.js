@@ -27,7 +27,9 @@ const TASK = {
 
 const MANAGEMENT = {
 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
+	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
+	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 };
 
 const AUTH = {
@@ -146,8 +148,18 @@ const presentation = [
 		exact: true,
 	},
 	{
+		path: `${demoPages.phongBan.path}/:id`,
+		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
+		exact: true,
+	},
+	{
 		path: demoPages.nhanVien.path,
 		element: <MANAGEMENT.EMPLOYEE />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.nhanVien.path}/:id`,
+		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
 		exact: true,
 	},
 	{

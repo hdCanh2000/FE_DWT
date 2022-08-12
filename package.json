@@ -67,6 +67,7 @@
 		"i18next-browser-languagedetector": "^6.1.4",
 		"i18next-http-backend": "^1.4.0",
 		"jsx-to-string": "^1.4.0",
+		"jwt-decode": "^3.1.2",
 		"lodash": "^4.17.21",
 		"moment": "^2.29.3",
 		"pascalcase": "^2.0.0",

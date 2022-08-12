@@ -5,7 +5,6 @@ import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
-import _ from 'lodash';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import toast from 'react-hot-toast';
@@ -15,12 +14,12 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownItem,
 } from '../../../components/bootstrap/Dropdown';
-import Alert from '../../../components/bootstrap/Alert';
 import { updateSubtasks, getAllSubtasks, updateStatusPendingTask } from './services';
 import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Card, {
+	CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
@@ -32,8 +31,9 @@ import {
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
-	TASK_STATUS,
-	TASK_STATUS_MANAGE,
+	renderStatusTask,
+	STATUS,
+	renderStatus,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -51,6 +51,17 @@ import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
+import {
+	calcKPICompleteOfTask,
+	calcProgressSubtask,
+	calcProgressTask,
+	calcTotalKPIOfTask,
+	calcTotalSubtaskByStatus,
+} from '../../../utils/function';
+import TableCommon from '../../common/ComponentCommon/TableCommon';
+import Alert from '../../../components/bootstrap/Alert';
+import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
+import { formatDateFromMiliseconds } from '../../../utils/utils';
 
 const TaskDetailPage = () => {
 	// State
@@ -69,12 +80,15 @@ const TaskDetailPage = () => {
 	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [openListInfoModal, setOpenListInfoModal] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
 		title: '',
 		subTitle: '',
 		status: null,
 		type: 1,
+		isShowNote: false,
 	});
+
 	const chartOptions = {
 		chart: {
 			type: 'donut',
@@ -83,7 +97,15 @@ const TaskDetailPage = () => {
 		stroke: {
 			width: 0,
 		},
-		labels: ['Đang thực hiện', 'Chờ xác nhận', 'Đã hoàn thành', 'Huỷ', 'Từ chối'],
+		labels: [
+			'Chờ chấp nhận',
+			'Đang thực hiện',
+			'Đã hoàn thành',
+			'Chờ xác nhận',
+			'Huỷ',
+			'Đóng',
+			'Tạm dừng',
+		],
 		dataLabels: {
 			enabled: false,
 		},
@@ -123,9 +145,245 @@ const TaskDetailPage = () => {
 		},
 	};
 	const [state, setState] = React.useState({
-		series: [0, 0, 0, 0],
+		series: [0, 0, 0, 0, 0, 0, 0],
 		options: chartOptions,
 	});
+
+	const columns = [
+		{
+			title: 'ID',
+			id: 'id',
+			key: 'id',
+			type: 'number',
+			align: 'right',
+		},
+		{
+			title: 'Tên công việc',
+			id: 'name',
+			key: 'name',
+			type: 'text',
+			render: (item) => (
+				<Link className='text-underline' to={`/cong-viec-${task?.id}/dau-viec/${item?.id}`}>
+					{item.name}
+				</Link>
+			),
+		},
+		{
+			title: 'Thời gian dự kiến',
+			id: 'estimateDate',
+			key: 'estimateDate',
+			type: 'text',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
+		},
+		{
+			title: 'Hạn hoàn thành',
+			id: 'deadlineDate',
+			key: 'deadlineDate',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
+		},
+		{
+			title: 'Tiến độ',
+			id: 'progress',
+			key: 'progress',
+			type: 'text',
+			minWidth: 100,
+			render: (item) => (
+				<div className='d-flex align-items-center flex-column'>
+					<div className='flex-shrink-0 me-3'>{`${calcProgressSubtask(item)}%`}</div>
+					<Progress
+						className='flex-grow-1'
+						isAutoColor
+						value={calcProgressSubtask(item)}
+						style={{
+							height: 10,
+							width: '100%',
+						}}
+					/>
+				</div>
+			),
+			align: 'center',
+		},
+		{
+			title: 'Giá trị KPI',
+			id: 'kpiValue',
+			key: 'kpiValue',
+			type: 'number',
+			align: 'center',
+		},
+		{
+			title: 'Độ ưu tiên',
+			id: 'priority',
+			key: 'priority',
+			type: 'text',
+			render: (item) => (
+				<div className='d-flex align-items-center'>
+					<span
+						style={{
+							paddingRight: '1rem',
+							paddingLeft: '1rem',
+						}}
+						className={classNames(
+							'badge',
+							'border border-2',
+							`border-light`,
+							'bg-success',
+							'pt-2 pb-2 me-2',
+							`bg-${formatColorPriority(item.priority)}`,
+						)}>
+						<span className=''>{`Cấp ${item.priority}`}</span>
+					</span>
+				</div>
+			),
+			align: 'center',
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'number',
+			render: (item) => (
+				<Dropdown>
+					<DropdownToggle hasIcon={false}>
+						<Button
+							isLink
+							color={formatColorStatus(item.status)}
+							icon='Circle'
+							className='text-nowrap'>
+							{FORMAT_TASK_STATUS(item.status)}
+						</Button>
+					</DropdownToggle>
+					<DropdownMenu>
+						{Object.keys(renderStatusTask(item.status)).map((key) => (
+							<DropdownItem
+								key={key}
+								onClick={() =>
+									handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
+								}>
+								<div>
+									<Icon icon='Circle' color={STATUS[key].color} />
+									{STATUS[key].name}
+								</div>
+							</DropdownItem>
+						))}
+					</DropdownMenu>
+				</Dropdown>
+			),
+		},
+		{
+			title: 'Hành động',
+			id: 'action',
+			key: 'action',
+			render: (item) => (
+				<>
+					<Button
+						isOutline={!darkModeStatus}
+						color='success'
+						isDisable={item?.status === 4 || item?.status === 7 || item.status === 3}
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='Edit'
+						onClick={() => handleOpenModal(item, 'edit')}
+					/>
+					<Button
+						isOutline={!darkModeStatus}
+						color='danger'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2 '
+						icon='Delete'
+						onClick={() => handleOpenConfirm(item)}
+					/>
+				</>
+			),
+		},
+	];
+
+	const columnsPending = [
+		{
+			title: 'Ngày dự kiến',
+			id: 'estimateDate',
+			key: 'estimateDate',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Lời nhắn',
+			id: 'name',
+			key: 'note',
+		},
+		{
+			title: 'Người yêu cầu xác nhận',
+			id: 'user',
+			key: 'user',
+			render: (item) => <span>{item?.user?.name}</span>,
+		},
+		{
+			title: 'Tên đầu việc',
+			id: 'name',
+			key: 'name',
+			type: 'text',
+			render: (item) => (
+				<Link className='text-underline' to={`/quan-ly-cong-viec/cong-viec/${item.id}`}>
+					{item.name}
+				</Link>
+			),
+		},
+		{
+			title: 'Hạn hoàn thành',
+			id: 'deadlineDate',
+			key: 'deadlineDate',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'KPI',
+			id: 'kpiValue',
+			key: 'kpiValue',
+			type: 'number',
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'number',
+			render: (item) => (
+				<Button
+					isLink
+					color={formatColorStatus(item.status)}
+					icon='Circle'
+					className='text-nowrap'>
+					{FORMAT_TASK_STATUS(item.status)}
+				</Button>
+			),
+		},
+		{
+			title: '',
+			id: 'action',
+			key: 'action',
+			render: (item) => (
+				<>
+					<Button
+						isOutline={!darkModeStatus}
+						color='success'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						onClick={() => handleOpenConfirmStatusTask(item, 4, 2)}
+						icon='Edit'>
+						Xác nhận
+					</Button>
+					<Button
+						isOutline={!darkModeStatus}
+						color='danger'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2 '
+						onClick={() => handleOpenConfirmStatusTask(item, 5, 2)}
+						icon='Trash'>
+						Từ chối
+					</Button>
+				</>
+			),
+		},
+	];
+
 	// Data
 	React.useEffect(() => {
 		const fetchSubtasks = async (id) => {
@@ -133,8 +391,8 @@ const TaskDetailPage = () => {
 			setTask(res.data);
 			setTask({
 				...res.data,
-				departments: [res.data?.department]?.concat(res.data?.departments_related),
-				users: [res.data?.user]?.concat(res.data?.users_related),
+				departments: [res.data?.department]?.concat(res.data?.departmentsRelated),
+				users: [res.data?.user]?.concat(res.data?.usersRelated),
 			});
 		};
 		fetchSubtasks(parseInt(params?.id, 10));
@@ -165,13 +423,13 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			current_kpi_value: totalKpiSubtask(newSubTasks),
 		});
+
 		try {
 			const respose = await updateSubtasks(parseInt(params?.id, 10), newData);
 			const result = await respose.data;
 			setTask(result);
-			navigate(`/quan-ly-cong-viec/cong-viec/${task?.id}`);
+			navigate(`/cong-viec/${task?.id}`);
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thất bại!`);
@@ -190,8 +448,8 @@ const TaskDetailPage = () => {
 	};
 
 	const handleStatus = async (newStatus, items) => {
-		const checkValid = prevIsValidClickChangeStatus(items, newStatus);
-		if (!checkValid) return;
+		// const checkValid = prevIsValidClickChangeStatus(items, newStatus);
+		// if (!checkValid) return;
 		const newSubTasks = task.subtasks.map((item) => {
 			return item.id === items.id
 				? {
@@ -203,7 +461,6 @@ const TaskDetailPage = () => {
 		const taskValue = JSON.parse(JSON.stringify(task));
 		const newData = Object.assign(taskValue, {
 			subtasks: newSubTasks,
-			current_kpi_value: totalKpiSubtask(newSubTasks),
 		});
 		try {
 			const respose = await updateSubtasks(parseInt(params?.id, 10), newData).then(
@@ -216,26 +473,30 @@ const TaskDetailPage = () => {
 			toast.error('Cập nhật trạng thái thất bại !');
 		}
 	};
-	// eslint-disable-next-line no-unused-vars
+
 	// ------------------	UPDATE AND DELETE TASK	-------------------
 	// form task modal
 	const handleOpenEditTaskForm = (item) => {
 		setEditModalTaskStatus(true);
 		setTaskEdit({ ...item });
 	};
+
 	const handleCloseEditTaskForm = () => {
 		setEditModalTaskStatus(false);
 		setTaskEdit(null);
 	};
+
 	// // confirm task modal
 	const handleOpenConfirmTaskModal = (item) => {
 		setOpenConfirmTaskModal(true);
 		setTaskEdit({ ...item });
 	};
+
 	const handleCloseConfirmTaskModal = () => {
 		setOpenConfirmTaskModal(false);
 		setTaskEdit(null);
 	};
+
 	const handleDeleteTask = async (taskId) => {
 		try {
 			await deleteTaskById(taskId);
@@ -247,6 +508,7 @@ const TaskDetailPage = () => {
 			toast.error('Xoá công việc không thành công. Vui lòng thử lại!');
 		}
 	};
+
 	const handleSubmitTaskForm = async (data) => {
 		if (data.id) {
 			try {
@@ -261,176 +523,94 @@ const TaskDetailPage = () => {
 			}
 		}
 	};
-	// funtion caculator
-	// phần trăm hòan thành subtask
-	const progressSubtask = (subtasks) => {
-		let length = subtasks?.steps.length;
-		let count = 0;
-		subtasks?.steps.forEach((element) => {
-			if (element.status === 1) {
-				count += 1;
-			}
-		});
-		if (!length) length = 1;
-		return (count / length).toFixed(2) * 100;
-	};
-	// số đầu việc Quá hạn / thất bại của 1 task
-	const totalFailSubtask = (tasks) => {
-		if (_.isEmpty(tasks)) return 0;
-		const { subtasks } = tasks;
-		if (_.isEmpty(subtasks)) return 0;
-		let total = 0;
-		// eslint-disable-next-line consistent-return
-		subtasks.forEach((item) => {
-			if (item.status === 3) {
-				total += 1;
-			}
-		});
-		return total;
-	};
-	// phầm trăm số đầu việc xem xét / bế tắc trên task
-	// const progressAllSubtask = (a, b) => {
-	// 	if (!b) b = 1;
-	// 	return (a / b).toFixed(2) * 100;
-	// };
-	// số đầu việc hoàn thành trên task
-	const totalSuccessSubtaskOfTask = (tasks) => {
-		if (_.isEmpty(tasks)) return 0;
-		const { subtasks } = tasks;
-		if (_.isEmpty(subtasks)) return 0;
-		let total = 0;
-		// eslint-disable-next-line consistent-return
-		subtasks.forEach((item) => {
-			if (item.status === 4) {
-				total += 1;
-			}
-		});
-		return total;
-	};
-	// phần trăm hoàn thành task theo subtask
-	const progressTaskBySubtask = (tasks) => {
-		if (_.isEmpty(tasks)) return 0;
-		const { subtasks } = tasks;
-		if (_.isEmpty(subtasks)) return 0;
-		const total = totalSuccessSubtaskOfTask(tasks);
-		const lengthSubtask = subtasks.length;
-		return (total / lengthSubtask).toFixed(2) * 100;
-	};
-	// Số kpi đã được giao
-	const totalKpiSubtask = (newSubtask) => {
-		if (_.isEmpty(newSubtask)) return 0;
-		let totalKpi = 0;
-		newSubtask.forEach((item) => {
-			if (item.status === 4) totalKpi += item.kpi_value;
-		});
-		return totalKpi;
-	};
-	// Số đầu đang chờ xét duyệt
-	const totalPendingSubtaskOfTask = (tasks) => {
-		if (_.isEmpty(tasks)) return 0;
-		const { subtasks } = tasks;
-		if (_.isEmpty(subtasks)) return 0;
-		let total = 0;
-		// eslint-disable-next-line consistent-return
-		subtasks.forEach((item) => {
-			if (item.status === 3) {
-				total += 1;
-			}
-		});
-		return total;
-	};
-	// Số đầu việc đang thực hiện
-	const subtasksDangThucHien = (tasks) => {
-		if (_.isEmpty(tasks)) return 0;
-		let total = 0;
-		tasks?.subtasks?.forEach((item) => {
-			if (item?.status === 2) {
-				total += 1;
-			}
-		});
-		return total;
-	};
+
 	React.useEffect(() => {
 		setState({
 			series: [
-				subtasksDangThucHien(task),
-				totalPendingSubtaskOfTask(task),
-				totalSuccessSubtaskOfTask(task),
-				totalFailSubtask(task),
+				calcTotalSubtaskByStatus(task, 0),
+				calcTotalSubtaskByStatus(task, 2),
+				calcTotalSubtaskByStatus(task, 4),
+				calcTotalSubtaskByStatus(task, 3),
+				calcTotalSubtaskByStatus(task, 6),
+				calcTotalSubtaskByStatus(task, 7),
+				calcTotalSubtaskByStatus(task, 8),
 			],
 			options: chartOptions,
 		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [task]);
+
 	// --------------	  Xử lý chức năng thay đổi trạng thái	  	----------------
 	// --------------	  Handle change status task	  	----------------
-	const prevIsValidClickChangeStatus = (data, status) => {
-		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} chưa được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 2 && (status === 1 || status === 2)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} đang được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (
-			data.status === 3 &&
-			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
-		) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 6 && status !== 2) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} đã bị huỷ!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		if (data.status === 8 && (status === 1 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Công việc ${data.name} đang tạm dừng!`,
-				'Error',
-				'danger',
-			);
-			return false;
-		}
-		return true;
-	};
+
+	// const prevIsValidClickChangeStatus = (data, status) => {
+	// 	if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 1 && (status === 1 || status === 3 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} chưa được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 2 && (status === 1 || status === 2)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} đang được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (
+	// 		data.status === 3 &&
+	// 		(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+	// 	) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 6 && status !== 2) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} đã bị huỷ!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	if (data.status === 8 && (status === 1 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Công việc ${data.name} đang tạm dừng!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		return false;
+	// 	}
+	// 	return true;
+	// };
+
 	const handleClickChangeStatusTask = async (status, data) => {
-		const checkValid = prevIsValidClickChangeStatus(data, status);
-		if (!checkValid) return;
+		// const checkValid = prevIsValidClickChangeStatus(data, status);
+		// if (!checkValid) return;
 		try {
 			const taskClone = { ...data };
 			taskClone.status = status;
@@ -451,23 +631,37 @@ const TaskDetailPage = () => {
 			);
 		}
 	};
+
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
 	// handleStatus(4, item)
-	const handleOpenConfirmStatusTask = (item, nextStatus, type = 1) => {
+
+	const handleOpenConfirmStatusTask = (item, nextStatus, type = 1, isShowNote = false) => {
 		setOpenConfirmModalStatus(true);
 		setTaskEdit({ ...item });
 		setInfoConfirmModalStatus({
 			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
 			subTitle: item?.name,
 			status: nextStatus,
-			type, // 1 task, 2 subtask
+			type, // 1 task, 2 subtask,
+			isShowNote,
 		});
 	};
+
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
 		setTaskEdit(null);
 	};
+
+	// Modal hiển thị thông tin note
+	const handleOpenListInfoModal = () => {
+		setOpenListInfoModal(true);
+	};
+
+	const handleCloseListInfoModal = () => {
+		setOpenListInfoModal(false);
+	};
+
 	return (
 		<PageWrapper title={task?.name}>
 			<SubHeader>
@@ -489,6 +683,7 @@ const TaskDetailPage = () => {
 									isLight={darkModeStatus}
 									className='text-nowrap mx-2'
 									icon='Edit'
+									isDisable={task?.status === 4 || task?.status === 7}
 									onClick={() => handleOpenEditTaskForm(task)}>
 									Sửa
 								</Button>
@@ -513,36 +708,48 @@ const TaskDetailPage = () => {
 											Tổng kết
 										</CardTitle>
 									</CardLabel>
-									<Dropdown>
-										<DropdownToggle hasIcon={false}>
-											<Button
-												color='danger'
-												icon='Report'
-												className='text-nowrap'>
-												Cập nhật trạng thái công việc
-											</Button>
-										</DropdownToggle>
-										<DropdownMenu>
-											{Object.keys(TASK_STATUS).map((key) => (
-												<DropdownItem
-													key={key}
-													onClick={() =>
-														handleOpenConfirmStatusTask(
-															task,
-															TASK_STATUS[key].value,
-														)
-													}>
-													<div>
-														<Icon
-															icon='Circle'
-															color={TASK_STATUS[key].color}
-														/>
-														{TASK_STATUS[key].name}
-													</div>
-												</DropdownItem>
-											))}
-										</DropdownMenu>
-									</Dropdown>
+									<CardActions className='d-flex'>
+										<Dropdown>
+											<DropdownToggle hasIcon={false}>
+												<Button
+													color='danger'
+													icon='Report'
+													className='text-nowrap'>
+													Cập nhật trạng thái công việc
+												</Button>
+											</DropdownToggle>
+											<DropdownMenu>
+												{Object.keys(renderStatus(task?.status)).map(
+													(key) => (
+														<DropdownItem
+															key={key}
+															onClick={() =>
+																handleOpenConfirmStatusTask(
+																	task,
+																	STATUS[key].value,
+																)
+															}>
+															<div>
+																<Icon
+																	icon='Circle'
+																	color={STATUS[key].color}
+																/>
+																{STATUS[key].name}
+															</div>
+														</DropdownItem>
+													),
+												)}
+											</DropdownMenu>
+										</Dropdown>
+										<Button
+											isOutline={!darkModeStatus}
+											color='dark'
+											isLight={darkModeStatus}
+											className='text-nowrap mx-2 shadow-none'
+											icon='Info'
+											onClick={() => handleOpenListInfoModal()}
+										/>
+									</CardActions>
 								</CardHeader>
 								<CardBody className='py-2'>
 									<div className='row g-4'>
@@ -565,41 +772,56 @@ const TaskDetailPage = () => {
 													</CardLabel>
 												</CardHeader>
 												<CardBody className='py-2'>
-													<div className='row d-flex align-items-end pb-3'>
-														<div className='col-12 text-start'>
+													<div className='d-flex align-items-center pb-3'>
+														<div className='flex-grow-1'>
 															<div className='fw-bold fs-3 mb-0'>
-																{progressTaskBySubtask(task)}%
+																{calcProgressTask(task)}%
+																<div>
+																	<Progress
+																		isAutoColor
+																		value={calcProgressTask(
+																			task,
+																		)}
+																		height={10}
+																	/>
+																</div>
 															</div>
-															<div
-																className='text-muted'
-																style={{ fontSize: 15 }}>
-																{totalSuccessSubtaskOfTask(task)}{' '}
-																trên tổng số{' '}
-																{task?.subtasks?.length} đầu việc.
+															<div className='fs-5 mt-2'>
+																<span className='fw-bold text-danger fs-5 me-2'>
+																	{calcTotalSubtaskByStatus(
+																		task,
+																		4,
+																	)}
+																</span>
+																trên tổng số
+																<span className='fw-bold text-danger fs-5 mx-2'>
+																	{task?.subtasks?.length}
+																</span>
+																đầu việc.
 															</div>
-															<Progress
-																isAutoColor
-																value={progressTaskBySubtask(task)}
-																height={10}
-																size='lg'
-															/>
 														</div>
 													</div>
 													<div className='row d-flex align-items-end pb-3'>
-														<div className='col col-sm-6 text-start'>
+														<div className='col col-sm-5 text-start'>
 															<div className='fw-bold fs-4 mb-10'>
-																{task?.kpi_value}
+																{task?.kpiValue}
 															</div>
 															<div className='text-muted'>
-																Giá trị KPI
+																KPI được giao
+															</div>
+															<div className='fw-bold fs-4 mb-10 mt-4'>
+																{calcTotalKPIOfTask(task)}
+															</div>
+															<div className='text-muted'>
+																KPI thực tế
 															</div>
 														</div>
-														<div className='col col-sm-6 text-start'>
+														<div className='col col-sm-7'>
 															<div className='fw-bold fs-4 mb-10'>
-																{totalKpiSubtask(task?.subtasks)}
+																{calcKPICompleteOfTask(task)}
 															</div>
 															<div className='text-muted'>
-																KPI thực tế đạt được
+																Kpi thực tế đã hoàn thành
 															</div>
 														</div>
 													</div>
@@ -656,6 +878,7 @@ const TaskDetailPage = () => {
 												</CardHeader>
 												<CardBody className='py-2'>
 													<ReportCommon
+														col={4}
 														data={[
 															{
 																label: 'Tổng số đầu việc',
@@ -663,19 +886,59 @@ const TaskDetailPage = () => {
 															},
 															{
 																label: 'Đã hoàn thành',
-																value: totalSuccessSubtaskOfTask(
+																value: calcTotalSubtaskByStatus(
 																	task,
+																	4,
 																),
 															},
 															{
 																label: 'Đang thực hiện',
-																value: totalPendingSubtaskOfTask(
+																value: calcTotalSubtaskByStatus(
 																	task,
+																	2,
 																),
 															},
 															{
-																label: 'Huỷ/Quá hạn',
-																value: totalFailSubtask(task),
+																label: 'Chờ xét duyệt',
+																value: calcTotalSubtaskByStatus(
+																	task,
+																	3,
+																),
+															},
+															{
+																label: 'Chờ chấp nhận',
+																value: calcTotalSubtaskByStatus(
+																	task,
+																	0,
+																),
+															},
+															{
+																label: 'Từ chối',
+																value: calcTotalSubtaskByStatus(
+																	task,
+																	5,
+																),
+															},
+															{
+																label: 'Huỷ',
+																value: calcTotalSubtaskByStatus(
+																	task,
+																	6,
+																),
+															},
+															{
+																label: 'Đóng',
+																value: calcTotalSubtaskByStatus(
+																	task,
+																	7,
+																),
+															},
+															{
+																label: 'Tạm dừng',
+																value: calcTotalSubtaskByStatus(
+																	task,
+																	8,
+																),
 															},
 														]}
 													/>
@@ -741,7 +1004,7 @@ const TaskDetailPage = () => {
 												<div className='fs-5'>
 													<span className='me-2'>Thời gian dự kiến:</span>
 													{moment(
-														`${task?.estimate_date} ${task.estimate_time}`,
+														`${task?.estimateDate} ${task.estimateTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
 												</div>
 											),
@@ -753,7 +1016,7 @@ const TaskDetailPage = () => {
 												<div className='fs-5'>
 													<span className='me-2'>Hạn hoàn thành:</span>
 													{moment(
-														`${task?.deadline_date} ${task.deadline_time}`,
+														`${task?.deadlineDate} ${task.deadlineTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
 												</div>
 											),
@@ -761,6 +1024,7 @@ const TaskDetailPage = () => {
 									]}
 								/>
 								{/* Chỉ số key */}
+
 								<CardInfoCommon
 									isScrollable
 									className='transition-base w-100 rounded-2 mb-4'
@@ -774,12 +1038,12 @@ const TaskDetailPage = () => {
 											icon: 'DoneAll',
 											color: 'danger',
 											children: (
-												<div key={key?.key_name}>
+												<div key={key?.keyName}>
 													<div className='fw-bold fs-5 mb-1'>
-														{key?.key_name}
+														{key?.keyName}
 													</div>
 													<div className='mt-n2' style={{ fontSize: 14 }}>
-														{key?.key_value}
+														{key?.keyValue}
 													</div>
 												</div>
 											),
@@ -809,10 +1073,10 @@ const TaskDetailPage = () => {
 																? item?.user?.name
 																: item?.user
 														}
-														id={item?.task_id}
-														taskName={item?.task_name}
-														prevStatus={item?.prev_status}
-														nextStatus={item?.next_status}
+														id={item?.taskId}
+														taskName={item?.taskName}
+														prevStatus={item?.prevStatus}
+														nextStatus={item?.nextStatus}
 													/>
 												);
 											})}
@@ -821,18 +1085,14 @@ const TaskDetailPage = () => {
 							</Card>
 						</div>
 					</div>
+
 					{/* Tổng kết */}
 					<Card>
 						<Tabs defaultActiveKey='DetailSubtask' id='uncontrolled-tab-example'>
 							<Tab
 								eventKey='DetailSubtask'
 								title={`Danh sách đầu việc (${
-									task.subtasks?.filter(
-										(item) =>
-											item.status === 1 ||
-											item.status === 0 ||
-											item.status === 4,
-									).length
+									task.subtasks?.filter((item) => item.status !== 0).length
 								})`}
 								className='mb-3'>
 								{/* Danh sách đầu việc */}
@@ -852,196 +1112,25 @@ const TaskDetailPage = () => {
 										Thêm đầu việc
 									</Button>
 								</CardHeader>
-								<CardBody
-									isScrollable
-									style={{ textAlign: 'center', minHeight: '60vh' }}>
-									<div>
-										<table className='table table-modern mb-0'>
-											<thead>
-												<tr>
-													<th>STT</th>
-													<th>Tên đầu việc</th>
-													<th>Thời gian dự kiến</th>
-													<th>Hạn hoàn thành</th>
-													<th>Tiến độ đầu việc</th>
-													<th>Giá trị kpi</th>
-													<th>Độ ưu tiên</th>
-													<th>Trạng thái</th>
-													<th>Hành động</th>
-												</tr>
-											</thead>
-											<tbody>
-												{task?.subtasks?.filter(
-													(item) =>
-														item.status === 1 ||
-														item.status === 0 ||
-														item.status === 4,
-												).length === 0 ? (
-													<tr>
-														<td colSpan='8'>
-															<Alert
-																color='warning'
-																isLight
-																icon='Report'
-																className='mt-3'>
-																Không có đầu việc thuộc danh sách
-																này !
-															</Alert>
-														</td>
-													</tr>
-												) : (
-													''
-												)}
-												{task?.subtasks
-													?.filter(
-														(item) =>
-															item.status === 0 ||
-															item.status === 1 ||
-															item.status === 2 ||
-															item.status === 4 ||
-															item.status === 5 ||
-															item.status === 6 ||
-															item.status === 7 ||
-															item.status === 8,
-													)
-													.map((item) => (
-														<tr key={item.id}>
-															<td>#{item.id}</td>
-															<td>
-																<div>
-																	<div>
-																		<Link
-																			className='text-underline'
-																			to={`/cong-viec-${task?.id}/dau-viec/${item?.id}`}>
-																			{item.name}
-																		</Link>
-																	</div>
-																	<div className='small text-muted'>
-																		{item.departmnent?.name}
-																	</div>
-																</div>
-															</td>
-															<td>
-																{moment(
-																	`${item.estimate_date} ${item.estimate_time}`,
-																).format('DD-MM-YYYY, HH:mm')}
-															</td>
-															<td>
-																{moment(
-																	`${item.deadline_date} ${item.deadline_time}`,
-																).format('DD-MM-YYYY, HH:mm')}
-															</td>
-															<td>
-																{progressSubtask(item)} %
-																<Progress
-																	isAutoColor
-																	value={progressSubtask(item)}
-																	height={10}
-																/>
-															</td>
-															<td>{item.kpi_value}</td>
-															<td>
-																<span
-																	style={{
-																		paddingRight: '1rem',
-																		paddingLeft: '1rem',
-																	}}
-																	className={classNames(
-																		'badge',
-																		'border border-2',
-																		// [`border-${themeStatus}`],
-																		'bg-success',
-																		'pt-2 pb-2 me-2',
-																		`bg-${formatColorPriority(
-																			item.priority,
-																		)}`,
-																	)}>
-																	<span className=''>{`Cấp ${item.priority}`}</span>
-																</span>
-															</td>
-															<td>
-																<Dropdown>
-																	<DropdownToggle hasIcon={false}>
-																		<Button
-																			isLink
-																			color={formatColorStatus(
-																				item.status,
-																			)}
-																			icon='Circle'
-																			className='text-nowrap'>
-																			{FORMAT_TASK_STATUS(
-																				item.status,
-																			)}
-																		</Button>
-																	</DropdownToggle>
-																	<DropdownMenu>
-																		{Object.keys(
-																			TASK_STATUS_MANAGE,
-																		).map((key) => (
-																			<DropdownItem
-																				key={key}
-																				onClick={() =>
-																					handleOpenConfirmStatusTask(
-																						item,
-																						TASK_STATUS_MANAGE[
-																							key
-																						].value,
-																						2,
-																					)
-																				}>
-																				<div>
-																					<Icon
-																						icon='Circle'
-																						color={
-																							TASK_STATUS_MANAGE[
-																								key
-																							].color
-																						}
-																					/>
-																					{
-																						TASK_STATUS_MANAGE[
-																							key
-																						].name
-																					}
-																				</div>
-																			</DropdownItem>
-																		))}
-																	</DropdownMenu>
-																</Dropdown>
-															</td>
-															<td style={{ width: '270px' }}>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='success'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2'
-																	icon='Edit'
-																	onClick={() =>
-																		handleOpenModal(
-																			item,
-																			'edit',
-																		)
-																	}>
-																	Sửa
-																</Button>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='danger'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2 '
-																	icon='Delete'
-																	onClick={() =>
-																		handleOpenConfirm(item)
-																	}>
-																	Xóa
-																</Button>
-															</td>
-														</tr>
-													))}
-											</tbody>
-										</table>
-									</div>
-								</CardBody>
+								<div className='p-4'>
+									<TableCommon
+										className='table table-modern mb-0'
+										columns={columns}
+										data={task.subtasks?.filter((item) => item.status !== 3)}
+									/>
+								</div>
+								<div className='p-4'>
+									{!task.subtasks?.filter((item) => item.status !== 3)
+										?.length && (
+										<Alert
+											color='warning'
+											isLight
+											icon='Report'
+											className='mt-3'>
+											Không có công việc thuộc mục tiêu này!
+										</Alert>
+									)}
+								</div>
 							</Tab>
 							<Tab
 								eventKey='SubmitSubtask'
@@ -1055,118 +1144,25 @@ const TaskDetailPage = () => {
 										</CardTitle>
 									</CardLabel>
 								</CardHeader>
-								<CardBody
-									isScrollable
-									style={{ textAlign: 'center', minHeight: '60vh' }}>
-									<div>
-										<table className='table table-modern mb-0 align-middle'>
-											<thead>
-												<tr>
-													<th>Ngày dự kiến</th>
-													<th>Lời nhắn</th>
-													<th>Người yêu cầu xác nhận</th>
-													<th>Tên đầu việc</th>
-													<th>Hạn nộp</th>
-													<th>KPI</th>
-													<th>Trạng thái</th>
-													<th>Hành động</th>
-												</tr>
-											</thead>
-											<tbody>
-												{task?.subtasks?.filter((item) => item.status === 3)
-													.length === 0 ? (
-													<tr>
-														<td colSpan='8'>
-															<Alert
-																color='warning'
-																isLight
-																icon='Report'
-																className='mt-3'>
-																Không có đầu việc thuộc danh sách
-																này !
-															</Alert>
-														</td>
-													</tr>
-												) : (
-													''
-												)}
-												{task?.subtasks
-													?.filter((item) => item.status === 3)
-													.map((item) => (
-														<tr key={item.id}>
-															<td>
-																<div className='d-flex align-items-center'>
-																	<span className='text-nowrap'>
-																		{moment(
-																			`${item.estimate_date} ${item.estimate_time}`,
-																		).format(
-																			'DD-MM-YYYY, HH:mm',
-																		)}
-																	</span>
-																</div>
-															</td>
-															<td>{item.name}</td>
-															<td>{item?.user?.name}</td>
-															<td>{item.name}</td>
-															<td>
-																<div className='d-flex align-items-center'>
-																	<span className='text-nowrap'>
-																		{moment(
-																			`${item.deadline_date} ${item.deadline_time}`,
-																		).format(
-																			'DD-MM-YYYY, HH:mm',
-																		)}
-																	</span>
-																</div>
-															</td>
-															<td>{item?.kpi_value}</td>
-															<td>
-																<Icon
-																	icon='Circle'
-																	color={formatColorStatus(
-																		item.status,
-																	)}
-																/>
-																{FORMAT_TASK_STATUS(item.status)}
-															</td>
-															<td style={{ width: '270px' }}>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='success'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2'
-																	onClick={() =>
-																		handleOpenConfirmStatusTask(
-																			item,
-																			4,
-																			2,
-																		)
-																	}
-																	icon='Edit'>
-																	Xác nhận
-																</Button>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='danger'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-2 '
-																	onClick={() =>
-																		handleOpenConfirmStatusTask(
-																			item,
-																			5,
-																			2,
-																		)
-																	}
-																	icon='Trash'>
-																	Từ chối
-																</Button>
-															</td>
-														</tr>
-													))}
-											</tbody>
-										</table>
-									</div>
-								</CardBody>
+								<div className='p-4'>
+									<TableCommon
+										className='table table-modern mb-0'
+										columns={columnsPending}
+										data={task.subtasks?.filter((item) => item.status === 3)}
+									/>
+								</div>
+								<div className='p-4'>
+									{!task?.subtasks?.filter((item) => item.status === 3)
+										?.length && (
+										<Alert
+											color='warning'
+											isLight
+											icon='Report'
+											className='mt-3'>
+											Không có công việc đang chờ xác nhận!
+										</Alert>
+									)}
+								</div>
 							</Tab>
 						</Tabs>
 					</Card>
@@ -1211,9 +1207,40 @@ const TaskDetailPage = () => {
 							: handleStatus
 					}
 					item={taskEdit}
+					isShowNote={infoConfirmModalStatus.isShowNote}
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}
+				/>
+				<ModalShowListCommon
+					show={openListInfoModal}
+					onClose={handleCloseListInfoModal}
+					title='Thông tin ghi chú'
+					columns={[
+						{
+							title: 'Ghi chú',
+							id: 'note',
+							key: 'note',
+							type: 'text',
+							align: 'left',
+							render: (item) => <span className='fs-5'>{item.note}</span>,
+						},
+						{
+							title: 'Ngày ghi chú',
+							id: 'time',
+							key: 'time',
+							type: 'text',
+							align: 'center',
+							render: (item) => (
+								<span className='fs-5'>{formatDateFromMiliseconds(item.time)}</span>
+							),
+						},
+					]}
+					data={
+						task?.notes
+							?.sort((a, b) => b.time - a.time)
+							?.filter((note) => note.note !== '') || []
+					}
 				/>
 			</Page>
 		</PageWrapper>

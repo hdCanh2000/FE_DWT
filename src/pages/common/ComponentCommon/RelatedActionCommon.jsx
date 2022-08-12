@@ -48,7 +48,7 @@ const RelatedActionCommonItem = (props) => {
 	// eslint-disable-next-line react/prop-types
 	const { time } = props;
 	return (
-		<TimelineItem key={Date.now()} className='align-items-center' label={time} color='primary'>
+		<TimelineItem key={time} className='align-items-start' label={time} color='primary'>
 			{renderTextByType(props)}
 		</TimelineItem>
 	);

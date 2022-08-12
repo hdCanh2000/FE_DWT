@@ -7,6 +7,7 @@ import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Board from './board/Board';
 import Card, {
+	CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
@@ -14,7 +15,12 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
-import { formatColorStatus, FORMAT_TASK_STATUS, TASK_STATUS } from '../../../utils/constants';
+import {
+	formatColorStatus,
+	FORMAT_TASK_STATUS,
+	renderStatus,
+	STATUS,
+} from '../../../utils/constants';
 import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
 import {
 	calcKPICompleteOfSubtask,
@@ -41,6 +47,7 @@ import Dropdown, {
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
+import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
 
 const chartOptions = {
 	chart: {
@@ -137,6 +144,7 @@ const SubTaskPage = () => {
 	const [newWork, setNewWork] = React.useState();
 	const [taskEdit, setTaskEdit] = useState({});
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [openListInfoModal, setOpenListInfoModal] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
 		title: '',
 		subTitle: '',
@@ -182,8 +190,8 @@ const SubTaskPage = () => {
 			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
 			setSubtask({
 				...subtaskRes,
-				departments: [subtaskRes?.department]?.concat(subtaskRes?.departments_related),
-				users: [subtaskRes?.user]?.concat(subtaskRes?.users_related),
+				departments: [subtaskRes?.department]?.concat(subtaskRes?.departmentsRelated),
+				users: [subtaskRes?.user]?.concat(subtaskRes?.usersRelated),
 			});
 		};
 		fetch();
@@ -239,80 +247,80 @@ const SubTaskPage = () => {
 		}
 	};
 
-	const prevIsValidClickChangeStatus = (data, status) => {
-		if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} chưa được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 2 && (status === 1 || status === 2)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đang được thực hiện!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (
-			data.status === 3 &&
-			(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
-		) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-					data.status,
-				)}!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 6 && status !== 2) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đã bị huỷ!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		if (data.status === 8 && (status === 1 || status === 8)) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Đầu việc ${data.name} đang tạm dừng!`,
-				'Error',
-				'danger',
-			);
-			handleCloseConfirmStatusTask();
-			return false;
-		}
-		return true;
-	};
+	// const prevIsValidClickChangeStatus = (data, status) => {
+	// 	if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} chưa được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 2 && (status === 1 || status === 2)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} đang được thực hiện!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (
+	// 		data.status === 3 &&
+	// 		(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
+	// 	) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
+	// 				data.status,
+	// 			)}!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 6 && status !== 2) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} đã bị huỷ!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	if (data.status === 8 && (status === 1 || status === 8)) {
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái!`,
+	// 			`Thao tác không thành công. Đầu việc ${data.name} đang tạm dừng!`,
+	// 			'Error',
+	// 			'danger',
+	// 		);
+	// 		handleCloseConfirmStatusTask();
+	// 		return false;
+	// 	}
+	// 	return true;
+	// };
 
 	const handleClickChangeStatusSubtask = async (status, data) => {
-		const checkValid = prevIsValidClickChangeStatus(data, status);
-		if (!checkValid) return;
+		// const checkValid = prevIsValidClickChangeStatus(data, status);
+		// if (!checkValid) return;
 		try {
 			const taskClone = { ...task };
 			const subtaskClone = { ...data };
@@ -335,6 +343,15 @@ const SubTaskPage = () => {
 		} catch (error) {
 			setSubtask(subtask);
 		}
+	};
+
+	// Modal hiển thị thông tin note
+	const handleOpenListInfoModal = () => {
+		setOpenListInfoModal(true);
+	};
+
+	const handleCloseListInfoModal = () => {
+		setOpenListInfoModal(false);
 	};
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
@@ -425,36 +442,48 @@ const SubTaskPage = () => {
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
-								<Dropdown>
-									<DropdownToggle hasIcon={false}>
-										<Button
-											color='danger'
-											icon='Report'
-											className='text-nowrap'>
-											Cập nhật trạng thái đầu việc
-										</Button>
-									</DropdownToggle>
-									<DropdownMenu>
-										{Object.keys(TASK_STATUS).map((key) => (
-											<DropdownItem
-												key={key}
-												onClick={() =>
-													handleOpenConfirmStatusTask(
-														subtask,
-														TASK_STATUS[key].value,
-													)
-												}>
-												<div>
-													<Icon
-														icon='Circle'
-														color={TASK_STATUS[key].color}
-													/>
-													{TASK_STATUS[key].name}
-												</div>
-											</DropdownItem>
-										))}
-									</DropdownMenu>
-								</Dropdown>
+								<CardActions className='d-flex'>
+									<Dropdown>
+										<DropdownToggle hasIcon={false}>
+											<Button
+												color='danger'
+												icon='Report'
+												className='text-nowrap'>
+												Cập nhật trạng thái đầu việc
+											</Button>
+										</DropdownToggle>
+										<DropdownMenu>
+											{Object.keys(renderStatus(subtask?.status)).map(
+												(key) => (
+													<DropdownItem
+														key={key}
+														onClick={() =>
+															handleOpenConfirmStatusTask(
+																subtask,
+																STATUS[key].value,
+															)
+														}>
+														<div>
+															<Icon
+																icon='Circle'
+																color={STATUS[key].color}
+															/>
+															{STATUS[key].name}
+														</div>
+													</DropdownItem>
+												),
+											)}
+										</DropdownMenu>
+									</Dropdown>
+									<Button
+										isOutline={!darkModeStatus}
+										color='dark'
+										isLight={darkModeStatus}
+										className='text-nowrap mx-2 shadow-none'
+										icon='Info'
+										onClick={() => handleOpenListInfoModal()}
+									/>
+								</CardActions>
 							</CardHeader>
 							<CardBody className='py-2'>
 								<div className='row h-100'>
@@ -499,7 +528,7 @@ const SubTaskPage = () => {
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col col-sm-6 text-start'>
 														<div className='fw-bold fs-4 mb-10'>
-															{subtask.kpi_value}
+															{subtask.kpiValue}
 														</div>
 														<div className='text-muted'>
 															Giá trị KPI
@@ -647,11 +676,11 @@ const SubTaskPage = () => {
 												<div
 													className='fs-5'
 													style={{
-														'-webkit-line-clamp': '2',
+														WebkitLineClamp: 2,
 														overflow: 'hidden',
 														textOverflow: 'ellipsis',
 														display: '-webkit-box',
-														'-webkit-box-orient': 'vertical',
+														WebkitBoxOrient: 'vertical',
 													}}>
 													{subtask?.description}
 												</div>
@@ -665,7 +694,7 @@ const SubTaskPage = () => {
 											<div className='fs-5'>
 												<span className='me-2'>Thời gian dự kiến:</span>
 												{moment(
-													`${subtask?.estimate_date} ${subtask.estimate_time}`,
+													`${subtask?.estimateDate} ${subtask.estimateTime}`,
 												).format('DD-MM-YYYY, HH:mm')}
 											</div>
 										),
@@ -677,7 +706,7 @@ const SubTaskPage = () => {
 											<div className='fs-5'>
 												<span className='me-2'>Hạn hoàn thành:</span>
 												{moment(
-													`${subtask?.deadline_date} ${subtask.deadline_time}`,
+													`${subtask?.deadlineDate} ${subtask.deadlineTime}`,
 												).format('DD-MM-YYYY, HH:mm')}
 											</div>
 										),
@@ -699,10 +728,10 @@ const SubTaskPage = () => {
 										children: (
 											<>
 												<div className='fw-bold fs-5 mb-1'>
-													{key?.key_name}
+													{key?.keyName}
 												</div>
 												<div className='mt-n2' style={{ fontSize: 14 }}>
-													{key?.key_value}
+													{key?.keyValue}
 												</div>
 											</>
 										),
@@ -731,10 +760,10 @@ const SubTaskPage = () => {
 												username={
 													item?.user?.name ? item?.user?.name : item?.user
 												}
-												id={item?.subtask_id}
-												taskName={item?.subtask_name}
-												prevStatus={item?.prev_status}
-												nextStatus={item?.next_status}
+												id={item?.subtaskId}
+												taskName={item?.subtaskName}
+												prevStatus={item?.prevStatus}
+												nextStatus={item?.nextStatus}
 											/>
 										))}
 								</CardBody>
@@ -769,7 +798,7 @@ const SubTaskPage = () => {
 					task={task}
 					setEditModalStatus={setEditModalStatus}
 					editModalStatus={editModalStatus}
-					id={subtask?.task_id}
+					id={subtask?.taskId}
 					idEdit={subtask.id}
 					newWork={newWork}
 				/>
@@ -781,6 +810,38 @@ const SubTaskPage = () => {
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}
+				/>
+				<ModalShowListCommon
+					show={openListInfoModal}
+					onClose={handleCloseListInfoModal}
+					title='Thông tin ghi chú'
+					columns={[
+						{
+							title: 'Ghi chú',
+							id: 'note',
+							key: 'note',
+							type: 'text',
+							align: 'left',
+							render: (item) => <span className='fs-5'>{item.note}</span>,
+						},
+						{
+							title: 'Ngày ghi chú',
+							id: 'time',
+							key: 'time',
+							type: 'text',
+							align: 'center',
+							render: (item) => (
+								<span className='fs-5'>
+									{new Date(item.time).toLocaleDateString()}
+								</span>
+							),
+						},
+					]}
+					data={
+						subtask?.notes
+							?.sort((a, b) => b.time - a.time)
+							?.filter((note) => note.note !== '') || []
+					}
 				/>
 			</Page>
 		</PageWrapper>

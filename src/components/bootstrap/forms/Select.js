@@ -115,7 +115,11 @@ Select.propTypes = {
 	/**
 	 * For formik ***`formik.values.ID_OR_NAME`***
 	 */
-	value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+	value: PropTypes.oneOfType([
+		PropTypes.string,
+		PropTypes.number,
+		PropTypes.arrayOf(PropTypes.string),
+	]),
 	defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
 	list: PropTypes.arrayOf(
 		PropTypes.shape({

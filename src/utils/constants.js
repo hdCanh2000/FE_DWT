@@ -75,6 +75,232 @@ export const TASK_STATUS_MANAGE = {
 	ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
 };
 
+export const renderStatus = (status) => {
+	let result = {};
+	switch (status) {
+		case 0:
+			result = {
+				ACCEPTED: {
+					value: 1,
+					name: 'Chấp nhận',
+					code: 'accepted',
+					color: COLORS.INFO.name,
+				},
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+			};
+			break;
+		case 1:
+			result = {
+				SOLVED: {
+					value: 3,
+					name: 'Đã xong - Chờ duyệt',
+					code: 'solved',
+					color: COLORS.SUCCESS.name,
+				},
+				ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
+			};
+			break;
+		case 2:
+			result = {
+				SOLVED: {
+					value: 3,
+					name: 'Đã xong - Chờ duyệt',
+					code: 'solved',
+					color: COLORS.SUCCESS.name,
+				},
+				ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
+			};
+			break;
+		case 3:
+			result = {
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+				COMPLETED: {
+					value: 4,
+					name: 'Đã hoàn thành',
+					code: 'completed',
+					color: COLORS.SUCCESS.name,
+				},
+				REJECTED: {
+					value: 5,
+					name: 'Từ chối',
+					code: 'rejectes',
+					color: COLORS.DANGER.name,
+				},
+			};
+			break;
+		case 4:
+			result = {};
+			break;
+		case 5:
+			result = {
+				ACCEPTED: {
+					value: 1,
+					name: 'Chấp nhận',
+					code: 'accepted',
+					color: COLORS.INFO.name,
+				},
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+				SOLVED: {
+					value: 3,
+					name: 'Đã xong - Chờ duyệt',
+					code: 'solved',
+					color: COLORS.SUCCESS.name,
+				},
+			};
+			break;
+		case 6:
+			result = {};
+			break;
+		case 7:
+			result = {};
+			break;
+		case 8:
+			result = {
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+				SOLVED: {
+					value: 3,
+					name: 'Đã xong - Chờ duyệt',
+					code: 'solved',
+					color: COLORS.SUCCESS.name,
+				},
+				FAILED: { value: 6, name: 'Huỷ', code: 'failed', color: COLORS.DARK.name },
+			};
+			break;
+		default:
+			result = STATUS;
+			break;
+	}
+	return result;
+};
+
+export const renderStatusTask = (status) => {
+	let result = {};
+	switch (status) {
+		case 0:
+			result = TASK_STATUS_MANAGE;
+			break;
+		case 1:
+			result = TASK_STATUS_MANAGE;
+			break;
+		case 2:
+			result = {
+				ONHOLD: { value: 8, name: 'Tạm dừng', code: 'Pending', color: COLORS.INFO.name },
+			};
+			break;
+		case 3:
+			result = {
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+				REJECTED: {
+					value: 5,
+					name: 'Từ chối',
+					code: 'rejectes',
+					color: COLORS.DANGER.name,
+				},
+				COMPLETED: {
+					value: 4,
+					name: 'Đã hoàn thành',
+					code: 'completed',
+					color: COLORS.SUCCESS.name,
+				},
+			};
+			break;
+		case 4:
+			result = {
+				CLOSE: { value: 7, name: 'Đóng', code: 'Pending', color: COLORS.DARK.name },
+			};
+			break;
+		case 5:
+			result = {
+				CLOSE: { value: 7, name: 'Đóng', code: 'Pending', color: COLORS.DARK.name },
+			};
+			break;
+		case 6:
+			result = {
+				PENDING: {
+					value: 0,
+					name: 'Chờ chấp nhận',
+					code: 'pending',
+					color: COLORS.DANGER.name,
+				},
+				ACCEPTED: {
+					value: 1,
+					name: 'Chấp nhận',
+					code: 'accepted',
+					color: COLORS.INFO.name,
+				},
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+			};
+			break;
+		case 7:
+			result = {
+				PENDING: {
+					value: 0,
+					name: 'Chờ chấp nhận',
+					code: 'pending',
+					color: COLORS.DANGER.name,
+				},
+				ACCEPTED: {
+					value: 1,
+					name: 'Chấp nhận',
+					code: 'accepted',
+					color: COLORS.INFO.name,
+				},
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+			};
+			break;
+		case 8:
+			result = {
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
+				FAILED: { value: 6, name: 'Huỷ', code: 'failed', color: COLORS.DARK.name },
+			};
+			break;
+		default:
+			result = STATUS;
+			break;
+	}
+	return result;
+};
+
 export const formatColorStatus = (status) => {
 	let result = '';
 	switch (status) {

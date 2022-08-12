@@ -29,6 +29,8 @@ import {
 	formatColorPriority,
 	formatColorStatus,
 	FORMAT_TASK_STATUS,
+	renderStatusTask,
+	STATUS,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
 import Icon from '../../../components/icon/Icon';
@@ -42,6 +44,12 @@ import { calcProgressTask } from '../../../utils/function';
 import Badge from '../../../components/bootstrap/Badge';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import { getAllSubtasks } from '../TaskDetail/services';
+import Dropdown, {
+	DropdownItem,
+	DropdownMenu,
+	DropdownToggle,
+} from '../../../components/bootstrap/Dropdown';
+import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 
 const Item = ({
 	id,
@@ -144,6 +152,14 @@ const TaskListPage = () => {
 	const [newWorkExpand, setNewWorkExpand] = React.useState([]);
 	const [titleExpand, setTitleExpand] = useState();
 
+	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+		title: '',
+		subTitle: '',
+		status: null,
+		isShowNote: false,
+	});
+
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -185,11 +201,11 @@ const TaskListPage = () => {
 			id: null,
 			name: '',
 			description: '',
-			kpi_value: '',
-			estimate_date: moment().add(0, 'days').format('YYYY-MM-DD'),
-			estimate_time: '08:00',
-			deadline_date: moment().add(0, 'days').format('YYYY-MM-DD'),
-			deadline_time: '08:00',
+			kpiValue: '',
+			estimateDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			estimateTime: '08:00',
+			deadlineDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			deadlineTime: '08:00',
 			status: 0,
 		});
 	};
@@ -284,25 +300,26 @@ const TaskListPage = () => {
 		}
 	};
 
-	// const handleUpdateStatus = async (status, data) => {
-	// 	try {
-	// 		const newData = { ...data };
-	// 		newData.status = status;
-	// 		const response = await updateTaskByID(newData);
-	// 		const result = await response.data;
-	// 		const newTasks = [...tasks];
-	// 		setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-	// 		handleClearValueForm();
-	// 		handleCloseEditForm();
-	// 		handleShowToast(
-	// 			`Cập nhật công việc!`,
-	// 			`Công việc ${result.name} được cập nhật thành công!`,
-	// 		);
-	// 	} catch (error) {
-	// 		setTasks(tasks);
-	// 		handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
-	// 	}
-	// };
+	const handleUpdateStatus = async (status, data) => {
+		try {
+			const newData = { ...data };
+			newData.status = status;
+			const response = await updateTaskByID(newData);
+			const result = await response.data;
+			const newTasks = [...tasks];
+			setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
+			handleClearValueForm();
+			handleCloseEditForm();
+			handleCloseConfirmStatusTask();
+			handleShowToast(
+				`Cập nhật công việc!`,
+				`Công việc ${result.name} được cập nhật thành công!`,
+			);
+		} catch (error) {
+			setTasks(tasks);
+			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+		}
+	};
 
 	const handleClickSwitchView = (view) => {
 		navigate({
@@ -311,6 +328,25 @@ const TaskListPage = () => {
 				view,
 			})}`,
 		});
+	};
+
+	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+
+	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
+		setOpenConfirmModalStatus(true);
+		setItemEdit({ ...item });
+		setInfoConfirmModalStatus({
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			subTitle: item?.name,
+			status: nextStatus,
+			isShowNote,
+		});
+	};
+
+	const handleCloseConfirmStatusTask = () => {
+		setOpenConfirmModalStatus(false);
+		setItemEdit(null);
 	};
 
 	return (
@@ -420,11 +456,11 @@ const TaskListPage = () => {
 															{item?.user?.name}
 														</td>
 														<td align='center'>
-															{moment(`${item.deadline_date}`).format(
+															{moment(`${item.deadlineDate}`).format(
 																'DD-MM-YYYY',
 															)}
 														</td>
-														<td align='center'>{item?.kpi_value}</td>
+														<td align='center'>{item?.kpiValue}</td>
 														<td>
 															<div className='d-flex align-items-center'>
 																<span
@@ -447,15 +483,49 @@ const TaskListPage = () => {
 															</div>
 														</td>
 														<td>
-															<Button
-																isLink
-																color={formatColorStatus(
-																	item.status,
-																)}
-																icon='Circle'
-																className='text-nowrap'>
-																{FORMAT_TASK_STATUS(item.status)}
-															</Button>
+															<Dropdown>
+																<DropdownToggle hasIcon={false}>
+																	<Button
+																		isLink
+																		color={formatColorStatus(
+																			item.status,
+																		)}
+																		icon='Circle'
+																		className='text-nowrap'>
+																		{FORMAT_TASK_STATUS(
+																			item.status,
+																		)}
+																	</Button>
+																</DropdownToggle>
+																<DropdownMenu>
+																	{Object.keys(
+																		renderStatusTask(
+																			item.status,
+																		),
+																	).map((key) => (
+																		<DropdownItem
+																			key={key}
+																			onClick={() =>
+																				handleOpenConfirmStatusTask(
+																					item,
+																					STATUS[key]
+																						.value,
+																				)
+																			}>
+																			<div>
+																				<Icon
+																					icon='Circle'
+																					color={
+																						STATUS[key]
+																							.color
+																					}
+																				/>
+																				{STATUS[key].name}
+																			</div>
+																		</DropdownItem>
+																	))}
+																</DropdownMenu>
+															</Dropdown>
 														</td>
 														<td>
 															<div className='d-flex align-items-center flex-column'>
@@ -558,12 +628,12 @@ const TaskListPage = () => {
 										<Item
 											key={item?.id}
 											keys={item?.keys}
-											departmentsRelated={item?.departments_related}
-											usersRelated={item?.users_related}
+											departmentsRelated={item?.departmentsRelated}
+											usersRelated={item?.usersRelated}
 											id={item?.id}
 											name={item?.name}
 											teamName={`${item?.department?.name} - ${item?.user?.name}`}
-											dueDate={`${item?.deadline_date}`}
+											dueDate={`${item?.deadlineDate}`}
 											percent={calcProgressTask(item) || 0}
 											data-tour='project-item'
 										/>
@@ -600,6 +670,16 @@ const TaskListPage = () => {
 					onClose={handleCloseEditForm}
 					onSubmit={handleSubmitTaskForm}
 					item={itemEdit}
+				/>
+				<ModalConfirmCommon
+					show={openConfirmModalStatus}
+					onClose={handleCloseConfirmStatusTask}
+					onSubmit={handleUpdateStatus}
+					item={itemEdit}
+					isShowNote={infoConfirmModalStatus.isShowNote}
+					title={infoConfirmModalStatus.title}
+					subTitle={infoConfirmModalStatus.subTitle}
+					status={infoConfirmModalStatus.status}
 				/>
 			</Page>
 		</PageWrapper>
