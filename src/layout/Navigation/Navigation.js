@@ -503,7 +503,6 @@ export const Item = ({
 		collapsed: !!children && !isHorizontal,
 		active: isHorizontal ? match : here,
 	});
-
 	const _Inner = (
 		<>
 			<span className='navigation-link-info'>
@@ -530,7 +529,6 @@ export const Item = ({
 			)}
 		</>
 	);
-
 	const _withoutChild =
 		!children &&
 		!hide &&
@@ -670,6 +668,7 @@ export const Item = ({
 		);
 	}
 	// without submenu
+	// const role = window.localStorage.getItem('roles');
 	return <li className='navigation-item'>{_withoutChild}</li>;
 };
 Item.propTypes = {
@@ -726,13 +725,75 @@ NavigationTitle.defaultProps = {
 	className: null,
 };
 
+const newData = (data) => {
+	const roles = window.localStorage.getItem('roles');
+	let newDatas = null;
+	switch (roles) {
+		case 'user':
+			newDatas = {
+				quanLyCongViec: {
+					id: 'quanlycongviec',
+					text: 'Công việc',
+					path: '/cong-viec',
+				},
+				cauHinh: {
+					id: 'cauHinh',
+					text: 'Cấu hình',
+					path: '/cau-hinh',
+				},
+				baoCao: {
+					id: 'baoCao',
+					text: 'Báo cáo',
+					path: '/bao-cao',
+				},
+			};
+			break;
+		case 'manager':
+			newDatas = {
+				mucTieu: {
+					id: 'mission',
+					text: 'Mục tiêu',
+					path: '/muc-tieu',
+				},
+				quanLyCongViec: {
+					id: 'quanlycongviec',
+					text: 'Công việc',
+					path: '/cong-viec',
+				},
+				phongBan: {
+					id: 'phongBan',
+					text: 'Phòng ban',
+					path: '/phong-ban',
+				},
+				nhanVien: {
+					id: 'nhanVien',
+					text: 'Nhân viên',
+					path: '/nhan-vien',
+				},
+				cauHinh: {
+					id: 'cauHinh',
+					text: 'Cấu hình',
+					path: '/cau-hinh',
+				},
+				baoCao: {
+					id: 'baoCao',
+					text: 'Báo cáo',
+					path: '/bao-cao',
+				},
+			};
+			break;
+		default:
+			newDatas = data;
+			break;
+	}
+	return newDatas;
+};
 const Navigation = forwardRef(({ menu, horizontal, id, className, ...props }, ref) => {
 	const [activeItem, setActiveItem] = useState(null);
-
 	const { t } = useTranslation('menu');
-
 	function fillMenu(data, parentId, rootId, isHorizontal, isMore) {
-		return Object.keys(data).map((item) =>
+		const datas = newData(data);
+		return Object.keys(datas).map((item) =>
 			data[item].path ? (
 				<Item
 					key={data[item].id}

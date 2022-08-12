@@ -88,7 +88,7 @@ const TaskDetailPage = () => {
 		type: 1,
 		isShowNote: false,
 	});
-
+	navigate('/');
 	const chartOptions = {
 		chart: {
 			type: 'donut',
