@@ -1,5 +1,4 @@
 import React from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { TimelineItem } from '../../../components/extras/Timeline';
 
 const renderTextByType = (props) => {
@@ -49,7 +48,7 @@ const RelatedActionCommonItem = (props) => {
 	// eslint-disable-next-line react/prop-types
 	const { time } = props;
 	return (
-		<TimelineItem key={uuidv4()} className='align-items-center' label={time} color='primary'>
+		<TimelineItem key={Date.now()} className='align-items-center' label={time} color='primary'>
 			{renderTextByType(props)}
 		</TimelineItem>
 	);

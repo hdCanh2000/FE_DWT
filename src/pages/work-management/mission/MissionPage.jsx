@@ -2,7 +2,6 @@
 /* eslint-disable react/prop-types */
 
 import React, { useCallback, useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import {
 	useNavigate,
 	Link,
@@ -240,7 +239,7 @@ const MissionPage = () => {
 			}
 		} else {
 			try {
-				const response = await addNewMission({ ...data, id: uuidv4() });
+				const response = await addNewMission({ ...data, id: Date.now() });
 				const result = await response.data;
 				const newMissions = [...missions];
 				newMissions.push(result);

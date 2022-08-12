@@ -1,6 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -23,7 +24,7 @@ const CardInfoCommon = ({
 	...props
 }) => {
 	return (
-		<Card className={classNames(className)} shadow={shadow} {...props}>
+		<Card className={classNames(className)} shadow={shadow} {...props} key={uuidv4()}>
 			<CardHeader className='py-2'>
 				<CardLabel icon={icon} iconColor={iconColor}>
 					<CardTitle>{title}</CardTitle>
@@ -34,7 +35,7 @@ const CardInfoCommon = ({
 				<div className='row g-2 ps-5 pe-4'>
 					{data?.map((item) => {
 						return (
-							<div className='col-12 mb-2' key={children?.key}>
+							<div className='col-12 mb-2' key={uuidv4()}>
 								<div className='d-flex align-items-center'>
 									<div className='flex-shrink-0'>
 										<Icon

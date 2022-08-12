@@ -249,7 +249,7 @@ const MissionDetailPage = () => {
 					<DropdownMenu>
 						{Object.keys(TASK_STATUS_MANAGE).map((key) => (
 							<DropdownItem
-								key={key}
+								key={uuidv4()}
 								onClick={() =>
 									handleOpenConfirmStatusTask(item, TASK_STATUS_MANAGE[key].value)
 								}>
@@ -856,7 +856,7 @@ const MissionDetailPage = () => {
 													color: 'info',
 													children: (
 														<div
-															key={department?.name}
+															key={uuidv4()}
 															className='fw-bold fs-5 mb-1'>
 															{department?.name}
 														</div>
@@ -1006,7 +1006,7 @@ const MissionDetailPage = () => {
 										icon: 'DoneAll',
 										color: 'danger',
 										children: (
-											<div>
+											<div key={uuidv4()}>
 												<div className='fw-bold fs-5 mb-1'>
 													{key?.key_name}
 												</div>
