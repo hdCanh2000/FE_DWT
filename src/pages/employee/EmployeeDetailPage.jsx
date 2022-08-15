@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { isEmpty } from 'lodash';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Formik, useFormik } from 'formik';
 import Button from '../../components/bootstrap/Button';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import SubHeader, { SubHeaderLeft, SubheaderSeparator } from '../../layout/SubHeader/SubHeader';
 import validate from './validate';
 import { demoPages } from '../../menu';
 import Input from '../../components/bootstrap/forms/Input';
@@ -14,9 +13,9 @@ import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Avatar from '../../components/Avatar';
 import { getUserById } from './services';
 import Textarea from '../../components/bootstrap/forms/Textarea';
+import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
 
 const EmployeePage = () => {
-	const navigate = useNavigate();
 	const params = useParams();
 	const [user, setUser] = useState({});
 	const formik = useFormik({
@@ -64,17 +63,7 @@ const EmployeePage = () => {
 
 	return (
 		<PageWrapper title={demoPages.nhanVien.text}>
-			<SubHeader>
-				<SubHeaderLeft>
-					<Button color='info' isLink icon='ArrowBack' onClick={() => navigate(-1)}>
-						Quay lại
-					</Button>
-					<SubheaderSeparator />
-					<span>
-						<strong>{user?.name}</strong>
-					</span>
-				</SubHeaderLeft>
-			</SubHeader>
+			<SubHeaderCommon />
 			<Page>
 				<div className='row h-100'>
 					<div className='col-lg-4 col-md-6'>
@@ -205,7 +194,6 @@ const EmployeePage = () => {
 											</div>
 										</CardBody>
 									</Card>
-
 									<Card className='h-100 mb-0'>
 										<CardHeader>
 											<CardLabel icon='Edit' iconColor='warning'>

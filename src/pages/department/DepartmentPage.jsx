@@ -17,6 +17,7 @@ import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment, getAllDepartmentWithUser, updateDepartment } from './services';
 import validate from './validate';
+import SubHeaderCommonRight from '../common/SubHeaders/SubHeaderCommonRight';
 
 const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -39,14 +40,14 @@ const DepartmentPage = () => {
 	}, []);
 
 	const columns = [
-		{
-			title: 'ID',
-			id: 'id',
-			key: 'id',
-			type: 'number',
-			align: 'center',
-			isShow: false,
-		},
+		// {
+		// 	title: 'ID',
+		// 	id: 'id',
+		// 	key: 'id',
+		// 	type: 'number',
+		// 	align: 'center',
+		// 	isShow: false,
+		// },
 		{
 			title: 'Tên phòng ban',
 			id: 'name',
@@ -202,6 +203,7 @@ const DepartmentPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.phongBan.text}>
+			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				<div className='row mb-4'>
 					<div className='col-12'>

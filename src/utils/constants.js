@@ -96,6 +96,12 @@ export const renderStatus = (status) => {
 			break;
 		case 1:
 			result = {
+				INPROGRESS: {
+					value: 2,
+					name: 'Đang thực hiện',
+					code: 'inprogress',
+					color: COLORS.PRIMARY.name,
+				},
 				SOLVED: {
 					value: 3,
 					name: 'Đã xong - Chờ duyệt',
@@ -124,18 +130,18 @@ export const renderStatus = (status) => {
 					code: 'inprogress',
 					color: COLORS.PRIMARY.name,
 				},
-				COMPLETED: {
-					value: 4,
-					name: 'Đã hoàn thành',
-					code: 'completed',
-					color: COLORS.SUCCESS.name,
-				},
-				REJECTED: {
-					value: 5,
-					name: 'Từ chối',
-					code: 'rejectes',
-					color: COLORS.DANGER.name,
-				},
+				// COMPLETED: {
+				// 	value: 4,
+				// 	name: 'Đã hoàn thành',
+				// 	code: 'completed',
+				// 	color: COLORS.SUCCESS.name,
+				// },
+				// REJECTED: {
+				// 	value: 5,
+				// 	name: 'Từ chối',
+				// 	code: 'rejectes',
+				// 	color: COLORS.DANGER.name,
+				// },
 			};
 			break;
 		case 4:
@@ -262,26 +268,7 @@ export const renderStatusTask = (status) => {
 			};
 			break;
 		case 7:
-			result = {
-				PENDING: {
-					value: 0,
-					name: 'Chờ chấp nhận',
-					code: 'pending',
-					color: COLORS.DANGER.name,
-				},
-				ACCEPTED: {
-					value: 1,
-					name: 'Chấp nhận',
-					code: 'accepted',
-					color: COLORS.INFO.name,
-				},
-				INPROGRESS: {
-					value: 2,
-					name: 'Đang thực hiện',
-					code: 'inprogress',
-					color: COLORS.PRIMARY.name,
-				},
-			};
+			result = {};
 			break;
 		case 8:
 			result = {

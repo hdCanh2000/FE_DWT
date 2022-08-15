@@ -47,7 +47,7 @@ const CommonForm = ({
 					<div className='row'>
 						<div className='col-md-12'>
 							<div className='row g-4'>
-								{fields.slice(1)?.map((field) => {
+								{fields?.map((field) => {
 									if (field.type === 'select') {
 										return (
 											<FormGroup

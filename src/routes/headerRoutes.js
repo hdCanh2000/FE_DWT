@@ -1,7 +1,7 @@
 import React from 'react';
 import { dashboardMenu, demoPages, layoutMenu } from '../menu';
 import DashboardHeader from '../pages/common/Headers/DashboardHeader';
-import CommonHeader from '../pages/common/Headers/CommonHeader';
+// import CommonHeader from '../pages/common/Headers/CommonHeader';
 import DefaultHeader from '../pages/common/Headers/DefaultHeader';
 
 const headers = [
@@ -17,7 +17,7 @@ const headers = [
 	},
 	// chi tiet muc tieu
 	{
-		path: `/muc-tieu/chi-tiet/:id`,
+		path: `/muc-tieu/:id`,
 		element: null,
 		exact: true,
 	},
@@ -30,7 +30,7 @@ const headers = [
 	},
 	// chi tiết đầu việc -step
 	{
-		path: `/cong-viec-:taskid/dau-viec/:id`,
+		path: `/dau-viec/:id`,
 		element: null,
 		exact: true,
 	},
@@ -45,7 +45,7 @@ const headers = [
 	// quản lý phòng ban
 	{
 		path: demoPages.phongBan.path,
-		element: <CommonHeader />,
+		element: null,
 		exact: true,
 	},
 	{
@@ -56,7 +56,7 @@ const headers = [
 	// quản lý nhân viên
 	{
 		path: demoPages.nhanVien.path,
-		element: <CommonHeader />,
+		element: null,
 		exact: true,
 	},
 	{

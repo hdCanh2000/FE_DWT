@@ -63,7 +63,7 @@ const presentation = [
 	},
 	// Trang đầu việc - Step
 	{
-		path: `/cong-viec-:taskid/dau-viec/:id`,
+		path: `/dau-viec/:id`,
 		element: <TASK.SUBTASK_STEP />,
 		exact: true,
 	},
@@ -71,7 +71,7 @@ const presentation = [
 	 * Trang chi tiết nhiệm vụ
 	 */
 	{
-		path: `/muc-tieu/chi-tiet/:id`,
+		path: `/muc-tieu/:id`,
 		element: <TASK.MISSION_DETAIL />,
 		exact: true,
 	},

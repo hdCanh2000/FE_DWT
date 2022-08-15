@@ -21,20 +21,13 @@ import {
 	renderStatus,
 	STATUS,
 } from '../../../utils/constants';
-import { addStepIntoSubtask, getTaskById, updateStatusPendingSubtask } from './services';
-import {
-	calcKPICompleteOfSubtask,
-	calcProgressSubtask,
-	calcTotalStepByStatus,
-	calcTotalStepOfSubTask,
-} from '../../../utils/function';
+import { getSubTaskById, updateSubtask } from './services';
 import Progress from '../../../components/bootstrap/Progress';
 import Button from '../../../components/bootstrap/Button';
+import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
 import useDarkMode from '../../../hooks/useDarkMode';
 import Chart from '../../../components/extras/Chart';
-import SubHeader, { SubHeaderLeft } from '../../../layout/SubHeader/SubHeader';
-import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
-import { updateSubtasks } from '../TaskDetail/services';
+import { deleteSubtask } from '../TaskDetail/services';
 import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
@@ -48,6 +41,7 @@ import Dropdown, {
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
+import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 
 const chartOptions = {
 	chart: {
@@ -57,7 +51,7 @@ const chartOptions = {
 	stroke: {
 		width: 0,
 	},
-	labels: ['Đang thực hiện', 'Dự kiến', 'Đã hoàn thành', 'Quá hạn/Huỷ'],
+	labels: ['Dự kiến', 'Đang thực hiện', 'Đã hoàn thành', 'Quá hạn/Huỷ'],
 	dataLabels: {
 		enabled: false,
 	},
@@ -98,13 +92,19 @@ const chartOptions = {
 };
 
 const SubTaskPage = () => {
+	const { addToast } = useToasts();
+	const { darkModeStatus } = useDarkMode();
+	const navigate = useNavigate();
+	const params = useParams(); // taskid, id
+	const { id } = params;
+
 	const [boardData, setBoardData] = useState([
 		{
 			id: 1,
 			title: 'Dự kiến',
 			color: COLORS.INFO.name,
 			icon: 'DoneOutline',
-			status: 2,
+			status: 0,
 			cards: [],
 		},
 		{
@@ -112,7 +112,7 @@ const SubTaskPage = () => {
 			title: 'Đang thực hiện',
 			color: COLORS.PRIMARY.name,
 			icon: 'PendingActions',
-			status: 0,
+			status: 1,
 			cards: [],
 		},
 		{
@@ -120,7 +120,7 @@ const SubTaskPage = () => {
 			title: 'Đã hoàn thành',
 			color: COLORS.SUCCESS.name,
 			icon: 'DoneAll',
-			status: 1,
+			status: 2,
 			cards: [],
 		},
 		{
@@ -133,16 +133,11 @@ const SubTaskPage = () => {
 		},
 	]);
 	const [subtask, setSubtask] = useState({});
-	const [task, setTask] = useState({});
-	const { addToast } = useToasts();
-	const { darkModeStatus } = useDarkMode();
-	const navigate = useNavigate();
-	const params = useParams(); // taskid, id
-	const { taskid, id } = params;
-	const [editModalStatus, setEditModalStatus] = useState(false);
-	const [openConfirm, set0penConfirm] = React.useState(false);
-	const [newWork, setNewWork] = React.useState();
-	const [taskEdit, setTaskEdit] = useState({});
+	const [subtaskReport, setSubtaskReport] = useState({});
+	const [openConfirm, set0penConfirm] = useState(false);
+	const [subTaskEdit, setSubTaskEdit] = useState({});
+	const [editModalSubtaskStatus, setEditModalSubtaskStatus] = useState(false);
+	const [subtaskEdit, setSubtaskEdit] = useState({});
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [openListInfoModal, setOpenListInfoModal] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
@@ -151,52 +146,38 @@ const SubTaskPage = () => {
 		status: null,
 	});
 
+	async function fetchDataSubTaskById() {
+		const reponse = await getSubTaskById(id);
+		const result = await reponse.data;
+		const subtaskRes = result?.data;
+		setSubtask(result.data);
+		setSubtaskReport(result.report);
+		setBoardData(
+			boardData.map((item) => {
+				return {
+					...item,
+					cards: subtaskRes?.steps
+						?.filter((step) => step?.status === item?.status)
+						?.map((step) => {
+							if (step?.status === item?.status) {
+								return {
+									...step,
+									id: step.id,
+									name: step.name,
+									description: step.description,
+								};
+							}
+							return {};
+						}),
+				};
+			}),
+		);
+	}
+
 	useEffect(() => {
-		async function fetchDataTaskById() {
-			const reponse = await getTaskById(taskid);
-			const result = await reponse.data;
-			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
-			setNewWork(result.logs);
-			setTask(result);
-			setBoardData(
-				boardData.map((item) => {
-					return {
-						...item,
-						cards: subtaskRes?.steps
-							?.filter((step) => step?.status === item?.status)
-							?.map((step) => {
-								if (step?.status === item?.status) {
-									return {
-										...step,
-										id: step.id,
-										name: step.name,
-										description: step.description,
-										label: '5 day left',
-									};
-								}
-								return {};
-							}),
-					};
-				}),
-			);
-		}
-		fetchDataTaskById();
+		fetchDataSubTaskById();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [taskid]);
-	useEffect(() => {
-		const fetch = async () => {
-			const reponse = await getTaskById(taskid);
-			const result = await reponse.data;
-			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
-			setSubtask({
-				...subtaskRes,
-				departments: [subtaskRes?.department]?.concat(subtaskRes?.departmentsRelated),
-				users: [subtaskRes?.user]?.concat(subtaskRes?.usersRelated),
-			});
-		};
-		fetch();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [taskid, task]);
+	}, [id]);
 
 	// show toast
 	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
@@ -212,20 +193,14 @@ const SubTaskPage = () => {
 
 	const handleAddStepIntoSubtask = async (data) => {
 		try {
-			const taskClone = { ...task };
-			taskClone.subtasks = task.subtasks.map((item) =>
-				item.id === data.id ? { ...data } : item,
-			);
-			const response = await addStepIntoSubtask(taskClone);
+			const response = await updateSubtask(data);
 			const result = await response.data;
-			setTask(result);
-			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
-			setSubtask(subtaskRes);
+			setSubtask(result);
 			setBoardData(
 				boardData.map((item) => {
 					return {
 						...item,
-						cards: subtaskRes?.steps
+						cards: result?.steps
 							?.filter((step) => step?.status === item?.status)
 							?.map((step) => {
 								if (step?.status === item?.status) {
@@ -234,7 +209,6 @@ const SubTaskPage = () => {
 										id: step.id,
 										name: step.name,
 										description: step.description,
-										label: '5 day left',
 									};
 								}
 								return {};
@@ -242,103 +216,23 @@ const SubTaskPage = () => {
 					};
 				}),
 			);
+			fetchDataSubTaskById();
 		} catch (error) {
-			setTask(task);
+			setSubtask(data);
 		}
 	};
 
-	// const prevIsValidClickChangeStatus = (data, status) => {
-	// 	if (data.status === 0 && (status === 3 || status === 6 || status === 8)) {
-	// 		handleShowToast(
-	// 			`Cập nhật trạng thái!`,
-	// 			`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-	// 				data.status,
-	// 			)}!`,
-	// 			'Error',
-	// 			'danger',
-	// 		);
-	// 		handleCloseConfirmStatusTask();
-	// 		return false;
-	// 	}
-	// 	if (data.status === 1 && (status === 1 || status === 3 || status === 6 || status === 8)) {
-	// 		handleShowToast(
-	// 			`Cập nhật trạng thái!`,
-	// 			`Thao tác không thành công. Đầu việc ${data.name} chưa được thực hiện!`,
-	// 			'Error',
-	// 			'danger',
-	// 		);
-	// 		handleCloseConfirmStatusTask();
-	// 		return false;
-	// 	}
-	// 	if (data.status === 2 && (status === 1 || status === 2)) {
-	// 		handleShowToast(
-	// 			`Cập nhật trạng thái!`,
-	// 			`Thao tác không thành công. Đầu việc ${data.name} đang được thực hiện!`,
-	// 			'Error',
-	// 			'danger',
-	// 		);
-	// 		handleCloseConfirmStatusTask();
-	// 		return false;
-	// 	}
-	// 	if (
-	// 		data.status === 3 &&
-	// 		(status === 1 || status === 8 || status === 3 || status === 6 || status === 8)
-	// 	) {
-	// 		handleShowToast(
-	// 			`Cập nhật trạng thái!`,
-	// 			`Thao tác không thành công. Đầu việc ${data.name} ${FORMAT_TASK_STATUS(
-	// 				data.status,
-	// 			)}!`,
-	// 			'Error',
-	// 			'danger',
-	// 		);
-	// 		handleCloseConfirmStatusTask();
-	// 		return false;
-	// 	}
-	// 	if (data.status === 6 && status !== 2) {
-	// 		handleShowToast(
-	// 			`Cập nhật trạng thái!`,
-	// 			`Thao tác không thành công. Đầu việc ${data.name} đã bị huỷ!`,
-	// 			'Error',
-	// 			'danger',
-	// 		);
-	// 		handleCloseConfirmStatusTask();
-	// 		return false;
-	// 	}
-	// 	if (data.status === 8 && (status === 1 || status === 8)) {
-	// 		handleShowToast(
-	// 			`Cập nhật trạng thái!`,
-	// 			`Thao tác không thành công. Đầu việc ${data.name} đang tạm dừng!`,
-	// 			'Error',
-	// 			'danger',
-	// 		);
-	// 		handleCloseConfirmStatusTask();
-	// 		return false;
-	// 	}
-	// 	return true;
-	// };
-
 	const handleClickChangeStatusSubtask = async (status, data) => {
-		// const checkValid = prevIsValidClickChangeStatus(data, status);
-		// if (!checkValid) return;
 		try {
-			const taskClone = { ...task };
 			const subtaskClone = { ...data };
 			subtaskClone.status = status;
-			const subtaskSubmit = taskClone?.subtasks?.map((item) =>
-				item.id === data.id ? { ...subtaskClone } : item,
-			);
-			const taskSubmit = { ...taskClone };
-			taskSubmit.subtasks = subtaskSubmit;
-			const response = await updateStatusPendingSubtask(taskSubmit);
+			const response = await updateSubtask(subtaskClone);
 			const result = await response.data;
-			const subtaskRes = result?.subtasks.filter((item) => item.id === parseInt(id, 10))[0];
-			setTask(result);
-			setSubtask(subtaskRes);
+			setSubtask(result);
 			handleCloseConfirmStatusTask();
 			handleShowToast(
 				`Cập nhật trạng thái!`,
-				`Cập nhật trạng thái đầu việc ${subtaskRes.name} thành công!`,
+				`Cập nhật trạng thái đầu việc ${result.name} thành công!`,
 			);
 		} catch (error) {
 			setSubtask(subtask);
@@ -359,7 +253,7 @@ const SubTaskPage = () => {
 
 	const handleOpenConfirmStatusTask = (item, nextStatus) => {
 		setOpenConfirmModalStatus(true);
-		setTaskEdit({ ...item });
+		setSubTaskEdit({ ...item });
 		setInfoConfirmModalStatus({
 			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
 			subTitle: item?.name,
@@ -369,30 +263,46 @@ const SubTaskPage = () => {
 
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
-		setTaskEdit(null);
+		setSubTaskEdit(null);
 	};
 
 	// edit task
-	const handleEditTask = () => {
-		setEditModalStatus(true);
+	const handleOpenEditTask = (item) => {
+		setEditModalSubtaskStatus(true);
+		setSubtaskEdit({ ...item });
 	};
+	const handleCloseEditSubtaskForm = () => {
+		setEditModalSubtaskStatus(false);
+		setSubtaskEdit(null);
+	};
+	const handleSubmitSubTaskForm = async (data) => {
+		try {
+			const response = await updateSubtask(data);
+			const result = await response.data;
+			setSubtask(result);
+			handleCloseEditSubtaskForm();
+			handleShowToast(
+				`Cập nhật đầu việc!`,
+				`Đầu việc ${result.name} được cập nhật thành công!`,
+			);
+		} catch (error) {
+			setSubtask(subtask);
+			handleShowToast(`Cập nhật đầu việc`, `Cập nhật đầu việc không thành công!`);
+		}
+	};
+
 	const handleOpenConfirm = () => {
 		set0penConfirm(true);
 	};
+
 	const handleCloseConfirm = () => {
 		set0penConfirm(false);
 	};
-	const handleDeleteSubTask = async (subtasks) => {
-		const newSubTasks = task?.subtasks?.filter((item) => item.id !== subtasks?.id);
-		const taskValue = JSON.parse(JSON.stringify(task));
-		const newData = Object.assign(taskValue, {
-			subtasks: newSubTasks,
-		});
+
+	const handleDeleteSubTask = async () => {
 		try {
-			const respose = await updateSubtasks(task?.id, newData);
-			const result = await respose.data;
-			setTask(result);
-			navigate(`/quan-ly-cong-viec/cong-viec/${task?.id}`);
+			await deleteSubtask(id);
+			navigate(-1);
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thất bại!`);
@@ -400,13 +310,7 @@ const SubTaskPage = () => {
 	};
 	return (
 		<PageWrapper title={subtask?.name}>
-			<SubHeader>
-				<SubHeaderLeft>
-					<Button color='info' isLink icon='ArrowBack' onClick={() => navigate(-1)}>
-						Quay lại
-					</Button>
-				</SubHeaderLeft>
-			</SubHeader>
+			<SubHeaderCommon />
 			<Page container='fluid' className='overflow-hidden'>
 				<div className='col-12'>
 					<div className='d-flex justify-content-between align-items-center'>
@@ -418,7 +322,8 @@ const SubTaskPage = () => {
 								isLight={darkModeStatus}
 								className='text-nowrap mx-2'
 								icon='Edit'
-								onClick={handleEditTask}>
+								isDisable={subtask?.status === 4 || subtask?.status === 7}
+								onClick={() => handleOpenEditTask(subtask)}>
 								Sửa
 							</Button>
 							<Button
@@ -509,17 +414,16 @@ const SubTaskPage = () => {
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col-12 text-start'>
 														<div className='fw-bold fs-3 mb-0'>
-															{calcProgressSubtask(subtask)}%
+															{subtaskReport.progress}%
 														</div>
 														<div
 															className='text-muted'
 															style={{ fontSize: 15 }}>
-															trên tổng số{' '}
-															{calcTotalStepOfSubTask(subtask)} bước
+															trên tổng số {subtaskReport.total} bước
 														</div>
 														<Progress
 															isAutoColor
-															value={calcProgressSubtask(subtask)}
+															value={subtaskReport.progress}
 															height={10}
 															size='lg'
 														/>
@@ -536,7 +440,7 @@ const SubTaskPage = () => {
 													</div>
 													<div className='col col-sm-6 text-start'>
 														<div className='fw-bold fs-4 mb-10'>
-															{calcKPICompleteOfSubtask(subtask)}
+															{subtaskReport.completeKPI}
 														</div>
 														<div className='text-muted'>
 															KPI thực tế đạt được
@@ -552,7 +456,21 @@ const SubTaskPage = () => {
 											title='Phòng ban phụ trách'
 											icon='LayoutTextWindow'
 											iconColor='info'
-											data={subtask?.departments?.map((department) => {
+											data={subtask?.departments?.map((department, index) => {
+												if (index === 0) {
+													return {
+														icon: 'TrendingFlat',
+														color: 'info',
+														children: (
+															<div className='fw-bold fs-5 mb-1'>
+																{department?.name}{' '}
+																<i className='d-block'>
+																	(Chịu trách nhiệm)
+																</i>
+															</div>
+														),
+													};
+												}
 												return {
 													icon: 'TrendingFlat',
 													color: 'info',
@@ -572,13 +490,27 @@ const SubTaskPage = () => {
 											icon='PersonCircle'
 											iconColor='info'
 											isScrollable
-											data={subtask?.users?.map((department) => {
+											data={subtask?.users?.map((user, index) => {
+												if (index === 0) {
+													return {
+														icon: 'TrendingFlat',
+														color: 'info',
+														children: (
+															<div className='fw-bold fs-5 mb-1'>
+																{user?.name}{' '}
+																<i className='d-block'>
+																	(Chịu trách nhiệm)
+																</i>
+															</div>
+														),
+													};
+												}
 												return {
 													icon: 'TrendingFlat',
 													color: 'info',
 													children: (
 														<div className='fw-bold fs-5 mb-1'>
-															{department?.name}
+															{user?.name}
 														</div>
 													),
 												};
@@ -597,28 +529,23 @@ const SubTaskPage = () => {
 													data={[
 														{
 															label: 'Tổng số bước',
-															value: calcTotalStepOfSubTask(subtask),
+															value: subtaskReport.total,
+														},
+														{
+															label: 'Dự kiến',
+															value: subtaskReport.expected,
 														},
 														{
 															label: 'Đã hoàn thành',
-															value: calcTotalStepByStatus(
-																subtask,
-																1,
-															),
+															value: subtaskReport.completed,
 														},
 														{
 															label: 'Đang thực hiện',
-															value: calcTotalStepByStatus(
-																subtask,
-																0,
-															),
+															value: subtaskReport.inprogress,
 														},
 														{
 															label: 'Huỷ/Quá hạn',
-															value: calcTotalStepByStatus(
-																subtask,
-																3,
-															),
+															value: subtaskReport.cancel,
 														},
 													]}
 												/>
@@ -627,22 +554,10 @@ const SubTaskPage = () => {
 														<div className='col-xl-12 col-md-12'>
 															<Chart
 																series={[
-																	calcTotalStepByStatus(
-																		subtask,
-																		0,
-																	),
-																	calcTotalStepByStatus(
-																		subtask,
-																		2,
-																	),
-																	calcTotalStepByStatus(
-																		subtask,
-																		1,
-																	),
-																	calcTotalStepByStatus(
-																		subtask,
-																		3,
-																	),
+																	subtaskReport.expected,
+																	subtaskReport.inprogress,
+																	subtaskReport.completed,
+																	subtaskReport.cancel,
 																]}
 																options={chartOptions}
 																type={chartOptions.chart.type}
@@ -794,19 +709,16 @@ const SubTaskPage = () => {
 					content={`Xác nhận xoá đầu việc <strong>${subtask?.name}</strong> ?`}
 				/>
 				<TaskDetailForm
-					setTask={setTask}
-					task={task}
-					setEditModalStatus={setEditModalStatus}
-					editModalStatus={editModalStatus}
-					id={subtask?.taskId}
-					idEdit={subtask.id}
-					newWork={newWork}
+					show={editModalSubtaskStatus}
+					item={subtaskEdit}
+					onClose={handleCloseEditSubtaskForm}
+					onSubmit={handleSubmitSubTaskForm}
 				/>
 				<ModalConfirmCommon
 					show={openConfirmModalStatus}
 					onClose={handleCloseConfirmStatusTask}
 					onSubmit={handleClickChangeStatusSubtask}
-					item={taskEdit}
+					item={subTaskEdit}
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}

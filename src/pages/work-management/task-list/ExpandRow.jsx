@@ -37,9 +37,7 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 				{subtasks?.map((subTaskItem) => (
 					<tr key={subTaskItem.id}>
 						<td>
-							<Link
-								className='text-underline'
-								to={`/cong-viec-${subTaskItem.taskId}/dau-viec/${subTaskItem?.id}`}>
+							<Link className='text-underline' to={`/dau-viec/${subTaskItem?.id}`}>
 								{subTaskItem?.name}
 							</Link>
 						</td>

@@ -52,9 +52,9 @@ const Login = ({ isSignUp }) => {
 			const response = await login(account);
 			const result = await response.data;
 			localStorage.setItem('token', result.accessToken);
-			localStorage.setItem('email', result.user.email);
-			localStorage.setItem('name', result.user.name);
-			localStorage.setItem('roles', result.user.roles);
+			localStorage.setItem('email', result.email);
+			localStorage.setItem('name', result.name);
+			localStorage.setItem('roles', JSON.stringify(result.roles));
 			navigate('/muc-tieu');
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');

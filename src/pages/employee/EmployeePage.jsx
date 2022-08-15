@@ -19,6 +19,7 @@ import CommonForm from '../common/ComponentCommon/CommonForm';
 import { getAllDepartments } from '../work-management/mission/services';
 import { addEmployee, getAllEmployee, updateEmployee } from './services';
 import Popovers from '../../components/bootstrap/Popovers';
+import SubHeaderCommonRight from '../common/SubHeaders/SubHeaderCommonRight';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -66,14 +67,14 @@ const EmployeePage = () => {
 	}, []);
 
 	const columns = [
-		{
-			title: 'ID',
-			id: 'id',
-			key: 'id',
-			type: 'number',
-			align: 'center',
-			isShow: false,
-		},
+		// {
+		// 	title: 'ID',
+		// 	id: 'id',
+		// 	key: 'id',
+		// 	type: 'number',
+		// 	align: 'center',
+		// 	isShow: false,
+		// },
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -280,6 +281,7 @@ const EmployeePage = () => {
 
 	return (
 		<PageWrapper title={demoPages.nhanVien.text}>
+			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				<div className='row mb-4'>
 					<div className='col-12'>

@@ -6,44 +6,58 @@ const getAllDepartments = () => {
 		url: '/departments',
 	});
 };
+
 const getAllUser = () => {
 	return axiosClient({
 		method: 'GET',
 		url: '/users',
 	});
 };
-const getAllSubtasks = (id) => {
+
+const getTaskById = (id) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/tasks/${id}`,
 	});
 };
-const updateSubtasks = (id, data) => {
+
+const getAllSubtasksByTaskId = (id) => {
 	return axiosClient({
-		method: 'PATCH',
-		url: `/tasks/${id}`,
+		method: 'GET',
+		url: `/subtasks/task/${id}`,
+	});
+};
+
+const getSubTaskById = (id) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/subtasks/${id}`,
+	});
+};
+
+const addNewSubtask = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/subtasks`,
 		data,
 	});
 };
-const updateCurrentKpiMission = (id, data) => {
+
+const updateSubtask = (data) => {
 	return axiosClient({
-		method: 'PATCH',
-		url: `/missions/${id}`,
+		method: 'PUT',
+		url: `/subtasks/${data.id}`,
 		data,
 	});
 };
-const getMission = () => {
+
+const deleteSubtask = (id) => {
 	return axiosClient({
-		method: 'GET',
-		url: `/missions`,
+		method: 'DELETE',
+		url: `/subtasks/${id}`,
 	});
 };
-const getTask = () => {
-	return axiosClient({
-		method: 'GET',
-		url: `/tasks`,
-	});
-};
+
 const updateStatusPendingTask = (data) => {
 	return axiosClient({
 		method: 'PUT',
@@ -51,13 +65,15 @@ const updateStatusPendingTask = (data) => {
 		data,
 	});
 };
+
 export {
-	updateSubtasks,
 	getAllDepartments,
-	getAllSubtasks,
+	getTaskById,
+	getAllSubtasksByTaskId,
 	getAllUser,
-	updateCurrentKpiMission,
-	getMission,
-	getTask,
+	getSubTaskById,
+	addNewSubtask,
+	updateSubtask,
 	updateStatusPendingTask,
+	deleteSubtask,
 };
