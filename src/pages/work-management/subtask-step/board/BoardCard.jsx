@@ -2,7 +2,6 @@ import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
 import useDarkMode from '../../../../hooks/useDarkMode';
 import Card, {
 	CardBody,
@@ -28,7 +27,6 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	const { darkModeStatus } = useDarkMode();
 	const [users, setUsers] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
-	const person = window.localStorage.getItem('name');
 	const formik = useFormik({
 		initialValues: {
 			name: card?.name || '',
@@ -37,29 +35,14 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 			partner: card?.partner || '',
 		},
 		onSubmit: (values, { resetForm }) => {
-			const valuesClone = { ...values };
-			const newWorks = JSON.parse(JSON.stringify(subtask.logs ? subtask.logs : []));
-			const newLogs = [
-				...newWorks,
-				{
-					user: person,
-					type: 2,
-					prevStatus: null,
-					nextStatus: `Chỉnh sửa`,
-					stepId: card?.stepId,
-					stepName: card?.name,
-					time: moment().format('YYYY/MM/DD hh:mm'),
-				},
-			];
-			const subtaskClone = { ...subtask, logs: newLogs };
+			const valuesSubmit = { ...values };
+			const subtaskClone = { ...subtask };
 			const { steps } = subtaskClone;
 			const stepsClone = [...steps];
-			valuesClone.taskId = subtaskClone?.taskId;
-			valuesClone.subtaskId = subtaskClone?.id;
-			valuesClone.id = card.id;
-			valuesClone.status = parseInt(values.status, 10);
+			valuesSubmit.status = parseInt(values.status, 10);
+			valuesSubmit.id = card.id;
 			subtaskClone.steps = stepsClone.map((item) =>
-				item.id === valuesClone.id ? { ...valuesClone } : item,
+				item.id === valuesSubmit.id ? { ...valuesSubmit } : item,
 			);
 			onAddStep(subtaskClone);
 			setEditModalStatus(false);
@@ -124,6 +107,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 									<div className='row g-4'>
 										<FormGroup className='col-12' id='name' label='Tên bước'>
 											<Input
+												ariaLabel='name'
 												onChange={formik.handleChange}
 												value={formik.values.name}
 											/>
@@ -133,6 +117,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 											id='description'
 											label='Mô tả'>
 											<Textarea
+												ariaLabel='description'
 												onChange={formik.handleChange}
 												value={formik.values.description}
 											/>
@@ -163,7 +148,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 										onChange={formik.handleChange}
 										value={formik.values.partner}>
 										{users.map((u) => (
-											<Option key={u.id} value={u.name}>
+											<Option key={u.id} value={u.id}>
 												{`${u.name}`}
 											</Option>
 										))}

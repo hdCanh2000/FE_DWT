@@ -1,7 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useState } from 'react';
-import { isArray } from 'lodash';
 import moment from 'moment';
 import { Button, Modal } from 'react-bootstrap';
 import SelectComponent from 'react-select';
@@ -102,22 +101,23 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	useEffect(() => {
 		if (item?.id) {
 			getTaskById(item?.id).then((res) => {
-				setTask(res.data);
-				setKeysState(res.data?.keys || []);
+				const response = res.data;
+				setTask(response?.data);
+				setKeysState(response.data?.keys || []);
 				setDepartmentOption({
-					...res.data.department,
-					id: res.data.department.id,
-					label: res.data.department.name,
-					value: res.data.department.id,
+					...response.data.departments[0],
+					id: response.data.departments[0].id,
+					label: response.data.departments[0].name,
+					value: response.data.departments[0].id,
 				});
 				setUserOption({
-					...res.data.user,
-					id: res.data.user.id,
-					label: res.data.user.name,
-					value: res.data.user.id,
+					...response.data.users[0],
+					id: response.data.users[0].id,
+					label: response.data.users[0].name,
+					value: response.data.users[0].id,
 				});
 				setDepartmentRelatedOption(
-					res.data?.departmentsRelated?.map((department) => {
+					response.data?.departments?.slice(1)?.map((department) => {
 						return {
 							id: department.id,
 							label: department.name,
@@ -126,7 +126,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 					}),
 				);
 				setUserRelatedOption(
-					res.data?.usersRelated?.map((user) => {
+					response.data?.users?.slice(1)?.map((user) => {
 						return {
 							id: user.id,
 							label: user.name,
@@ -312,56 +312,6 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	};
 	const person = window.localStorage.getItem('name');
 	const handleSubmit = () => {
-		const newWorks = JSON.parse(JSON.stringify(task?.logs || []));
-		const newNotes = JSON.parse(JSON.stringify(task?.notes || []));
-		const newLogs = [
-			...newWorks,
-			{
-				id: task?.logs ? task.logs.length + 1 : 1,
-				user: person,
-				type: 2,
-				prevStatus: null,
-				nextStatus: task?.id ? 'Chỉnh sửa' : 'Thêm mới',
-				taskId: task?.id,
-				taskName: task?.name,
-				time: moment().format('DD/MM/YYYY hh:mm'),
-			},
-		];
-
-		const data = { ...task };
-		data.missionId = parseInt(data?.missionId, 10);
-		data.kpiValue = parseInt(task?.kpiValue, 10);
-		data.priority = parseInt(task?.priority, 10);
-		data.keys = keysState.map((key) => {
-			return {
-				keyName: key.keyName,
-				keyValue: key.keyValue,
-			};
-		});
-		data.subtasks = isArray(task.subtasks) && task?.subtasks?.length > 0 ? task.subtasks : [];
-		data.logs = [];
-		data.departmentId = departmentOption.id;
-		data.department = {
-			id: departmentOption.id,
-			name: departmentOption.label,
-		};
-		data.departmentsRelated = departmentReplatedOption.map((department) => {
-			return {
-				id: department.id,
-				name: department.label,
-			};
-		});
-		data.userId = userOption.value;
-		data.user = {
-			id: userOption.id,
-			name: userOption.label,
-		};
-		data.usersRelated = userReplatedOption.map((user) => {
-			return {
-				id: user.id,
-				name: user.label,
-			};
-		});
 		validateForm();
 		if (!task?.name) {
 			nameRef.current.focus();
@@ -386,6 +336,57 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 		if (!prevIsValid()) {
 			return;
 		}
+		const newWorks = JSON.parse(JSON.stringify(task?.logs || []));
+		const newNotes = JSON.parse(JSON.stringify(task?.notes || []));
+		const newLogs = [
+			...newWorks,
+			{
+				user: person,
+				type: 2,
+				prevStatus: null,
+				nextStatus: task?.id ? 'Cập nhật' : 'Thêm mới',
+				taskId: task?.id,
+				taskName: task?.name,
+				time: moment().format('DD/MM/YYYY hh:mm'),
+				createdAt: Date.now(),
+			},
+		];
+
+		const data = { ...task };
+		data.kpiValue = parseInt(task?.kpiValue, 10);
+		data.priority = parseInt(task?.priority, 10);
+		data.keys = keysState.map((key) => {
+			return {
+				keyName: key.keyName,
+				keyValue: key.keyValue,
+			};
+		});
+		data.departmentId = departmentOption.id;
+		data.departments = [
+			{
+				id: departmentOption.id,
+				name: departmentOption.label,
+			},
+			...departmentReplatedOption.map((department) => {
+				return {
+					id: department.id,
+					name: department.label,
+				};
+			}),
+		];
+		data.userId = userOption.value;
+		data.users = [
+			{
+				id: userOption.id,
+				name: userOption.label,
+			},
+			...userReplatedOption.map((user) => {
+				return {
+					id: user.id,
+					name: user.label,
+				};
+			}),
+		];
 		const newData = { ...data, logs: newLogs, notes: newNotes };
 		onSubmit(newData);
 		handleClearForm();
@@ -484,7 +485,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 										)}
 										{/* phòng ban phụ trách */}
 										<FormGroup
-											className='col-12'
+											className='col-6'
 											id='departmentOption'
 											label='Phòng ban phụ trách'>
 											<SelectComponent
@@ -504,7 +505,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 										)}
 										{/* nhân viên phụ trách chính */}
 										<FormGroup
-											className='col-12'
+											className='col-6'
 											id='userOption'
 											label='Nhân viên phụ trách'>
 											<SelectComponent
@@ -559,8 +560,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 										</FormGroup>
 										<div className='d-flex align-items-center justify-content-between'>
 											<FormGroup
-												className='w-50 mr-2'
-												style={{ width: '45%', marginRight: 10 }}
+												className='w-50 me-2'
 												id='estimateDate'
 												label='Ngày dự kiến hoàn thành'
 												isFloating>
@@ -578,8 +578,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												/>
 											</FormGroup>
 											<FormGroup
-												className='w-50 mr-2'
-												style={{ width: '45%', marginRight: 10 }}
+												className='w-50 ms-2'
 												id='estimateTime'
 												label='Thời gian dự kiến hoàn thành'
 												isFloating>
@@ -596,8 +595,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 										</div>
 										<div className='d-flex align-items-center justify-content-between'>
 											<FormGroup
-												className='w-50 ml-2'
-												style={{ width: '45%', marginRight: 10 }}
+												className='w-50 me-2'
 												id='deadlineDate'
 												label='Hạn ngày hoàn thành'
 												isFloating>
@@ -615,8 +613,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 												/>
 											</FormGroup>
 											<FormGroup
-												className='w-50 mr-2'
-												style={{ width: '45%', marginLeft: 10 }}
+												className='w-50 ms-2'
 												id='deadlineTime'
 												label='Hạn thời gian hoàn thành'
 												isFloating>
@@ -724,7 +721,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 					Đóng
 				</Button>
 				<Button variant='primary' type='submit' onClick={handleSubmit}>
-					Lưu mục tiêu
+					Lưu công việc
 				</Button>
 			</Modal.Footer>
 		</Modal>

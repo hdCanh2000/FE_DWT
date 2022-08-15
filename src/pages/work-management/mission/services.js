@@ -72,7 +72,7 @@ const getAllTaksByMissionID = (id) => {
 	// lấy tất cả task của nhiệm vụ theo id
 	return axiosClient({
 		method: 'GET',
-		url: `/tasks?mission_id=${id}`,
+		url: `/tasks/mission/${id}`,
 	});
 };
 

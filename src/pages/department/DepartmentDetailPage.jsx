@@ -13,7 +13,6 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import SubHeader, { SubHeaderLeft, SubheaderSeparator } from '../../layout/SubHeader/SubHeader';
 import { demoPages } from '../../menu';
 import Input from '../../components/bootstrap/forms/Input';
 import Textarea from '../../components/bootstrap/forms/Textarea';
@@ -26,6 +25,7 @@ import validate from './validate';
 import Checks from '../../components/bootstrap/forms/Checks';
 import { addEmployee, updateEmployee } from '../employee/services';
 import Popovers from '../../components/bootstrap/Popovers';
+import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
 
 const DepartmentDetailPage = () => {
 	const navigate = useNavigate();
@@ -302,17 +302,7 @@ const DepartmentDetailPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.nhanVien.text}>
-			<SubHeader>
-				<SubHeaderLeft>
-					<Button color='info' isLink icon='ArrowBack' onClick={() => navigate(-1)}>
-						Quay lại
-					</Button>
-					<SubheaderSeparator />
-					<span>
-						<strong>{department?.name}</strong>
-					</span>
-				</SubHeaderLeft>
-			</SubHeader>
+			<SubHeaderCommon />
 			<Page container='fluid'>
 				<div className='row h-100 w-100'>
 					<div className='col-lg-3 col-md-6'>

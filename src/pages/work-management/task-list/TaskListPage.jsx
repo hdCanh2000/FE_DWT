@@ -43,13 +43,13 @@ import ExpandRow from './ExpandRow';
 import { calcProgressTask } from '../../../utils/function';
 import Badge from '../../../components/bootstrap/Badge';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
-import { getAllSubtasks } from '../TaskDetail/services';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
+import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
 
 const Item = ({
 	id,
@@ -77,10 +77,10 @@ const Item = ({
 				</CardHeader>
 				<CardBody>
 					<div className='row g-2 align-items-center'>
-						<div className='col-auto mt-2'>
+						<div className='col-auto mb-3'>
 							<span>Hạn hoàn thành:</span>
 						</div>
-						<div className='col-auto mt-2'>
+						<div className='col-auto mb-3'>
 							<small
 								style={{ fontSize: 14 }}
 								className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
@@ -173,7 +173,7 @@ const TaskListPage = () => {
 		setIdEditExpand(items?.id);
 		setTitleExpand(titles);
 		try {
-			const res = await getAllSubtasks(taskId);
+			const res = await getAllTasks(taskId);
 			setTask(res.data);
 		} catch (error) {
 			setTask({});
@@ -351,6 +351,7 @@ const TaskListPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.quanLyCongViec.text}>
+			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -628,11 +629,11 @@ const TaskListPage = () => {
 										<Item
 											key={item?.id}
 											keys={item?.keys}
-											departmentsRelated={item?.departmentsRelated}
-											usersRelated={item?.usersRelated}
+											departmentsRelated={item?.departments?.slice(1)}
+											usersRelated={item?.users?.slice(1)}
 											id={item?.id}
 											name={item?.name}
-											teamName={`${item?.department?.name} - ${item?.user?.name}`}
+											teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
 											dueDate={`${item?.deadlineDate}`}
 											percent={calcProgressTask(item) || 0}
 											data-tour='project-item'

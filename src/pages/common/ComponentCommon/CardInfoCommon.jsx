@@ -35,7 +35,7 @@ const CardInfoCommon = ({
 						return (
 							// eslint-disable-next-line react/no-array-index-key
 							<div className='col-12 mb-2' key={index}>
-								<div className='d-flex align-items-center'>
+								<div className='d-flex align-items-start'>
 									<div className='flex-shrink-0'>
 										<Icon
 											icon={item?.icon || ''}

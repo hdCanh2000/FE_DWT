@@ -49,6 +49,7 @@ import {
 } from '../../../utils/function';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
+import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
 
 const Item = ({
 	id,
@@ -76,10 +77,10 @@ const Item = ({
 				</CardHeader>
 				<CardBody>
 					<div className='row g-2 align-items-center'>
-						<div className='col-auto mt-2'>
+						<div className='col-auto mb-3'>
 							<span>Hạn hoàn thành:</span>
 						</div>
-						<div className='col-auto mt-2'>
+						<div className='col-auto mb-3'>
 							<small
 								style={{ fontSize: 14 }}
 								className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
@@ -150,10 +151,7 @@ const MissionPage = () => {
 	const [searchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const navigateToDetailPage = useCallback(
-		(page) => navigate(`/muc-tieu/chi-tiet/${page}`),
-		[navigate],
-	);
+	const navigateToDetailPage = useCallback((page) => navigate(`/muc-tieu/${page}`), [navigate]);
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await getAllMission();
@@ -293,7 +291,7 @@ const MissionPage = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			const result = await getLatestTasks();
-			setLatestTasks(result.data?.data);
+			setLatestTasks(result.data);
 		};
 		fetchData();
 	}, []);
@@ -309,6 +307,7 @@ const MissionPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.mucTieu.text}>
+			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				<div className='row mt-4 mb-4'>
 					<div className='col-12'>
@@ -346,13 +345,6 @@ const MissionPage = () => {
 											<CardTitle tag='h3' className='h3'>
 												{item?.name}
 											</CardTitle>
-											<CardSubTitle>
-												<span
-													style={{ fontSize: 16 }}
-													className='text-success fw-bold ps-0 d-block pb-2'>
-													#MT{item?.id}
-												</span>
-											</CardSubTitle>
 											<CardSubTitle style={{ fontSize: 15 }}>
 												<div className='d-flex'>
 													<div className='me-2'>
@@ -529,7 +521,7 @@ const MissionPage = () => {
 													<td className='cursor-pointer'>
 														<Link
 															className='text-underline'
-															to={`/muc-tieu/chi-tiet/${item?.id}`}>
+															to={`/muc-tieu/${item?.id}`}>
 															{item?.name}
 														</Link>
 													</td>
@@ -627,11 +619,11 @@ const MissionPage = () => {
 							<Item
 								key={item?.id}
 								keys={item?.keys}
-								departmentsRelated={item?.departmentsRelated}
-								usersRelated={item?.usersRelated}
+								departmentsRelated={item?.departments?.slice(1)}
+								usersRelated={item?.users?.slice(1)}
 								id={item?.id}
 								name={item?.name}
-								teamName={`${item?.department?.name} - ${item?.user?.name}`}
+								teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
 								dueDate={`${item?.deadlineDate}`}
 								percent={calcProgressTask(item) || 0}
 								data-tour='project-item'

@@ -53,6 +53,7 @@ const calcKPICompleteOfSubtask = (subtask) => {
 
 // tính tổng số kpi của 1 task theo subtask
 const calcTotalKPIOfTask = (task) => {
+	if (task.status === 4) return task.kpiValue;
 	const { subtasks } = task;
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
@@ -64,6 +65,7 @@ const calcTotalKPIOfTask = (task) => {
 
 // tính tổng số kpi đã dùng của 1 task
 const calcKPICompleteOfTask = (task) => {
+	if (task?.status === 4 || task?.status === 7) return task?.kpiValue;
 	const { subtasks } = task;
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
