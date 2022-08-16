@@ -45,11 +45,13 @@ export const demoPages = {
 		id: 'mission',
 		text: 'Mục tiêu',
 		path: '/muc-tieu',
+		roles: ['admin', 'manager'],
 	},
 	quanLyCongViec: {
 		id: 'quanlycongviec',
 		text: 'Công việc',
 		path: '/cong-viec',
+		roles: ['admin', 'manager', 'user'],
 		// subMenu: {
 		// 	congViec: {
 		// 		id: 'congViec',
@@ -78,25 +80,35 @@ export const demoPages = {
 		// 	},
 		// },
 	},
+	dauViec: {
+		id: 'dauViec',
+		text: 'Đầu việc',
+		path: '/dau-viec',
+		roles: ['admin', 'manager', 'user'],
+	},
 	phongBan: {
 		id: 'phongBan',
 		text: 'Phòng ban',
 		path: '/phong-ban',
+		roles: ['admin'],
 	},
 	nhanVien: {
 		id: 'nhanVien',
 		text: 'Nhân viên',
 		path: '/nhan-vien',
+		roles: ['admin', 'manager'],
 	},
 	cauHinh: {
 		id: 'cauHinh',
 		text: 'Cấu hình',
 		path: '/cau-hinh',
+		roles: ['admin'],
 	},
 	baoCao: {
 		id: 'baoCao',
 		text: 'Báo cáo',
 		path: '/bao-cao',
+		roles: ['admin'],
 	},
 };
 

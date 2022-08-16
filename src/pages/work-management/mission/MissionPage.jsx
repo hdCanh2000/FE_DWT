@@ -50,6 +50,7 @@ import {
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
+import verifyPermission from '../../../HOC/verifyPermissionHOC';
 
 const Item = ({
 	id,
@@ -63,7 +64,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`/cong-viec/${id}`),
+		() => navigate(`${demoPages.quanLyCongViec.path}/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -151,7 +152,10 @@ const MissionPage = () => {
 	const [searchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const navigateToDetailPage = useCallback((page) => navigate(`/muc-tieu/${page}`), [navigate]);
+	const navigateToDetailPage = useCallback(
+		(page) => navigate(`${demoPages.mucTieu.path}/${page}`),
+		[navigate],
+	);
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await getAllMission();
@@ -310,29 +314,31 @@ const MissionPage = () => {
 		<PageWrapper title={demoPages.mucTieu.text}>
 			<SubHeaderCommonRight />
 			<Page container='fluid'>
-				<div className='row mt-4 mb-4'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách mục tiêu</div>
-							<div>
-								<Button
-									size='lg'
-									className='rounded-0'
-									color='info'
-									icon='CardList'
-									onClick={() => handleClickSwitchView(1)}
-								/>
-								<Button
-									size='lg'
-									className='rounded-0'
-									color='primary'
-									icon='Table'
-									onClick={() => handleClickSwitchView(2)}
-								/>
+				{missions?.length > 0 && (
+					<div className='row mt-4 mb-4'>
+						<div className='col-12'>
+							<div className='d-flex justify-content-between align-items-center'>
+								<div className='display-6 fw-bold py-3'>Danh sách mục tiêu</div>
+								<div>
+									<Button
+										size='lg'
+										className='rounded-0'
+										color='info'
+										icon='CardList'
+										onClick={() => handleClickSwitchView(1)}
+									/>
+									<Button
+										size='lg'
+										className='rounded-0'
+										color='primary'
+										icon='Table'
+										onClick={() => handleClickSwitchView(2)}
+									/>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				)}
 				{parseInt(searchParams.get('view'), 10) === 1 || !searchParams.get('view') ? (
 					<div className='row'>
 						{missions?.map((item) => (
@@ -369,41 +375,44 @@ const MissionPage = () => {
 												</div>
 											</CardSubTitle>
 										</CardLabel>
-										<CardActions>
-											<Dropdown>
-												<DropdownToggle hasIcon={false}>
-													<Button
-														color='dark'
-														isLink
-														hoverShadow='default'
-														icon='MoreHoriz'
-														ariaLabel='More Actions'
-													/>
-												</DropdownToggle>
-												<DropdownMenu isAlignmentEnd>
-													<DropdownItem>
+										{verifyPermission(
+											<CardActions>
+												<Dropdown>
+													<DropdownToggle hasIcon={false}>
 														<Button
-															icon='Edit'
-															tag='button'
-															onClick={() =>
-																handleOpenEditForm(item)
-															}>
-															Sửa mục tiêu
-														</Button>
-													</DropdownItem>
-													<DropdownItem>
-														<Button
-															icon='Delete'
-															tag='button'
-															onClick={() =>
-																handleOpenConfirmModal(item)
-															}>
-															Xoá mục tiêu
-														</Button>
-													</DropdownItem>
-												</DropdownMenu>
-											</Dropdown>
-										</CardActions>
+															color='dark'
+															isLink
+															hoverShadow='default'
+															icon='MoreHoriz'
+															aria-label='More Actions'
+														/>
+													</DropdownToggle>
+													<DropdownMenu isAlignmentEnd>
+														<DropdownItem>
+															<Button
+																icon='Edit'
+																tag='button'
+																onClick={() =>
+																	handleOpenEditForm(item)
+																}>
+																Sửa mục tiêu
+															</Button>
+														</DropdownItem>
+														<DropdownItem>
+															<Button
+																icon='Delete'
+																tag='button'
+																onClick={() =>
+																	handleOpenConfirmModal(item)
+																}>
+																Xoá mục tiêu
+															</Button>
+														</DropdownItem>
+													</DropdownMenu>
+												</Dropdown>
+											</CardActions>,
+											['admin'],
+										)}
 									</CardHeader>
 									<CardBody
 										className='pt-2 pb-4'
@@ -460,21 +469,24 @@ const MissionPage = () => {
 								</Card>
 							</div>
 						))}
-						<div className='col-md-12 col-xl-4 col-sm-12'>
-							<Card stretch>
-								<CardBody className='d-flex align-items-center justify-content-center'>
-									<Button
-										color='info'
-										size='lg'
-										isLight
-										className='w-100 h-100'
-										icon='AddCircle'
-										onClick={() => handleOpenEditForm(null)}>
-										Thêm mục tiêu
-									</Button>
-								</CardBody>
-							</Card>
-						</div>
+						{verifyPermission(
+							<div className='col-md-12 col-xl-4 col-sm-12'>
+								<Card stretch>
+									<CardBody className='d-flex align-items-center justify-content-center'>
+										<Button
+											color='info'
+											size='lg'
+											isLight
+											className='w-100 h-100'
+											icon='AddCircle'
+											onClick={() => handleOpenEditForm(null)}>
+											Thêm mục tiêu
+										</Button>
+									</CardBody>
+								</Card>
+							</div>,
+							['admin'],
+						)}
 					</div>
 				) : (
 					<div className='row'>
@@ -519,7 +531,7 @@ const MissionPage = () => {
 													<td className='cursor-pointer'>
 														<Link
 															className='text-underline'
-															to={`/muc-tieu/${item?.id}`}>
+															to={`${demoPages.mucTieu.path}/${item?.id}`}>
 															{item?.name}
 														</Link>
 													</td>

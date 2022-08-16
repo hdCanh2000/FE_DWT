@@ -49,6 +49,7 @@ import Dropdown, {
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
 import { addNewSubtask } from '../TaskDetail/services';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 
 const Item = ({
 	id,
@@ -366,7 +367,7 @@ const TaskListPage = () => {
 				<div className='row'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách công việc</div>
+							<div className='display-6 fw-bold pt-3'>Danh sách công việc</div>
 							<div>
 								<Button
 									size='lg'
@@ -397,15 +398,18 @@ const TaskListPage = () => {
 											<CardLabel>Danh sách công việc</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									<CardActions>
-										<Button
-											color='info'
-											icon='Plus'
-											tag='button'
-											onClick={() => handleOpenEditForm(null)}>
-											Thêm công việc
-										</Button>
-									</CardActions>
+									{verifyPermissionHOC(
+										<CardActions>
+											<Button
+												color='info'
+												icon='Plus'
+												tag='button'
+												onClick={() => handleOpenEditForm(null)}>
+												Thêm công việc
+											</Button>
+										</CardActions>,
+										['admin', 'manager'],
+									)}
 								</CardHeader>
 								<div className='p-4'>
 									<table
@@ -555,31 +559,33 @@ const TaskListPage = () => {
 															</div>
 														</td>
 														<td>
-															<Button
-																isOutline={!darkModeStatus}
-																color='success'
-																isLight={darkModeStatus}
-																className='text-nowrap mx-2'
-																icon='Edit'
-																isDisable={
-																	item.status === 4 ||
-																	item.status === 7 ||
-																	item.status === 3
-																}
-																onClick={() =>
-																	handleOpenEditForm(item)
-																}
-															/>
-															<Button
-																isOutline={!darkModeStatus}
-																color='danger'
-																isLight={darkModeStatus}
-																className='text-nowrap mx-2'
-																icon='Trash'
-																onClick={() =>
-																	handleOpenConfirmModal(item)
-																}
-															/>
+															<div className='d-flex align-items-center'>
+																<Button
+																	isOutline={!darkModeStatus}
+																	color='success'
+																	isLight={darkModeStatus}
+																	className='text-nowrap mx-2'
+																	icon='Edit'
+																	isDisable={
+																		item.status === 4 ||
+																		item.status === 7 ||
+																		item.status === 3
+																	}
+																	onClick={() =>
+																		handleOpenEditForm(item)
+																	}
+																/>
+																<Button
+																	isOutline={!darkModeStatus}
+																	color='danger'
+																	isLight={darkModeStatus}
+																	className='text-nowrap mx-2'
+																	icon='Trash'
+																	onClick={() =>
+																		handleOpenConfirmModal(item)
+																	}
+																/>
+															</div>
 														</td>
 													</tr>
 													<tr>

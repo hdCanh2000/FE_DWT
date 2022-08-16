@@ -14,7 +14,7 @@ const SubHeaderCommonRight = () => {
 	};
 	return (
 		<SubHeader>
-			<SubHeaderLeft />
+			<SubHeaderLeft> </SubHeaderLeft>
 			<SubHeaderRight>
 				<Button color='info' isLink icon='ArrowForward' onClick={() => handleLogout()}>
 					Đăng xuất

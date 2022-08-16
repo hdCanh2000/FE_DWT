@@ -90,7 +90,7 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 							style={{ paddingLeft: 0 }}
 							onClick={() => onOpenModal(taskId)}>
 							<Icon size='lg' icon='PlusCircle' />
-							<span className='mx-2'>Thêm mới</span>
+							<span className='mx-2'>Thêm đầu việc</span>
 						</Button>
 					</td>
 				</tr>
