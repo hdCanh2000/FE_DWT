@@ -224,7 +224,7 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data.name,
-			departmentId: parseInt(data.departmentId, 10),
+			departmentId: data.departmentId,
 			code: data.code,
 			email: data.email,
 			password: '123456',
@@ -244,9 +244,9 @@ const EmployeePage = () => {
 				handleClearValueForm();
 				hanleCloseForm();
 				getAllEmployees();
-				setTimeout(() => {
-					window.location.reload();
-				}, 500);
+				// setTimeout(() => {
+				// 	window.location.reload();
+				// }, 500);
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,

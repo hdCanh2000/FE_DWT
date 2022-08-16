@@ -20,7 +20,7 @@ const getAllTasks = () => {
 	// lấy danh sách các task mới nhất
 	return axiosClient({
 		method: 'GET',
-		url: '/tasks?_sort=id&_order=desc',
+		url: '/tasks',
 	});
 };
 

@@ -10,7 +10,6 @@ import {
 } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import Card, {
 	CardActions,
@@ -40,7 +39,6 @@ import TaskFormModal from '../mission/TaskFormModal';
 import MissionAlertConfirm from '../mission/MissionAlertConfirm';
 import Progress from '../../../components/bootstrap/Progress';
 import ExpandRow from './ExpandRow';
-import { calcProgressTask } from '../../../utils/function';
 import Badge from '../../../components/bootstrap/Badge';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import Dropdown, {
@@ -50,6 +48,7 @@ import Dropdown, {
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
+import { addNewSubtask } from '../TaskDetail/services';
 
 const Item = ({
 	id,
@@ -146,11 +145,8 @@ const TaskListPage = () => {
 	const [expandedRows, setExpandedRows] = useState([]);
 	const [expandState, setExpandState] = useState({});
 	// handle expand subtask
-	const [task, setTask] = useState({});
 	const [editModalStatusExpand, setEditModalStatusExpand] = useState(false);
-	const [idEditExpand, setIdEditExpand] = useState(0);
-	const [newWorkExpand, setNewWorkExpand] = React.useState([]);
-	const [titleExpand, setTitleExpand] = useState();
+	const [taskExpandId, setTaskExpandId] = useState('');
 
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
@@ -168,16 +164,19 @@ const TaskListPage = () => {
 	const { addToast } = useToasts();
 
 	// Handle
-	const handleOpenModalExpand = async (items, titles, taskId) => {
+	const handleOpenModalExpand = (taskId) => {
 		setEditModalStatusExpand(true);
-		setIdEditExpand(items?.id);
-		setTitleExpand(titles);
-		try {
-			const res = await getAllTasks(taskId);
-			setTask(res.data);
-		} catch (error) {
-			setTask({});
-		}
+		setTaskExpandId(taskId);
+	};
+
+	const handleCloseModalExpand = () => {
+		setEditModalStatusExpand(false);
+		// try {
+		// 	const res = await getAllTasks(taskId);
+		// 	setTask(res.data);
+		// } catch (error) {
+		// 	setTask({});
+		// }
 	};
 
 	const handleEpandRow = (event, userId) => {
@@ -244,13 +243,14 @@ const TaskListPage = () => {
 		);
 	};
 
+	async function fetchDataAllTasks() {
+		const response = await getAllTasks();
+		const result = await response.data;
+		setTasks(result);
+	}
+
 	useEffect(() => {
-		async function fetchDataMissionByID() {
-			const response = await getAllTasks();
-			const result = await response.data;
-			setTasks(result);
-		}
-		fetchDataMissionByID();
+		fetchDataAllTasks();
 	}, []);
 
 	const handleDeleteItem = async (taskId) => {
@@ -273,6 +273,7 @@ const TaskListPage = () => {
 				const result = await response.data;
 				const newTasks = [...tasks];
 				setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
+				fetchDataAllTasks();
 				handleClearValueForm();
 				handleCloseEditForm();
 				handleShowToast(
@@ -349,6 +350,20 @@ const TaskListPage = () => {
 		setItemEdit(null);
 	};
 
+	const handleSubmitSubTaskForm = async (data) => {
+		const dataSubmit = { ...data, taskId: taskExpandId };
+		try {
+			const response = await addNewSubtask(dataSubmit);
+			const result = await response.data;
+			handleCloseEditForm();
+			fetchDataAllTasks();
+			handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
+		} catch (error) {
+			fetchDataAllTasks();
+			handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);
+		}
+	};
+
 	return (
 		<PageWrapper title={demoPages.quanLyCongViec.text}>
 			<SubHeaderCommonRight />
@@ -410,6 +425,7 @@ const TaskListPage = () => {
 												<th className='text-center'>Nhân viên</th>
 												<th className='text-center'>Hạn hoàn thành</th>
 												<th className='text-center'>Giá trị KPI</th>
+												<th className='text-center'>KPI thực tế</th>
 												<th className='text-center'>Độ ưu tiên</th>
 												<th className='text-center'>Trạng thái</th>
 												<th className='text-center'>Tiến độ</th>
@@ -451,10 +467,10 @@ const TaskListPage = () => {
 															</Button>
 														</td>
 														<td className='text-center'>
-															{item?.department?.name}
+															{item?.departments[0]?.name}
 														</td>
 														<td className='text-center'>
-															{item?.user?.name}
+															{item?.users[0]?.name}
 														</td>
 														<td align='center'>
 															{moment(`${item.deadlineDate}`).format(
@@ -462,6 +478,7 @@ const TaskListPage = () => {
 															)}
 														</td>
 														<td align='center'>{item?.kpiValue}</td>
+														<td align='center'>{item?.currentKPI}</td>
 														<td>
 															<div className='d-flex align-items-center'>
 																<span
@@ -530,13 +547,11 @@ const TaskListPage = () => {
 														</td>
 														<td>
 															<div className='d-flex align-items-center flex-column'>
-																<div className='flex-shrink-0 me-3'>{`${calcProgressTask(
-																	item,
-																)}%`}</div>
+																<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 																<Progress
 																	className='flex-grow-1'
 																	isAutoColor
-																	value={calcProgressTask(item)}
+																	value={item.progress}
 																	style={{
 																		height: 10,
 																		width: '100%',
@@ -574,37 +589,26 @@ const TaskListPage = () => {
 													</tr>
 													<tr>
 														<td
-															colSpan='11'
+															colSpan='12'
 															style={{ paddingLeft: 50 }}>
 															{expandedRows.includes(item?.id) && (
 																<>
 																	<ExpandRow
 																		key={item.id}
-																		subtasks={
-																			!isEmpty(task)
-																				? task?.subtasks
-																				: item?.subtasks
-																		}
+																		subtasks={item?.subtasks}
 																		taskId={item.id}
 																		onOpenModal={
 																			handleOpenModalExpand
 																		}
 																	/>
 																	<TaskDetailForm
-																		title={titleExpand}
-																		setTask={setTask}
-																		task={task}
-																		setEditModalStatus={
-																			setEditModalStatusExpand
+																		show={editModalStatusExpand}
+																		item={itemEdit}
+																		onClose={
+																			handleCloseModalExpand
 																		}
-																		editModalStatus={
-																			editModalStatusExpand
-																		}
-																		id={item.id}
-																		idEdit={idEditExpand}
-																		newWork={newWorkExpand}
-																		setNewWork={
-																			setNewWorkExpand
+																		onSubmit={
+																			handleSubmitSubTaskForm
 																		}
 																	/>
 																</>
@@ -635,7 +639,7 @@ const TaskListPage = () => {
 											name={item?.name}
 											teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
 											dueDate={`${item?.deadlineDate}`}
-											percent={calcProgressTask(item) || 0}
+											percent={item.progress || 0}
 											data-tour='project-item'
 										/>
 									);

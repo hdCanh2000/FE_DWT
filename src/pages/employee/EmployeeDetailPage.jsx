@@ -57,7 +57,7 @@ const EmployeePage = () => {
 				setUser({});
 			}
 		}
-		getInfoUserById(parseInt(params.id, 10));
+		getInfoUserById(params.id);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [params.id]);
 
