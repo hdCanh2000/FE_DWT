@@ -12,7 +12,6 @@ import {
 import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
 import useDarkMode from '../../../hooks/useDarkMode';
-import { calcProgressSubtask } from '../../../utils/function';
 
 const minWidth100 = {
 	minWidth: 100,
@@ -41,7 +40,7 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 								{subTaskItem?.name}
 							</Link>
 						</td>
-						<td className='text-center'>{subTaskItem?.user?.name}</td>
+						<td className='text-center'>{subTaskItem?.users[0]?.name}</td>
 						<td className='text-center'>
 							<Button
 								isLink
@@ -57,26 +56,19 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 						<td className='text-center'>{subTaskItem.kpiValue}</td>
 						<td className='text-center' style={minWidth100}>
 							<div className='d-flex align-items-center'>
-								<div className='flex-shrink-0 me-3'>{`${calcProgressSubtask(
-									subTaskItem,
-								)}%`}</div>
+								<div className='flex-shrink-0 me-3'>{`${subTaskItem.progress}%`}</div>
 								<Progress
 									className='flex-grow-1'
 									isAutoColor
-									value={calcProgressSubtask(subTaskItem)}
-									style={{
-										height: 10,
-									}}
+									value={subTaskItem.progress}
+									style={{ height: 10 }}
 								/>
 							</div>
 						</td>
 						<td className='text-center'>
 							<div className='d-flex align-items-center justify-content-center'>
 								<span
-									style={{
-										paddingRight: '1rem',
-										paddingLeft: '1rem',
-									}}
+									style={{ paddingRight: '1rem', paddingLeft: '1rem' }}
 									className={classNames(
 										'badge',
 										'border border-2',
@@ -95,10 +87,8 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 					<td colSpan={12}>
 						<Button
 							className='d-flex align-items-center cursor-pointer'
-							style={{
-								paddingLeft: 0,
-							}}
-							onClick={() => onOpenModal(0, 'add', taskId)}>
+							style={{ paddingLeft: 0 }}
+							onClick={() => onOpenModal(taskId)}>
 							<Icon size='lg' icon='PlusCircle' />
 							<span className='mx-2'>Thêm mới</span>
 						</Button>

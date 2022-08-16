@@ -10,7 +10,7 @@ import {
 	useLocation,
 } from 'react-router-dom';
 import moment from 'moment';
-import { uniqBy } from 'lodash';
+// import { uniqBy } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -31,7 +31,7 @@ import {
 	getAllMission,
 	getLatestTasks,
 	updateMissionById,
-	getAllTasks,
+	// getAllTasks,
 } from './services';
 import Dropdown, {
 	DropdownItem,
@@ -141,7 +141,7 @@ const Item = ({
 const MissionPage = () => {
 	const { addToast } = useToasts();
 	const [missions, setMissions] = useState([]);
-	const [missionsWithTask, setMissionsWithTask] = useState([]);
+	// const [missionsWithTask, setMissionsWithTask] = useState([]);
 	const [latestTasks, setLatestTasks] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
@@ -252,42 +252,43 @@ const MissionPage = () => {
 		}
 	};
 
-	const mergeObjToArray = (arr) => {
-		const output = [];
-		arr.forEach((item) => {
-			const existing = output.filter((v) => {
-				return v.task.missionId === item.task.missionId;
-			});
-			if (existing?.length) {
-				const existingIndex = output.indexOf(existing[0]);
-				output[existingIndex].tasks = output[existingIndex].tasks.concat(item.task);
-			} else {
-				if (typeof item.task === 'object') item.tasks = [item.task];
-				output.push(item);
-			}
-		});
-		return output;
-	};
+	// const mergeObjToArray = (arr) => {
+	// 	const output = [];
+	// 	arr.forEach((item) => {
+	// 		const existing = output.filter((v) => {
+	// 			return v.task.missionId === item.task.missionId;
+	// 		});
+	// 		if (existing?.length) {
+	// 			const existingIndex = output.indexOf(existing[0]);
+	// 			output[existingIndex].tasks = output[existingIndex].tasks.concat(item.task);
+	// 		} else {
+	// 			if (typeof item.task === 'object') item.tasks = [item.task];
+	// 			output.push(item);
+	// 		}
+	// 	});
+	// 	return output;
+	// };
 
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await getAllTasks();
-			const result = await response.data;
-			const kq = [];
-			missions?.forEach((mission) => {
-				result?.forEach((task) => {
-					if (mission.id === task.missionId) {
-						kq.push({
-							...mission,
-							task,
-						});
-					}
-				});
-			});
-			setMissionsWithTask(uniqBy([...mergeObjToArray(kq), ...missions], 'id'));
-		};
-		fetchData();
-	}, [missions]);
+	// useEffect(() => {
+	// 	const fetchData = async () => {
+	// 		const response = await getAllTasks();
+	// 		const result = await response.data;
+	// const kq = [];
+	// missions?.forEach((mission) => {
+	// 	result?.forEach((task) => {
+	// 		if (mission.id === task.missionId) {
+	// 			kq.push({
+	// 				...mission,
+	// 				task,
+	// 			});
+	// 		}
+	// 	});
+	// });
+	// setMissionsWithTask(uniqBy([...mergeObjToArray(kq), ...missions], 'id'));
+	// };
+	// fetchData();
+	// }, [missions]);
+
 	useEffect(() => {
 		const fetchData = async () => {
 			const result = await getLatestTasks();
@@ -334,7 +335,7 @@ const MissionPage = () => {
 				</div>
 				{parseInt(searchParams.get('view'), 10) === 1 || !searchParams.get('view') ? (
 					<div className='row'>
-						{missionsWithTask?.map((item) => (
+						{missions?.map((item) => (
 							<div className='col-md-6 col-xl-4 col-sm-12' key={item?.id}>
 								<Card stretch className='cursor-pointer'>
 									<CardHeader className='bg-transparent py-0'>
@@ -350,7 +351,7 @@ const MissionPage = () => {
 													<div className='me-2'>
 														Số CV:
 														<span className='text-danger fw-bold ps-2'>
-															{item?.tasks?.length || 0}
+															{item?.totalTask || 0}
 														</span>
 													</div>
 													<div className='me-2'>
@@ -362,10 +363,7 @@ const MissionPage = () => {
 													<div>
 														KPI thực tế:
 														<span className='text-danger fw-bold ps-2'>
-															{calcTotalCurrentKPIOfMission(
-																item,
-																item?.tasks,
-															) || 0}
+															{item.currentKPI}
 														</span>
 													</div>
 												</div>
@@ -379,7 +377,7 @@ const MissionPage = () => {
 														isLink
 														hoverShadow='default'
 														icon='MoreHoriz'
-														aria-label='More Actions'
+														ariaLabel='More Actions'
 													/>
 												</DropdownToggle>
 												<DropdownMenu isAlignmentEnd>
@@ -449,11 +447,11 @@ const MissionPage = () => {
 										</div>
 										<div className='row mt-4'>
 											<div className='col-md-12'>
-												{calcProgressMission(item, item?.tasks)}
+												{item.progress}
 												%
 												<Progress
 													isAutoColor
-													value={calcProgressMission(item, item?.tasks)}
+													value={item.progress}
 													height={10}
 												/>
 											</div>
@@ -515,7 +513,7 @@ const MissionPage = () => {
 											</tr>
 										</thead>
 										<tbody>
-											{missionsWithTask?.map((item, index) => (
+											{missions?.map((item, index) => (
 												<tr key={item?.id}>
 													<td>{index + 1}</td>
 													<td className='cursor-pointer'>

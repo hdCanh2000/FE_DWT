@@ -640,11 +640,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 													// eslint-disable-next-line react/no-array-index-key
 													key={index}
 													className='mt-4 d-flex align-items-center justify-content-between'>
-													<div
-														style={{
-															width: '45%',
-															marginRight: 10,
-														}}>
+													<div style={{ width: '45%', marginRight: 10 }}>
 														<FormGroup
 															className='mr-2'
 															id='name'
