@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { isEmpty } from 'lodash';
 import { useParams } from 'react-router-dom';
 import { Formik, useFormik } from 'formik';
+import { useToasts } from 'react-toast-notifications';
 import Button from '../../components/bootstrap/Button';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
@@ -11,12 +12,14 @@ import { demoPages } from '../../menu';
 import Input from '../../components/bootstrap/forms/Input';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Avatar from '../../components/Avatar';
-import { getUserById } from './services';
+import { getUserById, updateEmployee } from './services';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
+import Toasts from '../../components/bootstrap/Toasts';
 
 const EmployeePage = () => {
 	const params = useParams();
+	const { addToast } = useToasts();
 	const [user, setUser] = useState({});
 	const formik = useFormik({
 		initialValues: {
@@ -33,7 +36,10 @@ const EmployeePage = () => {
 		},
 		enableReinitialize: true,
 		validate,
-		onSubmit: () => {},
+		onSubmit: (values, { resetForm }) => {
+			handleSubmitForm(values);
+			resetForm();
+		},
 	});
 
 	useEffect(() => {
@@ -60,6 +66,45 @@ const EmployeePage = () => {
 		getInfoUserById(params.id);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [params.id]);
+
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+
+	const handleSubmitForm = async (data) => {
+		const dataSubmit = {
+			id: data?.id,
+			name: data.name,
+			departmentId: params.id,
+			code: data.code,
+			email: data.email,
+			password: '123456',
+			dateOfBirth: data.dateOfBirth,
+			dateOfJoin: data.dateOfJoin,
+			phone: data.phone,
+			address: data.address,
+			status: Number(data.status),
+			roles: ['user'],
+		};
+		try {
+			const response = await updateEmployee(dataSubmit);
+			const result = await response.data;
+			setUser(result);
+			handleShowToast(
+				`Cập nhật nhân viên!`,
+				`Nhân viên ${result.name} được cập nhật thành công!`,
+			);
+		} catch (error) {
+			handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+		}
+	};
 
 	return (
 		<PageWrapper title={demoPages.nhanVien.text}>
@@ -295,7 +340,9 @@ const EmployeePage = () => {
 														<Button
 															color='primary'
 															size='lg'
-															className='w-50 p-3'>
+															className='w-50 p-3'
+															type='submit'
+															onClick={formik.handleSubmit}>
 															Lưu thông tin
 														</Button>
 													</div>

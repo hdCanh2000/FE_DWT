@@ -171,12 +171,6 @@ const TaskListPage = () => {
 
 	const handleCloseModalExpand = () => {
 		setEditModalStatusExpand(false);
-		// try {
-		// 	const res = await getAllTasks(taskId);
-		// 	setTask(res.data);
-		// } catch (error) {
-		// 	setTask({});
-		// }
 	};
 
 	const handleEpandRow = (event, userId) => {
@@ -289,8 +283,9 @@ const TaskListPage = () => {
 				const response = await addNewTask(data);
 				const result = await response.data;
 				const newTasks = [...tasks];
-				newTasks.unshift(result);
+				newTasks.push(result);
 				setTasks(newTasks);
+				fetchDataAllTasks();
 				handleClearValueForm();
 				handleCloseEditForm();
 				handleShowToast(`Thêm công việc`, `Công việc ${result.name} được thêm thành công!`);

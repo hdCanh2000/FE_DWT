@@ -58,7 +58,7 @@ const CommonForm = ({
 												<Select
 													ariaLabel={field.title}
 													placeholder={`Chọn ${field.title}`}
-													list={options}
+													list={field.options}
 													required
 													name={field.id}
 													className='border border-2 rounded-0 shadow-none'
