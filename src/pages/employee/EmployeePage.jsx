@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import Page from '../../layout/Page/Page';
@@ -26,17 +25,15 @@ const EmployeePage = () => {
 	const { addToast } = useToasts();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [options, setOptions] = useState([]);
+	const [departments, setDepartments] = useState([]);
 	const [users, setUsers] = useState([]);
-
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		async function getDepartments() {
 			try {
 				const response = await getAllDepartments();
 				const data = await response.data;
-				setOptions(
+				setDepartments(
 					data.map((department) => {
 						return {
 							id: department?.id,
@@ -46,7 +43,7 @@ const EmployeePage = () => {
 					}),
 				);
 			} catch (error) {
-				setOptions([]);
+				setDepartments([]);
 			}
 		}
 		getDepartments();
@@ -67,14 +64,6 @@ const EmployeePage = () => {
 	}, []);
 
 	const columns = [
-		// {
-		// 	title: 'ID',
-		// 	id: 'id',
-		// 	key: 'id',
-		// 	type: 'number',
-		// 	align: 'center',
-		// 	isShow: false,
-		// },
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -117,6 +106,7 @@ const EmployeePage = () => {
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.department?.name}</span>,
+			options: departments,
 		},
 		{
 			title: 'Email',
@@ -167,29 +157,40 @@ const EmployeePage = () => {
 			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
 		},
 		{
+			title: 'Chức vụ',
+			id: 'position',
+			key: 'position',
+			type: 'select',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
+			options: [
+				{
+					id: 1,
+					text: 'Quản lý',
+					value: 1,
+				},
+				{
+					id: 2,
+					text: 'Nhân viên',
+					value: 0,
+				},
+			],
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-1'
-						icon='Edit'
-						onClick={() => handleOpenActionForm(item)}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
-						color='primary'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-1'
-						icon='ArrowForward'
-						onClick={() => navigate(`/nhan-vien/${item.id}`)}
-					/>
-				</div>
+				<Button
+					isOutline={!darkModeStatus}
+					color='success'
+					isLight={darkModeStatus}
+					className='text-nowrap mx-1'
+					icon='Edit'
+					onClick={() => handleOpenActionForm(item)}
+				/>
 			),
 			isShow: false,
 		},
@@ -232,8 +233,9 @@ const EmployeePage = () => {
 			dateOfJoin: data.dateOfJoin,
 			phone: data.phone,
 			address: data.address,
+			position: Number.parseInt(data.position, 10),
 			status: Number(data.status),
-			roles: ['user'],
+			roles: Number.parseInt(data.position, 10) === 1 ? ['manager'] : ['user'],
 		};
 		if (data.id) {
 			try {
@@ -244,9 +246,6 @@ const EmployeePage = () => {
 				handleClearValueForm();
 				hanleCloseForm();
 				getAllEmployees();
-				// setTimeout(() => {
-				// 	window.location.reload();
-				// }, 500);
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,
@@ -265,9 +264,6 @@ const EmployeePage = () => {
 				handleClearValueForm();
 				hanleCloseForm();
 				getAllEmployees();
-				setTimeout(() => {
-					window.location.reload();
-				}, 500);
 				handleShowToast(
 					`Thêm nhân viên`,
 					`Nhân viên ${result?.user?.name} được thêm thành công!`,
@@ -336,7 +332,6 @@ const EmployeePage = () => {
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}
-					options={options}
 				/>
 			</Page>
 		</PageWrapper>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Formik, useFormik } from 'formik';
 import Button from '../../components/bootstrap/Button';
 import Card, {
@@ -28,7 +28,6 @@ import Popovers from '../../components/bootstrap/Popovers';
 import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
 
 const DepartmentDetailPage = () => {
-	const navigate = useNavigate();
 	const params = useParams();
 	const { addToast } = useToasts();
 	const TABS = {
@@ -36,14 +35,6 @@ const DepartmentDetailPage = () => {
 		EMPLOYEES: 'Nhân viên',
 	};
 	const columns = [
-		{
-			title: 'ID',
-			id: 'id',
-			key: 'id',
-			type: 'number',
-			align: 'center',
-			isShow: false,
-		},
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -127,29 +118,40 @@ const DepartmentDetailPage = () => {
 			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
 		},
 		{
+			title: 'Chức vụ',
+			id: 'position',
+			key: 'position',
+			type: 'select',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
+			options: [
+				{
+					id: 1,
+					text: 'Quản lý',
+					value: 1,
+				},
+				{
+					id: 2,
+					text: 'Nhân viên',
+					value: 0,
+				},
+			],
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<>
-					<Button
-						isOutline
-						color='success'
-						isLight
-						className='text-nowrap mx-2'
-						icon='Edit'
-						onClick={() => handleOpenActionForm(item)}
-					/>
-					<Button
-						isOutline
-						color='primary'
-						isLight
-						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => navigate(`/nhan-vien/${item.id}`)}
-					/>
-				</>
+				<Button
+					isOutline
+					color='success'
+					isLight
+					className='text-nowrap mx-2'
+					icon='Edit'
+					onClick={() => handleOpenActionForm(item)}
+				/>
 			),
 			isShow: false,
 		},
@@ -174,6 +176,29 @@ const DepartmentDetailPage = () => {
 			resetForm();
 		},
 	});
+
+	async function getInfoDepartmentById() {
+		try {
+			const response = await getDepartmentByIdWithUser(params.id);
+			const data = await response.data;
+			setDepartment(data);
+			formik.initialValues = {
+				id: department.id,
+				slug: department?.slug,
+				description: department?.description,
+				name: department?.name,
+				address: department?.address,
+				status: department?.status,
+			};
+		} catch (error) {
+			setDepartment({});
+		}
+	}
+
+	useEffect(() => {
+		getInfoDepartmentById();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [params.id]);
 
 	const handleShowToast = (title, content) => {
 		addToast(
@@ -213,7 +238,7 @@ const DepartmentDetailPage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data.name,
-			departmentId: parseInt(params.id, 10),
+			departmentId: params.id,
 			code: data.code,
 			email: data.email,
 			password: '123456',
@@ -221,74 +246,38 @@ const DepartmentDetailPage = () => {
 			dateOfJoin: data.dateOfJoin,
 			phone: data.phone,
 			address: data.address,
+			position: Number.parseInt(data.position, 10),
 			status: Number(data.status),
-			roles: ['user'],
+			roles: Number.parseInt(data.position, 10) === 1 ? ['manager'] : ['user'],
 		};
 		if (data.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
-				// const newUsers = [...users];
-				// setUsers(newUsers.map((item) => (item.id === data.id ? { ...result } : item)));
-				// handleClearValueForm();
-				// hanleCloseForm();
-				// getAllEmployees();
-				setTimeout(() => {
-					window.location.reload();
-				}, 500);
+				hanleCloseForm();
+				getInfoDepartmentById();
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				// setUsers(users);
 				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
 			}
 		} else {
 			try {
 				const response = await addEmployee(dataSubmit);
 				const result = await response.data;
-				// const newUsers = [...users];
-				// newUsers.push(result);
-				// setUsers(newUsers);
-				// handleClearValueForm();
-				// hanleCloseForm();
-				// getAllEmployees();
-				setTimeout(() => {
-					window.location.reload();
-				}, 500);
+				hanleCloseForm();
+				getInfoDepartmentById();
 				handleShowToast(
 					`Thêm nhân viên`,
 					`Nhân viên ${result?.user?.name} được thêm thành công!`,
 				);
 			} catch (error) {
-				// setUsers(users);
 				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
 			}
 		}
 	};
-
-	useEffect(() => {
-		async function getInfoDepartmentById(id) {
-			try {
-				const response = await getDepartmentByIdWithUser(id);
-				const data = await response.data;
-				setDepartment(data);
-				formik.initialValues = {
-					id: department.id,
-					slug: department?.slug,
-					description: department?.description,
-					name: department?.name,
-					address: department?.address,
-					status: department?.status,
-				};
-			} catch (error) {
-				setDepartment({});
-			}
-		}
-		getInfoDepartmentById(parseInt(params.id, 10));
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [params.id]);
 
 	const handleOpenActionForm = (item) => {
 		setOpenForm(true);
@@ -305,7 +294,7 @@ const DepartmentDetailPage = () => {
 			<SubHeaderCommon />
 			<Page container='fluid'>
 				<div className='row h-100 w-100'>
-					<div className='col-lg-3 col-md-6'>
+					<div className='col-lg-2 col-md-6'>
 						<Card className='h-100'>
 							<CardHeader>
 								<CardLabel icon='AccountCircle'>
@@ -338,7 +327,7 @@ const DepartmentDetailPage = () => {
 							</CardBody>
 						</Card>
 					</div>
-					<div className='col-lg-9 col-md-6'>
+					<div className='col-lg-10 col-md-6'>
 						{TABS.DETAIL === activeTab && (
 							<Formik initialValues={department} enableReinitialize>
 								<Card className='h-100'>
