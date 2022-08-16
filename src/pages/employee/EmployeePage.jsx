@@ -19,6 +19,7 @@ import { getAllDepartments } from '../work-management/mission/services';
 import { addEmployee, getAllEmployee, updateEmployee } from './services';
 import Popovers from '../../components/bootstrap/Popovers';
 import SubHeaderCommonRight from '../common/SubHeaders/SubHeaderCommonRight';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -279,52 +280,49 @@ const EmployeePage = () => {
 		<PageWrapper title={demoPages.nhanVien.text}>
 			<SubHeaderCommonRight />
 			<Page container='fluid'>
-				<div className='row mb-4'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách nhân viên</div>
-						</div>
-					</div>
-				</div>
-				<div className='row mb-0'>
-					<div className='col-12'>
-						<Card className='w-100'>
-							<CardHeader>
-								<CardLabel icon='AccountCircle' iconColor='primary'>
-									<CardTitle>
-										<CardLabel>Danh sách nhân viên</CardLabel>
-									</CardTitle>
-								</CardLabel>
-								<CardActions>
-									<Button
-										color='info'
-										icon='PersonPlusFill'
-										tag='button'
-										onClick={() => handleOpenActionForm(null)}>
-										Thêm nhân viên
-									</Button>
-									<Button
-										color='info'
-										icon='CloudDownload'
-										isLight
-										tag='a'
-										to='/employee.excel'
-										target='_blank'
-										download>
-										Xuất Excel
-									</Button>
-								</CardActions>
-							</CardHeader>
-							<div className='p-4'>
-								<TableCommon
-									className='table table-modern mb-0'
-									columns={columns}
-									data={users}
-								/>
+				{verifyPermissionHOC(
+					<div className='row mb-4'>
+						<div className='col-12'>
+							<div className='d-flex justify-content-between align-items-center'>
+								<div className='display-6 fw-bold py-3'>Danh sách nhân viên</div>
 							</div>
-						</Card>
-					</div>
-				</div>
+						</div>
+					</div>,
+					['admin', 'manager'],
+				)}
+				{verifyPermissionHOC(
+					<div className='row mb-0'>
+						<div className='col-12'>
+							<Card className='w-100'>
+								<CardHeader>
+									<CardLabel icon='AccountCircle' iconColor='primary'>
+										<CardTitle>
+											<CardLabel>Danh sách nhân viên</CardLabel>
+										</CardTitle>
+									</CardLabel>
+									<CardActions>
+										<Button
+											color='info'
+											icon='PersonPlusFill'
+											tag='button'
+											onClick={() => handleOpenActionForm(null)}>
+											Thêm nhân viên
+										</Button>
+									</CardActions>
+								</CardHeader>
+								<div className='p-4'>
+									<TableCommon
+										className='table table-modern mb-0'
+										columns={columns}
+										data={users}
+									/>
+								</div>
+							</Card>
+						</div>
+					</div>,
+					['admin', 'manager'],
+				)}
+
 				<CommonForm
 					show={openForm}
 					onClose={hanleCloseForm}

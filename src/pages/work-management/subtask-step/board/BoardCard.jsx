@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import useDarkMode from '../../../../hooks/useDarkMode';
 import Card, {
@@ -21,11 +21,11 @@ import Input from '../../../../components/bootstrap/forms/Input';
 import Button from '../../../../components/bootstrap/Button';
 import Select from '../../../../components/bootstrap/forms/Select';
 import Option from '../../../../components/bootstrap/Option';
-import { getAllUser } from '../services';
+// import { getAllUser } from '../services';
 
 const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	const { darkModeStatus } = useDarkMode();
-	const [users, setUsers] = useState([]);
+	// const [users, setUsers] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const formik = useFormik({
 		initialValues: {
@@ -49,14 +49,14 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 			resetForm();
 		},
 	});
-	useEffect(() => {
-		async function fetchDataUsers() {
-			const response = await getAllUser();
-			const result = await response.data;
-			setUsers(result);
-		}
-		fetchDataUsers();
-	}, []);
+	// useEffect(() => {
+	// 	async function fetchDataUsers() {
+	// 		const response = await getAllUser();
+	// 		const result = await response.data;
+	// 		setUsers(result);
+	// 	}
+	// 	fetchDataUsers();
+	// }, []);
 
 	return (
 		<>
@@ -141,7 +141,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 										))}
 									</Select>
 								</FormGroup>
-								<FormGroup className='col-12' id='partner' label='Cần phối hợp'>
+								{/* <FormGroup className='col-12' id='partner' label='Cần phối hợp'>
 									<Select
 										ariaLabel='Board select'
 										placeholder='Chọn người phối hợp'
@@ -153,7 +153,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 											</Option>
 										))}
 									</Select>
-								</FormGroup>
+								</FormGroup> */}
 							</div>
 						</div>
 					</div>

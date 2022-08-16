@@ -60,6 +60,8 @@ import Alert from '../../../components/bootstrap/Alert';
 import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
 import { formatDateFromMiliseconds } from '../../../utils/utils';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
+import { demoPages } from '../../../menu';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 
 const TaskDetailPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -155,20 +157,13 @@ const TaskDetailPage = () => {
 	};
 
 	const columns = [
-		// {
-		// 	title: 'ID',
-		// 	id: 'id',
-		// 	key: 'id',
-		// 	type: 'number',
-		// 	align: 'right',
-		// },
 		{
 			title: 'Tên công việc',
 			id: 'name',
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`/dau-viec/${item?.id}`}>
+				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item?.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -312,23 +307,12 @@ const TaskDetailPage = () => {
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
-			title: 'Lời nhắn',
-			id: 'name',
-			key: 'note',
-		},
-		{
-			title: 'Người yêu cầu xác nhận',
-			id: 'user',
-			key: 'user',
-			render: (item) => <span>{item?.user?.name}</span>,
-		},
-		{
 			title: 'Tên đầu việc',
 			id: 'name',
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`/dau-viec/${item.id}`}>
+				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -458,7 +442,6 @@ const TaskDetailPage = () => {
 				`Cập nhật trạng thái!`,
 				`Cập nhật trạng thái đầu việc ${result.name} thành công!`,
 			);
-			setTask(result);
 			handleCloseConfirmStatusTask();
 		} catch (error) {
 			handleShowToast(
@@ -660,27 +643,30 @@ const TaskDetailPage = () => {
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
 							<div className='display-4 fw-bold py-3'>{task?.name}</div>
-							<div>
-								<Button
-									isOutline={!darkModeStatus}
-									color='primary'
-									isLight={darkModeStatus}
-									className='text-nowrap mx-2'
-									icon='Edit'
-									isDisable={task?.status === 4 || task?.status === 7}
-									onClick={() => handleOpenEditTaskForm(task)}>
-									Sửa
-								</Button>
-								<Button
-									isOutline={!darkModeStatus}
-									color='danger'
-									isLight={darkModeStatus}
-									className='text-nowrap mx-2'
-									icon='Trash'
-									onClick={() => handleOpenConfirmTaskModal(task)}>
-									Xoá
-								</Button>
-							</div>
+							{verifyPermissionHOC(
+								<div>
+									<Button
+										isOutline={!darkModeStatus}
+										color='primary'
+										isLight={darkModeStatus}
+										className='text-nowrap mx-2'
+										icon='Edit'
+										isDisable={task?.status === 4 || task?.status === 7}
+										onClick={() => handleOpenEditTaskForm(task)}>
+										Sửa
+									</Button>
+									<Button
+										isOutline={!darkModeStatus}
+										color='danger'
+										isLight={darkModeStatus}
+										className='text-nowrap mx-2'
+										icon='Trash'
+										onClick={() => handleOpenConfirmTaskModal(task)}>
+										Xoá
+									</Button>
+								</div>,
+								['admin', 'manager'],
+							)}
 						</div>
 					</div>
 					<div className='row mb-4'>

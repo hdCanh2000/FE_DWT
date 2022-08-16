@@ -17,20 +17,26 @@ const headers = [
 	},
 	// chi tiet muc tieu
 	{
-		path: `/muc-tieu/:id`,
+		path: `/${demoPages.mucTieu.path}/:id`,
 		element: null,
 		exact: true,
 	},
 
 	// chi tiet cong viec
 	{
-		path: `/cong-viec/:id`,
+		path: `/${demoPages.quanLyCongViec.path}/:id`,
+		element: null,
+		exact: true,
+	},
+	// danh sách đầu việc
+	{
+		path: demoPages.dauViec.path,
 		element: null,
 		exact: true,
 	},
 	// chi tiết đầu việc -step
 	{
-		path: `/dau-viec/:id`,
+		path: `/${demoPages.dauViec.path}/:id`,
 		element: null,
 		exact: true,
 	},

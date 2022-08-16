@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useFormik } from 'formik';
@@ -25,11 +25,11 @@ import Input from '../../../../components/bootstrap/forms/Input';
 import Textarea from '../../../../components/bootstrap/forms/Textarea';
 import Select from '../../../../components/bootstrap/forms/Select';
 import Option from '../../../../components/bootstrap/Option';
-import { getAllUser } from '../services';
+// import { getAllUser } from '../services';
 
 const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 	const [editModalStatus, setEditModalStatus] = useState(false);
-	const [users, setUsers] = useState([]);
+	// const [users, setUsers] = useState([]);
 	const _cardCount = groups?.cards?.length;
 	const formik = useFormik({
 		initialValues: {
@@ -53,14 +53,14 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 		},
 	});
 
-	useEffect(() => {
-		async function fetchDataUsers() {
-			const response = await getAllUser();
-			const result = await response.data;
-			setUsers(result);
-		}
-		fetchDataUsers();
-	}, []);
+	// useEffect(() => {
+	// 	async function fetchDataUsers() {
+	// 		const response = await getAllUser();
+	// 		const result = await response.data;
+	// 		setUsers(result);
+	// 	}
+	// 	fetchDataUsers();
+	// }, []);
 	return (
 		<>
 			<div className='col'>
@@ -172,7 +172,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 										))}
 									</Select>
 								</FormGroup>
-								<FormGroup className='col-12' id='partner' label='Cần phối hợp'>
+								{/* <FormGroup className='col-12' id='partner' label='Cần phối hợp'>
 									<Select
 										ariaLabel='Board select'
 										placeholder='Chọn người phối hợp'
@@ -184,7 +184,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 											</Option>
 										))}
 									</Select>
-								</FormGroup>
+								</FormGroup> */}
 							</div>
 						</div>
 					</div>

@@ -20,6 +20,7 @@ import Alert from '../../../components/bootstrap/Alert';
 import Toasts from '../../../components/bootstrap/Toasts';
 import Icon from '../../../components/icon/Icon';
 import useDarkMode from '../../../hooks/useDarkMode';
+import { demoPages } from '../../../menu';
 import {
 	addNewTask,
 	deleteMissionById,
@@ -57,6 +58,7 @@ import Popovers from '../../../components/bootstrap/Popovers';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 
 const chartOptions = {
 	chart: {
@@ -137,20 +139,13 @@ const MissionDetailPage = () => {
 	});
 
 	const columns = [
-		// {
-		// 	title: 'ID',
-		// 	id: 'id',
-		// 	key: 'id',
-		// 	type: 'number',
-		// 	align: 'right',
-		// },
 		{
 			title: 'Tên công việc',
 			id: 'name',
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`/cong-viec/${item.id}`}>
+				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -295,20 +290,13 @@ const MissionDetailPage = () => {
 	];
 
 	const columnsPending = [
-		// {
-		// 	title: 'ID',
-		// 	id: 'id',
-		// 	key: 'id',
-		// 	type: 'number',
-		// 	align: 'right',
-		// },
 		{
 			title: 'Tên công việc',
 			id: 'name',
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`/cong-viec/${item.id}`}>
+				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -658,26 +646,29 @@ const MissionDetailPage = () => {
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
 							<div className='display-4 fw-bold py-3'>{mission?.name}</div>
-							<div>
-								<Button
-									isOutline={!darkModeStatus}
-									color='primary'
-									isLight={darkModeStatus}
-									className='text-nowrap mx-2'
-									icon='Edit'
-									onClick={() => handleOpenEditMissionForm(mission)}>
-									Sửa
-								</Button>
-								<Button
-									isOutline={!darkModeStatus}
-									color='danger'
-									isLight={darkModeStatus}
-									className='text-nowrap mx-2'
-									icon='Trash'
-									onClick={() => handleOpenConfirmMissionModal(mission)}>
-									Xoá
-								</Button>
-							</div>
+							{verifyPermissionHOC(
+								<div>
+									<Button
+										isOutline={!darkModeStatus}
+										color='primary'
+										isLight={darkModeStatus}
+										className='text-nowrap mx-2'
+										icon='Edit'
+										onClick={() => handleOpenEditMissionForm(mission)}>
+										Sửa
+									</Button>
+									<Button
+										isOutline={!darkModeStatus}
+										color='danger'
+										isLight={darkModeStatus}
+										className='text-nowrap mx-2'
+										icon='Trash'
+										onClick={() => handleOpenConfirmMissionModal(mission)}>
+										Xoá
+									</Button>
+								</div>,
+								['admin'],
+							)}
 						</div>
 					</div>
 					<div className='col-lg-8'>
