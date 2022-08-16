@@ -500,49 +500,67 @@ const TaskListPage = () => {
 															</div>
 														</td>
 														<td>
-															<Dropdown>
-																<DropdownToggle hasIcon={false}>
-																	<Button
-																		isLink
-																		color={formatColorStatus(
-																			item.status,
-																		)}
-																		icon='Circle'
-																		className='text-nowrap'>
-																		{FORMAT_TASK_STATUS(
-																			item.status,
-																		)}
-																	</Button>
-																</DropdownToggle>
-																<DropdownMenu>
-																	{Object.keys(
-																		renderStatusTask(
-																			item.status,
-																		),
-																	).map((key) => (
-																		<DropdownItem
-																			key={key}
-																			onClick={() =>
-																				handleOpenConfirmStatusTask(
-																					item,
-																					STATUS[key]
-																						.value,
-																				)
-																			}>
-																			<div>
-																				<Icon
-																					icon='Circle'
-																					color={
+															{verifyPermissionHOC(
+																<Dropdown>
+																	<DropdownToggle hasIcon={false}>
+																		<Button
+																			isLink
+																			color={formatColorStatus(
+																				item.status,
+																			)}
+																			icon='Circle'
+																			className='text-nowrap'>
+																			{FORMAT_TASK_STATUS(
+																				item.status,
+																			)}
+																		</Button>
+																	</DropdownToggle>
+																	<DropdownMenu>
+																		{Object.keys(
+																			renderStatusTask(
+																				item.status,
+																			),
+																		).map((key) => (
+																			<DropdownItem
+																				key={key}
+																				onClick={() =>
+																					handleOpenConfirmStatusTask(
+																						item,
 																						STATUS[key]
-																							.color
+																							.value,
+																					)
+																				}>
+																				<div>
+																					<Icon
+																						icon='Circle'
+																						color={
+																							STATUS[
+																								key
+																							].color
+																						}
+																					/>
+																					{
+																						STATUS[key]
+																							.name
 																					}
-																				/>
-																				{STATUS[key].name}
-																			</div>
-																		</DropdownItem>
-																	))}
-																</DropdownMenu>
-															</Dropdown>
+																				</div>
+																			</DropdownItem>
+																		))}
+																	</DropdownMenu>
+																</Dropdown>,
+																['admin', 'manager'],
+																<Button
+																	isLink
+																	color={formatColorStatus(
+																		item.status,
+																	)}
+																	icon='Circle'
+																	className='text-nowrap'>
+																	{FORMAT_TASK_STATUS(
+																		item.status,
+																	)}
+																</Button>,
+															)}
 														</td>
 														<td>
 															<div className='d-flex align-items-center flex-column'>
