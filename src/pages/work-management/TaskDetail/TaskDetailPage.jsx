@@ -218,7 +218,164 @@ const TaskDetailPage = () => {
 			key: 'priority',
 			type: 'text',
 			render: (item) => (
-				<div className='d-flex align-items-center'>
+				<div className='d-flex align-items-center justify-content-center'>
+					<span
+						style={{
+							paddingRight: '1rem',
+							paddingLeft: '1rem',
+						}}
+						className={classNames(
+							'badge',
+							'border border-2',
+							`border-light`,
+							'bg-success',
+							'pt-2 pb-2 me-2',
+							`bg-${formatColorPriority(item.priority)}`,
+						)}>
+						<span className=''>{`Cấp ${item.priority}`}</span>
+					</span>
+				</div>
+			),
+			align: 'center',
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'text',
+			align: 'center',
+			render: (item) =>
+				verifyPermissionHOC(
+					<Dropdown>
+						<DropdownToggle hasIcon={false}>
+							<Button
+								isLink
+								color={formatColorStatus(item.status)}
+								icon='Circle'
+								className='text-nowrap'>
+								{FORMAT_TASK_STATUS(item.status)}
+							</Button>
+						</DropdownToggle>
+						<DropdownMenu>
+							{Object.keys(renderStatusTask(item.status)).map((key) => (
+								<DropdownItem
+									key={key}
+									onClick={() =>
+										handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
+									}>
+									<div>
+										<Icon icon='Circle' color={STATUS[key].color} />
+										{STATUS[key].name}
+									</div>
+								</DropdownItem>
+							))}
+						</DropdownMenu>
+					</Dropdown>,
+					['admin', 'manager'],
+					<Button
+						isLink
+						color={formatColorStatus(item.status)}
+						icon='Circle'
+						className='text-nowrap'>
+						{FORMAT_TASK_STATUS(item.status)}
+					</Button>,
+				),
+		},
+		{
+			title: '',
+			id: 'action',
+			key: 'action',
+			render: (item) =>
+				verifyPermissionHOC(
+					<div>
+						<Button
+							isOutline={!darkModeStatus}
+							color='success'
+							isDisable={
+								item?.status === 4 || item?.status === 7 || item.status === 3
+							}
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2'
+							icon='Edit'
+							onClick={() => handleOpenModal(item, 'edit')}
+						/>
+						<Button
+							isOutline={!darkModeStatus}
+							color='danger'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2 '
+							icon='Delete'
+							onClick={() => handleOpenConfirm(item)}
+						/>
+					</div>,
+					['admin', 'manager'],
+				),
+		},
+	];
+
+	const columnsPending = [
+		{
+			title: 'Tên đầu việc',
+			id: 'name',
+			key: 'name',
+			type: 'text',
+			render: (item) => (
+				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item.id}`}>
+					{item.name}
+				</Link>
+			),
+		},
+		{
+			title: 'Thời gian dự kiến',
+			id: 'estimateDate',
+			key: 'estimateDate',
+			type: 'text',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
+		},
+		{
+			title: 'Hạn hoàn thành',
+			id: 'deadlineDate',
+			key: 'deadlineDate',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
+		},
+		{
+			title: 'Tiến độ',
+			id: 'progress',
+			key: 'progress',
+			type: 'text',
+			minWidth: 100,
+			render: (item) => (
+				<div className='d-flex align-items-center flex-column'>
+					<div className='flex-shrink-0 me-3'>{`${calcProgressSubtask(item)}%`}</div>
+					<Progress
+						className='flex-grow-1'
+						isAutoColor
+						value={calcProgressSubtask(item)}
+						style={{
+							height: 10,
+							width: '100%',
+						}}
+					/>
+				</div>
+			),
+			align: 'center',
+		},
+		{
+			title: 'Giá trị KPI',
+			id: 'kpiValue',
+			key: 'kpiValue',
+			type: 'number',
+			align: 'center',
+		},
+		{
+			title: 'Độ ưu tiên',
+			id: 'priority',
+			key: 'priority',
+			type: 'text',
+			render: (item) => (
+				<div className='d-flex align-items-center justify-content-center'>
 					<span
 						style={{
 							paddingRight: '1rem',
@@ -243,97 +400,7 @@ const TaskDetailPage = () => {
 			id: 'status',
 			key: 'status',
 			type: 'number',
-			render: (item) => (
-				<Dropdown>
-					<DropdownToggle hasIcon={false}>
-						<Button
-							isLink
-							color={formatColorStatus(item.status)}
-							icon='Circle'
-							className='text-nowrap'>
-							{FORMAT_TASK_STATUS(item.status)}
-						</Button>
-					</DropdownToggle>
-					<DropdownMenu>
-						{Object.keys(renderStatusTask(item.status)).map((key) => (
-							<DropdownItem
-								key={key}
-								onClick={() =>
-									handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
-								}>
-								<div>
-									<Icon icon='Circle' color={STATUS[key].color} />
-									{STATUS[key].name}
-								</div>
-							</DropdownItem>
-						))}
-					</DropdownMenu>
-				</Dropdown>
-			),
-		},
-		{
-			title: 'Hành động',
-			id: 'action',
-			key: 'action',
-			render: (item) => (
-				<>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isDisable={item?.status === 4 || item?.status === 7 || item.status === 3}
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='Edit'
-						onClick={() => handleOpenModal(item, 'edit')}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
-						color='danger'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2 '
-						icon='Delete'
-						onClick={() => handleOpenConfirm(item)}
-					/>
-				</>
-			),
-		},
-	];
-
-	const columnsPending = [
-		{
-			title: 'Ngày dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'Tên đầu việc',
-			id: 'name',
-			key: 'name',
-			type: 'text',
-			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item.id}`}>
-					{item.name}
-				</Link>
-			),
-		},
-		{
-			title: 'Hạn hoàn thành',
-			id: 'deadlineDate',
-			key: 'deadlineDate',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'KPI',
-			id: 'kpiValue',
-			key: 'kpiValue',
-			type: 'number',
-		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
+			align: 'center',
 			render: (item) => (
 				<Button
 					isLink
@@ -348,28 +415,30 @@ const TaskDetailPage = () => {
 			title: '',
 			id: 'action',
 			key: 'action',
-			render: (item) => (
-				<>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						onClick={() => handleOpenConfirmStatusTask(item, 4, 2)}
-						icon='Edit'>
-						Xác nhận
-					</Button>
-					<Button
-						isOutline={!darkModeStatus}
-						color='danger'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2 '
-						onClick={() => handleOpenConfirmStatusTask(item, 5, 2)}
-						icon='Trash'>
-						Từ chối
-					</Button>
-				</>
-			),
+			render: (item) =>
+				verifyPermissionHOC(
+					<div>
+						<Button
+							isOutline={!darkModeStatus}
+							color='success'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2'
+							onClick={() => handleOpenConfirmStatusTask(item, 4, 2)}
+							icon='Edit'>
+							Xác nhận
+						</Button>
+						<Button
+							isOutline={!darkModeStatus}
+							color='danger'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2 '
+							onClick={() => handleOpenConfirmStatusTask(item, 5, 2)}
+							icon='Trash'>
+							Từ chối
+						</Button>
+					</div>,
+					['admin', 'manager'],
+				),
 		},
 	];
 
@@ -678,48 +747,51 @@ const TaskDetailPage = () => {
 											Tổng kết
 										</CardTitle>
 									</CardLabel>
-									<CardActions className='d-flex'>
-										<Dropdown>
-											<DropdownToggle hasIcon={false}>
-												<Button
-													color='danger'
-													icon='Report'
-													className='text-nowrap'>
-													Cập nhật trạng thái công việc
-												</Button>
-											</DropdownToggle>
-											<DropdownMenu>
-												{Object.keys(renderStatus(task?.status)).map(
-													(key) => (
-														<DropdownItem
-															key={key}
-															onClick={() =>
-																handleOpenConfirmStatusTask(
-																	task,
-																	STATUS[key].value,
-																)
-															}>
-															<div>
-																<Icon
-																	icon='Circle'
-																	color={STATUS[key].color}
-																/>
-																{STATUS[key].name}
-															</div>
-														</DropdownItem>
-													),
-												)}
-											</DropdownMenu>
-										</Dropdown>
-										<Button
-											isOutline={!darkModeStatus}
-											color='dark'
-											isLight={darkModeStatus}
-											className='text-nowrap mx-2 shadow-none'
-											icon='Info'
-											onClick={() => handleOpenListInfoModal()}
-										/>
-									</CardActions>
+									{verifyPermissionHOC(
+										<CardActions className='d-flex'>
+											<Dropdown>
+												<DropdownToggle hasIcon={false}>
+													<Button
+														color='danger'
+														icon='Report'
+														className='text-nowrap'>
+														Cập nhật trạng thái công việc
+													</Button>
+												</DropdownToggle>
+												<DropdownMenu>
+													{Object.keys(renderStatus(task?.status)).map(
+														(key) => (
+															<DropdownItem
+																key={key}
+																onClick={() =>
+																	handleOpenConfirmStatusTask(
+																		task,
+																		STATUS[key].value,
+																	)
+																}>
+																<div>
+																	<Icon
+																		icon='Circle'
+																		color={STATUS[key].color}
+																	/>
+																	{STATUS[key].name}
+																</div>
+															</DropdownItem>
+														),
+													)}
+												</DropdownMenu>
+											</Dropdown>
+											<Button
+												isOutline={!darkModeStatus}
+												color='dark'
+												isLight={darkModeStatus}
+												className='text-nowrap mx-2 shadow-none'
+												icon='Info'
+												onClick={() => handleOpenListInfoModal()}
+											/>
+										</CardActions>,
+										['admin', 'manager'],
+									)}
 								</CardHeader>
 								<CardBody className='py-2'>
 									<div className='row g-4'>

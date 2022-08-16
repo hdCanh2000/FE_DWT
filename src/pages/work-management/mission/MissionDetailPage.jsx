@@ -389,28 +389,30 @@ const MissionDetailPage = () => {
 			title: '',
 			id: 'action',
 			key: 'action',
-			render: (item) => (
-				<>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='Check'
-						onClick={() => handleOpenConfirmStatusTask(item, 4)}>
-						Duyệt
-					</Button>
-					<Button
-						isOutline={!darkModeStatus}
-						color='danger'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='Trash'
-						onClick={() => handleOpenConfirmStatusTask(item, 5)}>
-						Từ chối
-					</Button>
-				</>
-			),
+			render: (item) =>
+				verifyPermissionHOC(
+					<div className='d-flex align-items-center'>
+						<Button
+							isOutline={!darkModeStatus}
+							color='success'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2'
+							icon='Check'
+							onClick={() => handleOpenConfirmStatusTask(item, 4)}>
+							Duyệt
+						</Button>
+						<Button
+							isOutline={!darkModeStatus}
+							color='danger'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2'
+							icon='Trash'
+							onClick={() => handleOpenConfirmStatusTask(item, 5)}>
+							Từ chối
+						</Button>
+					</div>,
+					['admin'],
+				),
 		},
 	];
 

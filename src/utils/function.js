@@ -35,9 +35,7 @@ const calcTotalStepCompleteOfSubTask = (subtask) => {
 // tính % hoàn thành của 1 subtask
 const calcProgressSubtask = (subtask) => {
 	if (isEmpty(subtask)) return 0;
-	if (subtask.status === 4 || subtask.status === 7) return 100;
-	const { steps } = subtask;
-	if (isEmpty(steps)) return 0;
+	if (subtask.status === 3 || subtask.status === 4 || subtask.status === 7) return 100;
 	return (
 		Math.round(
 			(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
