@@ -26,6 +26,7 @@ import Checks from '../../components/bootstrap/forms/Checks';
 import { addEmployee, updateEmployee } from '../employee/services';
 import Popovers from '../../components/bootstrap/Popovers';
 import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const DepartmentDetailPage = () => {
 	const params = useParams();
@@ -293,180 +294,189 @@ const DepartmentDetailPage = () => {
 		<PageWrapper title={demoPages.nhanVien.text}>
 			<SubHeaderCommon />
 			<Page container='fluid'>
-				<div className='row h-100 w-100'>
-					<div className='col-lg-2 col-md-6'>
-						<Card className='h-100'>
-							<CardHeader>
-								<CardLabel icon='AccountCircle'>
-									<CardTitle>Thông tin</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody>
-								<div className='row g-3'>
-									<div className='col-12'>
-										<Button
-											icon='Contacts'
-											color='info'
-											className='w-100 p-3'
-											isLight={TABS.DETAIL !== activeTab}
-											onClick={() => setActiveTab(TABS.DETAIL)}>
-											{TABS.DETAIL}
-										</Button>
+				{verifyPermissionHOC(
+					<div className='row h-100 w-100'>
+						<div className='col-lg-2 col-md-6'>
+							<Card className='h-100'>
+								<CardHeader>
+									<CardLabel icon='AccountCircle'>
+										<CardTitle>Thông tin</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody>
+									<div className='row g-3'>
+										<div className='col-12'>
+											<Button
+												icon='Contacts'
+												color='info'
+												className='w-100 p-3'
+												isLight={TABS.DETAIL !== activeTab}
+												onClick={() => setActiveTab(TABS.DETAIL)}>
+												{TABS.DETAIL}
+											</Button>
+										</div>
+										<div className='col-12'>
+											<Button
+												icon='LocalPolice'
+												color='info'
+												className='w-100 p-3'
+												isLight={TABS.EMPLOYEES !== activeTab}
+												onClick={() => setActiveTab(TABS.EMPLOYEES)}>
+												{TABS.EMPLOYEES}
+											</Button>
+										</div>
 									</div>
-									<div className='col-12'>
-										<Button
-											icon='LocalPolice'
-											color='info'
-											className='w-100 p-3'
-											isLight={TABS.EMPLOYEES !== activeTab}
-											onClick={() => setActiveTab(TABS.EMPLOYEES)}>
-											{TABS.EMPLOYEES}
-										</Button>
-									</div>
-								</div>
-							</CardBody>
-						</Card>
-					</div>
-					<div className='col-lg-10 col-md-6'>
-						{TABS.DETAIL === activeTab && (
-							<Formik initialValues={department} enableReinitialize>
+								</CardBody>
+							</Card>
+						</div>
+						<div className='col-lg-10 col-md-6'>
+							{TABS.DETAIL === activeTab && (
+								<Formik initialValues={department} enableReinitialize>
+									<Card className='h-100'>
+										<Card className='h-100 mb-0'>
+											<CardHeader>
+												<CardLabel icon='Edit' iconColor='warning'>
+													<CardTitle>Thông tin chi tiết</CardTitle>
+												</CardLabel>
+											</CardHeader>
+											<CardBody className='pt-0'>
+												<div className='row g-4'>
+													<div className='col-md-6'>
+														<FormGroup id='name' label='Tên phòng ban'>
+															<Input
+																placeholder='Tên phòng ban'
+																onChange={formik.handleChange}
+																onBlur={formik.handleBlur}
+																value={formik.values.name}
+																isValid={formik.isValid}
+																isTouched={formik.touched.name}
+																invalidFeedback={formik.errors.name}
+																size='lg'
+																className='border border-2 shadow-none'
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-md-6'>
+														<FormGroup id='slug' label='Mã phòng ban'>
+															<Input
+																type='text'
+																placeholder='Mã phòng ban'
+																onChange={formik.handleChange}
+																onBlur={formik.handleBlur}
+																value={formik.values.slug}
+																isValid={formik.isValid}
+																isTouched={formik.touched.slug}
+																size='lg'
+																className='border border-2 shadow-none'
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-md-12'>
+														<FormGroup id='description' label='Mô tả'>
+															<Textarea
+																rows={5}
+																placeholder='Mô tả'
+																onChange={formik.handleChange}
+																onBlur={formik.handleBlur}
+																value={formik.values.description}
+																isValid={formik.isValid}
+																isTouched={
+																	formik.touched.description
+																}
+																size='lg'
+																className='border border-2 shadow-none'
+																name='description'
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-12'>
+														<FormGroup id='address' label='Địa chỉ'>
+															<Textarea
+																rows={5}
+																placeholder='Địa chỉ'
+																onChange={formik.handleChange}
+																onBlur={formik.handleBlur}
+																value={formik.values.address}
+																isValid={formik.isValid}
+																isTouched={formik.touched.address}
+																invalidFeedback={
+																	formik.errors.address
+																}
+																size='lg'
+																className='border border-2 shadow-none'
+																name='address'
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-12'>
+														<FormGroup
+															id='status'
+															label='Trạng thái hoạt động'>
+															<Checks
+																id='status'
+																type='switch'
+																size='lg'
+																label={
+																	Number(formik.values.status) ===
+																	1
+																		? 'Đang hoạt động'
+																		: 'Không hoạt động'
+																}
+																onChange={formik.handleChange}
+																checked={formik.values.status}
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-12'>
+														<div className='w-100 mt-4 text-center'>
+															<Button
+																color='primary'
+																size='lg'
+																className='w-50 p-3'
+																type='submit'
+																onClick={formik.handleSubmit}>
+																Lưu thông tin
+															</Button>
+														</div>
+													</div>
+												</div>
+											</CardBody>
+										</Card>
+									</Card>
+								</Formik>
+							)}
+							{TABS.EMPLOYEES === activeTab && (
 								<Card className='h-100'>
 									<Card className='h-100 mb-0'>
 										<CardHeader>
 											<CardLabel icon='Edit' iconColor='warning'>
-												<CardTitle>Thông tin chi tiết</CardTitle>
+												<CardTitle>Danh sách nhân viên</CardTitle>
 											</CardLabel>
+											<CardActions>
+												<Button
+													color='info'
+													icon='PersonPlusFill'
+													tag='button'
+													onClick={() => handleOpenActionForm(null)}>
+													Thêm nhân viên
+												</Button>
+											</CardActions>
 										</CardHeader>
-										<CardBody className='pt-0'>
-											<div className='row g-4'>
-												<div className='col-md-6'>
-													<FormGroup id='name' label='Tên phòng ban'>
-														<Input
-															placeholder='Tên phòng ban'
-															onChange={formik.handleChange}
-															onBlur={formik.handleBlur}
-															value={formik.values.name}
-															isValid={formik.isValid}
-															isTouched={formik.touched.name}
-															invalidFeedback={formik.errors.name}
-															size='lg'
-															className='border border-2 shadow-none'
-														/>
-													</FormGroup>
-												</div>
-												<div className='col-md-6'>
-													<FormGroup id='slug' label='Mã phòng ban'>
-														<Input
-															type='text'
-															placeholder='Mã phòng ban'
-															onChange={formik.handleChange}
-															onBlur={formik.handleBlur}
-															value={formik.values.slug}
-															isValid={formik.isValid}
-															isTouched={formik.touched.slug}
-															size='lg'
-															className='border border-2 shadow-none'
-														/>
-													</FormGroup>
-												</div>
-												<div className='col-md-12'>
-													<FormGroup id='description' label='Mô tả'>
-														<Textarea
-															rows={5}
-															placeholder='Mô tả'
-															onChange={formik.handleChange}
-															onBlur={formik.handleBlur}
-															value={formik.values.description}
-															isValid={formik.isValid}
-															isTouched={formik.touched.description}
-															size='lg'
-															className='border border-2 shadow-none'
-															name='description'
-														/>
-													</FormGroup>
-												</div>
-												<div className='col-12'>
-													<FormGroup id='address' label='Địa chỉ'>
-														<Textarea
-															rows={5}
-															placeholder='Địa chỉ'
-															onChange={formik.handleChange}
-															onBlur={formik.handleBlur}
-															value={formik.values.address}
-															isValid={formik.isValid}
-															isTouched={formik.touched.address}
-															invalidFeedback={formik.errors.address}
-															size='lg'
-															className='border border-2 shadow-none'
-															name='address'
-														/>
-													</FormGroup>
-												</div>
-												<div className='col-12'>
-													<FormGroup
-														id='status'
-														label='Trạng thái hoạt động'>
-														<Checks
-															id='status'
-															type='switch'
-															size='lg'
-															label={
-																Number(formik.values.status) === 1
-																	? 'Đang hoạt động'
-																	: 'Không hoạt động'
-															}
-															onChange={formik.handleChange}
-															checked={formik.values.status}
-														/>
-													</FormGroup>
-												</div>
-												<div className='col-12'>
-													<div className='w-100 mt-4 text-center'>
-														<Button
-															color='primary'
-															size='lg'
-															className='w-50 p-3'
-															type='submit'
-															onClick={formik.handleSubmit}>
-															Lưu thông tin
-														</Button>
-													</div>
-												</div>
-											</div>
-										</CardBody>
+										<div className='p-4'>
+											<TableCommon
+												className='table table-modern mb-0'
+												columns={columns}
+												data={department?.users}
+											/>
+										</div>
 									</Card>
 								</Card>
-							</Formik>
-						)}
-						{TABS.EMPLOYEES === activeTab && (
-							<Card className='h-100'>
-								<Card className='h-100 mb-0'>
-									<CardHeader>
-										<CardLabel icon='Edit' iconColor='warning'>
-											<CardTitle>Danh sách nhân viên</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='PersonPlusFill'
-												tag='button'
-												onClick={() => handleOpenActionForm(null)}>
-												Thêm nhân viên
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={columns}
-											data={department?.users}
-										/>
-									</div>
-								</Card>
-							</Card>
-						)}
-					</div>
-				</div>
+							)}
+						</div>
+					</div>,
+					['admin', 'manager'],
+				)}
+
 				<CommonForm
 					show={openForm}
 					onClose={hanleCloseForm}

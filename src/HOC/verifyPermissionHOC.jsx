@@ -6,12 +6,12 @@ const checkIsAccessible = (permission) => {
 	return !isEmpty(roles.filter((element) => permission.includes(element)));
 };
 
-const verifyPermissionHOC = (Component, permission) => {
+const verifyPermissionHOC = (Component, permission, OtherComponent) => {
 	const Verify = () => {
 		const isAccessible = checkIsAccessible(permission);
 
 		if (!isAccessible) {
-			return '';
+			return OtherComponent || '';
 		}
 		return Component;
 	};
