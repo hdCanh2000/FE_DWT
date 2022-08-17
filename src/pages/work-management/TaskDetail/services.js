@@ -66,6 +66,14 @@ const updateStatusPendingTask = (data) => {
 	});
 };
 
+const getAllTasks = () => {
+	// lấy danh sách các task mới nhất
+	return axiosClient({
+		method: 'GET',
+		url: '/tasks',
+	});
+};
+
 export {
 	getAllDepartments,
 	getTaskById,
@@ -76,4 +84,5 @@ export {
 	updateSubtask,
 	updateStatusPendingTask,
 	deleteSubtask,
+	getAllTasks,
 };

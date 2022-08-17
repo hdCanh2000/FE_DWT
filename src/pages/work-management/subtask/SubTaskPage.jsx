@@ -30,7 +30,6 @@ import {
 	STATUS,
 } from '../../../utils/constants';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
-import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
 import { addNewSubtask, updateSubtask } from '../TaskDetail/services';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import Toasts from '../../../components/bootstrap/Toasts';
@@ -167,7 +166,6 @@ const SubTaskPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.dauViec.text}>
-			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -342,6 +340,7 @@ const SubTaskPage = () => {
 					item={itemEdit}
 					onClose={handleCloseEditForm}
 					onSubmit={handleSubmitSubTaskForm}
+					isShowTask={!itemEdit?.id}
 				/>
 				<ModalConfirmCommon
 					show={openConfirmModalStatus}

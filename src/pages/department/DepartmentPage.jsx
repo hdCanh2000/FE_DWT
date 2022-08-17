@@ -17,7 +17,6 @@ import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment, getAllDepartmentWithUser, updateDepartment } from './services';
 import validate from './validate';
-import SubHeaderCommonRight from '../common/SubHeaders/SubHeaderCommonRight';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const DepartmentPage = () => {
@@ -196,7 +195,6 @@ const DepartmentPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.phongBan.text}>
-			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>

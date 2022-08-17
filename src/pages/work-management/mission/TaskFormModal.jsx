@@ -18,7 +18,7 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Option from '../../../components/bootstrap/Option';
 import Icon from '../../../components/icon/Icon';
 import { PRIORITIES } from '../../../utils/constants';
-import { getAllDepartments, getAllUser, getTaskById } from './services';
+import { getAllDepartments, getAllMission, getAllUser, getTaskById } from './services';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -35,7 +35,7 @@ const customStyles = {
 	}),
 };
 
-const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
+const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 	const [task, setTask] = useState({});
 	const [keysState, setKeysState] = useState([]);
 	const [departments, setDepartments] = useState([]);
@@ -44,6 +44,8 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
 	const [userOption, setUserOption] = useState({ label: '', value: '' });
 	const [userReplatedOption, setUserRelatedOption] = useState([]);
+	const [missionOptions, setMissionOptions] = useState([]);
+	const [valueMission, setValueMisson] = useState({});
 	const [errors, setErrors] = useState({
 		name: { error: false, errorMsg: '' },
 		kpiValue: { error: false, errorMsg: '' },
@@ -195,6 +197,20 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 			}
 		}
 		getUsers();
+	}, []);
+
+	useEffect(() => {
+		getAllMission().then((res) => {
+			setMissionOptions(
+				res.data.map((mission) => {
+					return {
+						id: mission.id,
+						label: mission.name,
+						value: mission.id,
+					};
+				}),
+			);
+		});
 	}, []);
 
 	// hàm validate cho dynamic field form
@@ -361,6 +377,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 				keyValue: key.keyValue,
 			};
 		});
+		data.missionId = valueMission.id || null;
 		data.departmentId = departmentOption.id;
 		data.departments = [
 			{
@@ -426,6 +443,19 @@ const TaskFormModal = ({ show, onClose, item, onSubmit }) => {
 										</FormGroup>
 										{errors?.name?.errorMsg && (
 											<ErrorText>Vui lòng nhập tên công việc</ErrorText>
+										)}
+										{isShowMission && (
+											<div className='col-12'>
+												<FormGroup id='task' label='Thuộc mục tiêu'>
+													<SelectComponent
+														placeholder='Thuộc mục tiêu'
+														defaultValue={valueMission}
+														value={valueMission}
+														onChange={setValueMisson}
+														options={missionOptions}
+													/>
+												</FormGroup>
+											</div>
 										)}
 										<FormGroup
 											className='col-12'
