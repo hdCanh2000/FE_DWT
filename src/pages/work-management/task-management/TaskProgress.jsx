@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import Card, {
-	CardActions,
-	CardBody,
-	CardHeader,
-	CardLabel,
-	CardTitle,
-} from '../../../components/bootstrap/Card';
-import Button from '../../../components/bootstrap/Button';
+import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Chart from '../../../components/extras/Chart';
 // import CountProgressInfo from './CountProgressInfo';
 
@@ -80,65 +73,13 @@ const TaskProgress = () => {
 		},
 	};
 
-	const [state, setState] = useState({
+	const [state] = useState({
 		series: DUMMY_DATA.MONTH.series,
 		options: chartOptions,
 	});
 
-	const SALE_PER_TAB = {
-		DAY: 'Ngày',
-		WEEK: 'Tuần',
-		MONTH: 'Tháng',
-	};
-	const [activeSalePerTab, setActiveSalePerTab] = useState(SALE_PER_TAB.MONTH);
 	return (
 		<Card stretch>
-			<CardHeader>
-				<CardLabel>
-					<CardTitle>Tiến độ công việc</CardTitle>
-				</CardLabel>
-				<CardActions>
-					<Button
-						color='info'
-						onClick={() => {
-							setActiveSalePerTab(SALE_PER_TAB.DAY);
-							setState({
-								series: DUMMY_DATA.DAY.series,
-								options: DUMMY_DATA.DAY.options,
-							});
-						}}
-						isLink={activeSalePerTab !== SALE_PER_TAB.DAY}
-						isLight={activeSalePerTab === SALE_PER_TAB.DAY}>
-						Ngày
-					</Button>
-					<Button
-						color='info'
-						onClick={() => {
-							setActiveSalePerTab(SALE_PER_TAB.WEEK);
-							setState({
-								series: DUMMY_DATA.WEEK.series,
-								options: DUMMY_DATA.WEEK.options,
-							});
-						}}
-						isLink={activeSalePerTab !== SALE_PER_TAB.WEEK}
-						isLight={activeSalePerTab === SALE_PER_TAB.WEEK}>
-						Tuần
-					</Button>
-					<Button
-						color='info'
-						onClick={() => {
-							setActiveSalePerTab(SALE_PER_TAB.MONTH);
-							setState({
-								series: DUMMY_DATA.MONTH.series,
-								options: DUMMY_DATA.MONTH.options,
-							});
-						}}
-						isLink={activeSalePerTab !== SALE_PER_TAB.MONTH}
-						isLight={activeSalePerTab === SALE_PER_TAB.MONTH}>
-						Tháng
-					</Button>
-				</CardActions>
-			</CardHeader>
 			<CardBody>
 				<div className='row align-items-center'>
 					<div className='col-xl-8 col-md-12'>

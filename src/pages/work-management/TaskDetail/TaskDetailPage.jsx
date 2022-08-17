@@ -993,9 +993,7 @@ const TaskDetailPage = () => {
 																<Chart
 																	series={state?.series}
 																	options={state?.options}
-																	type={
-																		state?.options?.chart?.type
-																	}
+																	type={chartOptions.chart.type}
 																	height={
 																		state?.options?.chart
 																			?.height
