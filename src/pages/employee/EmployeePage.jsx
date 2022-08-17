@@ -18,7 +18,6 @@ import CommonForm from '../common/ComponentCommon/CommonForm';
 import { getAllDepartments } from '../work-management/mission/services';
 import { addEmployee, getAllEmployee, updateEmployee } from './services';
 import Popovers from '../../components/bootstrap/Popovers';
-import SubHeaderCommonRight from '../common/SubHeaders/SubHeaderCommonRight';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const EmployeePage = () => {
@@ -278,7 +277,6 @@ const EmployeePage = () => {
 
 	return (
 		<PageWrapper title={demoPages.nhanVien.text}>
-			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='row mb-4'>

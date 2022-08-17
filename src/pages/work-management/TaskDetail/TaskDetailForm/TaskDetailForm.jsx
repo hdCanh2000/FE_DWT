@@ -6,7 +6,7 @@ import moment from 'moment';
 import styled from 'styled-components';
 import SelectComponent from 'react-select';
 import { Button, Modal } from 'react-bootstrap';
-import { getAllDepartments, getAllUser, getSubTaskById } from '../services';
+import { getAllDepartments, getAllTasks, getAllUser, getSubTaskById } from '../services';
 import Option from '../../../../components/bootstrap/Option';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
@@ -19,14 +19,16 @@ const ErrorText = styled.span`
 	color: #e22828;
 	margin-top: 5px;
 `;
-const TaskDetailForm = ({ show, onClose, item, onSubmit }) => {
+const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) => {
 	// state
 	const [departmentOptions, setDepartmentOptions] = useState([]);
 	const [userOptions, setUserOptions] = useState([]);
+	const [taskOptions, setTaskOptions] = useState([]);
 	const [subtask, setSubtask] = useState({}); // subtask
 	const [keysState, setKeysState] = useState([]);
 	const [valueDepartment, setValueDepartment] = useState({});
 	const [valueUser, setValueUser] = useState({});
+	const [valueTask, setValueTask] = useState({});
 	const [usersRelated, setUsersRelated] = useState([]);
 	const [departmentRelated, setDepartmentRelated] = useState([]);
 	const PRIORITIES = [5, 4, 3, 2, 1];
@@ -99,6 +101,11 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit }) => {
 					label: response.data?.departments[0]?.name,
 					value: response.data.departments[0].id,
 				});
+				// setValueTask({
+				// 	id: response.data?.departments[0]?.id,
+				// 	label: response.data?.departments[0]?.name,
+				// 	value: response.data.departments[0].id,
+				// });
 				setUsersRelated(
 					response.data?.users?.slice(1)?.map((user) => {
 						return {
@@ -128,6 +135,20 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit }) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [item?.id]);
+
+	useEffect(() => {
+		getAllTasks().then((res) => {
+			setTaskOptions(
+				res.data.map((task) => {
+					return {
+						id: task.id,
+						label: task.name,
+						value: task.id,
+					};
+				}),
+			);
+		});
+	}, []);
 
 	// valueDalite
 	const onValidate = (value, name) => {
@@ -285,6 +306,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit }) => {
 			};
 		});
 		dataSubmit.userId = valueUser.id;
+		dataSubmit.taskId = valueTask.id || null;
 		dataSubmit.users = valueUsers;
 		dataSubmit.departmentId = valueDepartment.id;
 		dataSubmit.departments = valueDepartments;
@@ -328,11 +350,24 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit }) => {
 							/>
 						</FormGroup>
 						{errors?.name?.errorMsg && (
-							<ErrorText>Vui lòng nhập tên mục tiêu</ErrorText>
+							<ErrorText>Vui lòng nhập tên đầu việc</ErrorText>
 						)}
 					</div>
+					{isShowTask && (
+						<div className='col-12'>
+							<FormGroup id='task' label='Thuộc công việc'>
+								<SelectComponent
+									placeholder='Thuộc công việc'
+									defaultValue={valueTask}
+									value={valueTask}
+									onChange={setValueTask}
+									options={taskOptions}
+								/>
+							</FormGroup>
+						</div>
+					)}
 					<div className='col-12'>
-						<FormGroup id='description' label='Mô tả mục tiêu' isFloating>
+						<FormGroup id='description' label='Mô tả đầu việc' isFloating>
 							<Textarea
 								className='h-100 border border-2 rounded-0 shadow-none'
 								placeholder='note'
@@ -347,10 +382,10 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit }) => {
 						)}
 					</div>
 					<div className='col-12'>
-						<FormGroup id='kpiValue' label='Mức điểm KPI' isFloating>
+						<FormGroup id='kpiValue' label='Giá trị KPI' isFloating>
 							<Input
 								type='number'
-								placeholder='Mức điểm KPI'
+								placeholder='Giá trị KPI'
 								value={subtask.kpiValue || ''}
 								name='kpiValue'
 								onChange={handleChange}
@@ -359,7 +394,9 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit }) => {
 								className='border border-2 rounded-0 shadow-none'
 							/>
 						</FormGroup>
-						{errors?.kpiValue?.errorMsg && <ErrorText>Vui lòng nhập KPI</ErrorText>}
+						{errors?.kpiValue?.errorMsg && (
+							<ErrorText>Vui lòng nhập giá trị KPI</ErrorText>
+						)}
 					</div>
 					<div className='col-12'>
 						<FormGroup id='priority' label='Độ ưu tiên'>

@@ -47,7 +47,6 @@ import Dropdown, {
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
-import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
 import { addNewSubtask } from '../TaskDetail/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 
@@ -362,7 +361,6 @@ const TaskListPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.quanLyCongViec.text}>
-			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -668,21 +666,24 @@ const TaskListPage = () => {
 										/>
 									);
 								})}
-								<div className='col-md-12 col-xl-4 col-sm-12'>
-									<Card stretch>
-										<CardBody className='d-flex align-items-center justify-content-center'>
-											<Button
-												color='info'
-												size='lg'
-												isLight
-												className='w-100 h-100'
-												icon='AddCircle'
-												onClick={() => handleOpenEditForm(null)}>
-												Thêm công việc
-											</Button>
-										</CardBody>
-									</Card>
-								</div>
+								{verifyPermissionHOC(
+									<div className='col-md-12 col-xl-4 col-sm-12'>
+										<Card stretch>
+											<CardBody className='d-flex align-items-center justify-content-center'>
+												<Button
+													color='info'
+													size='lg'
+													isLight
+													className='w-100 h-100'
+													icon='AddCircle'
+													onClick={() => handleOpenEditForm(null)}>
+													Thêm công việc
+												</Button>
+											</CardBody>
+										</Card>
+									</div>,
+									['admin', 'manager'],
+								)}
 							</div>
 						)}
 					</div>
@@ -699,6 +700,7 @@ const TaskListPage = () => {
 					onClose={handleCloseEditForm}
 					onSubmit={handleSubmitTaskForm}
 					item={itemEdit}
+					isShowMission={!itemEdit?.id}
 				/>
 				<ModalConfirmCommon
 					show={openConfirmModalStatus}

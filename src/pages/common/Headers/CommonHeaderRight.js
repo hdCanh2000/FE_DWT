@@ -1,20 +1,30 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Button from '../../../components/bootstrap/Button';
 import { HeaderRight } from '../../../layout/Header/Header';
-import OffCanvas, {
-	OffCanvasBody,
-	OffCanvasHeader,
-	OffCanvasTitle,
-} from '../../../components/bootstrap/OffCanvas';
-import Alert from '../../../components/bootstrap/Alert';
+// import OffCanvas, {
+// 	OffCanvasBody,
+// 	OffCanvasHeader,
+// 	OffCanvasTitle,
+// } from '../../../components/bootstrap/OffCanvas';
+// import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { getLangWithKey } from '../../../lang';
 
 // eslint-disable-next-line react/prop-types
 const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 	const { darkModeStatus } = useDarkMode();
+
+	const navigate = useNavigate();
+	const handleLogout = () => {
+		localStorage.removeItem('token');
+		localStorage.removeItem('email');
+		localStorage.removeItem('name');
+		localStorage.removeItem('roles');
+		navigate('/dang-nhap');
+	};
 
 	const styledBtn = {
 		color: darkModeStatus ? 'dark' : 'light',
@@ -24,7 +34,7 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 		className: 'btn-outline-light',
 	};
 
-	const [offcanvasStatus, setOffcanvasStatus] = useState(false);
+	// const [offcanvasStatus, setOffcanvasStatus] = useState(false);
 
 	const { i18n } = useTranslation();
 
@@ -74,14 +84,24 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 						// eslint-disable-next-line react/jsx-props-no-spreading
 						{...styledBtn}
 						icon='Notifications'
-						onClick={() => setOffcanvasStatus(true)}
+						// onClick={() => setOffcanvasStatus(true)}
 						aria-label='Notifications'
 					/>
+				</div>
+				<div className='col-auto'>
+					<Button
+						// eslint-disable-next-line react/jsx-props-no-spreading
+						{...styledBtn}
+						icon='Logout'
+						onClick={handleLogout}
+						aria-label='Logout'>
+						Đăng xuất
+					</Button>
 				</div>
 				{afterChildren}
 			</div>
 
-			<OffCanvas
+			{/* <OffCanvas
 				id='notificationCanvas'
 				titleId='offcanvasExampleLabel'
 				placement='end'
@@ -107,7 +127,7 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 						Escalator will turn off at 6:00 pm.
 					</Alert>
 				</OffCanvasBody>
-			</OffCanvas>
+			</OffCanvas> */}
 		</HeaderRight>
 	);
 };

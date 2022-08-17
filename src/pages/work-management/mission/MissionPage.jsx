@@ -42,15 +42,10 @@ import MissionAlertConfirm from './MissionAlertConfirm';
 import MissionFormModal from './MissionFormModal';
 import Badge from '../../../components/bootstrap/Badge';
 import Progress from '../../../components/bootstrap/Progress';
-import {
-	calcProgressMission,
-	calcProgressTask,
-	calcTotalCurrentKPIOfMission,
-} from '../../../utils/function';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
-import SubHeaderCommonRight from '../../common/SubHeaders/SubHeaderCommonRight';
 import verifyPermission from '../../../HOC/verifyPermissionHOC';
+import TableCommon from '../../common/ComponentCommon/TableCommon';
 
 const Item = ({
 	id,
@@ -164,6 +159,108 @@ const MissionPage = () => {
 		};
 		fetchData();
 	}, []);
+
+	const columns = [
+		{
+			title: 'Tên mục tiêu',
+			id: 'name',
+			key: 'name',
+			type: 'text',
+			render: (item) => (
+				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
+					{item.name}
+				</Link>
+			),
+		},
+		{
+			title: 'Thời gian bắt đầu',
+			id: 'startTime',
+			key: 'startTime',
+			type: 'text',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
+		},
+		{
+			title: 'Thời gian kết thúc',
+			id: 'endTime',
+			key: 'endTime',
+			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			align: 'center',
+		},
+		{
+			title: 'Tiến độ mục tiêu',
+			id: 'progress',
+			key: 'progress',
+			type: 'text',
+			minWidth: 100,
+			render: (item) => (
+				<div className='d-flex align-items-center'>
+					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
+					<Progress
+						className='flex-grow-1'
+						isAutoColor
+						value={item.progress}
+						style={{
+							height: 10,
+							width: '100%',
+						}}
+					/>
+				</div>
+			),
+			align: 'center',
+		},
+		{
+			title: 'Giá trị KPI',
+			id: 'kpiValue',
+			key: 'kpiValue',
+			type: 'number',
+			align: 'center',
+		},
+		{
+			title: 'KPI thực tế',
+			id: 'currentKPI',
+			key: 'currentKPI',
+			type: 'number',
+			align: 'center',
+		},
+		{
+			title: 'KPI đã hoàn thành',
+			id: 'completeKPI',
+			key: 'completeKPI',
+			type: 'number',
+			align: 'center',
+		},
+		{
+			title: '',
+			id: 'action',
+			key: 'action',
+			render: (item) =>
+				verifyPermission(
+					<div className='d-flex align-items-center'>
+						<Button
+							isOutline={!darkModeStatus}
+							color='success'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2'
+							icon='Edit'
+							onClick={() => handleOpenEditForm(item)}>
+							Sửa
+						</Button>
+						<Button
+							isOutline={!darkModeStatus}
+							color='danger'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2'
+							icon='Trash'
+							onClick={() => handleOpenConfirmModal(item)}>
+							Xoá
+						</Button>
+					</div>,
+					['admin'],
+				),
+		},
+	];
+
 	const handleClearValueForm = () => {
 		setItemEdit({
 			name: '',
@@ -312,7 +409,6 @@ const MissionPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.mucTieu.text}>
-			<SubHeaderCommonRight />
 			<Page container='fluid'>
 				{missions?.length > 0 && (
 					<div className='row mt-4 mb-4'>
@@ -498,124 +594,31 @@ const MissionPage = () => {
 											<CardLabel>Danh sách mục tiêu</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									<CardActions>
-										<Button
-											color='info'
-											icon='Plus'
-											tag='button'
-											onClick={() => handleOpenEditForm(null)}>
-											Thêm mục tiêu
-										</Button>
-									</CardActions>
-								</CardHeader>
-								<CardBody className='table-responsive'>
-									<table
-										className='table table-modern mb-0'
-										style={{ fontSize: 14 }}>
-										<thead>
-											<tr>
-												<th align='center'>STT</th>
-												<th align='center'>Tên mục tiêu</th>
-												<th align='center'>Thời gian bắt đầu</th>
-												<th align='center'>Thời gian kết thúc</th>
-												<th align='center'>Tiến độ mục tiêu</th>
-												<th align='center'>Giá trị KPI</th>
-												<th align='center'>Giá trị KPI thực tế</th>
-												<td />
-											</tr>
-										</thead>
-										<tbody>
-											{missions?.map((item, index) => (
-												<tr key={item?.id}>
-													<td>{index + 1}</td>
-													<td className='cursor-pointer'>
-														<Link
-															className='text-underline'
-															to={`${demoPages.mucTieu.path}/${item?.id}`}>
-															{item?.name}
-														</Link>
-													</td>
-													<td align='center'>
-														<div className='d-flex align-items-center'>
-															<span className='text-nowrap'>
-																{item?.startTime}
-															</span>
-														</div>
-													</td>
-													<td align='center'>
-														<div className='d-flex align-items-center'>
-															<span className='text-nowrap'>
-																{item?.endTime}
-															</span>
-														</div>
-													</td>
-													<td align='center'>
-														<div className='d-flex align-items-center'>
-															<div className='flex-shrink-0 me-3'>
-																{calcProgressMission(
-																	item,
-																	item?.tasks,
-																)}
-																%
-															</div>
-															<Progress
-																className='flex-grow-1'
-																isAutoColor
-																value={calcProgressMission(
-																	item,
-																	item?.tasks,
-																)}
-																style={{
-																	height: 10,
-																}}
-															/>
-														</div>
-													</td>
-													<td align='center'>{item?.kpiValue}</td>
-													<td align='center'>
-														{calcTotalCurrentKPIOfMission(
-															item,
-															item?.tasks,
-														)}
-													</td>
-													<td>
-														<Button
-															isOutline={!darkModeStatus}
-															color='success'
-															isLight={darkModeStatus}
-															className='text-nowrap mx-2'
-															icon='Edit'
-															onClick={() =>
-																handleOpenEditForm(item)
-															}>
-															Sửa
-														</Button>
-														<Button
-															isOutline={!darkModeStatus}
-															color='danger'
-															isLight={darkModeStatus}
-															className='text-nowrap mx-2'
-															icon='Trash'
-															onClick={() =>
-																handleOpenConfirmModal(item)
-															}>
-															Xoá
-														</Button>
-													</td>
-												</tr>
-											))}
-										</tbody>
-									</table>
-									{!missions?.length && (
-										<Alert
-											color='warning'
-											isLight
-											icon='Report'
-											className='mt-3'>
-											Không có mục tiêu!
-										</Alert>
+									{verifyPermission(
+										<CardActions>
+											<Button
+												color='info'
+												icon='Plus'
+												tag='button'
+												onClick={() => handleOpenEditForm(null)}>
+												Thêm mục tiêu
+											</Button>
+										</CardActions>,
+										['admin'],
 									)}
-								</CardBody>
+								</CardHeader>
+								<div className='p-4'>
+									<TableCommon
+										className='table table-modern mb-0'
+										columns={columns}
+										data={missions}
+									/>
+								</div>
+								{!missions?.length && (
+									<Alert color='warning' isLight icon='Report' className='mt-3'>
+										Không có mục tiêu!
+									</Alert>
+								)}
 							</Card>
 						</div>
 					</div>
@@ -635,7 +638,7 @@ const MissionPage = () => {
 								name={item?.name}
 								teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
 								dueDate={`${item?.deadlineDate}`}
-								percent={calcProgressTask(item) || 0}
+								percent={item.progress || 0}
 								data-tour='project-item'
 							/>
 						);

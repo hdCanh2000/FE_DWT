@@ -12,74 +12,74 @@ const headers = [
 	// quan ly muc tieu
 	{
 		path: demoPages.mucTieu.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// chi tiet muc tieu
 	{
 		path: `/${demoPages.mucTieu.path}/:id`,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 
 	// chi tiet cong viec
 	{
 		path: `/${demoPages.quanLyCongViec.path}/:id`,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// danh sách đầu việc
 	{
 		path: demoPages.dauViec.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// chi tiết đầu việc -step
 	{
 		path: `/${demoPages.dauViec.path}/:id`,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 
 	// danh sach cong viec
 	{
 		path: demoPages.quanLyCongViec.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 
 	// quản lý phòng ban
 	{
 		path: demoPages.phongBan.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	{
 		path: `${demoPages.phongBan.path}/:id`,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// quản lý nhân viên
 	{
 		path: demoPages.nhanVien.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	{
 		path: `${demoPages.nhanVien.path}/:id`,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// công việc phòng ban chi tiết - cấu hình
 	{
 		path: demoPages.cauHinh.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// công việc phòng ban chi tiết - báo cáo
 	{
 		path: demoPages.baoCao.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	{
