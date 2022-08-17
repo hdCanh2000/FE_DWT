@@ -36,7 +36,7 @@ const Login = () => {
 			localStorage.setItem('email', result.email);
 			localStorage.setItem('name', result.name);
 			localStorage.setItem('roles', JSON.stringify(result.roles));
-			navigate('/muc-tieu');
+			navigate('/');
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 		}

@@ -12,7 +12,9 @@ const DashboardHeader = () => {
 
 	return (
 		<Header>
-			<HeaderLeft>{/* <Search /> */}</HeaderLeft>
+			<HeaderLeft>
+				<span> </span>
+			</HeaderLeft>
 			{/* <CommonHeaderRight afterChildren={<CommonHeaderChat />} /> */}
 			<CommonHeaderRight
 				afterChildren={
