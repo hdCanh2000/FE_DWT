@@ -32,11 +32,13 @@ import { FORMAT_TASK_STATUS, formatColorStatus, formatColorPriority } from '../.
 import MissionFormModal from '../work-management/mission/MissionFormModal';
 import Alert from '../../components/bootstrap/Alert';
 import {
+	getAllSubTasksByStatus,
 	getAllSubTasksByUser,
 	getAllTasksByDepartment,
 	getAllTasksByStatus,
 	getReportMisson,
 	getReportSubTask,
+	getReportSubTaskDepartment,
 	getReportTask,
 } from './services';
 import MissionChartReport from './admin/MissionChartReport';
@@ -49,52 +51,7 @@ import Dropdown, {
 import TaskFormModal from '../work-management/mission/TaskFormModal';
 import TaskDetailForm from '../work-management/TaskDetail/TaskDetailForm/TaskDetailForm';
 import { addNewSubtask, updateSubtask } from '../work-management/TaskDetail/services';
-
-// eslint-disable-next-line react/prop-types
-const TaskSolved = ({ id, name, to, departmentUser, value }) => {
-	return (
-		<div className='col-12' key={id}>
-			<div className='row g-2'>
-				<div className='col-8'>
-					<div className='flex-grow-1 ms-3 d-flex justify-content-between align-items-center'>
-						<div>
-							<Link to={to} className='fs-5'>
-								{name}
-							</Link>
-							<div className='text-muted mt-n1'>
-								<small style={{ fontSize: 13 }}>{departmentUser}</small>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div className='col-4'>
-					<div className='d-flex align-items-center'>
-						<div className='d-flex flex-column align-items-center w-75 me-3'>
-							<span className='me-3'>{value}%</span>
-							<Progress
-								className='flex-grow-1'
-								isAutoColor
-								value={value}
-								style={{
-									height: 10,
-									width: '100%',
-								}}
-							/>
-						</div>
-						<Button
-							color='info'
-							isLight
-							icon='Check2All'
-							size='lg'
-							className='text-nowrap'>
-							Duyệt
-						</Button>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-};
+import ModalConfirmCommon from '../common/ComponentCommon/ModalConfirmCommon';
 
 const DashboardPage = () => {
 	const { darkModeStatus, themeStatus } = useDarkMode();
@@ -121,12 +78,23 @@ const DashboardPage = () => {
 
 	// subtask
 	const [subtasks, setSubTasks] = useState([]);
+	const [subtasksSolved, setSubTasksSolved] = useState([]);
 	const [subTaskReport, setSubTaskReport] = useState({});
+	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState({});
 	const [editModalStatusSubTask, setEditModalStatusSubTask] = useState(false);
 	const [subtaskEdit, setSubTaskEdit] = useState({});
 
 	// select department
 	const [departmentSelect, setDepartmentSelect] = useState(1);
+	// confirm
+	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+		title: '',
+		subTitle: '',
+		status: null,
+		type: 1,
+		isShowNote: false,
+	});
 
 	const columns = [
 		{
@@ -351,7 +319,7 @@ const DashboardPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
+				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -477,15 +445,6 @@ const DashboardPage = () => {
 		fetchData();
 	}, []);
 
-	const memoizedCallbackMissionReport = useCallback(() => {
-		const fetchDataReport = async () => {
-			const response = await getReportMisson();
-			const result = await response.data;
-			setMissionReport(result);
-		};
-		fetchDataReport();
-	}, []);
-
 	// get all misisons
 	useEffect(() => {
 		const fetchData = async () => {
@@ -493,40 +452,50 @@ const DashboardPage = () => {
 			const result = await response.data;
 			setMissions(result);
 		};
+		const fetchDataReport = async () => {
+			const response = await getReportMisson();
+			const result = await response.data;
+			setMissionReport(result);
+		};
+		fetchDataReport();
 		fetchData();
-		memoizedCallbackMissionReport();
-	}, [memoizedCallbackMissionReport]);
+	}, []);
 
+	const fetchDataTaskSolved = async () => {
+		const response = await getAllTasksByStatus(3);
+		const result = await response.data;
+		setTasksSolved(result);
+	};
 	// task resolved
 	useEffect(() => {
-		const fetchDataTaskSolved = async () => {
-			const response = await getAllTasksByStatus(3);
-			const result = await response.data;
-			setTasksSolved(result);
-		};
 		fetchDataTaskSolved();
 	}, []);
 
-	const memoizedCallbackTaskReport = useCallback(() => {
+	// task by department
+	useEffect(() => {
+		const fetchDataTaskByDepartment = async () => {
+			const response = await getAllTasksByDepartment(departmentSelect, { type: 2 });
+			const result = await response.data;
+			setTasks(result);
+		};
 		const fetchDataReportTaskByDepartment = async () => {
 			const response = await getReportTask({ departmentId: departmentSelect });
 			const result = await response.data;
 			setTaskReport(result);
 		};
 		fetchDataReportTaskByDepartment();
+		fetchDataTaskByDepartment();
 	}, [departmentSelect]);
 
-	// task by department
+	const fetchDataSubTaskSolved = async () => {
+		const response = await getAllSubTasksByStatus(3);
+		const result = await response.data;
+		setSubTasksSolved(result);
+	};
+	// task resolved
 	useEffect(() => {
-		const fetchDataTaskByDepartment = async () => {
-			const response = await getAllTasksByDepartment(departmentSelect);
-			const result = await response.data;
-			setTasks(result);
-		};
-		fetchDataTaskByDepartment();
-		memoizedCallbackTaskReport();
-	}, [departmentSelect, memoizedCallbackTaskReport]);
-
+		fetchDataSubTaskSolved();
+	}, []);
 	// subtask
 	useEffect(() => {
 		const fetchDataSubtasks = async () => {
@@ -539,8 +508,14 @@ const DashboardPage = () => {
 			const result = await response.data;
 			setSubTaskReport(result);
 		};
+		const fetchDataSubtasksReportDepartment = async () => {
+			const response = await getReportSubTaskDepartment();
+			const result = await response.data;
+			setSubTaskReportDepartment(result);
+		};
 		fetchDataSubtasks();
 		fetchDataSubtasksReport();
+		fetchDataSubtasksReportDepartment();
 	}, []);
 
 	const handleShowToast = (title, content) => {
@@ -685,6 +660,74 @@ const DashboardPage = () => {
 		}
 	};
 
+	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+
+	const handleOpenConfirmStatusTask = (item, nextStatus, type = 1, isShowNote = false) => {
+		setOpenConfirmModalStatus(true);
+		setItemEdit({ ...item });
+		setInfoConfirmModalStatus({
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			subTitle: item?.name,
+			status: nextStatus,
+			type,
+			isShowNote,
+		});
+	};
+
+	const handleCloseConfirmStatusTask = () => {
+		setOpenConfirmModalStatus(false);
+		setItemEdit(null);
+	};
+
+	const handleUpdateStatus = async (status, data) => {
+		try {
+			const newData = { ...data };
+			newData.status = status;
+			const response = await updateTaskByID(newData);
+			const result = await response.data;
+			setTasks(tasks.map((item) => (item.id === data.id ? { ...result } : item)));
+			handleCloseEditForm();
+			fetchDataTaskSolved();
+			handleCloseConfirmStatusTask();
+			handleShowToast(
+				`Cập nhật công việc!`,
+				`Công việc ${result.name} được cập nhật thành công!`,
+			);
+		} catch (error) {
+			setTasks(tasks);
+			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+		}
+	};
+
+	// ------------			Modal confirm khi thay đổi trạng thái subtask		----------------------
+	// ------------			Moal Confirm when change status task		----------------------
+
+	// change status
+	const handleUpdateStatusSubtask = async (status, data) => {
+		try {
+			const subtaskClone = { ...data };
+			subtaskClone.status = status;
+			const respose = await updateSubtask(subtaskClone);
+			const result = await respose.data;
+			fetchDataSubTaskSolved();
+			setSubTasks(subtasks.map((item) => (item.id === data.id ? { ...result } : item)));
+			handleCloseEditForm();
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Cập nhật trạng thái đầu việc ${result.name} thành công!`,
+			);
+			handleCloseConfirmStatusTask();
+		} catch (error) {
+			handleShowToast(
+				`Cập nhật trạng thái!`,
+				`Thao tác không thành công. Xin vui lòng thử lại!`,
+				'Error',
+				'danger',
+			);
+		}
+	};
+
 	return (
 		<PageWrapper title={dashboardMenu.dashboard.text}>
 			<Page container='fluid overflow-hidden'>
@@ -784,7 +827,7 @@ const DashboardPage = () => {
 								<CardHeader className='py-0'>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
-											Thống kê đầu việc
+											Thống kê đầu việc của phòng
 										</CardTitle>
 										<CardSubTitle tag='h5' className='h6'>
 											Báo cáo
@@ -794,18 +837,199 @@ const DashboardPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={subTaskReport} />
+											<TaskChartReport data={subTaskReportDepartment} />
 										</div>
 									</div>
 								</CardBody>
 							</Card>
 						</div>,
-						['manager', 'user'],
+						['manager'],
+					)}
+				</div>
+				<div className='row mt-4'>
+					{verifyPermissionHOC(
+						<>
+							<div className='col-xxl-6'>
+								<Card className='mb-0'>
+									<CardHeader className='py-0'>
+										<CardLabel icon='ReceiptLong'>
+											<CardTitle tag='h4' className='h5'>
+												Thống kê đầu việc cá nhân
+											</CardTitle>
+											<CardSubTitle tag='h5' className='h6'>
+												Báo cáo
+											</CardSubTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody className='py-0'>
+										<div className='row'>
+											<div className='col-xl-12 col-xxl-12'>
+												<TaskChartReport data={subTaskReport} />
+											</div>
+										</div>
+									</CardBody>
+								</Card>
+							</div>
+							{verifyPermissionHOC(
+								<div className='col-xxl-6'>
+									<Card className='h-100'>
+										<CardHeader>
+											<CardLabel icon='ContactSupport' iconColor='secondary'>
+												<CardTitle tag='h4' className='h5'>
+													Đầu việc chờ duyệt
+												</CardTitle>
+												<CardSubTitle tag='h5' className='h6'>
+													Chờ duyệt
+												</CardSubTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody>
+											<div className='row g-3'>
+												{subtasksSolved.map((task) => (
+													<div className='col-12' key={task.id}>
+														<div className='row g-2'>
+															<div className='col-8'>
+																<div className='flex-grow-1 ms-3 d-flex justify-content-between align-items-center'>
+																	<div>
+																		<Link
+																			to={`${demoPages.dauViec.path}/${task.id}`}
+																			className='fs-5'>
+																			{task.name}
+																		</Link>
+																		<div className='text-muted mt-n1'>
+																			<small
+																				style={{
+																					fontSize: 13,
+																				}}>{`${task.departments[0]?.name} - ${task.users[0]?.name}`}</small>
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<div className='col-4'>
+																<div className='d-flex align-items-center'>
+																	<div className='d-flex flex-column align-items-center w-75 me-3'>
+																		<span className='me-3'>
+																			{task.progress}%
+																		</span>
+																		<Progress
+																			className='flex-grow-1'
+																			isAutoColor
+																			value={task.progress}
+																			style={{
+																				height: 10,
+																				width: '100%',
+																			}}
+																		/>
+																	</div>
+																	<Button
+																		color='info'
+																		isLight
+																		icon='Check2All'
+																		size='lg'
+																		className='text-nowrap'
+																		onClick={() =>
+																			handleOpenConfirmStatusTask(
+																				task,
+																				4,
+																				2,
+																			)
+																		}>
+																		Duyệt
+																	</Button>
+																</div>
+															</div>
+														</div>
+													</div>
+												))}
+											</div>
+										</CardBody>
+									</Card>
+								</div>,
+								['manager'],
+							)}
+							{verifyPermissionHOC(
+								<div className='col-xxl-6'>
+									<Card className='h-100'>
+										<CardHeader>
+											<CardLabel icon='ContactSupport' iconColor='secondary'>
+												<CardTitle tag='h4' className='h5'>
+													Công việc chờ duyệt
+												</CardTitle>
+												<CardSubTitle tag='h5' className='h6'>
+													Chờ duyệt
+												</CardSubTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody>
+											<div className='row g-3'>
+												{tasksSolved.map((task) => (
+													<div className='col-12' key={task.id}>
+														<div className='row g-2'>
+															<div className='col-8'>
+																<div className='flex-grow-1 ms-3 d-flex justify-content-between align-items-center'>
+																	<div>
+																		<Link
+																			to={`${demoPages.quanLyCongViec.path}/${task.id}`}
+																			className='fs-5'>
+																			{task.name}
+																		</Link>
+																		<div className='text-muted mt-n1'>
+																			<small
+																				style={{
+																					fontSize: 13,
+																				}}>{`${task.departments[0]?.name} - ${task.users[0]?.name}`}</small>
+																		</div>
+																	</div>
+																</div>
+															</div>
+															<div className='col-4'>
+																<div className='d-flex align-items-center'>
+																	<div className='d-flex flex-column align-items-center w-75 me-3'>
+																		<span className='me-3'>
+																			{task.progress}%
+																		</span>
+																		<Progress
+																			className='flex-grow-1'
+																			isAutoColor
+																			value={task.progress}
+																			style={{
+																				height: 10,
+																				width: '100%',
+																			}}
+																		/>
+																	</div>
+																	<Button
+																		color='info'
+																		isLight
+																		icon='Check2All'
+																		size='lg'
+																		className='text-nowrap'
+																		onClick={() =>
+																			handleOpenConfirmStatusTask(
+																				task,
+																				4,
+																			)
+																		}>
+																		Duyệt
+																	</Button>
+																</div>
+															</div>
+														</div>
+													</div>
+												))}
+											</div>
+										</CardBody>
+									</Card>
+								</div>,
+								['admin'],
+							)}
+						</>,
+						['manager', 'admin', 'user'],
 					)}
 				</div>
 				{verifyPermissionHOC(
 					<div className='row mt-4'>
-						<div className='col-xxl-7'>
+						<div className='col-xxl-12'>
 							<Card className='h-100'>
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
@@ -840,35 +1064,6 @@ const DashboardPage = () => {
 								)}
 							</Card>
 						</div>
-						<div className='col-xxl-5'>
-							<Card className='h-100'>
-								<CardHeader>
-									<CardLabel icon='ContactSupport' iconColor='secondary'>
-										<CardTitle tag='h4' className='h5'>
-											Công việc chờ duyệt
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Chờ duyệt
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody>
-									<div className='row g-3'>
-										{tasksSolved.map((task) => (
-											<TaskSolved
-												key={task.id}
-												id={task.id}
-												name={task.name}
-												to={`${demoPages.quanLyCongViec.path}/${task.id}`}
-												color='warning'
-												departmentUser={`${task.departments[0]?.name} - ${task.users[0]?.name}`}
-												value={task.progress}
-											/>
-										))}
-									</div>
-								</CardBody>
-							</Card>
-						</div>
 					</div>,
 					['admin'],
 				)}
@@ -878,7 +1073,7 @@ const DashboardPage = () => {
 							<CardHeader>
 								<CardLabel icon='Task' iconColor='danger'>
 									<CardTitle>
-										<CardLabel>Danh sách công việc theo phòng ban</CardLabel>
+										<CardLabel>Danh sách công việc đang thực hiện</CardLabel>
 									</CardTitle>
 								</CardLabel>
 								{verifyPermissionHOC(
@@ -890,33 +1085,37 @@ const DashboardPage = () => {
 											onClick={() => handleOpenEditTaskForm(null)}>
 											Thêm công việc
 										</Button>
-										<Dropdown>
-											<DropdownToggle hasIcon={false}>
-												<Button
-													color='primary'
-													icon='Circle'
-													className='text-nowrap'>
-													{
-														dataDepartments.filter(
-															(item) => item.id === departmentSelect,
-														)[0]?.name
-													}
-												</Button>
-											</DropdownToggle>
-											<DropdownMenu>
-												{dataDepartments.map((item) => (
-													<DropdownItem
-														key={item?.id}
-														onClick={() =>
-															setDepartmentSelect(item.id)
-														}>
-														<div>{item?.name}</div>
-													</DropdownItem>
-												))}
-											</DropdownMenu>
-										</Dropdown>
+										{verifyPermissionHOC(
+											<Dropdown>
+												<DropdownToggle hasIcon={false}>
+													<Button
+														color='primary'
+														icon='Circle'
+														className='text-nowrap'>
+														{
+															dataDepartments.filter(
+																(item) =>
+																	item.id === departmentSelect,
+															)[0]?.name
+														}
+													</Button>
+												</DropdownToggle>
+												<DropdownMenu>
+													{dataDepartments.map((item) => (
+														<DropdownItem
+															key={item?.id}
+															onClick={() =>
+																setDepartmentSelect(item.id)
+															}>
+															<div>{item?.name}</div>
+														</DropdownItem>
+													))}
+												</DropdownMenu>
+											</Dropdown>,
+											['admin'],
+										)}
 									</CardActions>,
-									['admin'],
+									['admin', 'manager'],
 								)}
 							</CardHeader>
 							<div className='p-4'>
@@ -989,6 +1188,22 @@ const DashboardPage = () => {
 					item={subtaskEdit}
 					onClose={handleCloseEditSubtaskForm}
 					onSubmit={handleSubmitSubTaskForm}
+					isShowTask={!subtaskEdit?.id}
+				/>
+				<ModalConfirmCommon
+					show={openConfirmModalStatus}
+					onClose={handleCloseConfirmStatusTask}
+					// onSubmit={handleUpdateStatus}
+					onSubmit={
+						infoConfirmModalStatus.type === 1
+							? handleUpdateStatus
+							: handleUpdateStatusSubtask
+					}
+					item={itemEdit}
+					isShowNote={infoConfirmModalStatus.isShowNote}
+					title={infoConfirmModalStatus.title}
+					subTitle={infoConfirmModalStatus.subTitle}
+					status={infoConfirmModalStatus.status}
 				/>
 			</Page>
 		</PageWrapper>
