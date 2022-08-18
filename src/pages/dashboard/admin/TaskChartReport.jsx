@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Chart from '../../../components/extras/Chart';
@@ -60,7 +60,7 @@ const TaskChartReport = ({ data }) => {
 	return (
 		<Card>
 			<CardBody className='pb-4'>
-				<div className='row align-items-center'>
+				<div className='row align-items-start'>
 					<div className='col-xl-8 col-md-12'>
 						<Chart
 							series={state.series}
@@ -73,7 +73,7 @@ const TaskChartReport = ({ data }) => {
 						<div className='row'>
 							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 								<div className='d-flex align-items-center justify-content-start'>
-									<div className='p-4' style={{ background: '#46BCAA' }} />
+									<div className='p-3' style={{ background: '#46BCAA' }} />
 									<div style={{ marginLeft: '1rem' }} className='fs-5'>
 										Đã hoàn thành:{' '}
 										<span className='fw-bold fs-4 text-success'>
@@ -85,7 +85,7 @@ const TaskChartReport = ({ data }) => {
 							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 								<div className='d-flex align-items-center justify-content-start'>
 									<div
-										className='p-4'
+										className='p-3'
 										style={{ background: 'rgb(77, 105, 250)' }}
 									/>
 									<div style={{ marginLeft: '1rem' }} className='fs-5'>
@@ -99,7 +99,7 @@ const TaskChartReport = ({ data }) => {
 							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 								<div className='d-flex align-items-center justify-content-start'>
 									<div
-										className='p-4'
+										className='p-3'
 										style={{ background: 'rgb(108, 93, 211)' }}
 									/>
 									<div style={{ marginLeft: '1rem' }} className='fs-5'>
@@ -112,7 +112,7 @@ const TaskChartReport = ({ data }) => {
 							</div>
 							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 								<div className='d-flex align-items-center justify-content-start'>
-									<div className='p-4' style={{ background: '#FFA2C0' }} />
+									<div className='p-3' style={{ background: '#FFA2C0' }} />
 									<div style={{ marginLeft: '1rem' }} className='fs-5'>
 										Từ chối:{' '}
 										<span className='fw-bold fs-4 text-secondary'>
@@ -124,7 +124,7 @@ const TaskChartReport = ({ data }) => {
 							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 								<div className='d-flex align-items-center justify-content-start'>
 									<div
-										className='p-4'
+										className='p-3'
 										style={{ background: 'rgb(255, 207, 82)' }}
 									/>
 									<div style={{ marginLeft: '1rem' }} className='fs-5'>
@@ -151,4 +151,4 @@ TaskChartReport.defaultProps = {
 	data: { inprogress: 0, completed: 0, solved: 2, rejected: 0, onhold: 0 },
 };
 
-export default TaskChartReport;
+export default memo(TaskChartReport);

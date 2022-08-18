@@ -33,7 +33,8 @@ import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon'
 import { addNewSubtask, updateSubtask } from '../TaskDetail/services';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import Toasts from '../../../components/bootstrap/Toasts';
-import { getAllSubTasks } from './services';
+import { deleteSubtaskById, getAllSubTasks } from './services';
+import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
 
 const SubTaskPage = () => {
 	const { themeStatus, darkModeStatus } = useDarkMode();
@@ -41,6 +42,9 @@ const SubTaskPage = () => {
 	const [subtasks, setSubtasks] = useState([]);
 	const [itemEdit, setItemEdit] = useState({});
 	const [editModalStatus, setEditModalStatus] = useState(false);
+	const [openConfirm, set0penConfirm] = React.useState(false);
+	const [deletes, setDeletes] = React.useState({});
+
 	// const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
@@ -81,6 +85,31 @@ const SubTaskPage = () => {
 				autoDismiss: true,
 			},
 		);
+	};
+
+	// ------------			Modal confirm khi xoá		----------------------
+	// ------------			Moal Confirm when delete task		----------------------
+	const handleOpenConfirm = (item) => {
+		setDeletes({
+			id: item.id,
+			name: item.name,
+		});
+		set0penConfirm(true);
+	};
+
+	const handleCloseComfirm = () => {
+		setDeletes({});
+		set0penConfirm(false);
+	};
+
+	// delete subtask
+	const handleDelete = async (id) => {
+		try {
+			await deleteSubtaskById(id);
+			handleShowToast(`Xoá đầu việc`, `Xoá đầu việc thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá đầu việc`, `Xoá đầu việc thất bại!`);
+		}
 	};
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
@@ -199,7 +228,7 @@ const SubTaskPage = () => {
 										<tr>
 											<th className='text-center'>STT</th>
 											<th>Tên đầu việc</th>
-											<th className='text-center'>Nhân viên phụ trách</th>
+											<th>Nhân viên phụ trách</th>
 											<th className='text-center'>Hạn hoàn thành</th>
 											<th className='text-center'>Điểm KPI</th>
 											<th className='text-center'>Độ ưu tiên</th>
@@ -220,9 +249,7 @@ const SubTaskPage = () => {
 															{item?.name}
 														</Link>
 													</td>
-													<td className='text-center'>
-														{item?.users[0]?.name}
-													</td>
+													<td>{item?.users[0]?.name}</td>
 													<td align='center'>
 														{moment(`${item.deadlineDate}`).format(
 															'DD-MM-YYYY',
@@ -250,7 +277,7 @@ const SubTaskPage = () => {
 															</span>
 														</div>
 													</td>
-													<td>
+													<td className='text-center'>
 														<Dropdown>
 															<DropdownToggle hasIcon={false}>
 																<Button
@@ -292,8 +319,8 @@ const SubTaskPage = () => {
 															</DropdownMenu>
 														</Dropdown>
 													</td>
-													<td>
-														<div className='d-flex align-items-center flex-column'>
+													<td className='text-center'>
+														<div className='d-flex align-items-center justify-content-center flex-column'>
 															<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 															<Progress
 																className='flex-grow-1'
@@ -306,7 +333,7 @@ const SubTaskPage = () => {
 															/>
 														</div>
 													</td>
-													<td>
+													<td className='text-center'>
 														<Button
 															isOutline={!darkModeStatus}
 															color='success'
@@ -319,6 +346,14 @@ const SubTaskPage = () => {
 																item.status === 3
 															}
 															onClick={() => handleOpenEditForm(item)}
+														/>
+														<Button
+															isOutline={!darkModeStatus}
+															color='danger'
+															isLight={darkModeStatus}
+															className='text-nowrap mx-2'
+															icon='Trash'
+															onClick={() => handleOpenConfirm(item)}
 														/>
 													</td>
 												</tr>
@@ -351,6 +386,13 @@ const SubTaskPage = () => {
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}
+				/>
+				<ComfirmSubtask
+					openModal={openConfirm}
+					onCloseModal={handleCloseComfirm}
+					onConfirm={() => handleDelete(deletes)}
+					title='Xoá Đầu việc'
+					content={`Xác nhận xoá đầu việc <strong>${deletes?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>

@@ -12,7 +12,7 @@ const getLatestTasks = () => {
 	// lấy danh sách các task mới nhất
 	return axiosClient({
 		method: 'GET',
-		url: '/tasks?_expand=user&_expand=department&_sort=id&_order=desc&_limit=6',
+		url: '/tasks?_order=desc&_limit=6',
 	});
 };
 

@@ -22,7 +22,8 @@ import Card, {
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
-import { addNewTask, deleteTaskById, getAllTasks, updateTaskByID } from '../mission/services';
+import { addNewTask, deleteTaskById, getAllDepartments, updateTaskByID } from '../mission/services';
+import { getAllTasksByDepartment } from './services';
 import useDarkMode from '../../../hooks/useDarkMode';
 import {
 	formatColorPriority,
@@ -138,6 +139,8 @@ const Item = ({
 };
 
 const TaskListPage = () => {
+	// departments
+	const [dataDepartments, setDataDepartments] = useState([]);
 	const [tasks, setTasks] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
@@ -147,6 +150,8 @@ const TaskListPage = () => {
 	// handle expand subtask
 	const [editModalStatusExpand, setEditModalStatusExpand] = useState(false);
 	const [taskExpandId, setTaskExpandId] = useState('');
+
+	const [departmentSelect, setDepartmentSelect] = useState(1);
 
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
@@ -162,6 +167,34 @@ const TaskListPage = () => {
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
+
+	// all department
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await getAllDepartments();
+			const result = await response.data;
+			setDataDepartments(
+				result
+					.reverse()
+					.concat({
+						id: 1,
+						name: 'Tất cả',
+					})
+					.reverse(),
+			);
+		};
+		fetchData();
+	}, []);
+
+	const fetchDataAllTasks = useCallback(async () => {
+		const response = await getAllTasksByDepartment(departmentSelect);
+		const result = await response.data;
+		setTasks(result);
+	}, [departmentSelect]);
+
+	useEffect(() => {
+		fetchDataAllTasks();
+	}, [departmentSelect, fetchDataAllTasks]);
 
 	// Handle
 	const handleOpenModalExpand = (taskId) => {
@@ -236,16 +269,6 @@ const TaskListPage = () => {
 			},
 		);
 	};
-
-	async function fetchDataAllTasks() {
-		const response = await getAllTasks();
-		const result = await response.data;
-		setTasks(result);
-	}
-
-	useEffect(() => {
-		fetchDataAllTasks();
-	}, []);
 
 	const handleDeleteItem = async (taskId) => {
 		try {
@@ -397,7 +420,7 @@ const TaskListPage = () => {
 										</CardTitle>
 									</CardLabel>
 									{verifyPermissionHOC(
-										<CardActions>
+										<CardActions className='d-flex align-items-center'>
 											<Button
 												color='info'
 												icon='Plus'
@@ -405,6 +428,36 @@ const TaskListPage = () => {
 												onClick={() => handleOpenEditForm(null)}>
 												Thêm công việc
 											</Button>
+											{verifyPermissionHOC(
+												<Dropdown>
+													<DropdownToggle hasIcon={false}>
+														<Button
+															color='primary'
+															icon='Circle'
+															className='text-nowrap'>
+															{
+																dataDepartments.filter(
+																	(item) =>
+																		item.id ===
+																		departmentSelect,
+																)[0]?.name
+															}
+														</Button>
+													</DropdownToggle>
+													<DropdownMenu>
+														{dataDepartments?.map((item) => (
+															<DropdownItem
+																key={item?.id}
+																onClick={() =>
+																	setDepartmentSelect(item.id)
+																}>
+																<div>{item?.name}</div>
+															</DropdownItem>
+														))}
+													</DropdownMenu>
+												</Dropdown>,
+												['admin'],
+											)}
 										</CardActions>,
 										['admin', 'manager'],
 									)}
@@ -418,8 +471,8 @@ const TaskListPage = () => {
 												<th className='text-center'>STT</th>
 												<th>Tên công việc</th>
 												<th className='text-center'>Số đầu việc</th>
-												<th className='text-center'>Phòng ban</th>
-												<th className='text-center'>Nhân viên</th>
+												<th>Phòng ban</th>
+												{/* <th className='text-center'>Nhân viên</th> */}
 												<th className='text-center'>Hạn hoàn thành</th>
 												<th className='text-center'>Giá trị KPI</th>
 												<th className='text-center'>KPI thực tế</th>
@@ -463,12 +516,10 @@ const TaskListPage = () => {
 																</span>
 															</Button>
 														</td>
-														<td className='text-center'>
-															{item?.departments[0]?.name}
-														</td>
-														<td className='text-center'>
+														<td>{item?.departments[0]?.name}</td>
+														{/* <td className='text-center'>
 															{item?.users[0]?.name}
-														</td>
+														</td> */}
 														<td align='center'>
 															{moment(`${item.deadlineDate}`).format(
 																'DD-MM-YYYY',
