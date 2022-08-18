@@ -54,7 +54,6 @@ import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
-import { calcProgressSubtask } from '../../../utils/function';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import Alert from '../../../components/bootstrap/Alert';
 import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
@@ -191,11 +190,11 @@ const TaskDetailPage = () => {
 			minWidth: 100,
 			render: (item) => (
 				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${calcProgressSubtask(item)}%`}</div>
+					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 					<Progress
 						className='flex-grow-1'
 						isAutoColor
-						value={calcProgressSubtask(item)}
+						value={item.progress}
 						style={{
 							height: 10,
 							width: '100%',
@@ -348,11 +347,11 @@ const TaskDetailPage = () => {
 			minWidth: 100,
 			render: (item) => (
 				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${calcProgressSubtask(item)}%`}</div>
+					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 					<Progress
 						className='flex-grow-1'
 						isAutoColor
-						value={calcProgressSubtask(item)}
+						value={item.progress}
 						style={{
 							height: 10,
 							width: '100%',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -116,4 +116,4 @@ TableCommon.defaultProps = {
 	columns: [],
 };
 
-export default TableCommon;
+export default memo(TableCommon);

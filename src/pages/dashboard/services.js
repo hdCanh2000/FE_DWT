@@ -8,6 +8,13 @@ const getAllTasks = (params) => {
 	});
 };
 
+const getAllTasksByDepartment = (departmentId) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/tasks/department/${departmentId}`,
+	});
+};
+
 const getAllTasksByStatus = (status) => {
 	return axiosClient({
 		method: 'GET',
@@ -49,6 +56,7 @@ const getReportSubTask = (params) => {
 export {
 	getAllTasks,
 	getAllTasksByStatus,
+	getAllTasksByDepartment,
 	getReportMisson,
 	getReportTask,
 	getAllSubTasksByUser,

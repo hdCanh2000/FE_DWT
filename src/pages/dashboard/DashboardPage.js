@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import moment from 'moment';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import { useToasts } from 'react-toast-notifications';
 import { dashboardMenu, demoPages } from '../../menu';
@@ -16,7 +16,6 @@ import Card, {
 	CardSubTitle,
 	CardTitle,
 } from '../../components/bootstrap/Card';
-import Chart from '../../components/extras/Chart';
 import useDarkMode from '../../hooks/useDarkMode';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -34,7 +33,7 @@ import MissionFormModal from '../work-management/mission/MissionFormModal';
 import Alert from '../../components/bootstrap/Alert';
 import {
 	getAllSubTasksByUser,
-	getAllTasks,
+	getAllTasksByDepartment,
 	getAllTasksByStatus,
 	getReportMisson,
 	getReportSubTask,
@@ -52,52 +51,11 @@ import TaskDetailForm from '../work-management/TaskDetail/TaskDetailForm/TaskDet
 import { addNewSubtask, updateSubtask } from '../work-management/TaskDetail/services';
 
 // eslint-disable-next-line react/prop-types
-const TaskSolved = ({ id, name, to, departmentUser, value, color }) => {
-	const [state] = useState({
-		series: [value],
-		options: {
-			chart: {
-				type: 'radialBar',
-				width: 50,
-				height: 50,
-				sparkline: {
-					enabled: true,
-				},
-			},
-			dataLabels: {
-				enabled: false,
-			},
-			plotOptions: {
-				radialBar: {
-					hollow: {
-						margin: 0,
-						size: '50%',
-					},
-					track: {
-						margin: 0,
-					},
-					dataLabels: {
-						show: false,
-					},
-				},
-			},
-			stroke: {
-				lineCap: 'round',
-			},
-			colors: [
-				(color === 'primary' && process.env.REACT_APP_PRIMARY_COLOR) ||
-					(color === 'secondary' && process.env.REACT_APP_SECONDARY_COLOR) ||
-					(color === 'success' && process.env.REACT_APP_SUCCESS_COLOR) ||
-					(color === 'info' && process.env.REACT_APP_INFO_COLOR) ||
-					(color === 'warning' && process.env.REACT_APP_WARNING_COLOR) ||
-					(color === 'danger' && process.env.REACT_APP_DANGER_COLOR),
-			],
-		},
-	});
+const TaskSolved = ({ id, name, to, departmentUser, value }) => {
 	return (
 		<div className='col-12' key={id}>
 			<div className='row g-2'>
-				<div className='col d-flex'>
+				<div className='col-8'>
 					<div className='flex-grow-1 ms-3 d-flex justify-content-between align-items-center'>
 						<div>
 							<Link to={to} className='fs-5'>
@@ -109,18 +67,26 @@ const TaskSolved = ({ id, name, to, departmentUser, value, color }) => {
 						</div>
 					</div>
 				</div>
-				<div className='col-auto'>
+				<div className='col-4'>
 					<div className='d-flex align-items-center'>
-						<span className='me-3'>{value}%</span>
-						<Chart
-							series={state.series}
-							options={state.options}
-							type={state.options.chart.type}
-							height={state.options.chart.height}
-							width={state.options.chart.width}
-							className='me-2'
-						/>
-						<Button color='info' isLight icon='Check' className='text-nowrap'>
+						<div className='d-flex flex-column align-items-center w-75 me-3'>
+							<span className='me-3'>{value}%</span>
+							<Progress
+								className='flex-grow-1'
+								isAutoColor
+								value={value}
+								style={{
+									height: 10,
+									width: '100%',
+								}}
+							/>
+						</div>
+						<Button
+							color='info'
+							isLight
+							icon='Check2All'
+							size='lg'
+							className='text-nowrap'>
 							Duyệt
 						</Button>
 					</div>
@@ -133,6 +99,11 @@ const TaskSolved = ({ id, name, to, departmentUser, value, color }) => {
 const DashboardPage = () => {
 	const { darkModeStatus, themeStatus } = useDarkMode();
 	const { addToast } = useToasts();
+	const navigate = useNavigate();
+	const handleOnClickToMissionListPage = useCallback(
+		() => navigate(`../${demoPages.mucTieu.path}`),
+		[navigate],
+	);
 	// departments
 	const [dataDepartments, setDataDepartments] = useState([]);
 	// mission
@@ -506,6 +477,15 @@ const DashboardPage = () => {
 		fetchData();
 	}, []);
 
+	const memoizedCallbackMissionReport = useCallback(() => {
+		const fetchDataReport = async () => {
+			const response = await getReportMisson();
+			const result = await response.data;
+			setMissionReport(result);
+		};
+		fetchDataReport();
+	}, []);
+
 	// get all misisons
 	useEffect(() => {
 		const fetchData = async () => {
@@ -513,14 +493,9 @@ const DashboardPage = () => {
 			const result = await response.data;
 			setMissions(result);
 		};
-		const fetchDataReport = async () => {
-			const response = await getReportMisson();
-			const result = await response.data;
-			setMissionReport(result);
-		};
 		fetchData();
-		fetchDataReport();
-	}, []);
+		memoizedCallbackMissionReport();
+	}, [memoizedCallbackMissionReport]);
 
 	// task resolved
 	useEffect(() => {
@@ -532,21 +507,25 @@ const DashboardPage = () => {
 		fetchDataTaskSolved();
 	}, []);
 
-	// task by department
-	useEffect(() => {
-		const fetchDataTaskByDepartment = async () => {
-			const response = await getAllTasks({ departmentId: departmentSelect });
-			const result = await response.data;
-			setTasks(result);
-		};
+	const memoizedCallbackTaskReport = useCallback(() => {
 		const fetchDataReportTaskByDepartment = async () => {
 			const response = await getReportTask({ departmentId: departmentSelect });
 			const result = await response.data;
 			setTaskReport(result);
 		};
-		fetchDataTaskByDepartment();
 		fetchDataReportTaskByDepartment();
 	}, [departmentSelect]);
+
+	// task by department
+	useEffect(() => {
+		const fetchDataTaskByDepartment = async () => {
+			const response = await getAllTasksByDepartment(departmentSelect);
+			const result = await response.data;
+			setTasks(result);
+		};
+		fetchDataTaskByDepartment();
+		memoizedCallbackTaskReport();
+	}, [departmentSelect, memoizedCallbackTaskReport]);
 
 	// subtask
 	useEffect(() => {
@@ -722,6 +701,16 @@ const DashboardPage = () => {
 											Báo cáo
 										</CardSubTitle>
 									</CardLabel>
+									<CardActions>
+										<Button
+											icon='ArrowForwardIos'
+											aria-label='Read More'
+											hoverShadow='default'
+											rounded={1}
+											color={darkModeStatus ? 'dark' : null}
+											onClick={handleOnClickToMissionListPage}
+										/>
+									</CardActions>
 								</CardHeader>
 								<CardBody className='py-0'>
 									<div className='row'>
@@ -740,7 +729,7 @@ const DashboardPage = () => {
 								<CardHeader className='py-0'>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
-											Thống kê công việc theo phòng ban
+											Thống kê công việc
 										</CardTitle>
 										<CardSubTitle tag='h5' className='h6'>
 											Báo cáo
@@ -816,7 +805,7 @@ const DashboardPage = () => {
 				</div>
 				{verifyPermissionHOC(
 					<div className='row mt-4'>
-						<div className='col-xxl-8'>
+						<div className='col-xxl-7'>
 							<Card className='h-100'>
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
@@ -851,7 +840,7 @@ const DashboardPage = () => {
 								)}
 							</Card>
 						</div>
-						<div className='col-xxl-4'>
+						<div className='col-xxl-5'>
 							<Card className='h-100'>
 								<CardHeader>
 									<CardLabel icon='ContactSupport' iconColor='secondary'>

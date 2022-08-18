@@ -7,5 +7,11 @@ const getAllSubTasks = () => {
 	});
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { getAllSubTasks };
+const deleteSubtaskById = (id) => {
+	return axiosClient({
+		method: 'DELETE',
+		url: `/subtasks/${id}`,
+	});
+};
+
+export { getAllSubTasks, deleteSubtaskById };

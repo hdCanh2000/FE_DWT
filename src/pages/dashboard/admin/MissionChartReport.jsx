@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Chart from '../../../components/extras/Chart';
@@ -58,10 +58,10 @@ const MissionChartReport = ({ data }) => {
 	});
 
 	return (
-		<Card stretch>
+		<Card>
 			<CardBody>
-				<div className='row align-items-center'>
-					<div className='col-xl-8 col-md-12'>
+				<div className='row align-items-start'>
+					<div className='col-xl-7 col-md-12'>
 						<Chart
 							series={state.series}
 							options={state.options}
@@ -69,7 +69,7 @@ const MissionChartReport = ({ data }) => {
 							height={state.options.chart.height}
 						/>
 					</div>
-					<div className='col-xl-4 col-md-12'>
+					<div className='col-xl-5 col-md-12'>
 						<div className='row'>
 							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 								<div className='d-flex align-items-center justify-content-start'>
@@ -133,4 +133,4 @@ MissionChartReport.defaultProps = {
 	data: { completed: 0, completedExpired: 0, inprogress: 0, inprogressExpired: 0, total: 0 },
 };
 
-export default MissionChartReport;
+export default memo(MissionChartReport);

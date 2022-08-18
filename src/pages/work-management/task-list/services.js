@@ -1,11 +1,18 @@
 import axiosClient from '../../../utils/axiosClient';
 
-const getAllTasks = () => {
+const getAllTasks = (params) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/tasks`,
+		params,
 	});
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { getAllTasks };
+const getAllTasksByDepartment = (departmentId) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/tasks/department/${departmentId}`,
+	});
+};
+
+export { getAllTasks, getAllTasksByDepartment };

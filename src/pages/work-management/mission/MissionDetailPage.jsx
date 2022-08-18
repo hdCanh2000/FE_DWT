@@ -30,7 +30,6 @@ import {
 	updateMissionById,
 	updateTaskByID,
 } from './services';
-import { calcProgressTask, calcTotalKPIOfTask } from '../../../utils/function';
 import Button from '../../../components/bootstrap/Button';
 import MissionAlertConfirm from './MissionAlertConfirm';
 import TaskAlertConfirm from './TaskAlertConfirm';
@@ -173,11 +172,11 @@ const MissionDetailPage = () => {
 			minWidth: 100,
 			render: (item) => (
 				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${calcProgressTask(item)}%`}</div>
+					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 					<Progress
 						className='flex-grow-1'
 						isAutoColor
-						value={calcProgressTask(item)}
+						value={item.progress}
 						style={{
 							height: 10,
 							width: '100%',
@@ -199,7 +198,7 @@ const MissionDetailPage = () => {
 			id: 'currentKpi',
 			key: 'currentKpi',
 			type: 'number',
-			render: (item) => <span>{calcTotalKPIOfTask(item)}</span>,
+			render: (item) => <span>{item.currentKPI}</span>,
 			align: 'center',
 		},
 		{
@@ -315,11 +314,11 @@ const MissionDetailPage = () => {
 			type: 'text',
 			render: (item) => (
 				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${calcProgressTask(item)}%`}</div>
+					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 					<Progress
 						className='flex-grow-1'
 						isAutoColor
-						value={calcProgressTask(item)}
+						value={item.progress}
 						style={{
 							height: 10,
 							width: '100%',
@@ -341,7 +340,7 @@ const MissionDetailPage = () => {
 			id: 'currentKpi',
 			key: 'currentKpi',
 			type: 'number',
-			render: (item) => <span>{calcTotalKPIOfTask(item)}</span>,
+			render: (item) => <span>{item.currentKPI}</span>,
 			align: 'center',
 		},
 		{
