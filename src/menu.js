@@ -43,13 +43,13 @@ export const dashboardMenu = {
 export const demoPages = {
 	mucTieu: {
 		id: 'mission',
-		text: 'Mục tiêu',
+		text: 'Mission',
 		path: '/muc-tieu',
 		roles: ['admin', 'manager'],
 	},
 	quanLyCongViec: {
 		id: 'quanlycongviec',
-		text: 'Công việc',
+		text: 'Tasks',
 		path: '/cong-viec',
 		roles: ['admin', 'manager', 'user'],
 		// subMenu: {
@@ -82,31 +82,31 @@ export const demoPages = {
 	},
 	dauViec: {
 		id: 'dauViec',
-		text: 'Đầu việc',
+		text: 'Subtasks',
 		path: '/dau-viec',
 		roles: ['admin', 'manager', 'user'],
 	},
 	phongBan: {
 		id: 'phongBan',
-		text: 'Phòng ban',
+		text: 'Department',
 		path: '/phong-ban',
 		roles: ['admin'],
 	},
 	nhanVien: {
 		id: 'nhanVien',
-		text: 'Nhân viên',
+		text: 'Employee',
 		path: '/nhan-vien',
 		roles: ['admin', 'manager'],
 	},
 	cauHinh: {
 		id: 'cauHinh',
-		text: 'Cấu hình',
+		text: 'Configure',
 		path: '/cau-hinh',
 		roles: ['admin'],
 	},
 	baoCao: {
 		id: 'baoCao',
-		text: 'Báo cáo',
+		text: 'Report',
 		path: '/bao-cao',
 		roles: ['admin'],
 	},
