@@ -12,7 +12,7 @@ const MissionChartReport = ({ data }) => {
 		stroke: {
 			width: 0,
 		},
-		labels: ['Đang thực hiện', 'Quá hạn', 'Đã hoàn thành', 'Hoàn thành chậm tiến độ'],
+		labels: ['Đang thực hiện', 'Quá hạn', 'Đã hoàn thành'],
 		dataLabels: {
 			enabled: false,
 		},
@@ -96,20 +96,6 @@ const MissionChartReport = ({ data }) => {
 										Đã hoàn thành:{' '}
 										<span className='fw-bold fs-4 text-success'>
 											{data.completed}
-										</span>
-									</div>
-								</div>
-							</div>
-							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
-								<div className='d-flex align-items-center justify-content-start'>
-									<div
-										className='p-4'
-										style={{ background: 'rgb(77, 105, 250)' }}
-									/>
-									<div style={{ marginLeft: '1rem' }} className='fs-5'>
-										Hoàn thành chậm tiến độ:{' '}
-										<span className='fw-bold fs-4 text-info'>
-											{data.completedExpired}
 										</span>
 									</div>
 								</div>
