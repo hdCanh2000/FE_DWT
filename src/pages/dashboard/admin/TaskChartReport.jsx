@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Chart from '../../../components/extras/Chart';
-// import CountProgressInfo from './CountProgressInfo';
 
 const TaskChartReport = ({ data }) => {
 	const chartOptions = {
@@ -53,18 +52,10 @@ const TaskChartReport = ({ data }) => {
 		},
 	};
 
-	const [state, setState] = useState({
-		series: [],
+	const [state] = useState({
+		series: Object.values(data),
 		options: chartOptions,
 	});
-
-	useEffect(() => {
-		setState({
-			...state,
-			series: Object.values(data),
-		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [data]);
 
 	return (
 		<Card>
