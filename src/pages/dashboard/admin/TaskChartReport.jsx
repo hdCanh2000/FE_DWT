@@ -12,7 +12,7 @@ const TaskChartReport = ({ data }) => {
 		stroke: {
 			width: 0,
 		},
-		labels: ['Đang thực hiện', 'Từ chối', 'Đã hoàn thành', 'Tạm dừng', 'Chờ xác nhận'],
+		labels: ['Đang thực hiện', 'Từ chối', 'Đã hoàn thành', 'Tạm dừng', 'Chờ xác nhận', 'Khác'],
 		dataLabels: {
 			enabled: false,
 		},
@@ -135,6 +135,20 @@ const TaskChartReport = ({ data }) => {
 									</div>
 								</div>
 							</div>
+							<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
+								<div className='d-flex align-items-center justify-content-start'>
+									<div
+										className='p-3'
+										style={{ background: 'rgb(243, 84, 33)' }}
+									/>
+									<div style={{ marginLeft: '1rem' }} className='fs-5'>
+										Khác:{' '}
+										<span className='fw-bold fs-4 text-danger'>
+											{data.other}
+										</span>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -148,7 +162,7 @@ TaskChartReport.propTypes = {
 	data: PropTypes.object,
 };
 TaskChartReport.defaultProps = {
-	data: { inprogress: 0, completed: 0, solved: 2, rejected: 0, onhold: 0 },
+	data: { inprogress: 0, completed: 0, solved: 2, rejected: 0, onhold: 0, other: 0 },
 };
 
 export default memo(TaskChartReport);

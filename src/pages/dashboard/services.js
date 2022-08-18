@@ -8,10 +8,11 @@ const getAllTasks = (params) => {
 	});
 };
 
-const getAllTasksByDepartment = (departmentId) => {
+const getAllTasksByDepartment = (departmentId, params) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/tasks/department/${departmentId}`,
+		params,
 	});
 };
 
@@ -19,6 +20,13 @@ const getAllTasksByStatus = (status) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/tasks/status/${status}`,
+	});
+};
+
+const getAllSubTasksByStatus = (status) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/subtasks/status/${status}`,
 	});
 };
 
@@ -53,6 +61,14 @@ const getReportSubTask = (params) => {
 	});
 };
 
+const getReportSubTaskDepartment = (params) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/subtasks_report/department`,
+		params,
+	});
+};
+
 export {
 	getAllTasks,
 	getAllTasksByStatus,
@@ -61,4 +77,6 @@ export {
 	getReportTask,
 	getAllSubTasksByUser,
 	getReportSubTask,
+	getReportSubTaskDepartment,
+	getAllSubTasksByStatus,
 };

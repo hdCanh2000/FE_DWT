@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Page from '../../../layout/Page/Page';
@@ -26,7 +26,7 @@ const Login = () => {
 		});
 	};
 
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 	const handleOnClick = async (e) => {
 		e.preventDefault();
 		try {
@@ -36,7 +36,8 @@ const Login = () => {
 			localStorage.setItem('email', result.email);
 			localStorage.setItem('name', result.name);
 			localStorage.setItem('roles', JSON.stringify(result.roles));
-			navigate('/');
+			// navigate('/');
+			window.location.href = '/';
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 		}
