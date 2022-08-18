@@ -307,7 +307,7 @@ const TaskDetailPage = () => {
 							onClick={() => handleOpenConfirm(item)}
 						/>
 					</div>,
-					['admin', 'manager'],
+					['admin', 'manager', 'user'],
 				),
 		},
 	];
