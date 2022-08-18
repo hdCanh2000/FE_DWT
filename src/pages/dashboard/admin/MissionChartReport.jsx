@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Chart from '../../../components/extras/Chart';
@@ -52,18 +52,10 @@ const MissionChartReport = ({ data }) => {
 		},
 	};
 
-	const [state, setState] = useState({
-		series: [],
+	const [state] = useState({
+		series: Object.values(data).slice(0, Object.values(data).length - 1),
 		options: chartOptions,
 	});
-
-	useEffect(() => {
-		setState({
-			...state,
-			series: Object.values(data).slice(0, Object.values(data).length - 1),
-		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [data]);
 
 	return (
 		<Card stretch>
