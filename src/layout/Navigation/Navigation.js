@@ -322,7 +322,6 @@ const Navigation = forwardRef(({ menu, horizontal, id, className, ...props }, re
 
 	const { t } = useTranslation('menu');
 	const roles = JSON.parse(localStorage.getItem('roles'));
-
 	function fillMenu(data, parentId, rootId, isHorizontal, isMore) {
 		const res = [];
 		Object.keys(data).forEach((item) => {
