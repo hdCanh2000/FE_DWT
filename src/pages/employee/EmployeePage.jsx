@@ -29,7 +29,10 @@ const EmployeePage = () => {
 	const [users, setUsers] = useState([]);
 
 	const navigate = useNavigate();
-
+	const roles = window.localStorage.getItem('roles');
+	if (roles === 'user') {
+		navigate('/404');
+	}
 	useEffect(() => {
 		async function getDepartments() {
 			try {
@@ -284,7 +287,7 @@ const EmployeePage = () => {
 				<div className='row mb-4'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách nhân viên</div>
+							<div className='display-6 fw-bold py-3'>Danh sách nhân viênn</div>
 						</div>
 					</div>
 				</div>

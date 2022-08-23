@@ -150,6 +150,10 @@ const MissionPage = () => {
 	const [searchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
+	const roles = window.localStorage.getItem('roles');
+	if (roles === 'user') {
+		navigate('/404');
+	}
 	const navigateToDetailPage = useCallback(
 		(page) => navigate(`/muc-tieu/chi-tiet/${page}`),
 		[navigate],

@@ -22,6 +22,10 @@ const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const navigate = useNavigate();
+	const roles = window.localStorage.getItem('roles');
+	if (roles === 'user') {
+		navigate('/404');
+	}
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [departments, setDepartments] = useState([]);

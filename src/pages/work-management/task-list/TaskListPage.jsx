@@ -66,6 +66,7 @@ const Item = ({
 		() => navigate(`/cong-viec/${id}`),
 		[id, navigate],
 	);
+	// phân quyền
 	return (
 		<div className='col-md-6 col-xl-4 col-sm-12' {...props}>
 			<Card stretch onClick={handleOnClickToProjectPage} className='cursor-pointer'>
@@ -163,7 +164,6 @@ const TaskListPage = () => {
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const location = useLocation();
-
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 

@@ -50,33 +50,6 @@ export const demoPages = {
 		id: 'quanlycongviec',
 		text: 'Công việc',
 		path: '/cong-viec',
-		// subMenu: {
-		// 	congViec: {
-		// 		id: 'congViec',
-		// 		text: 'Tổng quan',
-		// 		path: '/cong-viec/cong-viec',
-		// 	},
-		// 	danhSach: {
-		// 		id: 'danhSach',
-		// 		text: 'Danh sách',
-		// 		path: '/cong-viec/danh-sach',
-		// 	},
-		// 	dauViec: {
-		// 		id: 'dauViec',
-		// 		text: 'Đầu việc',
-		// 		path: '/cong-viec/dau-viec',
-		// 	},
-		// 	danhSachCongViecPhongBan: {
-		// 		id: 'danhSachCongViecPhongBan',
-		// 		text: 'DSCV phòng ban',
-		// 		path: '/cong-viec/tong-quan-phong-ban',
-		// 	},
-		// 	chiTietCongViecPhongBan: {
-		// 		id: 'chiTietCongViecPhongBan',
-		// 		text: 'CTCV phòng ban',
-		// 		path: '/cong-viec/chi-tiet-phong-ban',
-		// 	},
-		// },
 	},
 	phongBan: {
 		id: 'phongBan',

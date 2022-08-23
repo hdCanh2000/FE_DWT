@@ -78,6 +78,10 @@ const TaskDetailPage = () => {
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
 	const [newWork, setNewWork] = React.useState([]);
 	const navigate = useNavigate();
+	const roles = window.localStorage.getItem('roles');
+	if (roles === 'user') {
+		navigate('/404');
+	}
 	const { addToast } = useToasts();
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [openListInfoModal, setOpenListInfoModal] = useState(false);
@@ -88,7 +92,6 @@ const TaskDetailPage = () => {
 		type: 1,
 		isShowNote: false,
 	});
-	navigate('/');
 	const chartOptions = {
 		chart: {
 			type: 'donut',
