@@ -63,7 +63,7 @@ const presentation = [
 	},
 	// Trang đầu việc - Step
 	{
-		path: `/cong-viec-:taskid/dau-viec/:id`,
+		path: `/${demoPages.dauViec.path}/:id`,
 		element: <TASK.SUBTASK_STEP />,
 		exact: true,
 	},
@@ -71,7 +71,7 @@ const presentation = [
 	 * Trang chi tiết nhiệm vụ
 	 */
 	{
-		path: `/muc-tieu/chi-tiet/:id`,
+		path: `/${demoPages.mucTieu.path}/:id`,
 		element: <TASK.MISSION_DETAIL />,
 		exact: true,
 	},
@@ -104,11 +104,11 @@ const presentation = [
 	/**
 	 * trang quản lý đầu việc
 	 */
-	// {
-	// 	path: demoPages.quanLyCongViec.subMenu.dauViec.path,
-	// 	element: <TASK.SUBTASK />,
-	// 	exact: true,
-	// },
+	{
+		path: demoPages.dauViec.path,
+		element: <TASK.SUBTASK />,
+		exact: true,
+	},
 	/**
 	 * trang quản lý danh sách công việc theo phòng ban - danh sách dạng bảng
 	 */

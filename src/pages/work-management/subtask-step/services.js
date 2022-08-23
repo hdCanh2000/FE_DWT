@@ -7,36 +7,26 @@ const getTaskById = (id) => {
 	});
 };
 
-const getSubTaskById = () => {
+const getSubTaskById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: '/tasks',
+		url: `/subtasks/${id}`,
 	});
 };
 
-const updateStatusPendingSubtask = (data) => {
+const updateSubtask = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/tasks/${data.id}`,
-		data,
-	});
-};
-
-const addStepIntoSubtask = (data) => {
-	return axiosClient({
-		method: 'PUT',
-		url: `/tasks/${data.id}`,
+		url: `/subtasks/${data.id}`,
 		data,
 	});
 };
 
 const getAllUser = () => {
-	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
 		url: `/users`,
 	});
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { getTaskById, getSubTaskById, updateStatusPendingSubtask, getAllUser, addStepIntoSubtask };
+export { getTaskById, getSubTaskById, updateSubtask, getAllUser };

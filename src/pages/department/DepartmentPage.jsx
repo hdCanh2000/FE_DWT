@@ -17,6 +17,7 @@ import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment, getAllDepartmentWithUser, updateDepartment } from './services';
 import validate from './validate';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -43,14 +44,6 @@ const DepartmentPage = () => {
 	}, []);
 
 	const columns = [
-		{
-			title: 'ID',
-			id: 'id',
-			key: 'id',
-			type: 'number',
-			align: 'center',
-			isShow: false,
-		},
 		{
 			title: 'Tên phòng ban',
 			id: 'name',
@@ -207,61 +200,58 @@ const DepartmentPage = () => {
 	return (
 		<PageWrapper title={demoPages.phongBan.text}>
 			<Page container='fluid'>
-				<div className='row mb-4'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách phòng ban</div>
-						</div>
-					</div>
-				</div>
-				<div className='row mb-0'>
-					<div className='col-12'>
-						<Card className='w-100'>
-							<CardHeader>
-								<CardLabel icon='AccountCircle' iconColor='primary'>
-									<CardTitle>
-										<CardLabel>Danh sách phòng ban</CardLabel>
-									</CardTitle>
-								</CardLabel>
-								<CardActions>
-									<Button
-										color='info'
-										icon='PersonPlusFill'
-										tag='button'
-										onClick={() => handleOpenActionForm(null)}>
-										Thêm phòng ban
-									</Button>
-									<Button
-										color='info'
-										icon='CloudDownload'
-										isLight
-										tag='a'
-										to='/employee.excel'
-										target='_blank'
-										download>
-										Xuất Excel
-									</Button>
-								</CardActions>
-							</CardHeader>
-							<div className='p-4'>
-								<TableCommon
-									className='table table-modern mb-0'
-									columns={columns}
-									data={departments}
-								/>
+				{verifyPermissionHOC(
+					<>
+						<div className='row mb-4'>
+							<div className='col-12'>
+								<div className='d-flex justify-content-between align-items-center'>
+									<div className='display-6 fw-bold py-3'>
+										Danh sách phòng ban
+									</div>
+								</div>
 							</div>
-						</Card>
-					</div>
-				</div>
-				<CommonForm
-					show={openForm}
-					onClose={hanleCloseForm}
-					handleSubmit={handleSubmitForm}
-					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
-					fields={columns}
-					validate={validate}
-				/>
+						</div>
+						<div className='row mb-0'>
+							<div className='col-12'>
+								<Card className='w-100'>
+									<CardHeader>
+										<CardLabel icon='AccountCircle' iconColor='primary'>
+											<CardTitle>
+												<CardLabel>Danh sách phòng ban</CardLabel>
+											</CardTitle>
+										</CardLabel>
+										<CardActions>
+											<Button
+												color='info'
+												icon='PersonPlusFill'
+												tag='button'
+												onClick={() => handleOpenActionForm(null)}>
+												Thêm phòng ban
+											</Button>
+										</CardActions>
+									</CardHeader>
+									<div className='p-4'>
+										<TableCommon
+											className='table table-modern mb-0'
+											columns={columns}
+											data={departments}
+										/>
+									</div>
+								</Card>
+							</div>
+						</div>
+						<CommonForm
+							show={openForm}
+							onClose={hanleCloseForm}
+							handleSubmit={handleSubmitForm}
+							item={itemEdit}
+							label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
+							fields={columns}
+							validate={validate}
+						/>
+					</>,
+					['admin', 'manager'],
+				)}
 			</Page>
 		</PageWrapper>
 	);

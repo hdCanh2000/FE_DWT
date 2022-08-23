@@ -10,7 +10,6 @@ import {
 } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
-import { isEmpty } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import Card, {
 	CardActions,
@@ -23,7 +22,8 @@ import Card, {
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
-import { addNewTask, deleteTaskById, getAllTasks, updateTaskByID } from '../mission/services';
+import { addNewTask, deleteTaskById, getAllDepartments, updateTaskByID } from '../mission/services';
+import { getAllTasksByDepartment } from './services';
 import useDarkMode from '../../../hooks/useDarkMode';
 import {
 	formatColorPriority,
@@ -40,16 +40,16 @@ import TaskFormModal from '../mission/TaskFormModal';
 import MissionAlertConfirm from '../mission/MissionAlertConfirm';
 import Progress from '../../../components/bootstrap/Progress';
 import ExpandRow from './ExpandRow';
-import { calcProgressTask } from '../../../utils/function';
 import Badge from '../../../components/bootstrap/Badge';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
-import { getAllSubtasks } from '../TaskDetail/services';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
+import { addNewSubtask } from '../TaskDetail/services';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 
 const Item = ({
 	id,
@@ -78,10 +78,10 @@ const Item = ({
 				</CardHeader>
 				<CardBody>
 					<div className='row g-2 align-items-center'>
-						<div className='col-auto mt-2'>
+						<div className='col-auto mb-3'>
 							<span>Hạn hoàn thành:</span>
 						</div>
-						<div className='col-auto mt-2'>
+						<div className='col-auto mb-3'>
 							<small
 								style={{ fontSize: 14 }}
 								className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
@@ -140,6 +140,8 @@ const Item = ({
 };
 
 const TaskListPage = () => {
+	// departments
+	const [dataDepartments, setDataDepartments] = useState([]);
 	const [tasks, setTasks] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
@@ -147,11 +149,10 @@ const TaskListPage = () => {
 	const [expandedRows, setExpandedRows] = useState([]);
 	const [expandState, setExpandState] = useState({});
 	// handle expand subtask
-	const [task, setTask] = useState({});
 	const [editModalStatusExpand, setEditModalStatusExpand] = useState(false);
-	const [idEditExpand, setIdEditExpand] = useState(0);
-	const [newWorkExpand, setNewWorkExpand] = React.useState([]);
-	const [titleExpand, setTitleExpand] = useState();
+	const [taskExpandId, setTaskExpandId] = useState('');
+
+	const [departmentSelect, setDepartmentSelect] = useState(1);
 
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
@@ -167,17 +168,42 @@ const TaskListPage = () => {
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 
+	// all department
+	useEffect(() => {
+		const fetchData = async () => {
+			const response = await getAllDepartments();
+			const result = await response.data;
+			setDataDepartments(
+				result
+					.reverse()
+					.concat({
+						id: 1,
+						name: 'Tất cả',
+					})
+					.reverse(),
+			);
+		};
+		fetchData();
+	}, []);
+
+	const fetchDataAllTasks = useCallback(async () => {
+		const response = await getAllTasksByDepartment(departmentSelect);
+		const result = await response.data;
+		setTasks(result);
+	}, [departmentSelect]);
+
+	useEffect(() => {
+		fetchDataAllTasks();
+	}, [departmentSelect, fetchDataAllTasks]);
+
 	// Handle
-	const handleOpenModalExpand = async (items, titles, taskId) => {
+	const handleOpenModalExpand = (taskId) => {
 		setEditModalStatusExpand(true);
-		setIdEditExpand(items?.id);
-		setTitleExpand(titles);
-		try {
-			const res = await getAllSubtasks(taskId);
-			setTask(res.data);
-		} catch (error) {
-			setTask({});
-		}
+		setTaskExpandId(taskId);
+	};
+
+	const handleCloseModalExpand = () => {
+		setEditModalStatusExpand(false);
 	};
 
 	const handleEpandRow = (event, userId) => {
@@ -244,15 +270,6 @@ const TaskListPage = () => {
 		);
 	};
 
-	useEffect(() => {
-		async function fetchDataMissionByID() {
-			const response = await getAllTasks();
-			const result = await response.data;
-			setTasks(result);
-		}
-		fetchDataMissionByID();
-	}, []);
-
 	const handleDeleteItem = async (taskId) => {
 		try {
 			await deleteTaskById(taskId);
@@ -273,6 +290,7 @@ const TaskListPage = () => {
 				const result = await response.data;
 				const newTasks = [...tasks];
 				setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
+				fetchDataAllTasks();
 				handleClearValueForm();
 				handleCloseEditForm();
 				handleShowToast(
@@ -288,8 +306,9 @@ const TaskListPage = () => {
 				const response = await addNewTask(data);
 				const result = await response.data;
 				const newTasks = [...tasks];
-				newTasks.unshift(result);
+				newTasks.push(result);
 				setTasks(newTasks);
+				fetchDataAllTasks();
 				handleClearValueForm();
 				handleCloseEditForm();
 				handleShowToast(`Thêm công việc`, `Công việc ${result.name} được thêm thành công!`);
@@ -349,13 +368,27 @@ const TaskListPage = () => {
 		setItemEdit(null);
 	};
 
+	const handleSubmitSubTaskForm = async (data) => {
+		const dataSubmit = { ...data, taskId: taskExpandId };
+		try {
+			const response = await addNewSubtask(dataSubmit);
+			const result = await response.data;
+			handleCloseEditForm();
+			fetchDataAllTasks();
+			handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
+		} catch (error) {
+			fetchDataAllTasks();
+			handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);
+		}
+	};
+
 	return (
 		<PageWrapper title={demoPages.quanLyCongViec.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách công việc</div>
+							<div className='display-6 fw-bold pt-3'>Danh sách công việc</div>
 							<div>
 								<Button
 									size='lg'
@@ -386,15 +419,48 @@ const TaskListPage = () => {
 											<CardLabel>Danh sách công việc</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									<CardActions>
-										<Button
-											color='info'
-											icon='Plus'
-											tag='button'
-											onClick={() => handleOpenEditForm(null)}>
-											Thêm công việc
-										</Button>
-									</CardActions>
+									{verifyPermissionHOC(
+										<CardActions className='d-flex align-items-center'>
+											<Button
+												color='info'
+												icon='Plus'
+												tag='button'
+												onClick={() => handleOpenEditForm(null)}>
+												Thêm công việc
+											</Button>
+											{verifyPermissionHOC(
+												<Dropdown>
+													<DropdownToggle hasIcon={false}>
+														<Button
+															color='primary'
+															icon='Circle'
+															className='text-nowrap'>
+															{
+																dataDepartments.filter(
+																	(item) =>
+																		item.id ===
+																		departmentSelect,
+																)[0]?.name
+															}
+														</Button>
+													</DropdownToggle>
+													<DropdownMenu>
+														{dataDepartments?.map((item) => (
+															<DropdownItem
+																key={item?.id}
+																onClick={() =>
+																	setDepartmentSelect(item.id)
+																}>
+																<div>{item?.name}</div>
+															</DropdownItem>
+														))}
+													</DropdownMenu>
+												</Dropdown>,
+												['admin'],
+											)}
+										</CardActions>,
+										['admin', 'manager'],
+									)}
 								</CardHeader>
 								<div className='p-4'>
 									<table
@@ -405,10 +471,11 @@ const TaskListPage = () => {
 												<th className='text-center'>STT</th>
 												<th>Tên công việc</th>
 												<th className='text-center'>Số đầu việc</th>
-												<th className='text-center'>Phòng ban</th>
-												<th className='text-center'>Nhân viên</th>
+												<th>Phòng ban</th>
+												{/* <th className='text-center'>Nhân viên</th> */}
 												<th className='text-center'>Hạn hoàn thành</th>
 												<th className='text-center'>Giá trị KPI</th>
+												<th className='text-center'>KPI thực tế</th>
 												<th className='text-center'>Độ ưu tiên</th>
 												<th className='text-center'>Trạng thái</th>
 												<th className='text-center'>Tiến độ</th>
@@ -449,18 +516,17 @@ const TaskListPage = () => {
 																</span>
 															</Button>
 														</td>
-														<td className='text-center'>
-															{item?.department?.name}
-														</td>
-														<td className='text-center'>
-															{item?.user?.name}
-														</td>
+														<td>{item?.departments[0]?.name}</td>
+														{/* <td className='text-center'>
+															{item?.users[0]?.name}
+														</td> */}
 														<td align='center'>
 															{moment(`${item.deadlineDate}`).format(
 																'DD-MM-YYYY',
 															)}
 														</td>
 														<td align='center'>{item?.kpiValue}</td>
+														<td align='center'>{item?.currentKPI}</td>
 														<td>
 															<div className='d-flex align-items-center'>
 																<span
@@ -483,59 +549,75 @@ const TaskListPage = () => {
 															</div>
 														</td>
 														<td>
-															<Dropdown>
-																<DropdownToggle hasIcon={false}>
-																	<Button
-																		isLink
-																		color={formatColorStatus(
-																			item.status,
-																		)}
-																		icon='Circle'
-																		className='text-nowrap'>
-																		{FORMAT_TASK_STATUS(
-																			item.status,
-																		)}
-																	</Button>
-																</DropdownToggle>
-																<DropdownMenu>
-																	{Object.keys(
-																		renderStatusTask(
-																			item.status,
-																		),
-																	).map((key) => (
-																		<DropdownItem
-																			key={key}
-																			onClick={() =>
-																				handleOpenConfirmStatusTask(
-																					item,
-																					STATUS[key]
-																						.value,
-																				)
-																			}>
-																			<div>
-																				<Icon
-																					icon='Circle'
-																					color={
+															{verifyPermissionHOC(
+																<Dropdown>
+																	<DropdownToggle hasIcon={false}>
+																		<Button
+																			isLink
+																			color={formatColorStatus(
+																				item.status,
+																			)}
+																			icon='Circle'
+																			className='text-nowrap'>
+																			{FORMAT_TASK_STATUS(
+																				item.status,
+																			)}
+																		</Button>
+																	</DropdownToggle>
+																	<DropdownMenu>
+																		{Object.keys(
+																			renderStatusTask(
+																				item.status,
+																			),
+																		).map((key) => (
+																			<DropdownItem
+																				key={key}
+																				onClick={() =>
+																					handleOpenConfirmStatusTask(
+																						item,
 																						STATUS[key]
-																							.color
+																							.value,
+																					)
+																				}>
+																				<div>
+																					<Icon
+																						icon='Circle'
+																						color={
+																							STATUS[
+																								key
+																							].color
+																						}
+																					/>
+																					{
+																						STATUS[key]
+																							.name
 																					}
-																				/>
-																				{STATUS[key].name}
-																			</div>
-																		</DropdownItem>
-																	))}
-																</DropdownMenu>
-															</Dropdown>
+																				</div>
+																			</DropdownItem>
+																		))}
+																	</DropdownMenu>
+																</Dropdown>,
+																['admin', 'manager'],
+																<Button
+																	isLink
+																	color={formatColorStatus(
+																		item.status,
+																	)}
+																	icon='Circle'
+																	className='text-nowrap'>
+																	{FORMAT_TASK_STATUS(
+																		item.status,
+																	)}
+																</Button>,
+															)}
 														</td>
 														<td>
 															<div className='d-flex align-items-center flex-column'>
-																<div className='flex-shrink-0 me-3'>{`${calcProgressTask(
-																	item,
-																)}%`}</div>
+																<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 																<Progress
 																	className='flex-grow-1'
 																	isAutoColor
-																	value={calcProgressTask(item)}
+																	value={item.progress}
 																	style={{
 																		height: 10,
 																		width: '100%',
@@ -544,66 +626,62 @@ const TaskListPage = () => {
 															</div>
 														</td>
 														<td>
-															<Button
-																isOutline={!darkModeStatus}
-																color='success'
-																isLight={darkModeStatus}
-																className='text-nowrap mx-2'
-																icon='Edit'
-																isDisable={
-																	item.status === 4 ||
-																	item.status === 7 ||
-																	item.status === 3
-																}
-																onClick={() =>
-																	handleOpenEditForm(item)
-																}
-															/>
-															<Button
-																isOutline={!darkModeStatus}
-																color='danger'
-																isLight={darkModeStatus}
-																className='text-nowrap mx-2'
-																icon='Trash'
-																onClick={() =>
-																	handleOpenConfirmModal(item)
-																}
-															/>
+															{verifyPermissionHOC(
+																<div className='d-flex align-items-center'>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='success'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-2'
+																		icon='Edit'
+																		isDisable={
+																			item.status === 4 ||
+																			item.status === 7 ||
+																			item.status === 3
+																		}
+																		onClick={() =>
+																			handleOpenEditForm(item)
+																		}
+																	/>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='danger'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-2'
+																		icon='Trash'
+																		onClick={() =>
+																			handleOpenConfirmModal(
+																				item,
+																			)
+																		}
+																	/>
+																</div>,
+																['admin', 'manager'],
+															)}
 														</td>
 													</tr>
 													<tr>
 														<td
-															colSpan='11'
+															colSpan='12'
 															style={{ paddingLeft: 50 }}>
 															{expandedRows.includes(item?.id) && (
 																<>
 																	<ExpandRow
 																		key={item.id}
-																		subtasks={
-																			!isEmpty(task)
-																				? task?.subtasks
-																				: item?.subtasks
-																		}
+																		subtasks={item?.subtasks}
 																		taskId={item.id}
 																		onOpenModal={
 																			handleOpenModalExpand
 																		}
 																	/>
 																	<TaskDetailForm
-																		title={titleExpand}
-																		setTask={setTask}
-																		task={task}
-																		setEditModalStatus={
-																			setEditModalStatusExpand
+																		show={editModalStatusExpand}
+																		item={itemEdit}
+																		onClose={
+																			handleCloseModalExpand
 																		}
-																		editModalStatus={
-																			editModalStatusExpand
-																		}
-																		id={item.id}
-																		idEdit={idEditExpand}
-																		newWork={newWorkExpand}
-																		setNewWork={
-																			setNewWorkExpand
+																		onSubmit={
+																			handleSubmitSubTaskForm
 																		}
 																	/>
 																</>
@@ -628,32 +706,35 @@ const TaskListPage = () => {
 										<Item
 											key={item?.id}
 											keys={item?.keys}
-											departmentsRelated={item?.departmentsRelated}
-											usersRelated={item?.usersRelated}
+											departmentsRelated={item?.departments?.slice(1)}
+											usersRelated={item?.users?.slice(1)}
 											id={item?.id}
 											name={item?.name}
-											teamName={`${item?.department?.name} - ${item?.user?.name}`}
+											teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
 											dueDate={`${item?.deadlineDate}`}
-											percent={calcProgressTask(item) || 0}
+											percent={item.progress || 0}
 											data-tour='project-item'
 										/>
 									);
 								})}
-								<div className='col-md-12 col-xl-4 col-sm-12'>
-									<Card stretch>
-										<CardBody className='d-flex align-items-center justify-content-center'>
-											<Button
-												color='info'
-												size='lg'
-												isLight
-												className='w-100 h-100'
-												icon='AddCircle'
-												onClick={() => handleOpenEditForm(null)}>
-												Thêm công việc
-											</Button>
-										</CardBody>
-									</Card>
-								</div>
+								{verifyPermissionHOC(
+									<div className='col-md-12 col-xl-4 col-sm-12'>
+										<Card stretch>
+											<CardBody className='d-flex align-items-center justify-content-center'>
+												<Button
+													color='info'
+													size='lg'
+													isLight
+													className='w-100 h-100'
+													icon='AddCircle'
+													onClick={() => handleOpenEditForm(null)}>
+													Thêm công việc
+												</Button>
+											</CardBody>
+										</Card>
+									</div>,
+									['admin', 'manager'],
+								)}
 							</div>
 						)}
 					</div>
@@ -670,6 +751,7 @@ const TaskListPage = () => {
 					onClose={handleCloseEditForm}
 					onSubmit={handleSubmitTaskForm}
 					item={itemEdit}
+					isShowMission={!itemEdit?.id}
 				/>
 				<ModalConfirmCommon
 					show={openConfirmModalStatus}

@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import { v4 as uuidv4 } from 'uuid';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -12,7 +11,6 @@ import Card, {
 import Icon from '../../../components/icon/Icon';
 
 const CardInfoCommon = ({
-	children,
 	data,
 	title,
 	subTitle,
@@ -24,7 +22,7 @@ const CardInfoCommon = ({
 	...props
 }) => {
 	return (
-		<Card className={classNames(className)} shadow={shadow} {...props} key={uuidv4()}>
+		<Card className={classNames(className)} shadow={shadow} {...props}>
 			<CardHeader className='py-2'>
 				<CardLabel icon={icon} iconColor={iconColor}>
 					<CardTitle>{title}</CardTitle>
@@ -33,10 +31,11 @@ const CardInfoCommon = ({
 			</CardHeader>
 			<CardBody isScrollable={isScrollable} className='py-2'>
 				<div className='row g-2 ps-5 pe-4'>
-					{data?.map((item) => {
+					{data?.map((item, index) => {
 						return (
-							<div className='col-12 mb-2' key={uuidv4()}>
-								<div className='d-flex align-items-center'>
+							// eslint-disable-next-line react/no-array-index-key
+							<div className='col-12 mb-2' key={index}>
+								<div className='d-flex align-items-start'>
 									<div className='flex-shrink-0'>
 										<Icon
 											icon={item?.icon || ''}
@@ -54,8 +53,8 @@ const CardInfoCommon = ({
 		</Card>
 	);
 };
+
 CardInfoCommon.propTypes = {
-	children: PropTypes.node.isRequired,
 	className: PropTypes.string,
 	shadow: PropTypes.oneOf([null, 'none', 'sm', 'md', 'lg', '3d']),
 	title: PropTypes.string,
@@ -76,4 +75,5 @@ CardInfoCommon.defaultProps = {
 	isScrollable: false,
 	data: [],
 };
+
 export default CardInfoCommon;

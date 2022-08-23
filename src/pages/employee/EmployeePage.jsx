@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import Page from '../../layout/Page/Page';
@@ -19,26 +18,22 @@ import CommonForm from '../common/ComponentCommon/CommonForm';
 import { getAllDepartments } from '../work-management/mission/services';
 import { addEmployee, getAllEmployee, updateEmployee } from './services';
 import Popovers from '../../components/bootstrap/Popovers';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [options, setOptions] = useState([]);
+	const [departments, setDepartments] = useState([]);
 	const [users, setUsers] = useState([]);
 
-	const navigate = useNavigate();
-	const roles = window.localStorage.getItem('roles');
-	if (roles === 'user') {
-		navigate('/404');
-	}
 	useEffect(() => {
 		async function getDepartments() {
 			try {
 				const response = await getAllDepartments();
 				const data = await response.data;
-				setOptions(
+				setDepartments(
 					data.map((department) => {
 						return {
 							id: department?.id,
@@ -48,7 +43,7 @@ const EmployeePage = () => {
 					}),
 				);
 			} catch (error) {
-				setOptions([]);
+				setDepartments([]);
 			}
 		}
 		getDepartments();
@@ -69,14 +64,6 @@ const EmployeePage = () => {
 	}, []);
 
 	const columns = [
-		{
-			title: 'ID',
-			id: 'id',
-			key: 'id',
-			type: 'number',
-			align: 'center',
-			isShow: false,
-		},
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -119,6 +106,7 @@ const EmployeePage = () => {
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.department?.name}</span>,
+			options: departments,
 		},
 		{
 			title: 'Email',
@@ -169,29 +157,40 @@ const EmployeePage = () => {
 			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
 		},
 		{
+			title: 'Chức vụ',
+			id: 'position',
+			key: 'position',
+			type: 'select',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
+			options: [
+				{
+					id: 1,
+					text: 'Quản lý',
+					value: 1,
+				},
+				{
+					id: 2,
+					text: 'Nhân viên',
+					value: 0,
+				},
+			],
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-1'
-						icon='Edit'
-						onClick={() => handleOpenActionForm(item)}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
-						color='primary'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-1'
-						icon='ArrowForward'
-						onClick={() => navigate(`/nhan-vien/${item.id}`)}
-					/>
-				</div>
+				<Button
+					isOutline={!darkModeStatus}
+					color='success'
+					isLight={darkModeStatus}
+					className='text-nowrap mx-1'
+					icon='Edit'
+					onClick={() => handleOpenActionForm(item)}
+				/>
 			),
 			isShow: false,
 		},
@@ -226,7 +225,7 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data.name,
-			departmentId: parseInt(data.departmentId, 10),
+			departmentId: data.departmentId,
 			code: data.code,
 			email: data.email,
 			password: '123456',
@@ -234,8 +233,9 @@ const EmployeePage = () => {
 			dateOfJoin: data.dateOfJoin,
 			phone: data.phone,
 			address: data.address,
+			position: Number.parseInt(data.position, 10),
 			status: Number(data.status),
-			roles: ['user'],
+			roles: Number.parseInt(data.position, 10) === 1 ? ['manager'] : ['user'],
 		};
 		if (data.id) {
 			try {
@@ -246,9 +246,6 @@ const EmployeePage = () => {
 				handleClearValueForm();
 				hanleCloseForm();
 				getAllEmployees();
-				setTimeout(() => {
-					window.location.reload();
-				}, 500);
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,
@@ -267,9 +264,6 @@ const EmployeePage = () => {
 				handleClearValueForm();
 				hanleCloseForm();
 				getAllEmployees();
-				setTimeout(() => {
-					window.location.reload();
-				}, 500);
 				handleShowToast(
 					`Thêm nhân viên`,
 					`Nhân viên ${result?.user?.name} được thêm thành công!`,
@@ -284,52 +278,49 @@ const EmployeePage = () => {
 	return (
 		<PageWrapper title={demoPages.nhanVien.text}>
 			<Page container='fluid'>
-				<div className='row mb-4'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách nhân viênn</div>
-						</div>
-					</div>
-				</div>
-				<div className='row mb-0'>
-					<div className='col-12'>
-						<Card className='w-100'>
-							<CardHeader>
-								<CardLabel icon='AccountCircle' iconColor='primary'>
-									<CardTitle>
-										<CardLabel>Danh sách nhân viên</CardLabel>
-									</CardTitle>
-								</CardLabel>
-								<CardActions>
-									<Button
-										color='info'
-										icon='PersonPlusFill'
-										tag='button'
-										onClick={() => handleOpenActionForm(null)}>
-										Thêm nhân viên
-									</Button>
-									<Button
-										color='info'
-										icon='CloudDownload'
-										isLight
-										tag='a'
-										to='/employee.excel'
-										target='_blank'
-										download>
-										Xuất Excel
-									</Button>
-								</CardActions>
-							</CardHeader>
-							<div className='p-4'>
-								<TableCommon
-									className='table table-modern mb-0'
-									columns={columns}
-									data={users}
-								/>
+				{verifyPermissionHOC(
+					<div className='row mb-4'>
+						<div className='col-12'>
+							<div className='d-flex justify-content-between align-items-center'>
+								<div className='display-6 fw-bold py-3'>Danh sách nhân viên</div>
 							</div>
-						</Card>
-					</div>
-				</div>
+						</div>
+					</div>,
+					['admin', 'manager'],
+				)}
+				{verifyPermissionHOC(
+					<div className='row mb-0'>
+						<div className='col-12'>
+							<Card className='w-100'>
+								<CardHeader>
+									<CardLabel icon='AccountCircle' iconColor='primary'>
+										<CardTitle>
+											<CardLabel>Danh sách nhân viên</CardLabel>
+										</CardTitle>
+									</CardLabel>
+									<CardActions>
+										<Button
+											color='info'
+											icon='PersonPlusFill'
+											tag='button'
+											onClick={() => handleOpenActionForm(null)}>
+											Thêm nhân viên
+										</Button>
+									</CardActions>
+								</CardHeader>
+								<div className='p-4'>
+									<TableCommon
+										className='table table-modern mb-0'
+										columns={columns}
+										data={users}
+									/>
+								</div>
+							</Card>
+						</div>
+					</div>,
+					['admin', 'manager'],
+				)}
+
 				<CommonForm
 					show={openForm}
 					onClose={hanleCloseForm}
@@ -337,7 +328,6 @@ const EmployeePage = () => {
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}
-					options={options}
 				/>
 			</Page>
 		</PageWrapper>

@@ -47,7 +47,7 @@ const CommonForm = ({
 					<div className='row'>
 						<div className='col-md-12'>
 							<div className='row g-4'>
-								{fields.slice(1)?.map((field) => {
+								{fields?.map((field) => {
 									if (field.type === 'select') {
 										return (
 											<FormGroup
@@ -58,7 +58,7 @@ const CommonForm = ({
 												<Select
 													ariaLabel={field.title}
 													placeholder={`Chọn ${field.title}`}
-													list={options}
+													list={field.options}
 													required
 													name={field.id}
 													className='border border-2 rounded-0 shadow-none'

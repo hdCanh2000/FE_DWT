@@ -12,7 +12,7 @@ const getLatestTasks = () => {
 	// lấy danh sách các task mới nhất
 	return axiosClient({
 		method: 'GET',
-		url: '/tasks?_expand=user&_expand=department&_sort=id&_order=desc&_limit=6',
+		url: '/tasks?_order=desc&_limit=6',
 	});
 };
 
@@ -20,7 +20,7 @@ const getAllTasks = () => {
 	// lấy danh sách các task mới nhất
 	return axiosClient({
 		method: 'GET',
-		url: '/tasks?_sort=id&_order=desc',
+		url: '/tasks',
 	});
 };
 
@@ -72,7 +72,7 @@ const getAllTaksByMissionID = (id) => {
 	// lấy tất cả task của nhiệm vụ theo id
 	return axiosClient({
 		method: 'GET',
-		url: `/tasks?mission_id=${id}`,
+		url: `/tasks/mission/${id}`,
 	});
 };
 

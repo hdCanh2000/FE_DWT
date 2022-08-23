@@ -43,33 +43,72 @@ export const dashboardMenu = {
 export const demoPages = {
 	mucTieu: {
 		id: 'mission',
-		text: 'Mục tiêu',
+		text: 'Mission',
 		path: '/muc-tieu',
+		roles: ['admin', 'manager'],
 	},
 	quanLyCongViec: {
 		id: 'quanlycongviec',
-		text: 'Công việc',
+		text: 'Tasks',
 		path: '/cong-viec',
+		roles: ['admin', 'manager', 'user'],
+		// subMenu: {
+		// 	congViec: {
+		// 		id: 'congViec',
+		// 		text: 'Tổng quan',
+		// 		path: '/cong-viec/cong-viec',
+		// 	},
+		// 	danhSach: {
+		// 		id: 'danhSach',
+		// 		text: 'Danh sách',
+		// 		path: '/cong-viec/danh-sach',
+		// 	},
+		// 	dauViec: {
+		// 		id: 'dauViec',
+		// 		text: 'Đầu việc',
+		// 		path: '/cong-viec/dau-viec',
+		// 	},
+		// 	danhSachCongViecPhongBan: {
+		// 		id: 'danhSachCongViecPhongBan',
+		// 		text: 'DSCV phòng ban',
+		// 		path: '/cong-viec/tong-quan-phong-ban',
+		// 	},
+		// 	chiTietCongViecPhongBan: {
+		// 		id: 'chiTietCongViecPhongBan',
+		// 		text: 'CTCV phòng ban',
+		// 		path: '/cong-viec/chi-tiet-phong-ban',
+		// 	},
+		// },
+	},
+	dauViec: {
+		id: 'dauViec',
+		text: 'Subtasks',
+		path: '/dau-viec',
+		roles: ['admin', 'manager', 'user'],
 	},
 	phongBan: {
 		id: 'phongBan',
-		text: 'Phòng ban',
+		text: 'Department',
 		path: '/phong-ban',
+		roles: ['admin'],
 	},
 	nhanVien: {
 		id: 'nhanVien',
-		text: 'Nhân viên',
+		text: 'Employee',
 		path: '/nhan-vien',
+		roles: ['admin', 'manager'],
 	},
 	cauHinh: {
 		id: 'cauHinh',
-		text: 'Cấu hình',
+		text: 'Configure',
 		path: '/cau-hinh',
+		roles: ['admin'],
 	},
 	baoCao: {
 		id: 'baoCao',
-		text: 'Báo cáo',
+		text: 'Report',
 		path: '/bao-cao',
+		roles: ['admin'],
 	},
 };
 

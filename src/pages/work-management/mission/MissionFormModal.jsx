@@ -70,7 +70,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	};
 
 	const handleClearErrorMsgAfterChange = (name) => {
-		if (mission?.[name] || departmentOption.length > 0) {
+		if (mission?.[name] || departmentOption?.length > 0) {
 			setErrors((prev) => ({
 				...prev,
 				[name]: { ...prev[name], errorMsg: '' },
@@ -88,10 +88,10 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	useEffect(() => {
 		if (item?.id) {
 			getMissionById(item?.id).then((res) => {
-				setMission(res.data);
-				setKeysState(res.data.keys);
+				setMission(res.data?.data);
+				setKeysState(res.data?.data?.keys);
 				setDepartmentOption(
-					res.data?.departments?.map((department) => {
+					res.data?.data?.departments?.map((department) => {
 						return {
 							id: department.id,
 							label: department.name,

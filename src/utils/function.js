@@ -35,9 +35,7 @@ const calcTotalStepCompleteOfSubTask = (subtask) => {
 // tính % hoàn thành của 1 subtask
 const calcProgressSubtask = (subtask) => {
 	if (isEmpty(subtask)) return 0;
-	if (subtask.status === 4 || subtask.status === 7) return 100;
-	const { steps } = subtask;
-	if (isEmpty(steps)) return 0;
+	if (subtask.status === 3 || subtask.status === 4 || subtask.status === 7) return 100;
 	return (
 		Math.round(
 			(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
@@ -53,6 +51,7 @@ const calcKPICompleteOfSubtask = (subtask) => {
 
 // tính tổng số kpi của 1 task theo subtask
 const calcTotalKPIOfTask = (task) => {
+	if (task.status === 4) return task.kpiValue;
 	const { subtasks } = task;
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
@@ -64,6 +63,7 @@ const calcTotalKPIOfTask = (task) => {
 
 // tính tổng số kpi đã dùng của 1 task
 const calcKPICompleteOfTask = (task) => {
+	if (task?.status === 4 || task?.status === 7) return task?.kpiValue;
 	const { subtasks } = task;
 	let totalKPI = 0;
 	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
