@@ -457,9 +457,6 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 								placeholder=''
 							/>
 						</FormGroup>
-						{errors?.department?.errorMsg && (
-							<ErrorText>Vui lòng chọn phòng ban liên quan</ErrorText>
-						)}
 					</div>
 					<div className='col-12'>
 						<FormGroup id='user' label='Nhân viên liên quan'>
@@ -472,9 +469,6 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 								placeholder=''
 							/>
 						</FormGroup>
-						{errors?.user?.errorMsg && (
-							<ErrorText>Vui lòng chọn nhân viên liên quan</ErrorText>
-						)}
 					</div>
 					<div className='col-6'>
 						<FormGroup id='estimateDate' label='Ngày hoàn thành ước tính' isFloating>
@@ -613,8 +607,12 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 					</div>
 				</div>
 			</Modal.Body>
-			<Modal.Footer className='px-4 pb-4'>
-				<Button color='primary' className='w-100' type='submit' onClick={handleSubmit}>
+
+			<Modal.Footer>
+				<Button variant='secondary' onClick={handleCloseForm}>
+					Đóng
+				</Button>
+				<Button variant='primary' type='submit' onClick={handleSubmit}>
 					Lưu đầu việc
 				</Button>
 			</Modal.Footer>

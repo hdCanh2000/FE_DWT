@@ -18,6 +18,7 @@ import {
 	updateStatusPendingTask,
 	getAllSubtasksByTaskId,
 	addNewSubtask,
+	deleteSubtask,
 } from './services';
 import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
@@ -470,21 +471,13 @@ const TaskDetailPage = () => {
 
 	// delete subtask
 	const handleDelete = async (valueDelete) => {
-		const newSubTasks = task?.subtasks.filter((item) => item.id !== valueDelete.id);
-		const taskValue = JSON.parse(JSON.stringify(task));
-		const newData = Object.assign(taskValue, {
-			subtasks: newSubTasks,
-		});
-
 		try {
-			const respose = await updateSubtask(params?.id, newData);
-			const result = await respose.data;
-			setTask(result);
-			navigate(`/cong-viec/${task?.id}`);
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thành công!`);
+			await deleteSubtask(valueDelete?.id);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thất bại!`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thất bại!`);
 		}
+		fetchSubtasks(params?.id);
 	};
 	const handleOpenConfirm = (item) => {
 		setDeletes({
@@ -830,7 +823,7 @@ const TaskDetailPage = () => {
 																</span>
 																trên tổng số
 																<span className='fw-bold text-danger fs-5 mx-2'>
-																	{taskReport.total}
+																	{taskReport.total - taskReport.pending}
 																</span>
 																đầu việc.
 															</div>
