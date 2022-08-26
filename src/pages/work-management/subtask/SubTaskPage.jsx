@@ -7,8 +7,10 @@ import Alert from '../../../components/bootstrap/Alert';
 import Button from '../../../components/bootstrap/Button';
 import Card, {
 	CardActions,
+	CardBody,
 	CardHeader,
 	CardLabel,
+	CardSubTitle,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Dropdown, {
@@ -35,11 +37,16 @@ import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import Toasts from '../../../components/bootstrap/Toasts';
 import { deleteSubtaskById, getAllSubTasks } from './services';
 import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
+import TaskChartReport from '../../dashboard/admin/TaskChartReport';
+import { getReportSubTask, getReportSubTaskDepartment } from '../../dashboard/services';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 
 const SubTaskPage = () => {
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const [subtasks, setSubtasks] = useState([]);
+	const [subTaskReport, setSubTaskReport] = useState({});
+	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState({});
 	const [itemEdit, setItemEdit] = useState({});
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirm, set0penConfirm] = React.useState(false);
@@ -62,6 +69,21 @@ const SubTaskPage = () => {
 
 	useEffect(() => {
 		fetchDataAllSubTasks();
+	}, []);
+
+	useEffect(() => {
+		const fetchDataSubtasksReport = async () => {
+			const response = await getReportSubTask();
+			const result = await response.data;
+			setSubTaskReport(result);
+		};
+		const fetchDataSubtasksReportDepartment = async () => {
+			const response = await getReportSubTaskDepartment();
+			const result = await response.data;
+			setSubTaskReportDepartment(result);
+		};
+		fetchDataSubtasksReportDepartment();
+		fetchDataSubtasksReport();
 	}, []);
 
 	// form modal
@@ -204,7 +226,80 @@ const SubTaskPage = () => {
 					</div>
 				</div>
 				<div className='row'>
-					<div className='col-md-12' style={{ marginTop: 50 }}>
+					{verifyPermissionHOC(
+						<>
+							<div className='col-xxl-6'>
+								<Card className='mb-4'>
+									<CardHeader className='py-0'>
+										<CardLabel icon='ReceiptLong'>
+											<CardTitle tag='h4' className='h5'>
+												Thống kê đầu việc tổng quan
+											</CardTitle>
+											<CardSubTitle tag='h5' className='h6'>
+												Báo cáo
+											</CardSubTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody className='py-0'>
+										<div className='row'>
+											<div className='col-xl-12 col-xxl-12'>
+												<TaskChartReport data={subTaskReportDepartment} />
+											</div>
+										</div>
+									</CardBody>
+								</Card>
+							</div>
+							<div className='col-xxl-6'>
+								<Card className='mb-4'>
+									<CardHeader className='py-0'>
+										<CardLabel icon='ReceiptLong'>
+											<CardTitle tag='h4' className='h5'>
+												Thống kê đầu việc cá nhân
+											</CardTitle>
+											<CardSubTitle tag='h5' className='h6'>
+												Báo cáo
+											</CardSubTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody className='py-0'>
+										<div className='row'>
+											<div className='col-xl-12 col-xxl-12'>
+												<TaskChartReport data={subTaskReport} />
+											</div>
+										</div>
+									</CardBody>
+								</Card>
+							</div>
+						</>,
+						['manager', 'admin'],
+					)}
+					{verifyPermissionHOC(
+						<div className='col-xxl-12'>
+							<Card className='mb-4'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê đầu việc cá nhân
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-xl-12 col-xxl-12'>
+											<TaskChartReport data={subTaskReport} />
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['user'],
+					)}
+				</div>
+				<div className='row'>
+					<div className='col-md-12'>
 						<Card>
 							<CardHeader>
 								<CardLabel icon='Task' iconColor='danger'>

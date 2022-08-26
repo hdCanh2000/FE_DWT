@@ -50,6 +50,8 @@ import Dropdown, {
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import { addNewSubtask } from '../TaskDetail/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import TaskChartReport from '../../dashboard/admin/TaskChartReport';
+import { getReportSubTaskDepartment, getReportTask } from '../../dashboard/services';
 
 const Item = ({
 	id,
@@ -142,6 +144,8 @@ const TaskListPage = () => {
 	// departments
 	const [dataDepartments, setDataDepartments] = useState([]);
 	const [tasks, setTasks] = useState([]);
+	const [taskReport, setTaskReport] = useState({});
+	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState({});
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
@@ -194,7 +198,22 @@ const TaskListPage = () => {
 
 	useEffect(() => {
 		fetchDataAllTasks();
+		const fetchDataReportTaskByDepartment = async () => {
+			const response = await getReportTask({ departmentId: departmentSelect });
+			const result = await response.data;
+			setTaskReport(result);
+		};
+		fetchDataReportTaskByDepartment();
 	}, [departmentSelect, fetchDataAllTasks]);
+
+	useEffect(() => {
+		const fetchDataSubtasksReportDepartment = async () => {
+			const response = await getReportSubTaskDepartment();
+			const result = await response.data;
+			setSubTaskReportDepartment(result);
+		};
+		fetchDataSubtasksReportDepartment();
+	}, []);
 
 	// Handle
 	const handleOpenModalExpand = (taskId) => {
@@ -409,7 +428,57 @@ const TaskListPage = () => {
 					</div>
 				</div>
 				<div className='row'>
-					<div className='col-md-12' style={{ marginTop: 50 }}>
+					{verifyPermissionHOC(
+						<div className='col-xxl-6'>
+							<Card className='my-4'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê công việc
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-xl-12 col-xxl-12'>
+											<TaskChartReport data={taskReport} />
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['admin', 'manager'],
+					)}
+					{verifyPermissionHOC(
+						<div className='col-xxl-6'>
+							<Card className='my-4'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê đầu việc tổng quan
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-xl-12 col-xxl-12'>
+											<TaskChartReport data={subTaskReportDepartment} />
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['manager', 'admin'],
+					)}
+				</div>
+				<div className='row my-4'>
+					<div className='col-md-12'>
 						{parseInt(searchParams.get('view'), 10) === 1 ||
 						!searchParams.get('view') ? (
 							<Card>
