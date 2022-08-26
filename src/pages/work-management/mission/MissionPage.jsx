@@ -1,6 +1,5 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-
 import React, { useCallback, useEffect, useState } from 'react';
 import {
 	useNavigate,
@@ -10,7 +9,6 @@ import {
 	useLocation,
 } from 'react-router-dom';
 import moment from 'moment';
-// import { uniqBy } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -31,7 +29,6 @@ import {
 	getAllMission,
 	getLatestTasks,
 	updateMissionById,
-	// getAllTasks,
 } from './services';
 import Dropdown, {
 	DropdownItem,
@@ -46,6 +43,9 @@ import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 import verifyPermission from '../../../HOC/verifyPermissionHOC';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
+import MissionChartReport from '../../dashboard/admin/MissionChartReport';
+import TaskChartReport from '../../dashboard/admin/TaskChartReport';
+import { getReportMisson, getReportTask } from '../../dashboard/services';
 
 const Item = ({
 	id,
@@ -137,11 +137,13 @@ const Item = ({
 const MissionPage = () => {
 	const { addToast } = useToasts();
 	const [missions, setMissions] = useState([]);
-	// const [missionsWithTask, setMissionsWithTask] = useState([]);
+	const [missionReport, setMissionReport] = useState({});
+	const [taskReport, setTaskReport] = useState({});
 	const [latestTasks, setLatestTasks] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
+	const [departmentSelect] = useState(1);
 
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
@@ -157,8 +159,23 @@ const MissionPage = () => {
 			const result = await response.data;
 			setMissions(result);
 		};
+		const fetchDataReport = async () => {
+			const response = await getReportMisson();
+			const result = await response.data;
+			setMissionReport(result);
+		};
 		fetchData();
+		fetchDataReport();
 	}, []);
+
+	useEffect(() => {
+		const fetchDataReportTaskByDepartment = async () => {
+			const response = await getReportTask({ departmentId: departmentSelect });
+			const result = await response.data;
+			setTaskReport(result);
+		};
+		fetchDataReportTaskByDepartment();
+	}, [departmentSelect]);
 
 	const columns = [
 		{
@@ -317,6 +334,7 @@ const MissionPage = () => {
 			},
 		);
 	};
+
 	const handleSubmitMissionForm = async (data) => {
 		if (data.id) {
 			try {
@@ -411,7 +429,7 @@ const MissionPage = () => {
 		<PageWrapper title={demoPages.mucTieu.text}>
 			<Page container='fluid'>
 				{missions?.length > 0 && (
-					<div className='row mt-4 mb-4'>
+					<div className='row'>
 						<div className='col-12'>
 							<div className='d-flex justify-content-between align-items-center'>
 								<div className='display-6 fw-bold py-3'>Danh sách mục tiêu</div>
@@ -435,6 +453,80 @@ const MissionPage = () => {
 						</div>
 					</div>
 				)}
+				<div className='row'>
+					{verifyPermission(
+						<div className='col-xxl-6'>
+							<Card className='mb-4'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê mục tiêu
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-xl-12 col-xxl-12'>
+											<MissionChartReport data={missionReport} />
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['admin'],
+					)}
+					{verifyPermission(
+						<div className='col-xxl-6'>
+							<Card className='mb-8'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê công việc thuộc mục tiêu
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-xl-12 col-xxl-12'>
+											<TaskChartReport data={taskReport} />
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['admin'],
+					)}
+					{verifyPermission(
+						<div className='col-xxl-12'>
+							<Card className='mb-8'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê công việc thuộc mục tiêu
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-xl-12 col-xxl-12'>
+											<TaskChartReport data={taskReport} />
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['manager'],
+					)}
+				</div>
 				{parseInt(searchParams.get('view'), 10) === 1 || !searchParams.get('view') ? (
 					<div className='row'>
 						{missions?.map((item) => (

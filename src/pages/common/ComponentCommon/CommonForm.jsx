@@ -56,7 +56,7 @@ const CommonForm = ({
 												id={field.id}
 												label={field.title}>
 												<Select
-													ariaLabel={field.title}
+													ariaLabel={field.title || ''}
 													placeholder={`Chọn ${field.title}`}
 													list={field.options}
 													required
@@ -65,6 +65,7 @@ const CommonForm = ({
 													onChange={formik.handleChange}
 													onBlur={formik.handleBlur}
 													value={formik.values[field.id]}
+													defaultValue={formik.values[field.id] || ''}
 													isValid={formik.isValid}
 												/>
 											</FormGroup>
