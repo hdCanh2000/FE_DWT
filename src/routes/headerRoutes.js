@@ -1,8 +1,8 @@
 import React from 'react';
 import { dashboardMenu, demoPages, layoutMenu } from '../menu';
 import DashboardHeader from '../pages/common/Headers/DashboardHeader';
+// import CommonHeader from '../pages/common/Headers/CommonHeader';
 import DefaultHeader from '../pages/common/Headers/DefaultHeader';
-import CommonHeader from '../pages/common/Headers/CommonHeader';
 
 const headers = [
 	{ path: layoutMenu.pageLayout.subMenu.onlySubheader.path, element: null, exact: true },
@@ -12,78 +12,74 @@ const headers = [
 	// quan ly muc tieu
 	{
 		path: demoPages.mucTieu.path,
-		element: null,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// chi tiet muc tieu
 	{
-		path: `/muc-tieu/chi-tiet/:id`,
-		element: null,
+		path: `/${demoPages.mucTieu.path}/:id`,
+		element: <DashboardHeader />,
 		exact: true,
 	},
+
 	// chi tiet cong viec
 	{
-		path: `/quan-ly-cong-viec/cong-viec/danh-sach/:id`,
-		element: null,
+		path: `/${demoPages.quanLyCongViec.path}/:id`,
+		element: <DashboardHeader />,
 		exact: true,
 	},
-	// chi tiet cong viec
+	// danh sách đầu việc
 	{
-		path: `/quan-ly-cong-viec/cong-viec/:id`,
-		element: null,
+		path: demoPages.dauViec.path,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// chi tiết đầu việc -step
 	{
-		path: `/quan-ly-cong-viec/cong-viec-:taskid/dau-viec/:id`,
-		element: null,
-		exact: true,
-	},
-	// quan ly cong viec
-	{
-		path: demoPages.quanLyCongViec.subMenu.congViec.path,
-		element: <CommonHeader />,
+		path: `/${demoPages.dauViec.path}/:id`,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 
 	// danh sach cong viec
 	{
-		path: demoPages.quanLyCongViec.subMenu.danhSach.path,
-		element: <CommonHeader />,
+		path: demoPages.quanLyCongViec.path,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 
-	// quan ly dau viec
+	// quản lý phòng ban
 	{
-		path: demoPages.quanLyCongViec.subMenu.dauViec.path,
-		element: <CommonHeader />,
+		path: demoPages.phongBan.path,
+		element: <DashboardHeader />,
 		exact: true,
 	},
-
-	// công việc phòng ban chi tiết - danh sách dạng bảng
 	{
-		path: demoPages.quanLyCongViec.subMenu.danhSachCongViecPhongBan.path,
-		element: <CommonHeader />,
+		path: `${demoPages.phongBan.path}/:id`,
+		element: <DashboardHeader />,
 		exact: true,
 	},
-
-	// công việc phòng ban chi tiết - danh sách chi tiết dạng cột
+	// quản lý nhân viên
 	{
-		path: demoPages.quanLyCongViec.subMenu.chiTietCongViecPhongBan.path,
-		element: <CommonHeader />,
+		path: demoPages.nhanVien.path,
+		element: <DashboardHeader />,
 		exact: true,
 	},
-
+	{
+		path: `${demoPages.nhanVien.path}/:id`,
+		element: <DashboardHeader />,
+		exact: true,
+	},
 	// công việc phòng ban chi tiết - cấu hình
 	{
 		path: demoPages.cauHinh.path,
-		element: <CommonHeader />,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	// công việc phòng ban chi tiết - báo cáo
 	{
 		path: demoPages.baoCao.path,
-		element: <CommonHeader />,
+		element: <DashboardHeader />,
 		exact: true,
 	},
 	{

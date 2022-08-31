@@ -1,10 +1,10 @@
 import axiosClient from '../../../utils/axiosClient';
 
-const login = () => {
-	// lấy toàn bộ danh sách mục tiêu
+const login = (data) => {
 	return axiosClient({
-		method: 'GET',
+		method: 'POST',
 		url: '/login',
+		data,
 	});
 };
 

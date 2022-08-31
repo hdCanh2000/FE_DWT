@@ -21,7 +21,8 @@ const PageWrapper = forwardRef(({ title, description, className, children }, ref
 PageWrapper.propTypes = {
 	title: PropTypes.string,
 	description: PropTypes.string,
-	children: PropTypes.node.isRequired,
+	// eslint-disable-next-line react/require-default-props
+	children: PropTypes.node,
 	className: PropTypes.string,
 };
 PageWrapper.defaultProps = {

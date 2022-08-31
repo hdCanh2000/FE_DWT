@@ -126,7 +126,7 @@ const Header = ({ children, hasLeftMobileMenu, hasRightMobileMenu }) => {
 			</header>
 			<header
 				ref={refHeader}
-				className={classNames('header', {
+				className={classNames('header position-relative', {
 					'header-left-open': leftMenuStatus,
 					'header-right-open': rightMenuStatus,
 				})}>

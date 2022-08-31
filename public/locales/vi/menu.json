@@ -5,7 +5,7 @@
 	"Storybook": "Storybook",
 	"Formik": "Formik",
 	"Apex Charts": "Apex Charts",
-	"Dashboard": "Dashboard",
+	"Dashboard": "Tổng quan",
 	"Dashboard Booking": "Dashboard Booking",
 	"CRM Dashboard": "CRM Dashboard",
 	"Summary": "Summary",
@@ -149,5 +149,11 @@
 	"Profile": "Profile",
 	"DarkMode": "Dark Mode",
 	"LightMode": "Light Mode",
-	"Logout": "Logout"
+	"Logout": "Logout",
+	"Mission": "Mục tiêu",
+	"Tasks": "Công việc",
+	"Subtasks": "Đầu việc",
+	"Department": "Phòng ban",
+	"Configure": "Cấu hình",
+	"Report": "Báo cáo"
 }

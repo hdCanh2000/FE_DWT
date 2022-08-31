@@ -1,18 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import moment from 'moment';
 import classNames from 'classnames';
-import Dropdown, {
-	DropdownItem,
-	DropdownMenu,
-	DropdownToggle,
-} from '../../../components/bootstrap/Dropdown';
 import Button from '../../../components/bootstrap/Button';
 import {
 	formatColorPriority,
 	formatColorStatus,
 	FORMAT_TASK_STATUS,
-	STATUS,
 } from '../../../utils/constants';
 import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
@@ -22,117 +17,58 @@ const minWidth100 = {
 	minWidth: 100,
 };
 
-const ExpandRow = ({ subtasks, handleUpdateStatus }) => {
+const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 	const { themeStatus } = useDarkMode();
-
 	return (
-		<table className='table sub-table table-modern'>
+		<table className='table table-modern'>
 			<thead>
 				<tr>
-					<th
-						style={{
-							color: '#A562EC',
-							paddingLeft: 0,
-						}}>
-						<div className='d-flex align-items-center'>
-							<span className='mx-2 block'>Tên đầu việc</span>
-						</div>
-					</th>
+					<th>Tên đầu việc</th>
 					<th className='text-center'>Nhân viên phụ trách</th>
 					<th className='text-center'>Trạng thái</th>
-					<th className='text-center'>Thời gian dự tính</th>
 					<th className='text-center'>Hạn ngày hoàn thành</th>
 					<th className='text-center'>Giá trị KPI</th>
-					<th className='text-center'>Tỉ trọng hoàn thành</th>
+					<th className='text-center'>Tiến độ</th>
 					<th className='text-center'>Thứ tự ưu tiên</th>
 				</tr>
 			</thead>
 			<tbody>
 				{subtasks?.map((subTaskItem) => (
 					<tr key={subTaskItem.id}>
-						<td
-							style={{
-								borderLeft: '2px solid #A562EC',
-							}}>
-							{subTaskItem.name}
-						</td>
-						<td className='text-center'>{subTaskItem?.user?.name}</td>
 						<td>
-							<Dropdown>
-								<DropdownToggle hasIcon={false}>
-									<Button
-										isLink
-										color={formatColorStatus(subTaskItem.status)}
-										icon='Circle'
-										className='text-nowrap'>
-										{FORMAT_TASK_STATUS(subTaskItem.status)}
-									</Button>
-								</DropdownToggle>
-								<DropdownMenu>
-									{Object.keys(STATUS).map((key) => (
-										<DropdownItem
-											key={key}
-											onClick={() =>
-												handleUpdateStatus(STATUS[key].value, subTaskItem)
-											}>
-											<div>
-												<Icon icon='Circle' color={STATUS[key].color} />
-												{STATUS[key].name}
-											</div>
-										</DropdownItem>
-									))}
-								</DropdownMenu>
-							</Dropdown>
+							<Link className='text-underline' to={`/dau-viec/${subTaskItem?.id}`}>
+								{subTaskItem?.name}
+							</Link>
+						</td>
+						<td className='text-center'>{subTaskItem?.users[0]?.name}</td>
+						<td className='text-center'>
+							<Button
+								isLink
+								color={formatColorStatus(subTaskItem.status)}
+								icon='Circle'
+								className='text-nowrap'>
+								{FORMAT_TASK_STATUS(subTaskItem.status)}
+							</Button>
 						</td>
 						<td className='text-center'>
-							<span
-								className='text-nowrap'
-								style={{
-									background: '#569CFB',
-									color: '#fff',
-									padding: '5px 30px 5px 30px',
-									borderRadius: '2rem',
-								}}>
-								{moment(
-									`${subTaskItem.estimate_date} ${subTaskItem.estimate_time}`,
-								).format('DD-MM-YYYY, HH:mm')}
-							</span>
+							{moment(`${subTaskItem.deadlineDate}`).format('DD-MM-YYYY')}
 						</td>
-						<td className='text-center'>
-							<span
-								className='text-nowrap'
-								style={{
-									background: '#A25DDC',
-									color: '#fff',
-									padding: '5px 30px 5px 30px',
-									borderRadius: '2rem',
-								}}>
-								{moment(
-									`${subTaskItem.deadline_date} ${subTaskItem.deadline_time}`,
-								).format('DD-MM-YYYY, HH:mm')}
-							</span>
-						</td>
-						<td className='text-center'>{subTaskItem.kpi_value}</td>
+						<td className='text-center'>{subTaskItem.kpiValue}</td>
 						<td className='text-center' style={minWidth100}>
 							<div className='d-flex align-items-center'>
-								<div className='flex-shrink-0 me-3'>{`${75}%`}</div>
+								<div className='flex-shrink-0 me-3'>{`${subTaskItem.progress}%`}</div>
 								<Progress
 									className='flex-grow-1'
 									isAutoColor
-									value={75}
-									style={{
-										height: 10,
-									}}
+									value={subTaskItem.progress}
+									style={{ height: 10 }}
 								/>
 							</div>
 						</td>
 						<td className='text-center'>
-							<div className='d-flex align-items-center'>
+							<div className='d-flex align-items-center justify-content-center'>
 								<span
-									style={{
-										paddingRight: '1rem',
-										paddingLeft: '1rem',
-									}}
+									style={{ paddingRight: '1rem', paddingLeft: '1rem' }}
 									className={classNames(
 										'badge',
 										'border border-2',
@@ -148,18 +84,13 @@ const ExpandRow = ({ subtasks, handleUpdateStatus }) => {
 					</tr>
 				))}
 				<tr>
-					<td
-						colSpan={11}
-						style={{
-							borderLeft: '3px solid #D7A5FF',
-						}}>
+					<td colSpan={12}>
 						<Button
 							className='d-flex align-items-center cursor-pointer'
-							style={{
-								paddingLeft: 0,
-							}}>
+							style={{ paddingLeft: 0 }}
+							onClick={() => onOpenModal(taskId)}>
 							<Icon size='lg' icon='PlusCircle' />
-							<span className='mx-2'>Thêm mới</span>
+							<span className='mx-2'>Thêm đầu việc</span>
 						</Button>
 					</td>
 				</tr>
@@ -172,11 +103,15 @@ ExpandRow.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types, react/require-default-props
 	subtasks: PropTypes.array.isRequired,
 	// eslint-disable-next-line react/require-default-props
-	handleUpdateStatus: PropTypes.func,
+	// handleUpdateStatus: PropTypes.func,
+	// eslint-disable-next-line react/require-default-props
+	onOpenModal: PropTypes.func,
+	taskId: PropTypes.number,
 };
 ExpandRow.defaultProps = {
 	// eslint-disable-next-line react/default-props-match-prop-types
 	subtasks: null,
+	taskId: null,
 };
 
 export default ExpandRow;

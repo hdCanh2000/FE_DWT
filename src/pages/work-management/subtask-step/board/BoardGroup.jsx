@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useFormik } from 'formik';
-import moment from 'moment';
 import Card, {
 	CardActions,
 	CardBody,
@@ -26,11 +25,11 @@ import Input from '../../../../components/bootstrap/forms/Input';
 import Textarea from '../../../../components/bootstrap/forms/Textarea';
 import Select from '../../../../components/bootstrap/forms/Select';
 import Option from '../../../../components/bootstrap/Option';
-import { getAllUser } from '../services';
+// import { getAllUser } from '../services';
 
 const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 	const [editModalStatus, setEditModalStatus] = useState(false);
-	const [users, setUsers] = useState([]);
+	// const [users, setUsers] = useState([]);
 	const _cardCount = groups?.cards?.length;
 	const formik = useFormik({
 		initialValues: {
@@ -41,30 +40,12 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 		},
 		onSubmit: (values) => {
 			const valuesClone = { ...values };
-			const newWorks = JSON.parse(JSON.stringify(subtask?.logs ? subtask?.logs : []));
-			const newLogs = [
-				...newWorks,
-				{
-					user: {
-						id: subtask?.user?.id,
-						name: subtask?.user?.name,
-					},
-					type: 2,
-					prev_status: null,
-					next_status: `Thêm mới`,
-					// eslint-disable-next-line no-unsafe-optional-chaining
-					step_id: subtask?.steps?.length + 1,
-					step_name: values?.name,
-					time: moment().format('YYYY/MM/DD hh:mm'),
-				},
-			];
-			const subtaskClone = { ...subtask, logs: newLogs };
+			const subtaskClone = { ...subtask };
 			const { steps } = subtaskClone;
 			const stepsClone = [...steps];
-			valuesClone.task_id = subtaskClone?.task_id;
-			valuesClone.subtask_id = subtaskClone?.id;
-			valuesClone.id = steps.length + 1;
+			valuesClone.subtaskId = subtaskClone?.id;
 			valuesClone.status = parseInt(values.status, 10);
+			valuesClone.id = steps.length + 1;
 			stepsClone.push(valuesClone);
 			subtaskClone.steps = stepsClone;
 			onAddStep(subtaskClone);
@@ -72,14 +53,14 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 		},
 	});
 
-	useEffect(() => {
-		async function fetchDataUsers() {
-			const response = await getAllUser();
-			const result = await response.data;
-			setUsers(result);
-		}
-		fetchDataUsers();
-	}, []);
+	// useEffect(() => {
+	// 	async function fetchDataUsers() {
+	// 		const response = await getAllUser();
+	// 		const result = await response.data;
+	// 		setUsers(result);
+	// 	}
+	// 	fetchDataUsers();
+	// }, []);
 	return (
 		<>
 			<div className='col'>
@@ -106,7 +87,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 						</CardActions>
 					</CardHeader>
 					{!!_cardCount && (
-						<CardBody className='cursor-pointer' isScrollable={_cardCount > 3}>
+						<CardBody className='cursor-pointer h-100'>
 							{groups.cards.map((card) => (
 								<BoardCard
 									key={card.id}
@@ -156,6 +137,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 									<div className='row g-4'>
 										<FormGroup className='col-12' id='name' label='Tên bước'>
 											<Input
+												ariaLabel='Name'
 												onChange={formik.handleChange}
 												value={formik.values.name}
 											/>
@@ -165,6 +147,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 											id='description'
 											label='Mô tả'>
 											<Textarea
+												ariaLabel='Description'
 												onChange={formik.handleChange}
 												value={formik.values.description}
 											/>
@@ -189,19 +172,19 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 										))}
 									</Select>
 								</FormGroup>
-								<FormGroup className='col-12' id='partner' label='Cần phối hợp'>
+								{/* <FormGroup className='col-12' id='partner' label='Cần phối hợp'>
 									<Select
 										ariaLabel='Board select'
 										placeholder='Chọn người phối hợp'
 										onChange={formik.handleChange}
 										value={formik.values.partner}>
 										{users.map((u) => (
-											<Option key={u.id} value={u.name}>
+											<Option key={u.id} value={u.id}>
 												{`${u.name}`}
 											</Option>
 										))}
 									</Select>
-								</FormGroup>
+								</FormGroup> */}
 							</div>
 						</div>
 					</div>

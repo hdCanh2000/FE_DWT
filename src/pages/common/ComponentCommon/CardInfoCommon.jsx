@@ -11,7 +11,6 @@ import Card, {
 import Icon from '../../../components/icon/Icon';
 
 const CardInfoCommon = ({
-	children,
 	data,
 	title,
 	subTitle,
@@ -32,10 +31,11 @@ const CardInfoCommon = ({
 			</CardHeader>
 			<CardBody isScrollable={isScrollable} className='py-2'>
 				<div className='row g-2 ps-5 pe-4'>
-					{data?.map((item) => {
+					{data?.map((item, index) => {
 						return (
-							<div className='col-12 mb-2' key={children?.key}>
-								<div className='d-flex align-items-center'>
+							// eslint-disable-next-line react/no-array-index-key
+							<div className='col-12 mb-2' key={index}>
+								<div className='d-flex align-items-start'>
 									<div className='flex-shrink-0'>
 										<Icon
 											icon={item?.icon || ''}
@@ -55,7 +55,6 @@ const CardInfoCommon = ({
 };
 
 CardInfoCommon.propTypes = {
-	children: PropTypes.node.isRequired,
 	className: PropTypes.string,
 	shadow: PropTypes.oneOf([null, 'none', 'sm', 'md', 'lg', '3d']),
 	title: PropTypes.string,

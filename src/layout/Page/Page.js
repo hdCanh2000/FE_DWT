@@ -16,7 +16,8 @@ const Page = forwardRef(({ children, className, container, ...props }, ref) => {
 	);
 });
 Page.propTypes = {
-	children: PropTypes.node.isRequired,
+	// eslint-disable-next-line react/require-default-props
+	children: PropTypes.node,
 	container: PropTypes.oneOfType([
 		PropTypes.bool,
 		PropTypes.oneOf([null, 'sm', 'md', 'lg', 'xl', 'xxl', 'fluid']),

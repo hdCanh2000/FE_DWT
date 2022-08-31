@@ -25,6 +25,13 @@ const TASK = {
 	REPORT: lazy(() => import('../pages/work-management/report-department/ReportDepartmentPage')),
 };
 
+const MANAGEMENT = {
+	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
+	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
+	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
+	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
+};
+
 const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
 	LOGIN: lazy(() => import('../pages/presentation/auth/Login')),
@@ -56,7 +63,7 @@ const presentation = [
 	},
 	// Trang đầu việc - Step
 	{
-		path: `/quan-ly-cong-viec/cong-viec-:taskid/dau-viec/:id`,
+		path: `/${demoPages.dauViec.path}/:id`,
 		element: <TASK.SUBTASK_STEP />,
 		exact: true,
 	},
@@ -64,63 +71,63 @@ const presentation = [
 	 * Trang chi tiết nhiệm vụ
 	 */
 	{
-		path: `/muc-tieu/chi-tiet/:id`,
+		path: `/${demoPages.mucTieu.path}/:id`,
 		element: <TASK.MISSION_DETAIL />,
 		exact: true,
 	},
 	/**
 	 * Trang quản lý công việc
 	 */
-	{
-		path: demoPages.quanLyCongViec.subMenu.congViec.path,
-		element: <TASK.TASKMANAGEMENT />,
-		exact: true,
-	},
+	// {
+	// 	path: demoPages.quanLyCongViec.subMenu.congViec.path,
+	// 	element: <TASK.TASKMANAGEMENT />,
+	// 	exact: true,
+	// },
 
 	/**
 	 * Trang danh sách công việc
 	 */
 	{
-		path: demoPages.quanLyCongViec.subMenu.danhSach.path,
+		path: demoPages.quanLyCongViec.path,
 		element: <TASK.TASKLIST />,
 		exact: true,
 	},
 	/**
 	 * Trang chi tiết công việc theo id
 	 */
-	{
-		path: `${demoPages.quanLyCongViec.subMenu.congViec.path}/:id`,
-		element: <TASK.TASKDETAIL />,
-		exact: true,
-	},
+	// {
+	// 	path: `${demoPages.quanLyCongViec.subMenu.congViec.path}/:id`,
+	// 	element: <TASK.TASKDETAIL />,
+	// 	exact: true,
+	// },
 
 	/**
 	 * trang quản lý đầu việc
 	 */
 	{
-		path: demoPages.quanLyCongViec.subMenu.dauViec.path,
+		path: demoPages.dauViec.path,
 		element: <TASK.SUBTASK />,
 		exact: true,
 	},
 	/**
 	 * trang quản lý danh sách công việc theo phòng ban - danh sách dạng bảng
 	 */
-	{
-		path: demoPages.quanLyCongViec.subMenu.danhSachCongViecPhongBan.path,
-		element: <TASK.TASKLISTDEPARTMENT />,
-		exact: true,
-	},
+	// {
+	// 	path: demoPages.quanLyCongViec.subMenu.danhSachCongViecPhongBan.path,
+	// 	element: <TASK.TASKLISTDEPARTMENT />,
+	// 	exact: true,
+	// },
 	/**
 	 * trang quản lý danh sách công việc theo phòng ban - công việc dạng theo đầu nhiệm vụ
 	 */
-	{
-		path: demoPages.quanLyCongViec.subMenu.chiTietCongViecPhongBan.path,
-		element: <TASK.DETAIL_TASK_DEPARTMENT />,
-		exact: true,
-	},
+	// {
+	// 	path: demoPages.quanLyCongViec.subMenu.chiTietCongViecPhongBan.path,
+	// 	element: <TASK.DETAIL_TASK_DEPARTMENT />,
+	// 	exact: true,
+	// },
 	// trang chi tiết công việc
 	{
-		path: `${demoPages.quanLyCongViec.subMenu.danhSach}/:id`,
+		path: `${demoPages.quanLyCongViec.path}/:id`,
 		element: <TASK.TASKDETAIL />,
 		exact: true,
 	},
@@ -135,6 +142,26 @@ const presentation = [
 	/**
 	 * trang công việc phòng ban chi tiết - báo cáo
 	 */
+	{
+		path: demoPages.phongBan.path,
+		element: <MANAGEMENT.DEPARTMENT />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.phongBan.path}/:id`,
+		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
+		exact: true,
+	},
+	{
+		path: demoPages.nhanVien.path,
+		element: <MANAGEMENT.EMPLOYEE />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.nhanVien.path}/:id`,
+		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
+		exact: true,
+	},
 	{
 		path: demoPages.baoCao.path,
 		element: <TASK.REPORT />,

@@ -1,8 +1,7 @@
 import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
-import moment from 'moment';
 import useDarkMode from '../../../../hooks/useDarkMode';
 import Card, {
 	CardBody,
@@ -22,13 +21,12 @@ import Input from '../../../../components/bootstrap/forms/Input';
 import Button from '../../../../components/bootstrap/Button';
 import Select from '../../../../components/bootstrap/forms/Select';
 import Option from '../../../../components/bootstrap/Option';
-import { getAllUser } from '../services';
+// import { getAllUser } from '../services';
 
 const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	const { darkModeStatus } = useDarkMode();
-	const [users, setUsers] = useState([]);
+	// const [users, setUsers] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
-	const person = window.localStorage.getItem('name');
 	const formik = useFormik({
 		initialValues: {
 			name: card?.name || '',
@@ -37,43 +35,28 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 			partner: card?.partner || '',
 		},
 		onSubmit: (values, { resetForm }) => {
-			const valuesClone = { ...values };
-			const newWorks = JSON.parse(JSON.stringify(subtask.logs ? subtask.logs : []));
-			const newLogs = [
-				...newWorks,
-				{
-					user: person,
-					type: 2,
-					prev_status: null,
-					next_status: `Chỉnh sửa`,
-					step_id: card?.step_id,
-					step_name: card?.name,
-					time: moment().format('YYYY/MM/DD hh:mm'),
-				},
-			];
-			const subtaskClone = { ...subtask, logs: newLogs };
+			const valuesSubmit = { ...values };
+			const subtaskClone = { ...subtask };
 			const { steps } = subtaskClone;
 			const stepsClone = [...steps];
-			valuesClone.task_id = subtaskClone?.task_id;
-			valuesClone.subtask_id = subtaskClone?.id;
-			valuesClone.id = card.id;
-			valuesClone.status = parseInt(values.status, 10);
+			valuesSubmit.status = parseInt(values.status, 10);
+			valuesSubmit.id = card.id;
 			subtaskClone.steps = stepsClone.map((item) =>
-				item.id === valuesClone.id ? { ...valuesClone } : item,
+				item.id === valuesSubmit.id ? { ...valuesSubmit } : item,
 			);
 			onAddStep(subtaskClone);
 			setEditModalStatus(false);
 			resetForm();
 		},
 	});
-	useEffect(() => {
-		async function fetchDataUsers() {
-			const response = await getAllUser();
-			const result = await response.data;
-			setUsers(result);
-		}
-		fetchDataUsers();
-	}, []);
+	// useEffect(() => {
+	// 	async function fetchDataUsers() {
+	// 		const response = await getAllUser();
+	// 		const result = await response.data;
+	// 		setUsers(result);
+	// 	}
+	// 	fetchDataUsers();
+	// }, []);
 
 	return (
 		<>
@@ -124,6 +107,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 									<div className='row g-4'>
 										<FormGroup className='col-12' id='name' label='Tên bước'>
 											<Input
+												ariaLabel='name'
 												onChange={formik.handleChange}
 												value={formik.values.name}
 											/>
@@ -133,6 +117,7 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 											id='description'
 											label='Mô tả'>
 											<Textarea
+												ariaLabel='description'
 												onChange={formik.handleChange}
 												value={formik.values.description}
 											/>
@@ -156,19 +141,19 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 										))}
 									</Select>
 								</FormGroup>
-								<FormGroup className='col-12' id='partner' label='Cần phối hợp'>
+								{/* <FormGroup className='col-12' id='partner' label='Cần phối hợp'>
 									<Select
 										ariaLabel='Board select'
 										placeholder='Chọn người phối hợp'
 										onChange={formik.handleChange}
 										value={formik.values.partner}>
 										{users.map((u) => (
-											<Option key={u.id} value={u.name}>
+											<Option key={u.id} value={u.id}>
 												{`${u.name}`}
 											</Option>
 										))}
 									</Select>
-								</FormGroup>
+								</FormGroup> */}
 							</div>
 						</div>
 					</div>

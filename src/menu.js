@@ -41,253 +41,75 @@ export const dashboardMenu = {
 };
 
 export const demoPages = {
-	// login: {
-	// 	id: 'dangNhap',
-	// 	text: 'Đăng nhập',
-	// 	path: '/dang-nhap',
-	// },
 	mucTieu: {
 		id: 'mission',
-		text: 'Mục tiêu',
+		text: 'Mission',
 		path: '/muc-tieu',
-		// subMenu: {
-		// 	mission: {
-		// 		id: 'mission',
-		// 		text: 'Danh sách',
-		// 		path: '/muc-tieu/danh-sach',
-		// 	},
-		// },
+		roles: ['admin', 'manager'],
 	},
 	quanLyCongViec: {
 		id: 'quanlycongviec',
-		text: 'Công việc',
-		path: 'quan-ly-cong-viec',
-		subMenu: {
-			congViec: {
-				id: 'congViec',
-				text: 'Tổng quan',
-				path: '/quan-ly-cong-viec/cong-viec',
-			},
-			danhSach: {
-				id: 'danhSach',
-				text: 'Danh sách',
-				path: '/quan-ly-cong-viec/danh-sach',
-			},
-			dauViec: {
-				id: 'dauViec',
-				text: 'Đầu việc',
-				path: '/quan-ly-cong-viec/dau-viec',
-			},
-			danhSachCongViecPhongBan: {
-				id: 'danhSachCongViecPhongBan',
-				text: 'DSCV phòng ban',
-				path: '/quan-ly-cong-viec/tong-quan-phong-ban',
-			},
-			chiTietCongViecPhongBan: {
-				id: 'chiTietCongViecPhongBan',
-				text: 'CTCV phòng ban',
-				path: '/quan-ly-cong-viec/chi-tiet-phong-ban',
-			},
-			// cauHinh: {
-			// 	id: 'cauHinh',
-			// 	text: 'Cấu hình',
-			// 	path: '/quan-ly-cong-viec/cau-hinh',
-			// },
-			// baoCao: {
-			// 	id: 'baoCao',
-			// 	text: 'Báo cáo',
-			// 	path: '/quan-ly-cong-viec/bao-cao',
-			// },
-		},
+		text: 'Tasks',
+		path: '/cong-viec',
+		roles: ['admin', 'manager', 'user'],
+		// subMenu: {
+		// 	congViec: {
+		// 		id: 'congViec',
+		// 		text: 'Tổng quan',
+		// 		path: '/cong-viec/cong-viec',
+		// 	},
+		// 	danhSach: {
+		// 		id: 'danhSach',
+		// 		text: 'Danh sách',
+		// 		path: '/cong-viec/danh-sach',
+		// 	},
+		// 	dauViec: {
+		// 		id: 'dauViec',
+		// 		text: 'Đầu việc',
+		// 		path: '/cong-viec/dau-viec',
+		// 	},
+		// 	danhSachCongViecPhongBan: {
+		// 		id: 'danhSachCongViecPhongBan',
+		// 		text: 'DSCV phòng ban',
+		// 		path: '/cong-viec/tong-quan-phong-ban',
+		// 	},
+		// 	chiTietCongViecPhongBan: {
+		// 		id: 'chiTietCongViecPhongBan',
+		// 		text: 'CTCV phòng ban',
+		// 		path: '/cong-viec/chi-tiet-phong-ban',
+		// 	},
+		// },
+	},
+	dauViec: {
+		id: 'dauViec',
+		text: 'Subtasks',
+		path: '/dau-viec',
+		roles: ['admin', 'manager', 'user'],
+	},
+	phongBan: {
+		id: 'phongBan',
+		text: 'Department',
+		path: '/phong-ban',
+		roles: ['admin'],
+	},
+	nhanVien: {
+		id: 'nhanVien',
+		text: 'Employee',
+		path: '/nhan-vien',
+		roles: ['admin', 'manager'],
 	},
 	cauHinh: {
 		id: 'cauHinh',
-		text: 'Cấu hình',
+		text: 'Configure',
 		path: '/cau-hinh',
-		// subMenu: {
-		// 	cauHinh: {
-		// 		id: 'cauHinh',
-		// 		text: 'Cấu hình',
-		// 		path: '/quan-ly-cong-viec/cau-hinh',
-		// 	},
-		// },
+		roles: ['admin'],
 	},
 	baoCao: {
 		id: 'baoCao',
-		text: 'Báo cáo',
+		text: 'Report',
 		path: '/bao-cao',
-		// subMenu: {
-		// 	baoCao: {
-		// 		id: 'baoCao',
-		// 		text: 'Báo cáo',
-		// 		path: '/quan-ly-cong-viec/bao-cao',
-		// 	},
-		// },
+		roles: ['admin'],
 	},
-	// companyPage: {
-	// 	id: 'companyPage',
-	// 	text: 'Cơ cấu tổ chức',
-	// 	path: 'company-pages',
-	// 	icon: 'CustomCompany',
-	// 	subMenu: {
-	// 		department: {
-	// 			id: 'department',
-	// 			text: 'Phòng ban',
-	// 			path: '/phong-ban',
-	// 		},
-	// 		areas: {
-	// 			id: 'areas',
-	// 			text: 'Khu vực',
-	// 			path: '/khu-vuc',
-	// 		},
-	// 		unitTree: {
-	// 			id: 'unitTree',
-	// 			text: 'Cây đơn vị',
-	// 			path: '/cay-don-vi',
-	// 		},
-	// 		position: {
-	// 			id: 'position',
-	// 			text: 'Chức danh',
-	// 			path: '/chuc-danh',
-	// 		},
-	// 		records: {
-	// 			id: 'records',
-	// 			text: 'Hồ sơ nhân sự',
-	// 			path: '/ho-so-nhan-su',
-	// 		},
-	// 	},
-	// },
-	// jobsPage: {
-	// 	id: 'jobsPage',
-	// 	text: 'Công việc',
-	// 	path: 'jobs-page',
-	// 	icon: 'CustomBriefCase',
-	// 	subMenu: {
-	// 		work: {
-	// 			id: 'work',
-	// 			text: 'Công việc',
-	// 			path: '/cong-viec',
-	// 		},
-	// 		startWork: {
-	// 			id: 'startWork',
-	// 			text: 'Đầu việc',
-	// 			path: '/dau-viec',
-	// 		},
-	// 		resultsLadder: {
-	// 			id: 'resultsLadder',
-	// 			text: 'Thang kết quả',
-	// 			path: '/thang-ket-qua',
-	// 		},
-	// 		bonusMilestone: {
-	// 			id: 'bonusMilestone',
-	// 			text: 'Mốc khen thưởng',
-	// 			path: '/moc-khen-thuong',
-	// 		},
-	// 		workStatus: {
-	// 			id: 'workStatus',
-	// 			text: 'Trạng thái công việc',
-	// 			path: '/trang-thai-cong-viec',
-	// 		},
-	// 		process: {
-	// 			id: 'process',
-	// 			text: 'Quy trình',
-	// 			path: '/quy-trinh',
-	// 		},
-	// 		careerGuildline: {
-	// 			id: 'careerGuildline',
-	// 			text: 'Hướng dẫn nghiệp vụ',
-	// 			path: '/huong-dan-nghiep-vu',
-	// 		},
-	// 		jobForm: {
-	// 			id: 'jobForm',
-	// 			text: 'Biểu mẫu',
-	// 			path: '/bieu-mau',
-	// 		},
-	// 	},
-	// },
-	// permissionsPage: {
-	// 	id: 'permissionsPage',
-	// 	text: 'Phân quyền',
-	// 	path: 'permissions-page',
-	// 	icon: 'CustomBalanceScale',
-	// 	subMenu: {
-	// 		permissionName: {
-	// 			id: 'permissionName',
-	// 			text: 'Tên quyền',
-	// 			path: '/ten-quyen',
-	// 		},
-	// 		accessLevel: {
-	// 			id: 'accessLevel',
-	// 			text: 'Mức độ tiếp cận',
-	// 			path: '/muc-do-tiep-can',
-	// 		},
-	// 	},
-	// },
-	// kpiPage: {
-	// 	id: 'kpiPage',
-	// 	text: 'Chỉ tiêu KPI',
-	// 	path: 'kpi-page',
-	// 	icon: 'CustomChartBar',
-	// 	subMenu: {
-	// 		kpiList: {
-	// 			id: 'kpiList',
-	// 			text: 'Danh sách KPI',
-	// 			path: '/danh-sach-kpi',
-	// 		},
-	// 	},
-	// },
-	// supervisoryPage: {
-	// 	id: 'supervisoryPage',
-	// 	text: 'Giám sát',
-	// 	path: 'supervisory-page',
-	// 	icon: 'CustomCompass ',
-	// 	subMenu: {
-	// 		procedure: {
-	// 			id: 'procedure',
-	// 			text: 'Quy trình',
-	// 			path: '/quy-trinh',
-	// 		},
-	// 		progress: {
-	// 			id: 'progress',
-	// 			text: 'Tiến độ',
-	// 			path: '/tien-do',
-	// 		},
-	// 		productivity: {
-	// 			id: 'productivity',
-	// 			text: 'Năng suất',
-	// 			path: '/nang-xuat',
-	// 		},
-	// 		effective: {
-	// 			id: 'effective',
-	// 			text: 'Hiệu quả',
-	// 			path: '/hieu-qua',
-	// 		},
-	// 	},
-	// },
-	// reportPage: {
-	// 	id: 'reportPage',
-	// 	text: 'Báo cáo',
-	// 	path: 'report-page',
-	// 	icon: 'CustomPages',
-	// 	subMenu: {
-	// 		overview: {
-	// 			id: 'overview',
-	// 			text: 'Tổng quan',
-	// 			path: '/tong-quan',
-	// 		},
-	// 		progressReports: {
-	// 			id: 'progressReports',
-	// 			text: 'Báo cáo tiến độ',
-	// 			path: '/bao-cao-tien-do',
-	// 		},
-	// 	},
-	// },
-	// page404: {
-	// 	id: 'Page404',
-	// 	text: '',
-	// 	path: 'auth-pages/404',
-	// 	icon: '',
-	// },
 };
 
 export const layoutMenu = {
