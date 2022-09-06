@@ -427,6 +427,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 								<CardBody>
 									<div className='row g-4'>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='name'
 											label='Tên công việc'>
@@ -471,6 +472,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											/>
 										</FormGroup>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='kpiValue'
 											label='Giá trị KPI'>
@@ -490,6 +492,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											<ErrorText>Vui lòng nhập giá trị KPI hợp lệ</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='priority'
 											label='Độ ưu tiên'>
@@ -516,6 +519,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 										{/* phòng ban phụ trách */}
 										<div className='col-6'>
 											<FormGroup
+												color='red'
 												id='departmentOption'
 												label='Phòng ban phụ trách'>
 												<SelectComponent
@@ -536,7 +540,10 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 										</div>
 										{/* nhân viên phụ trách chính */}
 										<div className='col-6'>
-											<FormGroup id='userOption' label='Nhân viên phụ trách'>
+											<FormGroup
+												id='userOption'
+												label='Nhân viên phụ trách'
+												color='red'>
 												<SelectComponent
 													style={customStyles}
 													placeholder='Chọn nhân viên phụ trách'

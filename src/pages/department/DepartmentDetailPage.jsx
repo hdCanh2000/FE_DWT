@@ -482,7 +482,7 @@ const DepartmentDetailPage = () => {
 					onClose={hanleCloseForm}
 					handleSubmit={handleSubmitEmployeeForm}
 					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
+					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viênn'}
 					fields={columns}
 				/>
 			</Page>

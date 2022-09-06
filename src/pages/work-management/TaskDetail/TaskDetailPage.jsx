@@ -823,7 +823,8 @@ const TaskDetailPage = () => {
 																</span>
 																trên tổng số
 																<span className='fw-bold text-danger fs-5 mx-2'>
-																	{taskReport.total - taskReport.pending}
+																	{taskReport.total -
+																		taskReport.pending}
 																</span>
 																đầu việc.
 															</div>

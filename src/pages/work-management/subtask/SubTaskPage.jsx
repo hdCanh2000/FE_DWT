@@ -105,11 +105,12 @@ const SubTaskPage = () => {
 	// delete subtask
 	const handleDelete = async (id) => {
 		try {
-			await deleteSubtaskById(id);
+			await deleteSubtaskById(id.id);
 			handleShowToast(`Xoá đầu việc`, `Xoá đầu việc thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá đầu việc`, `Xoá đầu việc thất bại!`);
 		}
+		fetchDataAllSubTasks();
 	};
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------

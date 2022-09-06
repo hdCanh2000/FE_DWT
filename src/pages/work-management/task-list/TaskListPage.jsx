@@ -276,10 +276,10 @@ const TaskListPage = () => {
 			const newState = [...tasks];
 			setTasks(newState.filter((item) => item.id !== taskId));
 			handleCloseConfirmModal();
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
+			handleShowToast(`Xoá công việc`, `Xoá công việc thành công!`);
 		} catch (error) {
 			handleCloseConfirmModal();
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
+			handleShowToast(`Xoá công việc`, `Xoá công việc không thành công!`);
 		}
 	};
 

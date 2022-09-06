@@ -362,6 +362,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 								<CardBody>
 									<div className='row g-4'>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='name'
 											label='Tên mục tiêu'>
@@ -380,6 +381,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<ErrorText>Vui lòng nhập tên mục tiêu</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='description'
 											label='Mô tả mục tiêu'>
@@ -394,6 +396,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											/>
 										</FormGroup>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='kpi_value'
 											label='Giá trị KPI'>
@@ -413,6 +416,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<ErrorText>Vui lòng nhập giá trị KPI hợp lệ</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='kpi_value'
 											label='Phòng ban phụ trách'>

@@ -57,17 +57,14 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	// 	}
 	// 	fetchDataUsers();
 	// }, []);
-
+	const handleDeleteStep = (dataStep) => {
+		console.log(dataStep, 'dataStep');
+	};
 	return (
 		<>
-			<Card
-				shadow='md'
-				borderSize={1}
-				className='rounded-2'
-				borderColor='info'
-				onClick={() => setEditModalStatus(true)}>
+			<Card shadow='md' borderSize={1} className='rounded-2' borderColor='info'>
 				<CardHeader>
-					<CardLabel>
+					<CardLabel onClick={() => setEditModalStatus(true)}>
 						<CardTitle
 							tag='h6'
 							className={classNames('cursor-pointer', {
@@ -78,6 +75,15 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 							{card.name}
 						</CardTitle>
 					</CardLabel>
+					<Button
+						isOutline={!darkModeStatus}
+						color='danger'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='Trash'
+						onClick={() => handleDeleteStep(card)}
+						// eslint-disable-next-line prettier/prettier
+						/>
 				</CardHeader>
 				<CardBody className='pt-0' onClick={() => setEditModalStatus(true)}>
 					{card.description}

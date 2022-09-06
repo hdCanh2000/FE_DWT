@@ -338,7 +338,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 			<Modal.Body>
 				<div className='row g-4 px-2'>
 					<div className='col-12'>
-						<FormGroup id='name' label='Tên đầu việc' isFloating>
+						<FormGroup id='name' label='Tên đầu việc' color='red'>
 							<Input
 								onChange={handleChange}
 								placeholder='Tên đầu việc'
@@ -355,7 +355,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 					</div>
 					{isShowTask && (
 						<div className='col-12'>
-							<FormGroup id='task' label='Thuộc công việc'>
+							<FormGroup id='task' label='Thuộc công việc' color='red'>
 								<SelectComponent
 									placeholder='Thuộc công việc'
 									defaultValue={valueTask}
@@ -367,7 +367,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						</div>
 					)}
 					<div className='col-12'>
-						<FormGroup id='description' label='Mô tả đầu việc' isFloating>
+						<FormGroup id='description' label='Mô tả đầu việc'>
 							<Textarea
 								className='h-100 border border-2 rounded-0 shadow-none'
 								placeholder='note'
@@ -382,7 +382,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						)}
 					</div>
 					<div className='col-12'>
-						<FormGroup id='kpiValue' label='Giá trị KPI' isFloating>
+						<FormGroup id='kpiValue' label='Giá trị KPI' color='red'>
 							<Input
 								type='number'
 								placeholder='Giá trị KPI'
@@ -399,7 +399,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						)}
 					</div>
 					<div className='col-12'>
-						<FormGroup id='priority' label='Độ ưu tiên'>
+						<FormGroup id='priority' label='Độ ưu tiên' color='red'>
 							<Select
 								name='priority'
 								placeholder='Độ ưu tiên'
@@ -416,7 +416,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						</FormGroup>
 					</div>
 					<div className='col-6'>
-						<FormGroup id='department' label='Phòng ban phụ trách'>
+						<FormGroup id='department' label='Phòng ban phụ trách' color='red'>
 							<SelectComponent
 								placeholder='Phòng ban phụ trách'
 								defaultValue={valueDepartment}
@@ -431,7 +431,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						)}
 					</div>
 					<div className='col-6'>
-						<FormGroup id='user' label='Nhân viên phụ trách'>
+						<FormGroup id='user' label='Nhân viên phụ trách' color='red'>
 							<SelectComponent
 								defaultValue={valueUser}
 								value={valueUser}
