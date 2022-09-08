@@ -808,11 +808,22 @@ const TaskDetailPage = () => {
 													<div className='d-flex align-items-center pb-3'>
 														<div className='flex-grow-1'>
 															<div className='fw-bold fs-3 mb-0'>
-																{taskReport.progress}%
+																{(
+																	(taskReport.completed /
+																		(taskReport.total -
+																			taskReport.pending)) *
+																	100
+																).toFixed(0)}
+																%
 																<div>
 																	<Progress
 																		isAutoColor
-																		value={taskReport.progress}
+																		value={(
+																			(taskReport.completed /
+																				(taskReport.total -
+																					taskReport.pending)) *
+																			100
+																		).toFixed(0)}
 																		height={10}
 																	/>
 																</div>

@@ -237,10 +237,10 @@ const TaskListPage = () => {
 	};
 
 	// confirm modal
-	const handleOpenConfirmModal = (item) => {
-		setOpenConfirmModal(true);
-		setItemEdit({ ...item });
-	};
+	// const handleOpenConfirmModal = (item) => {
+	// 	setOpenConfirmModal(true);
+	// 	setItemEdit({ ...item });
+	// };
 
 	const handleCloseConfirmModal = () => {
 		setOpenConfirmModal(false);
@@ -270,7 +270,7 @@ const TaskListPage = () => {
 		);
 	};
 
-	const handleDeleteItem = async (taskId) => {
+	const handleCloseItem = async (taskId) => {
 		try {
 			await deleteTaskById(taskId);
 			const newState = [...tasks];
@@ -331,12 +331,15 @@ const TaskListPage = () => {
 			handleCloseEditForm();
 			handleCloseConfirmStatusTask();
 			handleShowToast(
-				`Cập nhật công việc!`,
-				`Công việc ${result.name} được cập nhật thành công!`,
+				`Cập nhật trạng thái công việc!`,
+				`Công việc ${result.name} được cập nhật trạng thái thành công!`,
 			);
 		} catch (error) {
 			setTasks(tasks);
-			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+			handleShowToast(
+				`Cập nhật trạng thái công việc`,
+				`Cập nhật trạng thái công việc không thành công!`,
+			);
 		}
 	};
 
@@ -644,14 +647,18 @@ const TaskListPage = () => {
 																		}
 																	/>
 																	<Button
+																		isDisable={
+																			item.status === 7
+																		}
 																		isOutline={!darkModeStatus}
 																		color='danger'
 																		isLight={darkModeStatus}
 																		className='text-nowrap mx-2'
-																		icon='Trash'
+																		icon='EditOff'
 																		onClick={() =>
-																			handleOpenConfirmModal(
+																			handleOpenConfirmStatusTask(
 																				item,
+																				7,
 																			)
 																		}
 																	/>
@@ -742,9 +749,9 @@ const TaskListPage = () => {
 				<MissionAlertConfirm
 					openModal={openConfirmModal}
 					onCloseModal={handleCloseConfirmModal}
-					onConfirm={() => handleDeleteItem(itemEdit?.id)}
-					title='Xoá công việc'
-					content={`Xác nhận xoá công việc <strong>${itemEdit?.name}</strong> ?`}
+					onConfirm={() => handleCloseItem(itemEdit?.id)}
+					title='Đóng công việc'
+					content={`Xác nhận đóng công việc <strong>${itemEdit?.name}</strong> ?`}
 				/>
 				<TaskFormModal
 					show={editModalStatus}

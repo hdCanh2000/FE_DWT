@@ -108,7 +108,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				kpi_value: '',
 				start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 				end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
-				status: 0,
+				status: 1,
 			});
 			setKeysState([]);
 			setDepartmentOption([]);

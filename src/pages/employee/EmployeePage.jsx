@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import Page from '../../layout/Page/Page';
@@ -12,33 +12,16 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-
+import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { getAllDepartments } from '../work-management/mission/services';
 import { addEmployee, getAllEmployee, updateEmployee } from './services';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import Toasts from '../../components/bootstrap/Toasts';
+import validate from './validate';
 
 const EmployeePage = () => {
-	const initError = {
-		name: { errorMsg: '' },
-		code: { errorMsg: '' },
-		departmentId: { errorMsg: '' },
-		email: { errorMsg: '' },
-		phone: { errorMsg: '' },
-		address: { errorMsg: '' },
-		position: { errorMsg: '' },
-	};
-	const [errors, setErrors] = useState(initError);
-	const nameRef = useRef(null);
-	const manvRef = useRef(null);
-	const phongbanRef = useRef(null);
-	const emailRef = useRef(null);
-	const sdtRef = useRef(null);
-	const dcRef = useRef(null);
-	const cvRef = useRef(null);
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const [openForm, setOpenForm] = useState(false);
@@ -221,8 +204,9 @@ const EmployeePage = () => {
 
 	const hanleCloseForm = () => {
 		setOpenForm(false);
-		setItemEdit(null);
+		// setItemEdit(null);
 	};
+
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -233,104 +217,54 @@ const EmployeePage = () => {
 			},
 		);
 	};
-	const handleSubmitForm = async (values) => {
+
+	const handleClearValueForm = () => {
+		setItemEdit(null);
+	};
+
+	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: values?.id,
-			name: values.name,
-			departmentId: values.departmentId,
-			code: values.code,
-			email: values.email,
+			id: data?.id,
+			name: data?.name,
+			departmentId: data?.departmentId,
+			code: data?.code,
+			email: data?.email,
 			password: '123456',
-			dateOfBirth: values.dateOfBirth,
-			dateOfJoin: values.dateOfJoin,
-			phone: values.phone,
-			address: values.address,
-			position: Number.parseInt(values.position, 10),
-			status: Number(values.status),
-			roles: Number.parseInt(values.position, 10) === 1 ? ['manager'] : ['user'],
+			dateOfBirth: data?.dateOfBirth,
+			dateOfJoin: data?.dateOfJoin,
+			phone: data?.phone,
+			address: data?.address,
+			position: Number.parseInt(data?.position, 10),
+			status: Number(data?.status),
+			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
 		};
-		if (values.id) {
+		if (data?.id) {
 			try {
-				validateForm(values);
-				if (!values?.name) {
-					nameRef.current.focus();
-					return;
-				}
-				if (!values?.code) {
-					manvRef.current.focus();
-					return;
-				}
-				if (!values?.departmentId) {
-					phongbanRef.current.focus();
-					return;
-				}
-				if (!values?.email) {
-					emailRef.current.focus();
-					return;
-				}
-				if (!values?.phone) {
-					sdtRef.current.focus();
-					return;
-				}
-				if (!values?.address) {
-					dcRef.current.focus();
-					return;
-				}
-				if (!values?.position) {
-					cvRef.current.focus();
-					return;
-				}
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
 				const newUsers = [...users];
-				setUsers(newUsers.map((items) => (items.id === values.id ? { ...result } : items)));
+				setUsers(newUsers.map((item) => (item.id === data.id ? { ...result } : item)));
+				// handleClearValueForm();
 				hanleCloseForm();
+				getAllEmployees();
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				setUsers(users);
+				// setUsers(users);
 				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
 			}
 		} else {
 			try {
-				validateForm(values);
-				if (!values?.name) {
-					nameRef.current.focus();
-					return;
-				}
-				if (!values?.code) {
-					manvRef.current.focus();
-					return;
-				}
-				if (!values?.departmentId) {
-					phongbanRef.current.focus();
-					return;
-				}
-				if (!values?.email) {
-					emailRef.current.focus();
-					return;
-				}
-				if (!values?.phone) {
-					sdtRef.current.focus();
-					return;
-				}
-				if (!values?.address) {
-					dcRef.current.focus();
-					return;
-				}
-				if (!values?.position) {
-					cvRef.current.focus();
-					return;
-				}
 				const response = await addEmployee(dataSubmit);
 				const result = await response.data;
 				const newUsers = [...users];
 				newUsers.push(result);
 				setUsers(newUsers);
+				handleClearValueForm();
 				hanleCloseForm();
-				await getAllEmployees();
+				getAllEmployees();
 				handleShowToast(
 					`Thêm nhân viên`,
 					`Nhân viên ${result?.user?.name} được thêm thành công!`,
@@ -341,49 +275,7 @@ const EmployeePage = () => {
 			}
 		}
 	};
-	// valueDalite
-	const onValidate = (value, name) => {
-		setErrors((prev) => ({
-			...prev,
-			[name]: { ...prev[name], errorMsg: value },
-		}));
-	};
-	const validateFieldForm = (field, value) => {
-		if (!value) {
-			onValidate(true, field);
-		}
-	};
-	const validateForm = (value) => {
-		setErrors(initError);
-		validateFieldForm('name', value?.name);
-		validateFieldForm('code', value?.code);
-		validateFieldForm('departmentId', value?.departmentId);
-		validateFieldForm('email', value?.email);
-		validateFieldForm('phone', value?.phone);
-		validateFieldForm('address', value?.address);
-		validateFieldForm('position', value?.position);
-	};
-	const ref = (lable) => {
-		let _ref = nameRef;
-		switch (lable) {
-			case 'Họ và tên':
-				_ref = nameRef;
-				break;
-			case 'Mã NV':
-				_ref = manvRef;
-				break;
-			case 'Email':
-				_ref = emailRef;
-				break;
-			case 'SĐT':
-				_ref = sdtRef;
-				break;
-			default:
-				_ref = nameRef;
-				break;
-		}
-		return _ref;
-	};
+
 	return (
 		<PageWrapper title={demoPages.nhanVien.text}>
 			<Page container='fluid'>
@@ -431,19 +323,13 @@ const EmployeePage = () => {
 				)}
 
 				<CommonForm
-					titles='employee'
 					show={openForm}
 					onClose={hanleCloseForm}
-					addToast={addToast}
-					errors={errors}
-					setItemEdit={setItemEdit}
-					handleSubmitForm={handleSubmitForm}
-					users={users}
-					setUsers={setUsers}
-					ref={ref}
+					handleSubmit={handleSubmitForm}
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}
+					validate={validate}
 				/>
 			</Page>
 		</PageWrapper>

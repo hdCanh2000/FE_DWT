@@ -27,7 +27,6 @@ import Toasts from '../../../components/bootstrap/Toasts';
 import Button from '../../../components/bootstrap/Button';
 import {
 	addNewMission,
-	deleteMissionById,
 	getAllMission,
 	getLatestTasks,
 	updateMissionById,
@@ -255,9 +254,9 @@ const MissionPage = () => {
 							color='danger'
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2'
-							icon='Trash'
+							icon='Close'
 							onClick={() => handleOpenConfirmModal(item)}>
-							Xoá
+							Đóng
 						</Button>
 					</div>,
 					['admin'],
@@ -287,16 +286,39 @@ const MissionPage = () => {
 		setItemEdit(null);
 	};
 
-	const handleDeleteItem = async (id) => {
-		try {
-			await deleteMissionById(id);
-			const newState = [...missions];
-			setMissions(newState.filter((item) => item.id !== id));
-			handleCloseConfirmModal();
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
-		} catch (error) {
-			handleCloseConfirmModal();
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
+	const handleCloseItem = async (data) => {
+		if (data.status === 1) {
+			try {
+				const newData = data;
+				newData.status = 0;
+				const response = await updateMissionById(data);
+				const result = await response.data;
+				const newMissions = [...missions];
+				setMissions(
+					newMissions.map((item) => (item.id === data.id ? { ...result } : item)),
+				);
+				handleCloseConfirmModal();
+				handleShowToast(`Đóng mục tiêu`, `Đóng mục tiêu thành công!`);
+			} catch (error) {
+				handleCloseConfirmModal();
+				handleShowToast(`Đóng mục tiêu`, `Đóng mục tiêu không thành công!`);
+			}
+		} else {
+			try {
+				const newData = data;
+				newData.status = 1;
+				const response = await updateMissionById(data);
+				const result = await response.data;
+				const newMissions = [...missions];
+				setMissions(
+					newMissions.map((item) => (item.id === data.id ? { ...result } : item)),
+				);
+				handleCloseConfirmModal();
+				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu thành công!`);
+			} catch (error) {
+				handleCloseConfirmModal();
+				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu không thành công!`);
+			}
 		}
 	};
 
@@ -473,6 +495,21 @@ const MissionPage = () => {
 														</span>
 													</div>
 												</div>
+												<div className='d-flex '>
+													<div>
+														Trạng thái:
+														<span
+															className={
+																item.status === 1
+																	? 'text-success fw-bold ps-2'
+																	: 'text-danger fw-bold ps-2'
+															}>
+															{item.status === 1
+																? 'ACTIVE'
+																: 'IN ACTIVE'}
+														</span>
+													</div>
+												</div>
 											</CardSubTitle>
 										</CardLabel>
 										{verifyPermission(
@@ -490,6 +527,7 @@ const MissionPage = () => {
 													<DropdownMenu isAlignmentEnd>
 														<DropdownItem>
 															<Button
+																disabled={item.status === 0}
 																icon='Edit'
 																tag='button'
 																onClick={() =>
@@ -500,12 +538,18 @@ const MissionPage = () => {
 														</DropdownItem>
 														<DropdownItem>
 															<Button
-																icon='Delete'
+																icon={
+																	item.status === 0
+																		? 'Check'
+																		: 'Close'
+																}
 																tag='button'
 																onClick={() =>
 																	handleOpenConfirmModal(item)
 																}>
-																Xoá mục tiêu
+																{item.status === 0
+																	? 'Mở mục tiêu'
+																	: 'Đóng mục tiêu'}
 															</Button>
 														</DropdownItem>
 													</DropdownMenu>
@@ -648,13 +692,16 @@ const MissionPage = () => {
 						);
 					})}
 				</div>
-
 				<MissionAlertConfirm
 					openModal={openConfirmModal}
 					onCloseModal={handleCloseConfirmModal}
-					onConfirm={() => handleDeleteItem(itemEdit?.id)}
-					title='Xoá mục tiêu'
-					content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
+					onConfirm={() => handleCloseItem(itemEdit)}
+					title={itemEdit?.status === 1 ? 'Đóng mục tiêu' : 'Mở mục tiêu'}
+					content={
+						itemEdit?.status === 1
+							? `Xác nhận đóng mục tiêu <strong>${itemEdit?.name}</strong> ?`
+							: `Xác nhận mở mục tiêu <strong>${itemEdit?.name}</strong> ?`
+					}
 				/>
 				<MissionFormModal
 					show={editModalStatus}

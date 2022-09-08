@@ -277,12 +277,13 @@ const MissionDetailPage = () => {
 						onClick={() => handleOpenEditForm(item)}
 					/>
 					<Button
+						isDisable={item.status === 7}
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='Trash'
-						onClick={() => handleOpenConfirmModal(item)}
+						icon='EditOff'
+						onClick={() => handleOpenConfirmStatusTask(item, 7)}
 					/>
 				</>
 			),
@@ -465,10 +466,10 @@ const MissionDetailPage = () => {
 	};
 
 	// confirm modal
-	const handleOpenConfirmModal = (item) => {
-		setOpenConfirmModal(true);
-		setItemEdit({ ...item });
-	};
+	// const handleOpenConfirmModal = (item) => {
+	// 	setOpenConfirmModal(true);
+	// 	setItemEdit({ ...item });
+	// };
 
 	const handleCloseConfirmModal = () => {
 		setOpenConfirmModal(false);

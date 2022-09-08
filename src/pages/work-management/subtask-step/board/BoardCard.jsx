@@ -2,6 +2,7 @@ import { useFormik } from 'formik';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import classNames from 'classnames';
+import { useToasts } from 'react-toast-notifications';
 import useDarkMode from '../../../../hooks/useDarkMode';
 import Card, {
 	CardBody,
@@ -21,12 +22,13 @@ import Input from '../../../../components/bootstrap/forms/Input';
 import Button from '../../../../components/bootstrap/Button';
 import Select from '../../../../components/bootstrap/forms/Select';
 import Option from '../../../../components/bootstrap/Option';
+import Toasts from '../../../../components/bootstrap/Toasts';
 // import { getAllUser } from '../services';
 
 const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	const { darkModeStatus } = useDarkMode();
-	// const [users, setUsers] = useState([]);
 	const [editModalStatus, setEditModalStatus] = useState(false);
+	const { addToast } = useToasts();
 	const formik = useFormik({
 		initialValues: {
 			name: card?.name || '',
@@ -57,8 +59,27 @@ const BoardCard = ({ card, status, data, subtask, onAddStep }) => {
 	// 	}
 	// 	fetchDataUsers();
 	// }, []);
-	const handleDeleteStep = (dataStep) => {
-		console.log(dataStep, 'dataStep');
+	const handleShowToast = (titleToast, content, icon = 'Check2Circle', color = 'success') => {
+		addToast(
+			<Toasts title={titleToast} icon={icon} iconColor={color} time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+	const handleDeleteStep = (dataDelete) => {
+		try {
+			const subtaskClone = { ...subtask };
+			const initSteps = subtaskClone.steps;
+			const newSteps = initSteps?.filter((item) => item.id !== dataDelete.id);
+			subtaskClone.steps = newSteps;
+			onAddStep(subtaskClone);
+			handleShowToast(`Xoá bước thực hiện`, `Xoá bước thực hiện thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá bước thực hiện`, `Xoá bước thực hiện thất bại!`);
+		}
 	};
 	return (
 		<>

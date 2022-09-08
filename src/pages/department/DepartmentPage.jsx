@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
@@ -16,30 +16,16 @@ import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment, getAllDepartmentWithUser, updateDepartment } from './services';
+import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const navigate = useNavigate();
-	const roles = window.localStorage.getItem('roles');
-	if (roles === 'user') {
-		navigate('/404');
-	}
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [departments, setDepartments] = useState([]);
-	const initError = {
-		name: { errorMsg: '' },
-		description: { errorMsg: '' },
-		slug: { errorMsg: '' },
-		address: { errorMsg: '' },
-	};
-	const [errors, setErrors] = useState(initError);
-	const nameRef = useRef(null);
-	const descriptionRef = useRef(null);
-	const slugRef = useRef(null);
-	const addressRef = useRef(null);
 	useEffect(() => {
 		async function getDepartments() {
 			try {
@@ -144,8 +130,8 @@ const DepartmentPage = () => {
 	};
 
 	const hanleCloseForm = () => {
-		setItemEdit(null);
 		setOpenForm(false);
+		setItemEdit(null);
 	};
 
 	const handleShowToast = (title, content) => {
@@ -157,6 +143,10 @@ const DepartmentPage = () => {
 				autoDismiss: true,
 			},
 		);
+	};
+
+	const handleClearValueForm = () => {
+		setItemEdit(null);
 	};
 
 	const handleSubmitForm = async (data) => {
@@ -176,6 +166,7 @@ const DepartmentPage = () => {
 				setDepartments(
 					newDepartments.map((item) => (item.id === data.id ? { ...result } : item)),
 				);
+				handleClearValueForm();
 				hanleCloseForm();
 				handleShowToast(
 					`Cập nhật phòng ban!`,
@@ -187,28 +178,12 @@ const DepartmentPage = () => {
 			}
 		} else {
 			try {
-				validateForm();
-				if (!data?.name) {
-					nameRef.current.focus();
-					return;
-				}
-				if (!data?.slug) {
-					slugRef.current.focus();
-					return;
-				}
-				if (!data?.description) {
-					descriptionRef.current.focus();
-					return;
-				}
-				if (!data?.address) {
-					addressRef.current.focus();
-					return;
-				}
 				const response = await addDepartment(dataSubmit);
 				const result = await response.data;
 				const newDepartments = [...departments];
 				newDepartments.push(result);
 				setDepartments(newDepartments);
+				handleClearValueForm();
 				hanleCloseForm();
 				handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
 			} catch (error) {
@@ -217,46 +192,7 @@ const DepartmentPage = () => {
 			}
 		}
 	};
-	// valueDalite
-	const onValidate = (value, name) => {
-		setErrors((prev) => ({
-			...prev,
-			[name]: { ...prev[name], errorMsg: value },
-		}));
-	};
-	const validateFieldForm = (field, value) => {
-		if (!value) {
-			onValidate(true, field);
-		}
-	};
-	const validateForm = (value) => {
-		// setErrors(initError);
-		validateFieldForm('name', value?.name);
-		validateFieldForm('slug', value?.slug);
-		validateFieldForm('description', value?.description);
-		validateFieldForm('address', value?.address);
-	};
-	const ref = (lable) => {
-		let _ref = nameRef;
-		switch (lable) {
-			case 'Tên phòng ban':
-				_ref = nameRef;
-				break;
-			case 'Mô tả':
-				_ref = descriptionRef;
-				break;
-			case 'Code':
-				_ref = slugRef;
-				break;
-			case 'Địa chỉ':
-				_ref = addressRef;
-				break;
-			default:
-				_ref = nameRef;
-				break;
-		}
-		return _ref;
-	};
+
 	return (
 		<PageWrapper title={demoPages.phongBan.text}>
 			<Page container='fluid'>
@@ -301,17 +237,13 @@ const DepartmentPage = () => {
 							</div>
 						</div>
 						<CommonForm
-							titles='department'
 							show={openForm}
 							onClose={hanleCloseForm}
-							addToast={addToast}
-							setItemEdit={setItemEdit}
-							handleSubmitForm={handleSubmitForm}
+							handleSubmit={handleSubmitForm}
 							item={itemEdit}
 							label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
 							fields={columns}
-							ref={ref}
-							errors={errors}
+							validate={validate}
 						/>
 					</>,
 					['admin', 'manager'],
