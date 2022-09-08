@@ -626,6 +626,7 @@ const DashboardPage = () => {
 		setEditModalStatusSubTask(false);
 		setSubTaskEdit(null);
 	};
+
 	const handleSubmitSubTaskForm = async (data) => {
 		if (data.id) {
 			try {
@@ -1024,7 +1025,31 @@ const DashboardPage = () => {
 								['admin'],
 							)}
 						</>,
-						['manager', 'admin', 'user'],
+						['manager', 'admin'],
+					)}
+					{verifyPermissionHOC(
+						<div className='col-xxl-12'>
+							<Card className='mb-0'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê đầu việc cá nhân
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-xl-12 col-xxl-12'>
+											<TaskChartReport data={subTaskReport} />
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['user'],
 					)}
 				</div>
 				{verifyPermissionHOC(
