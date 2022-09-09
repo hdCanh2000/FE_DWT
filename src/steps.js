@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTour } from '@reactour/tour';
 import { createUseStyles } from 'react-jss';
 import SusyDarkMode from './assets/img/wanna/susy/susy-dark-mode.png';
 import Susy from './assets/img/wanna/susy/susy.png';
@@ -57,30 +56,11 @@ const useStyles = createUseStyles({
  * @constructor
  */
 const TourNavigation = () => {
-	const { currentStep, setCurrentStep } = useTour();
 	return (
 		<div className='col-12 mt-3'>
 			<div className='row'>
-				<div className='col'>
-					{!!currentStep && (
-						<Button
-							icon='ArrowBackIos'
-							color='info'
-							isLink
-							onClick={() => setCurrentStep(currentStep - 1)}>
-							Prev
-						</Button>
-					)}
-				</div>
-				<div className='col-auto'>
-					<Button
-						icon='ArrowForwardIos'
-						color='info'
-						isLight
-						onClick={() => setCurrentStep(currentStep + 1)}>
-						Next
-					</Button>
-				</div>
+				<div className='col' />
+				<div className='col-auto' />
 			</div>
 		</div>
 	);
@@ -580,7 +560,6 @@ const DocTour = () => {
 };
 
 const LastTour = () => {
-	const { setIsOpen, setCurrentStep } = useTour();
 	const classes = useStyles();
 	return (
 		<div className='row'>
@@ -600,14 +579,7 @@ const LastTour = () => {
 						<p>- What would you like to do now?</p>
 					</div>
 					<div className='col'>
-						<Button
-							icon='Close'
-							color='danger'
-							isLink
-							onClick={() => {
-								setIsOpen(false);
-								setCurrentStep(0);
-							}}>
+						<Button icon='Close' color='danger' isLink onClick={() => {}}>
 							Close
 						</Button>
 					</div>

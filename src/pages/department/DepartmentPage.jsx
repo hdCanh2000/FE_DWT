@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -15,29 +16,29 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addDepartment, getAllDepartmentWithUser, updateDepartment } from './services';
+import { addDepartment, updateDepartment } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 
 const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const navigate = useNavigate();
-	const [openForm, setOpenForm] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
-	const [departments, setDepartments] = useState([]);
+
+	const dispatch = useDispatch();
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const departments = useSelector((state) => state.department.departments);
+
 	useEffect(() => {
-		async function getDepartments() {
-			try {
-				const response = await getAllDepartmentWithUser();
-				const data = await response.data;
-				setDepartments(data);
-			} catch (error) {
-				setDepartments([]);
-			}
-		}
-		getDepartments();
-	}, []);
+		dispatch(fetchDepartmentWithUserList());
+	}, [dispatch]);
 
 	const columns = [
 		{
@@ -108,7 +109,7 @@ const DepartmentPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenActionForm(item)}
+						onClick={() => handleOpenForm(item)}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -124,16 +125,6 @@ const DepartmentPage = () => {
 		},
 	];
 
-	const handleOpenActionForm = (item) => {
-		setOpenForm(true);
-		setItemEdit({ ...item });
-	};
-
-	const hanleCloseForm = () => {
-		setOpenForm(false);
-		setItemEdit(null);
-	};
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -143,10 +134,6 @@ const DepartmentPage = () => {
 				autoDismiss: true,
 			},
 		);
-	};
-
-	const handleClearValueForm = () => {
-		setItemEdit(null);
 	};
 
 	const handleSubmitForm = async (data) => {
@@ -162,32 +149,23 @@ const DepartmentPage = () => {
 			try {
 				const response = await updateDepartment(dataSubmit);
 				const result = await response.data;
-				const newDepartments = [...departments];
-				setDepartments(
-					newDepartments.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
-				handleClearValueForm();
-				hanleCloseForm();
+				dispatch(fetchDepartmentWithUserList());
+				handleCloseForm();
 				handleShowToast(
 					`Cập nhật phòng ban!`,
 					`Phòng ban ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				setDepartments(departments);
 				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
 			}
 		} else {
 			try {
 				const response = await addDepartment(dataSubmit);
 				const result = await response.data;
-				const newDepartments = [...departments];
-				newDepartments.push(result);
-				setDepartments(newDepartments);
-				handleClearValueForm();
-				hanleCloseForm();
+				dispatch(fetchDepartmentWithUserList());
+				handleCloseForm();
 				handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
 			} catch (error) {
-				setDepartments(departments);
 				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
 			}
 		}
@@ -221,7 +199,7 @@ const DepartmentPage = () => {
 												color='info'
 												icon='PersonPlusFill'
 												tag='button'
-												onClick={() => handleOpenActionForm(null)}>
+												onClick={() => handleOpenForm(null)}>
 												Thêm phòng ban
 											</Button>
 										</CardActions>
@@ -237,8 +215,8 @@ const DepartmentPage = () => {
 							</div>
 						</div>
 						<CommonForm
-							show={openForm}
-							onClose={hanleCloseForm}
+							show={toggleForm}
+							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
 							label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}

@@ -71,53 +71,58 @@ const TaskChartReport = ({ data }) => {
 					<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 						<div className='d-flex align-items-center justify-content-start'>
 							<div className='p-3' style={{ background: '#46BCAA' }} />
-							<div style={{ marginLeft: '1rem' }} className='fs-5'>
+							<div style={{ marginLeft: '1rem' }} className='fs-14'>
 								Đã hoàn thành:{' '}
-								<span className='fw-bold fs-4 text-success'>{data.completed}</span>
+								<span className='fw-bold fs-14 text-success'>{data.completed}</span>
 							</div>
 						</div>
 					</div>
 					<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 						<div className='d-flex align-items-center justify-content-start'>
 							<div className='p-3' style={{ background: 'rgb(77, 105, 250)' }} />
-							<div style={{ marginLeft: '1rem' }} className='fs-5'>
+							<div style={{ marginLeft: '1rem' }} className='fs-14'>
 								Tạm dừng:{' '}
-								<span className='fw-bold fs-4 text-info'>{data.onhold}</span>
+								<span className='fw-bold fs-14 text-info'>{data.onhold}</span>
 							</div>
 						</div>
 					</div>
 					<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 						<div className='d-flex align-items-center justify-content-start'>
 							<div className='p-3' style={{ background: 'rgb(108, 93, 211)' }} />
-							<div style={{ marginLeft: '1rem' }} className='fs-5'>
+							<div style={{ marginLeft: '1rem' }} className='fs-14'>
 								Đang thực hiện:{' '}
-								<span className='fw-bold fs-4 text-primary'>{data.inprogress}</span>
+								<span className='fw-bold fs-14 text-primary'>
+									{data.inprogress}
+								</span>
 							</div>
 						</div>
 					</div>
 					<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 						<div className='d-flex align-items-center justify-content-start'>
 							<div className='p-3' style={{ background: '#FFA2C0' }} />
-							<div style={{ marginLeft: '1rem' }} className='fs-5'>
+							<div style={{ marginLeft: '1rem' }} className='fs-14'>
 								Từ chối:{' '}
-								<span className='fw-bold fs-4 text-secondary'>{data.rejected}</span>
+								<span className='fw-bold fs-14 text-secondary'>
+									{data.rejected}
+								</span>
 							</div>
 						</div>
 					</div>
 					<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 						<div className='d-flex align-items-center justify-content-start'>
 							<div className='p-3' style={{ background: 'rgb(255, 207, 82)' }} />
-							<div style={{ marginLeft: '1rem' }} className='fs-5'>
+							<div style={{ marginLeft: '1rem' }} className='fs-14'>
 								Chờ xác nhận:{' '}
-								<span className='fw-bold fs-4 text-warning'>{data.solved}</span>
+								<span className='fw-bold fs-14 text-warning'>{data.solved}</span>
 							</div>
 						</div>
 					</div>
 					<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
 						<div className='d-flex align-items-center justify-content-start'>
 							<div className='p-3' style={{ background: 'rgb(243, 84, 33)' }} />
-							<div style={{ marginLeft: '1rem' }} className='fs-5'>
-								Khác: <span className='fw-bold fs-4 text-danger'>{data.other}</span>
+							<div style={{ marginLeft: '1rem' }} className='fs-14'>
+								Khác:{' '}
+								<span className='fw-bold fs-14 text-danger'>{data.other}</span>
 							</div>
 						</div>
 					</div>

@@ -1,6 +1,5 @@
 import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
-// import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Chart from '../../../components/extras/Chart';
 
 const MissionChartReport = ({ data }) => {
@@ -122,4 +121,9 @@ MissionChartReport.defaultProps = {
 	data: { completed: 0, completedExpired: 0, inprogress: 0, inprogressExpired: 0, total: 0 },
 };
 
-export default memo(MissionChartReport);
+export default memo(MissionChartReport, function areEqual(prevProps, nextProps) {
+	if (prevProps.data.inprogress === nextProps.data.inprogress) {
+		return false;
+	}
+	return true;
+});

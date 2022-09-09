@@ -41,74 +41,144 @@ export const dashboardMenu = {
 };
 
 export const demoPages = {
-	mucTieu: {
-		id: 'mission',
-		text: 'Mission',
-		path: '/muc-tieu',
-		roles: ['admin', 'manager'],
+	dashboard: {
+		id: 'dashboard',
+		text: 'Dashboard',
+		path: '/',
+		icon: 'Dashboard',
+		subMenu: null,
 	},
-	quanLyCongViec: {
-		id: 'quanlycongviec',
-		text: 'Tasks',
-		path: '/cong-viec',
-		roles: ['admin', 'manager', 'user'],
-		// subMenu: {
-		// 	congViec: {
-		// 		id: 'congViec',
-		// 		text: 'Tổng quan',
-		// 		path: '/cong-viec/cong-viec',
-		// 	},
-		// 	danhSach: {
-		// 		id: 'danhSach',
-		// 		text: 'Danh sách',
-		// 		path: '/cong-viec/danh-sach',
-		// 	},
-		// 	dauViec: {
-		// 		id: 'dauViec',
-		// 		text: 'Đầu việc',
-		// 		path: '/cong-viec/dau-viec',
-		// 	},
-		// 	danhSachCongViecPhongBan: {
-		// 		id: 'danhSachCongViecPhongBan',
-		// 		text: 'DSCV phòng ban',
-		// 		path: '/cong-viec/tong-quan-phong-ban',
-		// 	},
-		// 	chiTietCongViecPhongBan: {
-		// 		id: 'chiTietCongViecPhongBan',
-		// 		text: 'CTCV phòng ban',
-		// 		path: '/cong-viec/chi-tiet-phong-ban',
-		// 	},
-		// },
+	companyPage: {
+		id: 'companyPage',
+		text: 'Sơ đồ tổ chức',
+		path: 'company-pages',
+		icon: 'CustomCompany',
+		subMenu: {
+			organizational: {
+				id: 'organizational',
+				text: 'Sơ đồ tổ chức',
+				path: '/so-do-to-chuc',
+			},
+			features: {
+				id: 'features',
+				text: 'Sơ đồ phòng ban',
+				path: '/so-do-phong-ban',
+			},
+			areas: {
+				id: 'areas',
+				text: 'Sơ đồ khu vực',
+				path: '/so-do-khu-vuc',
+			},
+		},
 	},
-	dauViec: {
-		id: 'dauViec',
-		text: 'Subtasks',
-		path: '/dau-viec',
-		roles: ['admin', 'manager', 'user'],
+	jobsPage: {
+		// công việc
+		id: 'jobsPage',
+		text: 'Công việc',
+		path: 'jobs-page',
+		icon: 'CustomBriefCase',
+		subMenu: {
+			target: {
+				id: 'target',
+				text: 'Mục tiêu',
+				path: '/muc-tieu',
+			},
+			mission: {
+				id: 'mission',
+				text: 'Nhiệm vụ',
+				path: '/nhiem-vu',
+			},
+			process: {
+				id: 'process',
+				text: 'Quy trình',
+				path: '/quy-trinh',
+			},
+		},
 	},
-	phongBan: {
-		id: 'phongBan',
-		text: 'Department',
-		path: '/phong-ban',
-		roles: ['admin'],
+	hrRecords: {
+		id: 'hrRecords',
+		text: 'Hồ sơ nhân sự',
+		path: '/ho-so-nhan-su',
+		icon: 'CustomChartBar',
+		subMenu: {
+			hrList: {
+				id: 'hrList',
+				text: 'Danh sách nhân sự',
+				path: '/danh-sach-nhan-su',
+			},
+		},
 	},
-	nhanVien: {
-		id: 'nhanVien',
-		text: 'Employee',
-		path: '/nhan-vien',
-		roles: ['admin', 'manager'],
+	reportPage: {
+		// báo cáo
+		id: 'reportPage',
+		text: 'Báo cáo',
+		path: 'report-page',
+		icon: 'CustomPages',
+		subMenu: {
+			reportList: {
+				id: 'reportList',
+				text: 'Danh sách báo cáo',
+				path: '/danh-sach-bao-cao',
+			},
+			reportCriteria: {
+				id: 'reportCriteria',
+				text: 'Tiêu chí báo cáo',
+				path: '/tieu-chi-bao-cao',
+			},
+			sampleReport: {
+				id: 'sampleReport',
+				text: 'Mẫu báo cáo',
+				path: '/mau-bao-cao',
+			},
+		},
 	},
 	cauHinh: {
 		id: 'cauHinh',
-		text: 'Configure',
-		path: '/cau-hinh',
-		roles: ['admin'],
-	},
-	baoCao: {
-		id: 'baoCao',
-		text: 'Report',
-		path: '/bao-cao',
-		roles: ['admin'],
+		text: 'Cấu hình',
+		path: 'cau-hinh',
+		icon: 'CustomCompass',
+		subMenu: {
+			overall: {
+				id: 'overall',
+				text: 'Cấu hình chung',
+				path: '/cau-hinh-chung',
+			},
+			organization: {
+				id: 'organization',
+				text: 'Cấu hình tổ chức',
+				path: '/cau-hinh-to-chuc',
+			},
+			target: {
+				id: 'target',
+				text: 'Cấu hình mục tiêu',
+				path: '/cau-hinh-muc-tieu',
+			},
+			kpi: {
+				id: 'kpi',
+				text: 'Cấu hình KPI',
+				path: '/cau-hinh-kpi',
+			},
+			role: {
+				id: 'role',
+				text: 'Cầu hình vai trò',
+				path: '/cau-hinh-vai-tro',
+			},
+			report: {
+				id: 'report',
+				text: 'Cấu hình báo cáo',
+				path: '/cau-hinh-bao-cao',
+			},
+			table: {
+				id: 'table',
+				text: 'Cấu hình bảng số liệu',
+				path: '/cau-hinh-bang-so-lieu',
+			},
+			authorization: {
+				id: 'authorization',
+				text: 'Cấu hình phân quyền',
+				path: '/cau-hinh-phan-quyen',
+			},
+		},
 	},
 };
 
