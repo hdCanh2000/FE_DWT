@@ -5,9 +5,12 @@ const LANDING = {
 	DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
 };
 
-const TASK = {
+const MISSION = {
 	MISSION: lazy(() => import('../pages/work-management/mission/MissionPage')),
 	MISSION_DETAIL: lazy(() => import('../pages/work-management/mission/MissionDetailPage')),
+};
+
+const TASK = {
 	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
 	TASKMANAGEMENT: lazy(() =>
 		import('../pages/work-management/task-management/TaskManagementPage'),
@@ -25,12 +28,12 @@ const TASK = {
 	REPORT: lazy(() => import('../pages/work-management/report-department/ReportDepartmentPage')),
 };
 
-const MANAGEMENT = {
-	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
-	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
-	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
-	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
-};
+// const MANAGEMENT = {
+// 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
+// 	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
+// 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
+// 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
+// };
 
 const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
@@ -47,124 +50,29 @@ const presentation = [
 		exact: true,
 	},
 
-	/** ************************************************** */
-
-	/**
-	 * Pages
-	 */
-
-	/**
-	 * Trang quản lý nhiệm vụ
-	 */
+	/** Trang quản lý mục tiêu */
 	{
-		path: demoPages.mucTieu.path,
-		element: <TASK.MISSION />,
+		path: demoPages.jobsPage.subMenu.target.path,
+		element: <MISSION.MISSION />,
 		exact: true,
 	},
-	// Trang đầu việc - Step
+	/** Trang chi tiết mục tiêu */
 	{
-		path: `/${demoPages.dauViec.path}/:id`,
-		element: <TASK.SUBTASK_STEP />,
+		path: `/${demoPages.jobsPage.subMenu.target.path}/:id`,
+		element: <MISSION.MISSION_DETAIL />,
 		exact: true,
 	},
-	/**
-	 * Trang chi tiết nhiệm vụ
-	 */
-	{
-		path: `/${demoPages.mucTieu.path}/:id`,
-		element: <TASK.MISSION_DETAIL />,
-		exact: true,
-	},
-	/**
-	 * Trang quản lý công việc
-	 */
-	// {
-	// 	path: demoPages.quanLyCongViec.subMenu.congViec.path,
-	// 	element: <TASK.TASKMANAGEMENT />,
-	// 	exact: true,
-	// },
 
-	/**
-	 * Trang danh sách công việc
-	 */
+	/** * Trang danh sách công việc (nhiệm vụ cha) */
 	{
-		path: demoPages.quanLyCongViec.path,
+		path: demoPages.jobsPage.subMenu.mission.path,
 		element: <TASK.TASKLIST />,
 		exact: true,
 	},
-	/**
-	 * Trang chi tiết công việc theo id
-	 */
-	// {
-	// 	path: `${demoPages.quanLyCongViec.subMenu.congViec.path}/:id`,
-	// 	element: <TASK.TASKDETAIL />,
-	// 	exact: true,
-	// },
-
-	/**
-	 * trang quản lý đầu việc
-	 */
+	// trang chi tiết công việc (nhiệm vụ)
 	{
-		path: demoPages.dauViec.path,
-		element: <TASK.SUBTASK />,
-		exact: true,
-	},
-	/**
-	 * trang quản lý danh sách công việc theo phòng ban - danh sách dạng bảng
-	 */
-	// {
-	// 	path: demoPages.quanLyCongViec.subMenu.danhSachCongViecPhongBan.path,
-	// 	element: <TASK.TASKLISTDEPARTMENT />,
-	// 	exact: true,
-	// },
-	/**
-	 * trang quản lý danh sách công việc theo phòng ban - công việc dạng theo đầu nhiệm vụ
-	 */
-	// {
-	// 	path: demoPages.quanLyCongViec.subMenu.chiTietCongViecPhongBan.path,
-	// 	element: <TASK.DETAIL_TASK_DEPARTMENT />,
-	// 	exact: true,
-	// },
-	// trang chi tiết công việc
-	{
-		path: `${demoPages.quanLyCongViec.path}/:id`,
+		path: `${demoPages.jobsPage.subMenu.mission.path}/:id`,
 		element: <TASK.TASKDETAIL />,
-		exact: true,
-	},
-	/**
-	 * trang công việc phòng ban chi tiết - cấu hình
-	 */
-	{
-		path: demoPages.cauHinh.path,
-		element: <TASK.CONFIGURE />,
-		exact: true,
-	},
-	/**
-	 * trang công việc phòng ban chi tiết - báo cáo
-	 */
-	{
-		path: demoPages.phongBan.path,
-		element: <MANAGEMENT.DEPARTMENT />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.phongBan.path}/:id`,
-		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
-		exact: true,
-	},
-	{
-		path: demoPages.nhanVien.path,
-		element: <MANAGEMENT.EMPLOYEE />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.nhanVien.path}/:id`,
-		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
-		exact: true,
-	},
-	{
-		path: demoPages.baoCao.path,
-		element: <TASK.REPORT />,
 		exact: true,
 	},
 	{

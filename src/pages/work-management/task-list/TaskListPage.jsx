@@ -1,6 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useCallback, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
 	createSearchParams,
 	Link,
@@ -23,7 +24,6 @@ import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
 import { addNewTask, deleteTaskById, getAllDepartments, updateTaskByID } from '../mission/services';
-import { getAllTasksByDepartment } from './services';
 import useDarkMode from '../../../hooks/useDarkMode';
 import {
 	formatColorPriority,
@@ -51,7 +51,8 @@ import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon'
 import { addNewSubtask } from '../TaskDetail/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import TaskChartReport from '../../dashboard/admin/TaskChartReport';
-import { getReportSubTaskDepartment, getReportTask } from '../../dashboard/services';
+import { getReportSubTaskDepartment } from '../../dashboard/services';
+import { fetchTaskList, fetchTaskReport } from '../../../redux/slice/taskSlice';
 
 const Item = ({
 	id,
@@ -141,10 +142,9 @@ const Item = ({
 };
 
 const TaskListPage = () => {
+	const dispatch = useDispatch();
 	// departments
 	const [dataDepartments, setDataDepartments] = useState([]);
-	const [tasks, setTasks] = useState([]);
-	const [taskReport, setTaskReport] = useState({});
 	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState({});
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
@@ -172,6 +172,9 @@ const TaskListPage = () => {
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 
+	const tasks = useSelector((state) => state.task.tasks);
+	const taskReport = useSelector((state) => state.task.taskReport);
+
 	// all department
 	useEffect(() => {
 		const fetchData = async () => {
@@ -190,21 +193,10 @@ const TaskListPage = () => {
 		fetchData();
 	}, []);
 
-	const fetchDataAllTasks = useCallback(async () => {
-		const response = await getAllTasksByDepartment(departmentSelect);
-		const result = await response.data;
-		setTasks(result);
-	}, [departmentSelect]);
-
 	useEffect(() => {
-		fetchDataAllTasks();
-		const fetchDataReportTaskByDepartment = async () => {
-			const response = await getReportTask({ departmentId: departmentSelect });
-			const result = await response.data;
-			setTaskReport(result);
-		};
-		fetchDataReportTaskByDepartment();
-	}, [departmentSelect, fetchDataAllTasks]);
+		dispatch(fetchTaskList(departmentSelect));
+		dispatch(fetchTaskReport(departmentSelect));
+	}, [departmentSelect, dispatch]);
 
 	useEffect(() => {
 		const fetchDataSubtasksReportDepartment = async () => {
@@ -292,8 +284,7 @@ const TaskListPage = () => {
 	const handleDeleteItem = async (taskId) => {
 		try {
 			await deleteTaskById(taskId);
-			const newState = [...tasks];
-			setTasks(newState.filter((item) => item.id !== taskId));
+			dispatch(fetchTaskList(departmentSelect));
 			handleCloseConfirmModal();
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
@@ -307,9 +298,7 @@ const TaskListPage = () => {
 			try {
 				const response = await updateTaskByID(data);
 				const result = await response.data;
-				const newTasks = [...tasks];
-				setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-				fetchDataAllTasks();
+				dispatch(fetchTaskList(departmentSelect));
 				handleClearValueForm();
 				handleCloseEditForm();
 				handleShowToast(
@@ -317,22 +306,17 @@ const TaskListPage = () => {
 					`Công việc ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				setTasks(tasks);
 				handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 			}
 		} else {
 			try {
 				const response = await addNewTask(data);
 				const result = await response.data;
-				const newTasks = [...tasks];
-				newTasks.push(result);
-				setTasks(newTasks);
-				fetchDataAllTasks();
+				dispatch(fetchTaskList(departmentSelect));
 				handleClearValueForm();
 				handleCloseEditForm();
 				handleShowToast(`Thêm công việc`, `Công việc ${result.name} được thêm thành công!`);
 			} catch (error) {
-				setTasks(tasks);
 				handleShowToast(`Thêm công việc`, `Thêm công việc không thành công!`);
 			}
 		}
@@ -344,8 +328,7 @@ const TaskListPage = () => {
 			newData.status = status;
 			const response = await updateTaskByID(newData);
 			const result = await response.data;
-			const newTasks = [...tasks];
-			setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
+			dispatch(fetchTaskList(departmentSelect));
 			handleClearValueForm();
 			handleCloseEditForm();
 			handleCloseConfirmStatusTask();
@@ -354,7 +337,6 @@ const TaskListPage = () => {
 				`Công việc ${result.name} được cập nhật thành công!`,
 			);
 		} catch (error) {
-			setTasks(tasks);
 			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 		}
 	};
@@ -393,10 +375,10 @@ const TaskListPage = () => {
 			const response = await addNewSubtask(dataSubmit);
 			const result = await response.data;
 			handleCloseEditForm();
-			fetchDataAllTasks();
+			dispatch(fetchTaskList(departmentSelect));
 			handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
 		} catch (error) {
-			fetchDataAllTasks();
+			dispatch(fetchTaskList(departmentSelect));
 			handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);
 		}
 	};
@@ -539,9 +521,12 @@ const TaskListPage = () => {
 											<tr>
 												<th className='text-center'>STT</th>
 												<th>Tên công việc</th>
-												<th className='text-center'>Số đầu việc</th>
+
+												{verifyPermissionHOC(
+													<th className='text-center'>Số đầu việc</th>,
+													['admin', 'manager'],
+												)}
 												<th>Phòng ban</th>
-												{/* <th className='text-center'>Nhân viên</th> */}
 												<th className='text-center'>Hạn hoàn thành</th>
 												<th className='text-center'>Giá trị KPI</th>
 												<th className='text-center'>KPI thực tế</th>
@@ -563,32 +548,38 @@ const TaskListPage = () => {
 																{item?.name}
 															</Link>
 														</td>
-														<td align='center'>
-															<Button
-																className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
-																onClick={(event) =>
-																	handleEpandRow(event, item.id)
-																}>
-																<Icon
-																	color='info'
-																	size='sm'
-																	icon={`${
-																		expandState[item.id]
-																			? 'CaretUpFill'
-																			: 'CaretDownFill'
-																	}`}
-																/>
-																<span
-																	className='mx-2'
-																	style={{ color: '#0174EB' }}>
-																	{item?.subtasks?.length || 0}
-																</span>
-															</Button>
-														</td>
+														{verifyPermissionHOC(
+															<td align='center'>
+																<Button
+																	className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
+																	onClick={(event) =>
+																		handleEpandRow(
+																			event,
+																			item.id,
+																		)
+																	}>
+																	<Icon
+																		color='info'
+																		size='sm'
+																		icon={`${
+																			expandState[item.id]
+																				? 'CaretUpFill'
+																				: 'CaretDownFill'
+																		}`}
+																	/>
+																	<span
+																		className='mx-2'
+																		style={{
+																			color: '#0174EB',
+																		}}>
+																		{item?.subtasks?.length ||
+																			0}
+																	</span>
+																</Button>
+															</td>,
+															['admin', 'manager'],
+														)}
 														<td>{item?.departments[0]?.name}</td>
-														{/* <td className='text-center'>
-															{item?.users[0]?.name}
-														</td> */}
 														<td align='center'>
 															{moment(`${item.deadlineDate}`).format(
 																'DD-MM-YYYY',
@@ -775,8 +766,8 @@ const TaskListPage = () => {
 										<Item
 											key={item?.id}
 											keys={item?.keys}
-											departmentsRelated={item?.departments?.slice(1)}
-											usersRelated={item?.users?.slice(1)}
+											departmentsRelated={item?.departments}
+											usersRelated={item?.users}
 											id={item?.id}
 											name={item?.name}
 											teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
