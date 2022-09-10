@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
+import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
@@ -25,6 +26,7 @@ import { addEmployee, updateEmployee } from './services';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -164,14 +166,24 @@ const EmployeePage = () => {
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<Button
-					isOutline={!darkModeStatus}
-					color='success'
-					isLight={darkModeStatus}
-					className='text-nowrap mx-1'
-					icon='Edit'
-					onClick={() => handleOpenForm(item)}
-				/>
+				<>
+					<Button
+						isOutline={!darkModeStatus}
+						color='success'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-1'
+						icon='Edit'
+						onClick={() => handleOpenForm(item)}
+					/>
+					<Button
+						isOutline={!darkModeStatus}
+						color='primary'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='ArrowForward'
+						onClick={() => navigate(`/danh-sach-nhan-su/${item.id}`)}
+					/>
+				</>
 			),
 			isShow: false,
 		},
@@ -236,7 +248,7 @@ const EmployeePage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.nhanVien.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='row mb-4'>

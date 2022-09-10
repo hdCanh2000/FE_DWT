@@ -723,7 +723,10 @@ const TaskListPage = () => {
 													<tr>
 														<td
 															colSpan='12'
-															style={{ paddingLeft: 50 }}>
+															style={{
+																padding: '5px 0 5px 50px',
+																borderRadius: '0.5rem',
+															}}>
 															{expandedRows.includes(item?.id) && (
 																<>
 																	<ExpandRow
