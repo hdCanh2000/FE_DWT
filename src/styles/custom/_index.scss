@@ -12,3 +12,15 @@
 .sticky-top-size {
 	top: map.get($header, height) + map.get($subheader, height) + map.get($page, padding-y);
 }
+
+.card,
+.modal-content,
+.btn,
+.modern-design .header,
+.navigation .navigation-link-pill {
+	border-radius: 0.5rem !important;
+}
+
+.modern-design .header {
+	margin: 1rem 0 1rem 0.75rem;
+}

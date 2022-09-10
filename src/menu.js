@@ -136,7 +136,7 @@ export const demoPages = {
 		id: 'cauHinh',
 		text: 'Cấu hình',
 		path: 'cau-hinh',
-		icon: 'CustomCompass',
+		icon: 'Settings',
 		subMenu: {
 			overall: {
 				id: 'overall',

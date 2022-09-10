@@ -145,7 +145,9 @@ const MissionDetailPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
+				<Link
+					className='text-underline'
+					to={`${demoPages.jobsPage.subMenu.mission.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),

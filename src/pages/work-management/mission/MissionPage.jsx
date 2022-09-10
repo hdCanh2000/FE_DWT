@@ -147,7 +147,7 @@ const MissionPage = () => {
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const navigateToDetailPage = useCallback(
-		(page) => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${page}`),
+		(page) => navigate(`${demoPages.jobsPage.subMenu.target.path}/${page}`),
 		[navigate],
 	);
 	console.log(demoPages,'demoPages');
@@ -361,7 +361,7 @@ const MissionPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.mucTieu?.text}>
+		<PageWrapper title={demoPages.jobsPage.subMenu.target.text}>
 			<Page container='fluid'>
 				{missions?.length > 0 && (
 					<div className='row'>
