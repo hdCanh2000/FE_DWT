@@ -12,6 +12,7 @@ import {
 import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
 import useDarkMode from '../../../hooks/useDarkMode';
+import { demoPages } from '../../../menu';
 
 const minWidth100 = {
 	minWidth: 100,
@@ -36,7 +37,9 @@ const ExpandRow = ({ subtasks, onOpenModal, taskId }) => {
 				{subtasks?.map((subTaskItem) => (
 					<tr key={subTaskItem.id}>
 						<td>
-							<Link className='text-underline' to={`/dau-viec/${subTaskItem?.id}`}>
+							<Link
+								className='text-underline'
+								to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${subTaskItem?.id}`}>
 								{subTaskItem?.name}
 							</Link>
 						</td>
