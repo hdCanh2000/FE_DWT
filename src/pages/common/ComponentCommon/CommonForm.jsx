@@ -24,10 +24,11 @@ const CommonForm = ({
 	const formik = useFormik({
 		initialValues: { ...item },
 		enableReinitialize: true,
-		validate,
-		onSubmit: (values, { resetForm }) => {
+	 	validationSchema: validate,
+		onSubmit: (values) => {
+			console.log(values,'values');
 			handleSubmit(values);
-			resetForm();
+			// resetForm();
 		},
 	});
 	return (

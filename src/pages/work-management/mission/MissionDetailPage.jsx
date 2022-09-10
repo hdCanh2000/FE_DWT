@@ -1,6 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
@@ -130,7 +131,7 @@ const MissionDetailPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	// const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [editModalMissionStatus, setEditModalMissionStatus] = useState(false);
@@ -255,7 +256,7 @@ const MissionDetailPage = () => {
 					<DropdownMenu>
 						{Object.keys(renderStatusTask(item.status)).map((key) => (
 							<DropdownItem
-								key={key}
+								key={uuidv4()}
 								onClick={() =>
 									handleOpenConfirmStatusTask(item, STATUS[key].value)
 								}>
@@ -285,12 +286,13 @@ const MissionDetailPage = () => {
 						onClick={() => handleOpenFormEdit(item)}
 					/>
 					<Button
+						isDisable={item.status === 7}
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='Trash'
-						onClick={() => handleOpenFormDelete(item)}
+						icon='EditOff'
+						onClick={() => handleOpenConfirmStatusTask(item, 7)}
 					/>
 				</>
 			),
@@ -478,7 +480,7 @@ const MissionDetailPage = () => {
 	const handleDeleteMission = async (missionId) => {
 		try {
 			await deleteMissionById(missionId);
-			navigate('/muc-tieu/danh-sach');
+			navigate('/muc-tieu');
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
@@ -555,6 +557,7 @@ const MissionDetailPage = () => {
 		} catch (error) {
 			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 		}
+		setOpenConfirmMissionModal(false);
 	};
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
@@ -870,7 +873,7 @@ const MissionDetailPage = () => {
 										icon: 'DoneAll',
 										color: 'danger',
 										children: (
-											<div>
+											<div key={uuidv4()}>
 												<div className='fw-bold fs-5 mb-1'>
 													{key?.keyName}
 												</div>
@@ -894,6 +897,7 @@ const MissionDetailPage = () => {
 										.reverse()
 										.map((item) => (
 											<RelatedActionCommonItem
+												key={uuidv4()}
 												type={item?.type}
 												time={moment(`${item?.time}`).format(
 													'DD/MM/YYYY HH.mm',

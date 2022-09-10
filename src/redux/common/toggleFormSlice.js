@@ -32,5 +32,10 @@ export const toggleFormSlice = createSlice({
 			state.confirm = false;
 			state.data = {};
 		},
+		// openFormCloseMission: (state) => {
+		// 	state.open = true;
+		// 	state.confirm = false;
+		// 	state.data = {};
+		// },
 	},
 });

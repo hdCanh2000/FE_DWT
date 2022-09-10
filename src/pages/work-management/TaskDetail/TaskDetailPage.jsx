@@ -18,6 +18,7 @@ import {
 	updateStatusPendingTask,
 	getAllSubtasksByTaskId,
 	addNewSubtask,
+	deleteSubtask,
 } from './services';
 import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
@@ -83,7 +84,6 @@ const TaskDetailPage = () => {
 	const [editModalTaskStatus, setEditModalTaskStatus] = useState(false);
 	const [taskEdit, setTaskEdit] = useState({});
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
-
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [openListInfoModal, setOpenListInfoModal] = useState(false); // note task
 
@@ -475,21 +475,13 @@ const TaskDetailPage = () => {
 
 	// delete subtask
 	const handleDelete = async (valueDelete) => {
-		const newSubTasks = task?.subtasks.filter((item) => item.id !== valueDelete.id);
-		const taskValue = JSON.parse(JSON.stringify(task));
-		const newData = Object.assign(taskValue, {
-			subtasks: newSubTasks,
-		});
-
 		try {
-			const respose = await updateSubtask(params?.id, newData);
-			const result = await respose.data;
-			setTask(result);
-			navigate(`/cong-viec/${task?.id}`);
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thành công!`);
+			await deleteSubtask(valueDelete?.id);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thất bại!`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thất bại!`);
 		}
+		fetchSubtasks(params?.id);
 	};
 	const handleOpenConfirm = (item) => {
 		setDeletes({
@@ -820,11 +812,22 @@ const TaskDetailPage = () => {
 													<div className='d-flex align-items-center pb-3'>
 														<div className='flex-grow-1'>
 															<div className='fw-bold fs-3 mb-0'>
-																{taskReport.progress}%
+																{(
+																	(taskReport.completed /
+																		(taskReport.total -
+																			taskReport.pending)) *
+																	100
+																).toFixed(0)}
+																%
 																<div>
 																	<Progress
 																		isAutoColor
-																		value={taskReport.progress}
+																		value={(
+																			(taskReport.completed /
+																				(taskReport.total -
+																					taskReport.pending)) *
+																			100
+																		).toFixed(0)}
 																		height={10}
 																	/>
 																</div>
@@ -835,7 +838,8 @@ const TaskDetailPage = () => {
 																</span>
 																trên tổng số
 																<span className='fw-bold text-danger fs-5 mx-2'>
-																	{taskReport.total}
+																	{taskReport.total -
+																		taskReport.pending}
 																</span>
 																đầu việc.
 															</div>
