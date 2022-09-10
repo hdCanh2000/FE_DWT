@@ -65,7 +65,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`/cong-viec/${id}`),
+		() => navigate(`/${demoPages.jobsPage.subMenu.mission.path}/${id}`),
 		[id, navigate],
 	);
 	// phân quyền
@@ -405,7 +405,7 @@ const TaskListPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.quanLyCongViec.text}>
+		<PageWrapper title={demoPages.jobsPage.subMenu.mission.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -414,14 +414,14 @@ const TaskListPage = () => {
 							<div>
 								<Button
 									size='lg'
-									className='rounded-0'
+									className='rounded-0 mr-2'
 									color='primary'
 									icon='Table'
 									onClick={() => handleClickSwitchView(1)}
 								/>
 								<Button
 									size='lg'
-									className='rounded-0'
+									className='rounded-0 ml-2'
 									color='info'
 									icon='CardList'
 									onClick={() => handleClickSwitchView(2)}
@@ -562,7 +562,7 @@ const TaskListPage = () => {
 														<td className='cursor-pointer'>
 															<Link
 																className='text-underline'
-																to={`/cong-viec/${item?.id}`}>
+																to={`${demoPages.jobsPage.subMenu.mission.path}/${item?.id}`}>
 																{item?.name}
 															</Link>
 														</td>

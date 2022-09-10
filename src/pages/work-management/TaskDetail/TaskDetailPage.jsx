@@ -162,7 +162,9 @@ const TaskDetailPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item?.id}`}>
+				<Link
+					className='text-underline'
+					to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${item?.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -319,7 +321,9 @@ const TaskDetailPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item.id}`}>
+				<Link
+					className='text-underline'
+					to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${item?.id}`}>
 					{item.name}
 				</Link>
 			),
