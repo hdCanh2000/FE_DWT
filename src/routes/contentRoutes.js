@@ -79,6 +79,12 @@ const presentation = [
 		element: <TASK.TASKDETAIL />,
 		exact: true,
 	},
+	// trang chi tiết đầu việc (nhiệm vụ con)
+	{
+		path: `${demoPages.jobsPage.subMenu.mission.path}/dau-viec/:id`,
+		element: <TASK.SUBTASK_STEP />,
+		exact: true,
+	},
 	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,
