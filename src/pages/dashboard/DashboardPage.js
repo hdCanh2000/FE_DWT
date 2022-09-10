@@ -41,7 +41,7 @@ const DashboardPage = () => {
 	const { darkModeStatus, themeStatus } = useDarkMode();
 	const navigate = useNavigate();
 	const handleOnClickToMissionListPage = useCallback(
-		() => navigate(`../${demoPages.jobsPage.subMenu.mucTieu.path}`),
+		() => navigate(`../${demoPages.jobsPage.subMenu.target.path}`),
 		[navigate],
 	);
 	// departments
@@ -70,7 +70,7 @@ const DashboardPage = () => {
 			render: (item) => (
 				<Link
 					className='text-underline'
-					to={`${demoPages.jobsPage.subMenu.nhiemVu.path}/${item.id}`}>
+					to={`${demoPages.jobsPage.subMenu.mission.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -179,7 +179,7 @@ const DashboardPage = () => {
 			render: (item) => (
 				<Link
 					className='text-underline'
-					to={`${demoPages.jobsPage.subMenu.nhiemVu.path}/${item.id}`}>
+					to={`${demoPages.jobsPage.subMenu.mission.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -455,7 +455,7 @@ const DashboardPage = () => {
 						['manager'],
 					)}
 				</div>
-				<div className='row mt-4'>
+				<div className='row mt-0'>
 					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
 							<Card className='mb-0'>
