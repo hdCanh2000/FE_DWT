@@ -217,7 +217,7 @@ const SubTaskPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.dauViec.text}>
+		<PageWrapper title={demoPages.jobsPage.subMenu.task.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -341,7 +341,7 @@ const SubTaskPage = () => {
 													<td className='cursor-pointer'>
 														<Link
 															className='text-underline'
-															to={`/dau-viec/${item?.id}`}>
+															to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${item?.id}`}>
 															{item?.name}
 														</Link>
 													</td>

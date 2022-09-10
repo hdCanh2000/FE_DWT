@@ -56,7 +56,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`${demoPages.quanLyCongViec.path}/${id}`),
+		() => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${id}`),
 		[id, navigate],
 	);
 	return (

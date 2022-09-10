@@ -28,12 +28,12 @@ const TASK = {
 	REPORT: lazy(() => import('../pages/work-management/report-department/ReportDepartmentPage')),
 };
 
-// const MANAGEMENT = {
-// 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
-// 	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
-// 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
-// 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
-// };
+const MANAGEMENT = {
+	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
+	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
+	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
+	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
+};
 
 const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
@@ -75,10 +75,28 @@ const presentation = [
 		element: <TASK.TASKDETAIL />,
 		exact: true,
 	},
+	// trang danh sách đầu việc
+	{
+		path: `${demoPages.jobsPage.subMenu.task.path}`,
+		element: <TASK.SUBTASK />,
+		exact: true,
+	},
 	// trang chi tiết đầu việc (nhiệm vụ con)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/dau-viec/:id`,
 		element: <TASK.SUBTASK_STEP />,
+		exact: true,
+	},
+	// trang danh sách nhân sự
+	{
+		path: `${demoPages.hrRecords.subMenu.hrList.path}`,
+		element: <MANAGEMENT.EMPLOYEE />,
+		exact: true,
+	},
+	// trang danh sách nhân sự
+	{
+		path: `${demoPages.hrRecords.subMenu.hrList.path}/:id`,
+		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
 		exact: true,
 	},
 	{
