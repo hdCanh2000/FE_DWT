@@ -194,6 +194,7 @@ const TaskListPage = () => {
 		const response = await getAllTasksByDepartment(departmentSelect);
 		const result = await response.data;
 		setTasks(result);
+		console.log(result,'result');
 	}, [departmentSelect]);
 
 	useEffect(() => {
@@ -214,7 +215,6 @@ const TaskListPage = () => {
 		};
 		fetchDataSubtasksReportDepartment();
 	}, []);
-
 	// Handle
 	const handleOpenModalExpand = (taskId) => {
 		setEditModalStatusExpand(true);
