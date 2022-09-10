@@ -60,15 +60,15 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 	const departmentRef = useRef(null);
 	const userRef = useRef(null);
 
-	const onValidate = (message, value, name) => {
+	const onValidate = (value, name) => {
 		setErrors((prev) => ({
 			...prev,
-			[name]: { ...prev[name], error: value, errorMsg: value },
+			[name]: { ...prev[name], errorMsg: value },
 		}));
 	};
 
 	const validateFieldForm = (field, value) => {
-		if (!value) {
+		if (value === '' || !value || value === false) {
 			onValidate(true, field);
 		}
 	};
@@ -253,10 +253,10 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 	};
 
 	const handleChange = (e) => {
-		const { value } = e.target;
+		const { value, name } = e.target;
 		setTask({
 			...task,
-			[e.target.name]: value,
+			[name]: value,
 		});
 	};
 
@@ -427,12 +427,13 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 								<CardBody>
 									<div className='row g-4'>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='name'
 											label='Tên công việc'>
 											<Input
 												onChange={handleChange}
-												value={task.name || ''}
+												value={task?.name || ''}
 												name='name'
 												ref={nameRef}
 												required
@@ -471,6 +472,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											/>
 										</FormGroup>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='kpiValue'
 											label='Giá trị KPI'>
@@ -490,6 +492,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											<ErrorText>Vui lòng nhập giá trị KPI hợp lệ</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='priority'
 											label='Độ ưu tiên'>
@@ -514,45 +517,49 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											</ErrorText>
 										)}
 										{/* phòng ban phụ trách */}
-										<FormGroup
-											className='col-6'
-											id='departmentOption'
-											label='Phòng ban phụ trách'>
-											<SelectComponent
-												style={customStyles}
-												placeholder='Chọn phòng ban phụ trách'
-												defaultValue={departmentOption}
-												value={departmentOption}
-												onChange={setDepartmentOption}
-												options={departments}
-												ref={departmentRef}
-											/>
-										</FormGroup>
-										{errors?.departmentOption?.errorMsg && (
-											<ErrorText>
-												Vui lòng chọn phòng ban phụ trách cho công việc
-											</ErrorText>
-										)}
+										<div className='col-6'>
+											<FormGroup
+												color='red'
+												id='departmentOption'
+												label='Phòng ban phụ trách'>
+												<SelectComponent
+													style={customStyles}
+													placeholder='Chọn phòng ban phụ trách'
+													defaultValue={departmentOption}
+													value={departmentOption}
+													onChange={setDepartmentOption}
+													options={departments}
+													ref={departmentRef}
+												/>
+											</FormGroup>
+											{errors?.departmentOption?.errorMsg && (
+												<ErrorText>
+													Vui lòng chọn phòng ban phụ trách
+												</ErrorText>
+											)}
+										</div>
 										{/* nhân viên phụ trách chính */}
-										<FormGroup
-											className='col-6'
-											id='userOption'
-											label='Nhân viên phụ trách'>
-											<SelectComponent
-												style={customStyles}
-												placeholder='Chọn nhân viên phụ trách'
-												defaultValue={userOption}
-												value={userOption}
-												onChange={setUserOption}
-												options={users}
-												ref={userRef}
-											/>
-										</FormGroup>
-										{errors?.userOption?.errorMsg && (
-											<ErrorText>
-												Vui lòng chọn nhân viên phụ trách cho công việc
-											</ErrorText>
-										)}
+										<div className='col-6'>
+											<FormGroup
+												id='userOption'
+												label='Nhân viên phụ trách'
+												color='red'>
+												<SelectComponent
+													style={customStyles}
+													placeholder='Chọn nhân viên phụ trách'
+													defaultValue={userOption}
+													value={userOption}
+													onChange={setUserOption}
+													options={users}
+													ref={userRef}
+												/>
+											</FormGroup>
+											{errors?.userOption?.errorMsg && (
+												<ErrorText>
+													Vui lòng chọn nhân viên phụ trách
+												</ErrorText>
+											)}
+										</div>
 										{/* phòng ban liên quan */}
 										<FormGroup
 											className='col-12'

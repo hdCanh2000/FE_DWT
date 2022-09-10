@@ -35,7 +35,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const [departmentOption, setDepartmentOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
-		kpiValue: { errorMsg: '' },
+		kpi_value: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
 	});
 	const [logsMision, setLogsMission] = React.useState([]);
@@ -63,8 +63,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	const validateForm = () => {
 		validateFieldForm('name', mission?.name);
-		validateFieldForm('kpiValue', mission?.kpiValue);
-		validateFieldForm('kpiValue', parseInt(mission?.kpiValue, 10) > 0);
+		validateFieldForm('kpi_value', mission?.kpi_value);
+		validateFieldForm('kpi_value', parseInt(mission?.kpi_value, 10) > 0);
 		validateFieldForm('departmentOption', departmentOption.length);
 	};
 
@@ -79,10 +79,10 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	useEffect(() => {
 		handleClearErrorMsgAfterChange('name');
-		handleClearErrorMsgAfterChange('kpiValue');
+		handleClearErrorMsgAfterChange('kpi_value');
 		handleClearErrorMsgAfterChange('departmentOption');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mission?.name, mission?.kpiValue, departmentOption?.length]);
+	}, [mission?.name, mission?.kpi_value, departmentOption?.length]);
 
 	useEffect(() => {
 		if (item?.id) {
@@ -104,10 +104,10 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				id: null,
 				name: '',
 				description: '',
-				kpiValue: '',
-				startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-				endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-				status: 0,
+				kpi_value: '',
+				start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+				end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+				status: 1,
 			});
 			setKeysState([]);
 			setDepartmentOption([]);
@@ -129,17 +129,17 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		if (keysState.length === 0) {
 			return true;
 		}
-		const someEmpty = keysState.some((key) => key.keyName === '' || key.keyValue === '');
+		const someEmpty = keysState.some((key) => key.key_name === '' || key.key_value === '');
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
 			keysState.map((key, index) => {
 				const allPrev = [...keysState];
-				if (keysState[index].keyName === '') {
-					allPrev[index].error.keyName = 'Nhập tên chỉ số key!';
+				if (keysState[index].key_name === '') {
+					allPrev[index].error.key_name = 'Nhập tên chỉ số key!';
 				}
-				if (keysState[index].keyValue === '') {
-					allPrev[index].error.keyValue = 'Nhập giá trị key!';
+				if (keysState[index].key_value === '') {
+					allPrev[index].error.key_value = 'Nhập giá trị key!';
 				}
 				setKeysState(allPrev);
 			});
@@ -151,11 +151,11 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	// thêm field cho các giá trị key
 	const handleAddFieldKey = () => {
 		const initKeyState = {
-			keyName: '',
-			keyValue: '',
+			key_name: '',
+			key_value: '',
 			error: {
-				keyName: null,
-				keyValue: null,
+				key_name: null,
+				key_value: null,
 			},
 		};
 		if (prevIsValid() && keysState?.length <= 3) {
@@ -205,9 +205,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			id: null,
 			name: '',
 			description: '',
-			kpiValue: '',
-			startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
+			kpi_value: '',
+			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			status: 0,
 		});
 		setKeysState([]);
@@ -225,22 +225,22 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					id: 1,
 					user: userLogin,
 					type: 2,
-					prevStatus: null,
-					nextStatus: `Thêm mới`,
-					missionId: mission?.id,
-					missionName: mission?.name,
+					prev_status: null,
+					next_status: `Thêm mới`,
+					mission_name: mission?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
 			];
 			const data = { ...mission, logs: newLogs };
 			data.keys = keysState.map((key) => {
 				return {
-					keyName: key.keyName,
-					keyValue: key.keyValue,
+					key_name: key.key_name,
+					key_value: key.key_value,
 				};
 			});
 			data.status = 0;
-			data.kpiValue = parseInt(data.kpiValue, 10);
+			data.kpi_value = parseInt(data.kpi_value, 10);
+			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
 			const departmentClone = [...departmentOption];
 			data.departments = departmentClone.map((department) => {
 				return {
@@ -254,7 +254,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				nameRef.current.focus();
 				return;
 			}
-			if (parseInt(mission?.kpiValue, 10) <= 0 || !mission?.kpiValue) {
+			if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
 				kpiValueRef.current.focus();
 				return;
 			}
@@ -271,22 +271,22 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					id: mission?.logs?.length + 1,
 					user: userLogin,
 					type: 2,
-					prevStatus: null,
-					nextStatus: `Chỉnh sửa`,
-					missionId: mission?.id,
-					missionName: mission?.name,
+					prev_status: null,
+					next_status: `Chỉnh sửa`,
+					mission_name: mission?.name,
 					time: moment().format('YYYY/MM/DD HH:mm'),
 				},
 			];
 			const data = { ...mission, logs: newLogs };
 			data.keys = keysState.map((key) => {
 				return {
-					keyName: key.keyName,
-					keyValue: key.keyValue,
+					key_name: key.key_name,
+					key_value: key.key_value,
 				};
 			});
 			data.status = 0;
-			data.kpiValue = parseInt(data.kpiValue, 10);
+			data.kpi_value = parseInt(data.kpi_value, 10);
+			data.current_kpi_value = mission.current_kpi_value ? mission.current_kpi_value : 0;
 			const departmentClone = [...departmentOption];
 			data.departments = departmentClone.map((department) => {
 				return {
@@ -300,7 +300,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				nameRef.current.focus();
 				return;
 			}
-			if (parseInt(mission?.kpiValue, 10) <= 0 || !mission?.kpiValue) {
+			if (parseInt(mission?.kpi_value, 10) <= 0 || !mission?.kpi_value) {
 				kpiValueRef.current.focus();
 				return;
 			}
@@ -314,9 +314,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			id: null,
 			name: '',
 			description: '',
-			kpiValue: '',
-			startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
+			kpi_value: '',
+			start_time: moment().add(0, 'days').format('YYYY-MM-DD'),
+			end_time: moment().add(0, 'days').format('YYYY-MM-DD'),
 			status: 0,
 		});
 		setKeysState([]);
@@ -341,6 +341,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 								<CardBody>
 									<div className='row g-4'>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='name'
 											label='Tên mục tiêu'>
@@ -359,6 +360,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<ErrorText>Vui lòng nhập tên mục tiêu</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='description'
 											label='Mô tả mục tiêu'>
@@ -373,27 +375,29 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											/>
 										</FormGroup>
 										<FormGroup
+											color='red'
 											className='col-12'
-											id='kpiValue'
+											id='kpi_value'
 											label='Giá trị KPI'>
 											<Input
 												ref={kpiValueRef}
 												type='number'
-												name='kpiValue'
+												name='kpi_value'
 												onChange={handleChange}
-												value={mission.kpiValue || ''}
+												value={mission.kpi_value || ''}
 												required
 												size='lg'
 												placeholder='Giá trị KPI'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
-										{errors?.kpiValue?.errorMsg && (
+										{errors?.kpi_value?.errorMsg && (
 											<ErrorText>Vui lòng nhập giá trị KPI hợp lệ</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
-											id='kpiValue'
+											id='kpi_value'
 											label='Phòng ban phụ trách'>
 											<Select
 												placeholder='Chọn phòng ban phụ trách'
@@ -414,15 +418,15 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<FormGroup
 												className='w-50 mr-2'
 												style={{ width: '45%', marginRight: 10 }}
-												id='startTime'
+												id='start_time'
 												label='Ngày bắt đầu mục tiêu'
 												isFloating>
 												<Input
-													name='startTime'
+													name='start_time'
 													placeholder='Ngày bắt đầu mục tiêu'
 													onChange={handleChange}
 													value={
-														mission.startTime ||
+														mission.start_time ||
 														moment().add(0, 'days').format('YYYY-MM-DD')
 													}
 													type='date'
@@ -433,11 +437,11 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<FormGroup
 												className='w-50 ml-2'
 												style={{ width: '45%', marginLeft: 10 }}
-												id='endTime'
+												id='end_time'
 												label='Ngày kết thúc mục tiêu'
 												isFloating>
 												<Input
-													name='endTime'
+													name='end_time'
 													placeholder='Ngày kết thúc mục tiêu'
 													onChange={handleChange}
 													value={
@@ -475,17 +479,17 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
 																}
-																value={item?.keyName || ''}
-																name='keyName'
+																value={item?.key_name || ''}
+																name='key_name'
 																required
 																size='lg'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: Doanh thu, đơn hàng, ...'
 															/>
 														</FormGroup>
-														{item.error?.keyName && (
+														{item.error?.key_name && (
 															<ErrorText>
-																{item.error?.keyName}
+																{item.error?.key_name}
 															</ErrorText>
 														)}
 													</div>
@@ -498,17 +502,17 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
 																}
-																value={item?.keyValue || ''}
-																name='keyValue'
+																value={item?.key_value || ''}
+																name='key_value'
 																size='lg'
 																required
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
 															/>
 														</FormGroup>
-														{item.error?.keyValue && (
+														{item.error?.key_value && (
 															<ErrorText>
-																{item.error?.keyValue}
+																{item.error?.key_value}
 															</ErrorText>
 														)}
 													</div>

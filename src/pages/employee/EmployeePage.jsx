@@ -18,6 +18,7 @@ import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
@@ -176,7 +177,6 @@ const EmployeePage = () => {
 			isShow: false,
 		},
 	];
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -191,20 +191,20 @@ const EmployeePage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data.name,
-			departmentId: data.departmentId,
-			code: data.code,
-			email: data.email,
+			name: data?.name,
+			departmentId: data?.departmentId,
+			code: data?.code,
+			email: data?.email,
 			password: '123456',
-			dateOfBirth: data.dateOfBirth,
-			dateOfJoin: data.dateOfJoin,
-			phone: data.phone,
-			address: data.address,
-			position: Number.parseInt(data.position, 10),
-			status: Number(data.status),
-			roles: Number.parseInt(data.position, 10) === 1 ? ['manager'] : ['user'],
+			dateOfBirth: data?.dateOfBirth,
+			dateOfJoin: data?.dateOfJoin,
+			phone: data?.phone,
+			address: data?.address,
+			position: Number.parseInt(data?.position, 10),
+			status: Number(data?.status),
+			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
 		};
-		if (data.id) {
+		if (data?.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
@@ -288,6 +288,7 @@ const EmployeePage = () => {
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}
+					validate={validate}
 				/>
 			</Page>
 		</PageWrapper>

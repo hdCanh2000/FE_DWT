@@ -1,6 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -248,7 +249,7 @@ const MissionDetailPage = () => {
 					<DropdownMenu>
 						{Object.keys(renderStatusTask(item.status)).map((key) => (
 							<DropdownItem
-								key={key}
+								key={uuidv4()}
 								onClick={() =>
 									handleOpenConfirmStatusTask(item, STATUS[key].value)
 								}>
@@ -278,12 +279,13 @@ const MissionDetailPage = () => {
 						onClick={() => handleOpenEditForm(item)}
 					/>
 					<Button
+						isDisable={item.status === 7}
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='Trash'
-						onClick={() => handleOpenConfirmModal(item)}
+						icon='EditOff'
+						onClick={() => handleOpenConfirmStatusTask(item, 7)}
 					/>
 				</>
 			),
@@ -466,10 +468,10 @@ const MissionDetailPage = () => {
 	};
 
 	// confirm modal
-	const handleOpenConfirmModal = (item) => {
-		setOpenConfirmModal(true);
-		setItemEdit({ ...item });
-	};
+	// const handleOpenConfirmModal = (item) => {
+	// 	setOpenConfirmModal(true);
+	// 	setItemEdit({ ...item });
+	// };
 
 	const handleCloseConfirmModal = () => {
 		setOpenConfirmModal(false);
@@ -516,7 +518,7 @@ const MissionDetailPage = () => {
 		try {
 			await deleteMissionById(missionId);
 			handleCloseConfirmModal();
-			navigate('/muc-tieu/danh-sach');
+			navigate('/muc-tieu');
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
 			handleCloseConfirmModal();
@@ -619,6 +621,7 @@ const MissionDetailPage = () => {
 			setTasks(tasks);
 			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 		}
+		setOpenConfirmMissionModal(false);
 	};
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
@@ -774,7 +777,7 @@ const MissionDetailPage = () => {
 													color: 'info',
 													children: (
 														<div
-															key={department?.name}
+															key={uuidv4()}
 															className='fw-bold fs-5 mb-1'>
 															{department?.name}
 														</div>
@@ -927,7 +930,7 @@ const MissionDetailPage = () => {
 										icon: 'DoneAll',
 										color: 'danger',
 										children: (
-											<div>
+											<div key={uuidv4()}>
 												<div className='fw-bold fs-5 mb-1'>
 													{key?.keyName}
 												</div>
@@ -951,6 +954,7 @@ const MissionDetailPage = () => {
 										.reverse()
 										.map((item) => (
 											<RelatedActionCommonItem
+												key={uuidv4()}
 												type={item?.type}
 												time={moment(`${item?.time}`).format(
 													'DD/MM/YYYY HH.mm',
