@@ -40,6 +40,10 @@ const AUTH = {
 	LOGIN: lazy(() => import('../pages/presentation/auth/Login')),
 };
 
+const KEY = {
+	KEY: lazy(()=> import('../pages/key/keyPage')),
+}
+
 const presentation = [
 	/**
 	 * Landing
@@ -84,6 +88,11 @@ const presentation = [
 	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,
+		exact: true,
+	},
+	{
+		path: demoPages.cauHinh.subMenu.kpi.path,
+		element: <KEY.KEY />,
 		exact: true,
 	},
 ];

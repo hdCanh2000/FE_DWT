@@ -61,6 +61,7 @@ const CommonForm = ({
 													list={field.options}
 													required
 													name={field.id}
+													size="lg"
 													className='border border-2 rounded-0 shadow-none'
 													onChange={formik.handleChange}
 													onBlur={formik.handleBlur}
@@ -97,6 +98,24 @@ const CommonForm = ({
 												/>
 											</FormGroup>
 										);
+									}
+									if (field.type === "number") {
+										<FormGroup
+											key={field.id}
+											className='col-12'
+											id={field.id}
+											label={field.title}>
+											<Input
+												type='number'
+												name='kpiValue'
+												onChange={formik.handleChange}
+												value={formik.values[field.id] || ''}
+												required
+												size='lg'
+												placeholder='Giá trị KPI'
+												className='border border-2 rounded-0 shadow-none'
+											/>
+										</FormGroup>
 									}
 									if (field.type === 'switch') {
 										return (
