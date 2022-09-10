@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -15,54 +16,34 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { getAllDepartments } from '../work-management/mission/services';
-import { addEmployee, getAllEmployee, updateEmployee } from './services';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
+import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
+import { addEmployee, updateEmployee } from './services';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
-	const [openForm, setOpenForm] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
-	const [departments, setDepartments] = useState([]);
-	const [users, setUsers] = useState([]);
+	const dispatch = useDispatch();
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const users = useSelector((state) => state.employee.employees);
+	const departments = useSelector((state) => state.department.departments);
 
 	useEffect(() => {
-		async function getDepartments() {
-			try {
-				const response = await getAllDepartments();
-				const data = await response.data;
-				setDepartments(
-					data.map((department) => {
-						return {
-							id: department?.id,
-							text: department?.name,
-							value: department?.id,
-						};
-					}),
-				);
-			} catch (error) {
-				setDepartments([]);
-			}
-		}
-		getDepartments();
-	}, []);
-
-	async function getAllEmployees() {
-		try {
-			const response = await getAllEmployee();
-			const data = await response.data;
-			setUsers(data);
-		} catch (error) {
-			setUsers([]);
-		}
-	}
+		dispatch(fetchDepartmentList());
+	}, [dispatch]);
 
 	useEffect(() => {
-		getAllEmployees();
-	}, []);
+		dispatch(fetchEmployeeList());
+	}, [dispatch]);
 
 	const columns = [
 		{
@@ -106,7 +87,7 @@ const EmployeePage = () => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name}</span>,
+			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
 		},
 		{
@@ -190,23 +171,12 @@ const EmployeePage = () => {
 					isLight={darkModeStatus}
 					className='text-nowrap mx-1'
 					icon='Edit'
-					onClick={() => handleOpenActionForm(item)}
+					onClick={() => handleOpenForm(item)}
 				/>
 			),
 			isShow: false,
 		},
 	];
-
-	const handleOpenActionForm = (item) => {
-		setOpenForm(true);
-		setItemEdit({ ...item });
-	};
-
-	const hanleCloseForm = () => {
-		setOpenForm(false);
-		// setItemEdit(null);
-	};
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -216,10 +186,6 @@ const EmployeePage = () => {
 				autoDismiss: true,
 			},
 		);
-	};
-
-	const handleClearValueForm = () => {
-		setItemEdit(null);
 	};
 
 	const handleSubmitForm = async (data) => {
@@ -242,36 +208,29 @@ const EmployeePage = () => {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
-				const newUsers = [...users];
-				setUsers(newUsers.map((item) => (item.id === data.id ? { ...result } : item)));
-				// handleClearValueForm();
-				hanleCloseForm();
-				getAllEmployees();
+				dispatch(fetchEmployeeList());
+				handleCloseForm();
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				// setUsers(users);
 				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+				throw error;
 			}
 		} else {
 			try {
 				const response = await addEmployee(dataSubmit);
 				const result = await response.data;
-				const newUsers = [...users];
-				newUsers.push(result);
-				setUsers(newUsers);
-				handleClearValueForm();
-				hanleCloseForm();
-				getAllEmployees();
+				dispatch(fetchEmployeeList());
+				handleCloseForm();
 				handleShowToast(
 					`Thêm nhân viên`,
 					`Nhân viên ${result?.user?.name} được thêm thành công!`,
 				);
 			} catch (error) {
-				setUsers(users);
 				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
+				throw error;
 			}
 		}
 	};
@@ -304,7 +263,7 @@ const EmployeePage = () => {
 											color='info'
 											icon='PersonPlusFill'
 											tag='button'
-											onClick={() => handleOpenActionForm(null)}>
+											onClick={() => handleOpenForm(null)}>
 											Thêm nhân viên
 										</Button>
 									</CardActions>
@@ -323,8 +282,8 @@ const EmployeePage = () => {
 				)}
 
 				<CommonForm
-					show={openForm}
-					onClose={hanleCloseForm}
+					show={toggleForm}
+					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}

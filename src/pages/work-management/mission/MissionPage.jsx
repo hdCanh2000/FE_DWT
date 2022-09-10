@@ -8,6 +8,7 @@ import {
 	useSearchParams,
 	useLocation,
 } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
@@ -23,12 +24,7 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
 import Button from '../../../components/bootstrap/Button';
-import {
-	addNewMission,
-	getAllMission,
-	getLatestTasks,
-	updateMissionById,
-} from './services';
+import { addNewMission, updateMissionById } from './services';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
@@ -40,11 +36,13 @@ import Badge from '../../../components/bootstrap/Badge';
 import Progress from '../../../components/bootstrap/Progress';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
-import verifyPermission from '../../../HOC/verifyPermissionHOC';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import MissionChartReport from '../../dashboard/admin/MissionChartReport';
 import TaskChartReport from '../../dashboard/admin/TaskChartReport';
-import { getReportMisson, getReportTask } from '../../dashboard/services';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import { fetchMissionList, fetchMissionReport } from '../../../redux/slice/missionSlice';
+import { fetchTaskListLates, fetchTaskReport } from '../../../redux/slice/taskSlice';
+import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 
 const Item = ({
 	id,
@@ -135,50 +133,43 @@ const Item = ({
 
 const MissionPage = () => {
 	const { addToast } = useToasts();
-	const [missions, setMissions] = useState([]);
-	const [missionReport, setMissionReport] = useState({});
-	const [taskReport, setTaskReport] = useState({});
-	const [latestTasks, setLatestTasks] = useState([]);
-	const [editModalStatus, setEditModalStatus] = useState(false);
-	const [openConfirmModal, setOpenConfirmModal] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
-	const [departmentSelect] = useState(1);
-
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const roles = window.localStorage.getItem('roles');
-	if (roles === 'user') {
-		navigate('/404');
-	}
+	const dispatch = useDispatch();
+	const [departmentSelect] = useState(1);
+	const [openConfirmModal, setOpenConfirmModal] = useState(false);
+	const missions = useSelector((state) => state.mission?.missions);
+	const missionReport = useSelector((state) => state.mission?.missionReport);
+	const latestTasks = useSelector((state) => state.task?.taskLates);
+	const taskReport = useSelector((state) => state.task?.taskReport);
+	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const navigateToDetailPage = useCallback(
-		(page) => navigate(`${demoPages.mucTieu.path}/${page}`),
+		(page) => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${page}`),
 		[navigate],
 	);
+	console.log(demoPages,'demoPages');
 	useEffect(() => {
-		const fetchData = async () => {
-			const response = await getAllMission();
-			const result = await response.data;
-			setMissions(result);
-		};
-		const fetchDataReport = async () => {
-			const response = await getReportMisson();
-			const result = await response.data;
-			setMissionReport(result);
-		};
-		fetchData();
-		fetchDataReport();
-	}, []);
+		dispatch(fetchMissionList());
+	}, [dispatch]);
 
 	useEffect(() => {
-		const fetchDataReportTaskByDepartment = async () => {
-			const response = await getReportTask({ departmentId: departmentSelect });
-			const result = await response.data;
-			setTaskReport(result);
-		};
-		fetchDataReportTaskByDepartment();
-	}, [departmentSelect]);
+		dispatch(fetchMissionReport());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchTaskListLates());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchTaskReport(departmentSelect));
+	}, [departmentSelect, dispatch]);
+
+	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const columns = [
 		{
@@ -255,7 +246,7 @@ const MissionPage = () => {
 			id: 'action',
 			key: 'action',
 			render: (item) =>
-				verifyPermission(
+				verifyPermissionHOC(
 					<div className='d-flex align-items-center'>
 						<Button
 							isOutline={!darkModeStatus}
@@ -263,7 +254,7 @@ const MissionPage = () => {
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2'
 							icon='Edit'
-							onClick={() => handleOpenEditForm(item)}>
+							onClick={() => handleOpenFormEdit(item)}>
 							Sửa
 						</Button>
 						<Button
@@ -281,26 +272,13 @@ const MissionPage = () => {
 		},
 	];
 
-	const handleClearValueForm = () => {
-		setItemEdit({
-			name: '',
-			description: '',
-			kpiValue: '',
-			startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-			status: 1,
-		});
-	};
-
 	// confirm modal
-	const handleOpenConfirmModal = (item) => {
+	const handleOpenConfirmModal = () => {
 		setOpenConfirmModal(true);
-		setItemEdit({ ...item });
 	};
 
 	const handleCloseConfirmModal = () => {
 		setOpenConfirmModal(false);
-		setItemEdit(null);
 	};
 
 	const handleCloseItem = async (data) => {
@@ -308,12 +286,9 @@ const MissionPage = () => {
 			try {
 				const newData = data;
 				newData.status = 0;
-				const response = await updateMissionById(data);
-				const result = await response.data;
-				const newMissions = [...missions];
-				setMissions(
-					newMissions.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
+				await updateMissionById(data);
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
 				handleCloseConfirmModal();
 				handleShowToast(`Đóng mục tiêu`, `Đóng mục tiêu thành công!`);
 			} catch (error) {
@@ -324,12 +299,9 @@ const MissionPage = () => {
 			try {
 				const newData = data;
 				newData.status = 1;
-				const response = await updateMissionById(data);
-				const result = await response.data;
-				const newMissions = [...missions];
-				setMissions(
-					newMissions.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
+				await updateMissionById(data);
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
 				handleCloseConfirmModal();
 				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu thành công!`);
 			} catch (error) {
@@ -337,17 +309,6 @@ const MissionPage = () => {
 				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu không thành công!`);
 			}
 		}
-	};
-
-	// form modal
-	const handleOpenEditForm = (item) => {
-		setEditModalStatus(true);
-		setItemEdit({ ...item });
-	};
-
-	const handleCloseEditForm = () => {
-		setEditModalStatus(false);
-		setItemEdit(null);
 	};
 
 	const handleShowToast = (title, content) => {
@@ -366,81 +327,29 @@ const MissionPage = () => {
 			try {
 				const response = await updateMissionById(data);
 				const result = await response.data;
-				const newMissions = [...missions];
-				setMissions(
-					newMissions.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
-				handleClearValueForm();
-				handleCloseEditForm();
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
+				handleCloseForm();
 				handleShowToast(
 					`Cập nhật mục tiêu!`,
 					`mục tiêu ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				setMissions(missions);
 				handleShowToast(`Cập nhật mục tiêu`, `Cập nhật mục tiêu không thành công!`);
 			}
 		} else {
 			try {
 				const response = await addNewMission(data);
 				const result = await response.data;
-				const newMissions = [...missions];
-				newMissions.push(result);
-				setMissions(newMissions);
-				handleClearValueForm();
-				handleCloseEditForm();
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
+				handleCloseForm();
 				handleShowToast(`Thêm mục tiêu`, `mục tiêu ${result.name} được thêm thành công!`);
 			} catch (error) {
-				setMissions(missions);
 				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu không thành công!`);
 			}
 		}
 	};
-
-	// const mergeObjToArray = (arr) => {
-	// 	const output = [];
-	// 	arr.forEach((item) => {
-	// 		const existing = output.filter((v) => {
-	// 			return v.task.missionId === item.task.missionId;
-	// 		});
-	// 		if (existing?.length) {
-	// 			const existingIndex = output.indexOf(existing[0]);
-	// 			output[existingIndex].tasks = output[existingIndex].tasks.concat(item.task);
-	// 		} else {
-	// 			if (typeof item.task === 'object') item.tasks = [item.task];
-	// 			output.push(item);
-	// 		}
-	// 	});
-	// 	return output;
-	// };
-
-	// useEffect(() => {
-	// 	const fetchData = async () => {
-	// 		const response = await getAllTasks();
-	// 		const result = await response.data;
-	// const kq = [];
-	// missions?.forEach((mission) => {
-	// 	result?.forEach((task) => {
-	// 		if (mission.id === task.missionId) {
-	// 			kq.push({
-	// 				...mission,
-	// 				task,
-	// 			});
-	// 		}
-	// 	});
-	// });
-	// setMissionsWithTask(uniqBy([...mergeObjToArray(kq), ...missions], 'id'));
-	// };
-	// fetchData();
-	// }, [missions]);
-
-	useEffect(() => {
-		const fetchData = async () => {
-			const result = await getLatestTasks();
-			setLatestTasks(result.data);
-		};
-		fetchData();
-	}, []);
 
 	const handleClickSwitchView = (view) => {
 		navigate({
@@ -452,7 +361,7 @@ const MissionPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.mucTieu.text}>
+		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
 				{missions?.length > 0 && (
 					<div className='row'>
@@ -480,7 +389,7 @@ const MissionPage = () => {
 					</div>
 				)}
 				<div className='row'>
-					{verifyPermission(
+					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
 							<Card className='mb-4'>
 								<CardHeader className='py-0'>
@@ -504,7 +413,7 @@ const MissionPage = () => {
 						</div>,
 						['admin'],
 					)}
-					{verifyPermission(
+					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
 							<Card className='mb-8'>
 								<CardHeader className='py-0'>
@@ -528,7 +437,7 @@ const MissionPage = () => {
 						</div>,
 						['admin'],
 					)}
-					{verifyPermission(
+					{verifyPermissionHOC(
 						<div className='col-xxl-12'>
 							<Card className='mb-8'>
 								<CardHeader className='py-0'>
@@ -563,10 +472,10 @@ const MissionPage = () => {
 											icon='StarOutline'
 											className='pt-4 pb-2 w-100 align-items-start'
 											onClick={() => navigateToDetailPage(item?.id)}>
-											<CardTitle tag='h3' className='h3'>
+											<CardTitle tag='h4' className='h4'>
 												{item?.name}
 											</CardTitle>
-											<CardSubTitle style={{ fontSize: 15 }}>
+											<CardSubTitle style={{ fontSize: 14 }} className='mt-2'>
 												<div className='d-flex'>
 													<div className='me-2'>
 														Số CV:
@@ -604,7 +513,7 @@ const MissionPage = () => {
 												</div>
 											</CardSubTitle>
 										</CardLabel>
-										{verifyPermission(
+										{verifyPermissionHOC(
 											<CardActions>
 												<Dropdown>
 													<DropdownToggle hasIcon={false}>
@@ -623,7 +532,7 @@ const MissionPage = () => {
 																icon='Edit'
 																tag='button'
 																onClick={() =>
-																	handleOpenEditForm(item)
+																	handleOpenFormEdit(item)
 																}>
 																Sửa mục tiêu
 															</Button>
@@ -637,7 +546,7 @@ const MissionPage = () => {
 																}
 																tag='button'
 																onClick={() =>
-																	handleOpenConfirmModal(item)
+																	handleOpenFormDelete(item)
 																}>
 																{item.status === 0
 																	? 'Mở mục tiêu'
@@ -705,7 +614,7 @@ const MissionPage = () => {
 								</Card>
 							</div>
 						))}
-						{verifyPermission(
+						{verifyPermissionHOC(
 							<div className='col-md-12 col-xl-4 col-sm-12'>
 								<Card stretch>
 									<CardBody className='d-flex align-items-center justify-content-center'>
@@ -715,7 +624,7 @@ const MissionPage = () => {
 											isLight
 											className='w-100 h-100'
 											icon='AddCircle'
-											onClick={() => handleOpenEditForm(null)}>
+											onClick={() => handleOpenFormEdit(null)}>
 											Thêm mục tiêu
 										</Button>
 									</CardBody>
@@ -734,13 +643,13 @@ const MissionPage = () => {
 											<CardLabel>Danh sách mục tiêu</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									{verifyPermission(
+									{verifyPermissionHOC(
 										<CardActions>
 											<Button
 												color='info'
 												icon='Plus'
 												tag='button'
-												onClick={() => handleOpenEditForm(null)}>
+												onClick={() => handleOpenFormEdit(null)}>
 												Thêm mục tiêu
 											</Button>
 										</CardActions>,
@@ -796,8 +705,8 @@ const MissionPage = () => {
 					}
 				/>
 				<MissionFormModal
-					show={editModalStatus}
-					onClose={handleCloseEditForm}
+					show={toggleFormEdit}
+					onClose={handleCloseForm}
 					onSubmit={handleSubmitMissionForm}
 					item={itemEdit}
 				/>

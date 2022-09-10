@@ -2,8 +2,9 @@
 /* eslint-disable react/prop-types */
 
 import moment from 'moment';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import styled from 'styled-components';
 import Card, {
@@ -16,7 +17,8 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Icon from '../../../components/icon/Icon';
-import { getAllDepartments, getMissionById } from './services';
+import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
+import { getMissionById } from './services';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -24,19 +26,12 @@ const ErrorText = styled.span`
 	margin-top: 5px;
 `;
 
-// const customStyles = {
-// 	control: (provided) => ({
-// 		...provided,
-// 		padding: '4px',
-// 		fontSize: '18px',
-// 		borderRadius: '1.25rem',
-// 	}),
-// };
-
 const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
+	const dispatch = useDispatch();
+	const departments = useSelector((state) => state.department.departments);
+
 	const [mission, setMission] = useState({});
 	const [keysState, setKeysState] = useState([]);
-	const [departments, setDepartments] = useState([]);
 	const [departmentOption, setDepartmentOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
@@ -48,6 +43,10 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const nameRef = useRef(null);
 	const kpiValueRef = useRef(null);
 	const departmentRef = useRef(null);
+
+	useEffect(() => {
+		dispatch(fetchDepartmentList());
+	}, [dispatch]);
 
 	const onValidate = (value, name) => {
 		setErrors((prev) => ({
@@ -124,26 +123,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mission]);
-	useEffect(() => {
-		async function getDepartments() {
-			try {
-				const response = await getAllDepartments();
-				const data = await response.data;
-				setDepartments(
-					data.map((department) => {
-						return {
-							id: department.id,
-							label: department.name,
-							value: department.slug,
-						};
-					}),
-				);
-			} catch (error) {
-				setDepartments([]);
-			}
-		}
-		getDepartments();
-	}, []);
 
 	// hàm validate cho dynamic field form
 	const prevIsValid = () => {
@@ -466,8 +445,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													placeholder='Ngày kết thúc mục tiêu'
 													onChange={handleChange}
 													value={
-														mission.end_time ||
-														moment().add(0, 'days').format('YYYY-MM-DD')
+														mission.endTime ||
+														moment().add(1, 'days').format('YYYY-MM-DD')
 													}
 													type='date'
 													size='lg'
@@ -575,4 +554,4 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	);
 };
 
-export default MissionFormModal;
+export default memo(MissionFormModal);
