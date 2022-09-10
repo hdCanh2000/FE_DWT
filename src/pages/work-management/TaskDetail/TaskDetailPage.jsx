@@ -307,7 +307,7 @@ const TaskDetailPage = () => {
 							onClick={() => handleOpenConfirm(item)}
 						/>
 					</div>,
-					['admin', 'manager', 'user'],
+					['admin', 'manager'],
 				),
 		},
 	];
@@ -1146,15 +1146,18 @@ const TaskDetailPage = () => {
 											<CardLabel>Danh sách đầu việc </CardLabel>
 										</CardTitle>
 									</CardLabel>
-									<Button
-										color='success'
-										size='lg'
-										isLight
-										className='w-30 h-100'
-										onClick={() => handleOpenModal(0, 'add')}
-										icon='AddCircle'>
-										Thêm đầu việc
-									</Button>
+									{verifyPermissionHOC(
+										<Button
+											color='success'
+											size='lg'
+											isLight
+											className='w-30 h-100'
+											onClick={() => handleOpenModal(0, 'add')}
+											icon='AddCircle'>
+											Thêm đầu việc
+										</Button>,
+										['admin', 'manager'],
+									)}
 								</CardHeader>
 								<div className='p-4'>
 									<TableCommon

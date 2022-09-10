@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
 import { useParams } from 'react-router-dom';
@@ -18,7 +19,7 @@ import Input from '../../components/bootstrap/forms/Input';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Toasts from '../../components/bootstrap/Toasts';
-import { getDepartmentByIdWithUser, updateDepartment } from './services';
+import { updateDepartment } from './services';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import validate from './validate';
@@ -27,6 +28,8 @@ import { addEmployee, updateEmployee } from '../employee/services';
 import Popovers from '../../components/bootstrap/Popovers';
 import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import { fetchDepartmentById } from '../../redux/slice/departmentSlice';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 
 const DepartmentDetailPage = () => {
 	const params = useParams();
@@ -151,16 +154,35 @@ const DepartmentDetailPage = () => {
 					isLight
 					className='text-nowrap mx-2'
 					icon='Edit'
-					onClick={() => handleOpenActionForm(item)}
+					onClick={() => handleOpenForm(item)}
 				/>
 			),
 			isShow: false,
 		},
 	];
 	const [activeTab, setActiveTab] = useState(TABS.DETAIL);
-	const [openForm, setOpenForm] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
-	const [department, setDepartment] = useState({});
+
+	const dispatch = useDispatch();
+	const department = useSelector((state) => state.department.department);
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	useEffect(() => {
+		dispatch(fetchDepartmentById(params.id));
+		formik.initialValues = {
+			id: department.id,
+			slug: department?.slug,
+			description: department?.description,
+			name: department?.name,
+			address: department?.address,
+			status: department?.status,
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dispatch, params.id]);
+
 	const formik = useFormik({
 		initialValues: {
 			id: department.id,
@@ -177,29 +199,6 @@ const DepartmentDetailPage = () => {
 			resetForm();
 		},
 	});
-
-	async function getInfoDepartmentById() {
-		try {
-			const response = await getDepartmentByIdWithUser(params.id);
-			const data = await response.data;
-			setDepartment(data);
-			formik.initialValues = {
-				id: department.id,
-				slug: department?.slug,
-				description: department?.description,
-				name: department?.name,
-				address: department?.address,
-				status: department?.status,
-			};
-		} catch (error) {
-			setDepartment({});
-		}
-	}
-
-	useEffect(() => {
-		getInfoDepartmentById();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [params.id]);
 
 	const handleShowToast = (title, content) => {
 		addToast(
@@ -224,13 +223,12 @@ const DepartmentDetailPage = () => {
 		try {
 			const response = await updateDepartment(dataSubmit);
 			const result = await response.data;
-			setDepartment(result);
+			dispatch(fetchDepartmentById(params.id));
 			handleShowToast(
 				`Cập nhật phòng ban!`,
 				`Phòng ban ${result.name} được cập nhật thành công!`,
 			);
 		} catch (error) {
-			setDepartment(department);
 			handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
 		}
 	};
@@ -255,8 +253,8 @@ const DepartmentDetailPage = () => {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
-				hanleCloseForm();
-				getInfoDepartmentById();
+				dispatch(fetchDepartmentById(params.id));
+				handleCloseForm();
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,
@@ -268,8 +266,8 @@ const DepartmentDetailPage = () => {
 			try {
 				const response = await addEmployee(dataSubmit);
 				const result = await response.data;
-				hanleCloseForm();
-				getInfoDepartmentById();
+				dispatch(fetchDepartmentById(params.id));
+				handleCloseForm();
 				handleShowToast(
 					`Thêm nhân viên`,
 					`Nhân viên ${result?.user?.name} được thêm thành công!`,
@@ -278,16 +276,6 @@ const DepartmentDetailPage = () => {
 				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
 			}
 		}
-	};
-
-	const handleOpenActionForm = (item) => {
-		setOpenForm(true);
-		setItemEdit({ ...item });
-	};
-
-	const hanleCloseForm = () => {
-		setOpenForm(false);
-		setItemEdit(null);
 	};
 
 	return (
@@ -457,7 +445,7 @@ const DepartmentDetailPage = () => {
 													color='info'
 													icon='PersonPlusFill'
 													tag='button'
-													onClick={() => handleOpenActionForm(null)}>
+													onClick={() => handleOpenForm(null)}>
 													Thêm nhân viên
 												</Button>
 											</CardActions>
@@ -478,8 +466,8 @@ const DepartmentDetailPage = () => {
 				)}
 
 				<CommonForm
-					show={openForm}
-					onClose={hanleCloseForm}
+					show={toggleForm}
+					onClose={handleCloseForm}
 					handleSubmit={handleSubmitEmployeeForm}
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viênn'}

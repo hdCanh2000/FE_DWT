@@ -6,7 +6,7 @@ import Button from '../../../components/bootstrap/Button';
 const SubHeaderCommon = () => {
 	const navigate = useNavigate();
 	return (
-		<SubHeader>
+		<SubHeader className='top-0'>
 			<SubHeaderLeft>
 				<Button color='info' isLink icon='ArrowBack' onClick={() => navigate(-1)}>
 					Quay lại

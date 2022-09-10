@@ -2,19 +2,21 @@ import React from 'react';
 // import ReactDOM from 'react-dom'; // For React 17
 import { createRoot } from 'react-dom/client'; // For React 18
 import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
 import './styles/styles.scss';
 import App from './App/App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeContextProvider } from './contexts/themeContext';
+import { store } from './redux/store/index';
 import './i18n';
 
 const children = (
 	<Router>
-		<React.StrictMode>
+		<Provider store={store}>
 			<ThemeContextProvider>
 				<App />
 			</ThemeContextProvider>
-		</React.StrictMode>
+		</Provider>
 	</Router>
 );
 

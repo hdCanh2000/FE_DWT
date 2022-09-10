@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useTour } from '@reactour/tour';
 import { useNavigate } from 'react-router-dom';
 import Modal, {
 	ModalBody,
@@ -23,8 +22,6 @@ const TourModal = () => {
 			clearTimeout(timeout);
 		};
 	}, []);
-
-	const { setIsOpen } = useTour();
 
 	return (
 		<Modal isOpen={isOpenModal} setIsOpen={setIsOpenModal} titleId='tour-title'>
@@ -62,7 +59,6 @@ const TourModal = () => {
 					onClick={() => {
 						setIsOpenModal(false);
 						navigate('/');
-						setTimeout(() => setIsOpen(true), 1000);
 					}}>
 					Yes
 				</Button>
