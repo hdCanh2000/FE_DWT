@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-const validate = Yup.object({
+const validate = Yup.object().shape({
 	code: Yup.string()
 		.min(3, 'Mã nhân viên tối thiểu 3 ký tự')
 		.required('Vui lòng nhập mã nhân viên'),
@@ -8,11 +8,16 @@ const validate = Yup.object({
 		.max(30, 'Họ tên tối đa 30 kí tự')
 		.min(3, 'Họ tên tối thiểu 3 kí tự')
 		.required('Vui lòng nhập họ tên'),
-	email: Yup.string().email('Email không đúng định dạng').required('Vui lòng nhập Email '),
-	// password: Yup.string().min(6, 'Mật khẩu tối thiểu 6 kí tự').required('Vui lòng nhập mật khẩu'),
-	// confirmPassword: Yup.string()
-	// 	.oneOf([Yup.ref('password'), null], 'Mật khẩu không trùng nhau')
-	// 	.required('Vui lòng xác nhận mật khẩu'),
+	dateOfBirth: Yup.string().required('Vui lòng nhập ngày sinh'),
+	dateOfJoin: Yup.string().required('Vui lòng nhập ngày tham gia'),
+	department: Yup.object().required('Vui lòng chọn phòng ban'),
+	position: Yup.number().required('Vui lòng chọn chức vụ'),
+	email: Yup.string().email('Email không đúng định dạng').required('Vui lòng nhập email'),
+	// password: Yup.string().required('Vui lòng nhập mật khẩu'),
+	// confirmPassword: Yup.string().when('password', {
+	// 	is: (val) => !!(val && val.length > 0),
+	// 	then: Yup.string().oneOf([Yup.ref('password')], 'Mật khẩu xác nhận không khớp'),
+	// }),
 });
 
 export default validate;

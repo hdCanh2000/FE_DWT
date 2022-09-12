@@ -51,10 +51,10 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		status: 0,
 		name: '',
 		description: '',
-		estimateDate: '2022-12-01',
-		estimateTime: '17:00',
-		deadlineDate: '2022-12-01',
-		deadlineTime: '17:00',
+		estimateDate: '',
+		estimateTime: '',
+		deadlineDate: '',
+		deadlineTime: '',
 		kpiValue: 0,
 		keys: [],
 		steps: [],
@@ -101,11 +101,6 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 					label: response.data?.departments[0]?.name,
 					value: response.data.departments[0].id,
 				});
-				// setValueTask({
-				// 	id: response.data?.departments[0]?.id,
-				// 	label: response.data?.departments[0]?.name,
-				// 	value: response.data.departments[0].id,
-				// });
 				setUsersRelated(
 					response.data?.users?.slice(1)?.map((user) => {
 						return {
@@ -475,10 +470,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 							<Input
 								placeholder='Ngày hoàn thành ước tính'
 								type='date'
-								value={
-									subtask.estimateDate ||
-									moment().add(0, 'days').format('YYYY/MM/DD')
-								}
+								value={subtask.estimateDate || ''}
 								name='estimateDate'
 								ariaLabel='estimateDate'
 								onChange={handleChange}
@@ -507,10 +499,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 							<Input
 								placeholder='Hạn ngày hoàn thành'
 								type='date'
-								value={
-									subtask.deadlineDate ||
-									moment().add(0, 'days').format('YYYY/MM/DD')
-								}
+								value={subtask.deadlineDate || ''}
 								name='deadlineDate'
 								ariaLabel='deadlineDate'
 								onChange={handleChange}
