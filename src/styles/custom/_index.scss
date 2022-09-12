@@ -24,3 +24,8 @@
 .modern-design .header {
 	margin: 1rem 0 1rem 0.75rem;
 }
+
+.table-modern > tbody > tr > :first-child, .table-modern > thead > tr > :first-child,
+.table-modern > tbody > tr > :last-child, .table-modern > thead > tr > :last-child {
+	border-radius: 0.5rem !important;
+}

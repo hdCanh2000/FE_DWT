@@ -1,7 +1,9 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
@@ -25,8 +27,6 @@ import {
 	addNewTask,
 	deleteMissionById,
 	deleteTaskById,
-	getAllTaksByMissionID,
-	getMissionById,
 	updateMissionById,
 	updateTaskByID,
 } from './services';
@@ -58,6 +58,9 @@ import TableCommon from '../../common/ComponentCommon/TableCommon';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import { fetchMissionById } from '../../../redux/slice/missionSlice';
+import { fetchTaskListByMissionId } from '../../../redux/slice/taskSlice';
+import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 
 const chartOptions = {
 	chart: {
@@ -119,15 +122,20 @@ const MissionDetailPage = () => {
 	const params = useParams();
 	const navigate = useNavigate();
 	const { id } = params;
+	const dispatch = useDispatch();
 
-	const [mission, setMission] = useState({});
-	const [missionReport, setMissionReport] = useState({});
-	const [tasks, setTasks] = useState([]);
-	const [editModalStatus, setEditModalStatus] = useState(false);
-	const [openConfirmModal, setOpenConfirmModal] = useState(false);
+	const mission = useSelector((state) => state.mission.mission);
+	const tasks = useSelector((state) => state.task.tasksByMisson);
+	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+
+	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	// const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
 	const [editModalMissionStatus, setEditModalMissionStatus] = useState(false);
 	const [openConfirmMissionModal, setOpenConfirmMissionModal] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
 	const [missionEdit, setMissionEdit] = useState({});
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
@@ -174,11 +182,11 @@ const MissionDetailPage = () => {
 			minWidth: 100,
 			render: (item) => (
 				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
+					<div className='flex-shrink-0 me-3'>{`${item?.progress}%`}</div>
 					<Progress
 						className='flex-grow-1'
 						isAutoColor
-						value={item.progress}
+						value={item?.progress}
 						style={{
 							height: 10,
 							width: '100%',
@@ -200,7 +208,7 @@ const MissionDetailPage = () => {
 			id: 'currentKpi',
 			key: 'currentKpi',
 			type: 'number',
-			render: (item) => <span>{item.currentKPI}</span>,
+			render: (item) => <span>{item?.currentKPI}</span>,
 			align: 'center',
 		},
 		{
@@ -248,7 +256,7 @@ const MissionDetailPage = () => {
 					<DropdownMenu>
 						{Object.keys(renderStatusTask(item.status)).map((key) => (
 							<DropdownItem
-								key={key}
+								key={uuidv4()}
 								onClick={() =>
 									handleOpenConfirmStatusTask(item, STATUS[key].value)
 								}>
@@ -275,15 +283,16 @@ const MissionDetailPage = () => {
 						className='text-nowrap mx-2'
 						icon='Edit'
 						isDisable={item.status === 4 || item.status === 7 || item.status === 3}
-						onClick={() => handleOpenEditForm(item)}
+						onClick={() => handleOpenFormEdit(item)}
 					/>
 					<Button
+						isDisable={item.status === 7}
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='Trash'
-						onClick={() => handleOpenConfirmModal(item)}
+						icon='EditOff'
+						onClick={() => handleOpenConfirmStatusTask(item, 7)}
 					/>
 				</>
 			),
@@ -316,11 +325,11 @@ const MissionDetailPage = () => {
 			type: 'text',
 			render: (item) => (
 				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
+					<div className='flex-shrink-0 me-3'>{`${item?.progress}%`}</div>
 					<Progress
 						className='flex-grow-1'
 						isAutoColor
-						value={item.progress}
+						value={item?.progress}
 						style={{
 							height: 10,
 							width: '100%',
@@ -342,7 +351,7 @@ const MissionDetailPage = () => {
 			id: 'currentKpi',
 			key: 'currentKpi',
 			type: 'number',
-			render: (item) => <span>{item.currentKPI}</span>,
+			render: (item) => <span>{item?.currentKPI}</span>,
 			align: 'center',
 		},
 		{
@@ -417,44 +426,15 @@ const MissionDetailPage = () => {
 		},
 	];
 
-	async function fetchDataMissionByID() {
-		const response = await getMissionById(id);
-		const result = await response.data;
-		setMission(result.data);
-		setMissionReport(result.report);
-	}
-
-	async function fetchDataTaskByMissionID() {
-		const response = await getAllTaksByMissionID(id);
-		const result = await response.data;
-		setTasks(result);
-	}
-
 	useEffect(() => {
-		fetchDataMissionByID();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [id]);
-
-	useEffect(() => {
-		fetchDataTaskByMissionID();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [id]);
+		dispatch(fetchMissionById(id));
+		dispatch(fetchTaskListByMissionId(id));
+	}, [dispatch, id]);
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 
 	const handleClearValueForm = () => {
-		setItemEdit({
-			id: null,
-			name: '',
-			description: '',
-			kpiValue: '',
-			estimateDate: moment().add(0, 'days').format('YYYY-MM-DD'),
-			estimateTime: '08:00',
-			deadlineDate: moment().add(0, 'days').format('YYYY-MM-DD'),
-			deadlineTime: '08:00',
-			status: 0,
-		});
 		setMissionEdit({
 			name: '',
 			description: '',
@@ -463,17 +443,6 @@ const MissionDetailPage = () => {
 			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
 			status: 1,
 		});
-	};
-
-	// confirm modal
-	const handleOpenConfirmModal = (item) => {
-		setOpenConfirmModal(true);
-		setItemEdit({ ...item });
-	};
-
-	const handleCloseConfirmModal = () => {
-		setOpenConfirmModal(false);
-		setItemEdit(null);
 	};
 
 	// confirm mission modal
@@ -502,37 +471,20 @@ const MissionDetailPage = () => {
 	const handleDeleteItem = async (taskId) => {
 		try {
 			await deleteTaskById(taskId);
-			const newState = [...tasks];
-			setTasks(newState.filter((item) => item.id !== taskId));
-			handleCloseConfirmModal();
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
+			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ thành công!`);
 		} catch (error) {
-			handleCloseConfirmModal();
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
+			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ không thành công!`);
 		}
 	};
 
 	const handleDeleteMission = async (missionId) => {
 		try {
 			await deleteMissionById(missionId);
-			handleCloseConfirmModal();
-			navigate('/muc-tieu/danh-sach');
+			navigate('/muc-tieu');
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
-			handleCloseConfirmModal();
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
 		}
-	};
-
-	// form modal
-	const handleOpenEditForm = (item) => {
-		setEditModalStatus(true);
-		setItemEdit({ ...item });
-	};
-
-	const handleCloseEditForm = () => {
-		setEditModalStatus(false);
-		setItemEdit(null);
 	};
 
 	// form mission modal
@@ -551,16 +503,12 @@ const MissionDetailPage = () => {
 			try {
 				const response = await updateTaskByID(data);
 				const result = await response.data;
-				const newTasks = [...tasks];
-				setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
 				handleClearValueForm();
-				handleCloseEditForm();
 				handleShowToast(
 					`Cập nhật công việc!`,
 					`Công việc ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				setTasks(tasks);
 				handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 			}
 		} else {
@@ -570,14 +518,9 @@ const MissionDetailPage = () => {
 					missionId: params.id,
 				});
 				const result = await response.data;
-				const newTasks = [...tasks];
-				newTasks.push(result);
-				setTasks(newTasks);
 				handleClearValueForm();
-				handleCloseEditForm();
 				handleShowToast(`Thêm công việc`, `Công việc ${result.name} được thêm thành công!`);
 			} catch (error) {
-				setTasks(tasks);
 				handleShowToast(`Thêm công việc`, `Thêm công việc không thành công!`);
 			}
 		}
@@ -587,7 +530,6 @@ const MissionDetailPage = () => {
 			try {
 				const response = await updateMissionById(data);
 				const result = await response.data;
-				setMission(result);
 				handleClearValueForm();
 				handleCloseEditMissionForm();
 				handleShowToast(
@@ -595,7 +537,6 @@ const MissionDetailPage = () => {
 					`Mục tiêu ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				setMission(mission);
 				handleShowToast(`Cập nhật mục tiêu`, `Cập nhật mục tiêu không thành công!`);
 			}
 		}
@@ -607,18 +548,16 @@ const MissionDetailPage = () => {
 			newData.status = status;
 			const response = await updateTaskByID(newData);
 			const result = await response.data;
-			setTasks(tasks.map((item) => (item.id === data.id ? { ...result } : item)));
 			handleClearValueForm();
-			handleCloseEditForm();
 			handleCloseConfirmStatusTask();
 			handleShowToast(
 				`Cập nhật công việc!`,
 				`Công việc ${result.name} được cập nhật thành công!`,
 			);
 		} catch (error) {
-			setTasks(tasks);
 			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
 		}
+		setOpenConfirmMissionModal(false);
 	};
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
@@ -626,7 +565,6 @@ const MissionDetailPage = () => {
 
 	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
 		setOpenConfirmModalStatus(true);
-		setItemEdit({ ...item });
 		setInfoConfirmModalStatus({
 			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
 			subTitle: item?.name,
@@ -637,18 +575,16 @@ const MissionDetailPage = () => {
 
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
-		setItemEdit(null);
-		fetchDataMissionByID();
 	};
 
 	return (
-		<PageWrapper title={`${mission?.name}`}>
+		<PageWrapper title={`${mission?.data?.name}`}>
 			<SubHeaderCommon />
 			<Page container='fluid' className='overflow-hidden'>
 				<div className='row mb-4 pb-4'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-4 fw-bold py-3'>{mission?.name}</div>
+							<div className='display-4 fw-bold py-3'>{mission?.data?.name}</div>
 							{verifyPermissionHOC(
 								<div>
 									<Button
@@ -657,7 +593,7 @@ const MissionDetailPage = () => {
 										isLight={darkModeStatus}
 										className='text-nowrap mx-2'
 										icon='Edit'
-										onClick={() => handleOpenEditMissionForm(mission)}>
+										onClick={() => handleOpenEditMissionForm(mission?.data)}>
 										Sửa
 									</Button>
 									<Button
@@ -666,7 +602,9 @@ const MissionDetailPage = () => {
 										isLight={darkModeStatus}
 										className='text-nowrap mx-2'
 										icon='Trash'
-										onClick={() => handleOpenConfirmMissionModal(mission)}>
+										onClick={() =>
+											handleOpenConfirmMissionModal(mission?.data)
+										}>
 										Xoá
 									</Button>
 								</div>,
@@ -700,22 +638,24 @@ const MissionDetailPage = () => {
 												<div className='d-flex align-items-center pb-3'>
 													<div className='flex-grow-1'>
 														<div className='fw-bold fs-3 mb-0'>
-															{missionReport.progress}%
+															{mission?.report?.progress}%
 															<div>
 																<Progress
 																	isAutoColor
-																	value={missionReport.progress}
+																	value={
+																		mission?.report?.progress
+																	}
 																	height={10}
 																/>
 															</div>
 														</div>
 														<div className='fs-5 mt-2'>
 															<span className='fw-bold text-danger fs-5 me-2'>
-																{missionReport.completed}
+																{mission?.report?.completed}
 															</span>
 															cv hoàn thành trên tổng số
 															<span className='fw-bold text-danger fs-5 mx-2'>
-																{missionReport.total}
+																{mission?.report?.total}
 															</span>
 															cv.
 														</div>
@@ -724,13 +664,13 @@ const MissionDetailPage = () => {
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col col-sm-5 text-start'>
 														<div className='fw-bold fs-4 mb-10'>
-															{mission?.kpiValue}
+															{mission?.data?.kpiValue}
 														</div>
 														<div className='text-muted'>
 															KPI được giao
 														</div>
 														<div className='fw-bold fs-4 mb-10 mt-4'>
-															{missionReport.currentKPI}
+															{mission?.report?.currentKPI}
 														</div>
 														<div className='text-muted'>
 															KPI thực tế
@@ -738,7 +678,7 @@ const MissionDetailPage = () => {
 													</div>
 													<div className='col col-sm-7'>
 														<div className='fw-bold fs-4 mb-10 mt-4'>
-															{missionReport.completeKPI}
+															{mission?.report?.completeKPI}
 														</div>
 														<div className='text-muted'>
 															Kpi thực tế đã hoàn thành
@@ -753,34 +693,36 @@ const MissionDetailPage = () => {
 											title='Phòng ban phụ trách'
 											icon='LayoutTextWindow'
 											iconColor='info'
-											isScrollable={mission?.departments?.length > 5}
-											data={mission?.departments?.map((department, index) => {
-												if (index === 0) {
+											isScrollable={mission?.data?.departments?.length > 5}
+											data={mission?.data?.departments?.map(
+												(department, index) => {
+													if (index === 0) {
+														return {
+															icon: 'TrendingFlat',
+															color: 'info',
+															children: (
+																<div className='fw-bold fs-5 mb-1'>
+																	{department?.name}{' '}
+																	<i className='d-block'>
+																		(Chịu trách nhiệm)
+																	</i>
+																</div>
+															),
+														};
+													}
 													return {
 														icon: 'TrendingFlat',
 														color: 'info',
 														children: (
-															<div className='fw-bold fs-5 mb-1'>
-																{department?.name}{' '}
-																<i className='d-block'>
-																	(Chịu trách nhiệm)
-																</i>
+															<div
+																key={department?.name}
+																className='fw-bold fs-5 mb-1'>
+																{department?.name}
 															</div>
 														),
 													};
-												}
-												return {
-													icon: 'TrendingFlat',
-													color: 'info',
-													children: (
-														<div
-															key={department?.name}
-															className='fw-bold fs-5 mb-1'>
-															{department?.name}
-														</div>
-													),
-												};
-											})}
+												},
+											)}
 										/>
 									</div>
 									<div className='col-md-7'>
@@ -797,39 +739,39 @@ const MissionDetailPage = () => {
 													data={[
 														{
 															label: 'Số công việc',
-															value: missionReport.total,
+															value: mission?.report?.total,
 														},
 														{
 															label: 'Đã hoàn thành',
-															value: missionReport.completed,
+															value: mission?.report?.completed,
 														},
 														{
 															label: 'Đang thực hiện',
-															value: missionReport.inprogress,
+															value: mission?.report?.inprogress,
 														},
 														{
 															label: 'Chờ xét duyệt',
-															value: missionReport.solved,
+															value: mission?.report?.solved,
 														},
 														{
 															label: 'Chờ chấp nhận',
-															value: missionReport.pending,
+															value: mission?.report?.pending,
 														},
 														{
 															label: 'Từ chối',
-															value: missionReport.rejected,
+															value: mission?.report?.rejected,
 														},
 														{
 															label: 'Huỷ',
-															value: missionReport.cancel,
+															value: mission?.report?.cancel,
 														},
 														{
 															label: 'Đóng',
-															value: missionReport.closed,
+															value: mission?.report?.closed,
 														},
 														{
 															label: 'Tạm dừng',
-															value: missionReport.onhold,
+															value: mission?.report?.onhold,
 														},
 													]}
 												/>
@@ -838,13 +780,13 @@ const MissionDetailPage = () => {
 														<div className='col-xl-12 col-md-12'>
 															<Chart
 																series={[
-																	missionReport.pending,
-																	missionReport.inprogress,
-																	missionReport.completed,
-																	missionReport.solved,
-																	missionReport.cancel,
-																	missionReport.closed,
-																	missionReport.onhold,
+																	mission?.report?.pending,
+																	mission?.report?.inprogress,
+																	mission?.report?.completed,
+																	mission?.report?.solved,
+																	mission?.report?.cancel,
+																	mission?.report?.closed,
+																	mission?.report?.onhold,
 																]}
 																options={chartOptions}
 																type={chartOptions.chart.type}
@@ -874,7 +816,9 @@ const MissionDetailPage = () => {
 										icon: 'Pen',
 										color: 'primary',
 										children: (
-											<Popovers desc={mission?.description} trigger='hover'>
+											<Popovers
+												desc={mission?.data?.description}
+												trigger='hover'>
 												<div
 													className='fs-5'
 													style={{
@@ -884,7 +828,7 @@ const MissionDetailPage = () => {
 														display: '-webkit-box',
 														WebkitBoxOrient: 'vertical',
 													}}>
-													{mission?.description}
+													{mission?.data?.description}
 												</div>
 											</Popovers>
 										),
@@ -895,7 +839,7 @@ const MissionDetailPage = () => {
 										children: (
 											<div className='fs-5'>
 												<span className='me-2'>Ngày bắt đầu:</span>
-												{moment(`${mission?.startTime}`).format(
+												{moment(`${mission?.data?.startTime}`).format(
 													'DD-MM-YYYY',
 												)}
 											</div>
@@ -907,7 +851,9 @@ const MissionDetailPage = () => {
 										children: (
 											<div className='fs-5'>
 												<span className='me-2'>Ngày kết thúc:</span>
-												{moment(`${mission?.endTime}`).format('DD-MM-YYYY')}
+												{moment(`${mission?.data?.endTime}`).format(
+													'DD-MM-YYYY',
+												)}
 											</div>
 										),
 									},
@@ -921,13 +867,13 @@ const MissionDetailPage = () => {
 								title='Chỉ số key'
 								icon='ShowChart'
 								iconColor='danger'
-								isScrollable={mission?.keys?.length > 3}
-								data={mission?.keys?.map((key) => {
+								isScrollable={mission?.data?.keys?.length > 3}
+								data={mission?.data?.keys?.map((key) => {
 									return {
 										icon: 'DoneAll',
 										color: 'danger',
 										children: (
-											<div>
+											<div key={uuidv4()}>
 												<div className='fw-bold fs-5 mb-1'>
 													{key?.keyName}
 												</div>
@@ -946,11 +892,12 @@ const MissionDetailPage = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody isScrollable className='py-2'>
-									{mission?.logs
+									{mission?.data?.logs
 										?.slice()
 										.reverse()
 										.map((item) => (
 											<RelatedActionCommonItem
+												key={uuidv4()}
 												type={item?.type}
 												time={moment(`${item?.time}`).format(
 													'DD/MM/YYYY HH.mm',
@@ -987,7 +934,7 @@ const MissionDetailPage = () => {
 													color='info'
 													icon='Plus'
 													tag='button'
-													onClick={() => handleOpenEditForm(null)}>
+													onClick={() => handleOpenFormEdit(null)}>
 													Thêm công việc
 												</Button>
 											</CardActions>
@@ -1053,11 +1000,17 @@ const MissionDetailPage = () => {
 					</div>
 				</div>
 				<TaskAlertConfirm
-					openModal={openConfirmModal}
-					onCloseModal={handleCloseConfirmModal}
+					openModal={toggleFormDelete}
+					onCloseModal={handleCloseForm}
 					onConfirm={() => handleDeleteItem(itemEdit?.id)}
 					title='Xoá công việc'
 					content={`Xác nhận xoá công việc <strong>${itemEdit?.name}</strong> ?`}
+				/>
+				<TaskFormModal
+					show={toggleFormEdit}
+					onClose={handleCloseForm}
+					onSubmit={handleSubmitTaskForm}
+					item={itemEdit}
 				/>
 				<MissionAlertConfirm
 					openModal={openConfirmMissionModal}
@@ -1065,12 +1018,6 @@ const MissionDetailPage = () => {
 					onConfirm={() => handleDeleteMission(missionEdit?.id)}
 					title='Xoá mục tiêu'
 					content={`Xác nhận xoá mục tiêu <strong>${missionEdit?.name}</strong> ?`}
-				/>
-				<TaskFormModal
-					show={editModalStatus}
-					onClose={handleCloseEditForm}
-					onSubmit={handleSubmitTaskForm}
-					item={itemEdit}
 				/>
 				<MissionFormModal
 					show={editModalMissionStatus}

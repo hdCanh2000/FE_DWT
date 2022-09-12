@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
+import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
@@ -18,6 +19,7 @@ import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
@@ -25,6 +27,7 @@ import { addEmployee, updateEmployee } from './services';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -164,19 +167,28 @@ const EmployeePage = () => {
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<Button
-					isOutline={!darkModeStatus}
-					color='success'
-					isLight={darkModeStatus}
-					className='text-nowrap mx-1'
-					icon='Edit'
-					onClick={() => handleOpenForm(item)}
-				/>
+				<>
+					<Button
+						isOutline={!darkModeStatus}
+						color='success'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-1'
+						icon='Edit'
+						onClick={() => handleOpenForm(item)}
+					/>
+					<Button
+						isOutline={!darkModeStatus}
+						color='primary'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='ArrowForward'
+						onClick={() => navigate(`/danh-sach-nhan-su/${item.id}`)}
+					/>
+				</>
 			),
 			isShow: false,
 		},
 	];
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -191,20 +203,20 @@ const EmployeePage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data.name,
-			departmentId: data.departmentId,
-			code: data.code,
-			email: data.email,
+			name: data?.name,
+			departmentId: data?.departmentId,
+			code: data?.code,
+			email: data?.email,
 			password: '123456',
-			dateOfBirth: data.dateOfBirth,
-			dateOfJoin: data.dateOfJoin,
-			phone: data.phone,
-			address: data.address,
-			position: Number.parseInt(data.position, 10),
-			status: Number(data.status),
-			roles: Number.parseInt(data.position, 10) === 1 ? ['manager'] : ['user'],
+			dateOfBirth: data?.dateOfBirth,
+			dateOfJoin: data?.dateOfJoin,
+			phone: data?.phone,
+			address: data?.address,
+			position: Number.parseInt(data?.position, 10),
+			status: Number(data?.status),
+			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
 		};
-		if (data.id) {
+		if (data?.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
@@ -236,7 +248,7 @@ const EmployeePage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.nhanVien.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='row mb-4'>
@@ -288,6 +300,7 @@ const EmployeePage = () => {
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}
+					validate={validate}
 				/>
 			</Page>
 		</PageWrapper>

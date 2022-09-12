@@ -85,7 +85,6 @@ const deleteTaskById = (id) => {
 };
 
 const getTaskById = (id) => {
-	// xoá task thuộc mục tiêu
 	return axiosClient({
 		method: 'GET',
 		url: `/tasks/${id}`,

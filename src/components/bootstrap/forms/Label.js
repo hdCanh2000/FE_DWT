@@ -12,8 +12,34 @@ const Label = ({
 	title,
 	ariaLabelledby,
 	ariaLabel,
+	colors,
 	...props
 }) => {
+	if (colors === 'red') {
+		return (
+			<div>
+				<label
+					htmlFor={htmlFor}
+					className={classNames(
+						'form-label',
+						{
+							'col-form-label': isColForLabel,
+							[`col-form-label-${size}`]: isColForLabel && !!size,
+							'visually-hidden': isHidden,
+						},
+						className,
+					)}
+					title={title}
+					aria-label={ariaLabel}
+					aria-labelledby={ariaLabelledby}
+					// eslint-disable-next-line react/jsx-props-no-spreading
+					{...props}>
+					{children}
+				</label>
+				{colors ? <b style={{ color: colors }}>&ensp; *</b> : ''}
+			</div>
+		);
+	}
 	return (
 		<label
 			htmlFor={htmlFor}
@@ -36,6 +62,7 @@ const Label = ({
 	);
 };
 Label.propTypes = {
+	colors: PropTypes.string,
 	htmlFor: PropTypes.string,
 	className: PropTypes.string,
 	children: PropTypes.node,
@@ -47,6 +74,7 @@ Label.propTypes = {
 	ariaLabel: PropTypes.string,
 };
 Label.defaultProps = {
+	colors: null,
 	htmlFor: null,
 	className: null,
 	children: null,

@@ -343,7 +343,7 @@ const DashboardPage = () => {
 				<div className='row'>
 					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
-							<Card className='mb-8'>
+							<Card className='mb-0'>
 								<CardHeader className='py-0'>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
@@ -458,7 +458,7 @@ const DashboardPage = () => {
 				<div className='row mt-0'>
 					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
-							<Card className='mb-0'>
+							<Card className='mb-0 mt-4'>
 								<CardHeader className='py-0'>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>

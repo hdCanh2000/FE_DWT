@@ -107,7 +107,7 @@ const EmployeePage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.nhanVien.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<SubHeaderCommon />
 			<Page>
 				<div className='row h-100'>
