@@ -18,7 +18,7 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Option from '../../../components/bootstrap/Option';
 import Icon from '../../../components/icon/Icon';
 import { PRIORITIES } from '../../../utils/constants';
-import { getAllDepartments, getAllMission, getAllUser, getTaskById } from './services';
+import { getAllDepartments, getAllKeys, getAllMission, getAllUser, getTaskById } from './services';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -46,6 +46,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 	const [userReplatedOption, setUserRelatedOption] = useState([]);
 	const [missionOptions, setMissionOptions] = useState([]);
 	const [valueMission, setValueMisson] = useState({});
+	const [keyOption, setKeyOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { error: false, errorMsg: '' },
 		kpiValue: { error: false, errorMsg: '' },
@@ -112,6 +113,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 					label: response.data.departments[0].name,
 					value: response.data.departments[0].id,
 				});
+				
 				setUserOption({
 					...response.data.users[0],
 					id: response.data.users[0].id,
@@ -212,7 +214,18 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 			);
 		});
 	}, []);
-
+	useEffect(() => {
+		async function getKey() {
+			try {
+				const response = await getAllKeys();
+				const data = await response.data;
+				setKeyOption(data);
+			} catch (error) {
+				setKeyOption([]);
+			}
+		}
+		getKey();
+	}, []);
 	// hàm validate cho dynamic field form
 	const prevIsValid = () => {
 		if (keysState?.length === 0 || keysState === null) {
@@ -303,6 +316,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		setDepartmentRelatedOption([]);
 		setUserOption({});
 		setUserRelatedOption([]);
+		setKeyOption([]);
 	};
 
 	// close form
@@ -325,6 +339,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		setDepartmentRelatedOption([]);
 		setUserRelatedOption([]);
 		setErrors({});
+		setKeyOption([]);
 	};
 	const person = window.localStorage.getItem('name');
 	const handleSubmit = () => {
@@ -675,7 +690,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 															className='mr-2'
 															id='name'
 															label='Tên chỉ số key'>
-															<Input
+															{/* <Input
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
 																}
@@ -685,7 +700,24 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 																size='lg'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: Doanh thu, đơn hàng, ...'
-															/>
+															/> */}
+															<Select
+																onChange={(e) =>
+																	handleChangeKeysState(index, e)
+																}
+																value={item?.keyName}
+																name='keyName'
+																required
+																size = 'lg'
+																className='border border-2 rounded-0 shadow-none'
+																placeholder="Chọn chỉ số Key"
+															>
+																{keyOption.map((key) => (
+																	<Option key={`${key?.name} (${key?.unit})`} value={`${key?.name} (${key?.unit})`}>
+																		{`${key?.name} (${key?.unit})`}
+																	</Option>
+																))}
+															</Select>
 														</FormGroup>
 														{item.error?.keyName && (
 															<ErrorText>
@@ -699,6 +731,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 															id='name'
 															label='Giá trị key'>
 															<Input
+																type="number"
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
 																}
