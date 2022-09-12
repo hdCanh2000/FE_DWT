@@ -136,9 +136,7 @@ const KeyPage = () => {
 				const response = await updateKey(dataSubmit);
 				const result = await response.data;
 				const newKeys = [...keys];
-				setKeys(
-					newKeys.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
+				setKeys(newKeys.map((item) => (item.id === data.id ? { ...result } : item)));
 				handleClearValueForm();
 				hanleCloseForm();
 				handleShowToast(
@@ -158,7 +156,10 @@ const KeyPage = () => {
 				setKeys(newKeys);
 				handleClearValueForm();
 				hanleCloseForm();
-				handleShowToast(`Thêm chỉ số key`, `Chỉ số key ${result.name} được thêm thành công!`);
+				handleShowToast(
+					`Thêm chỉ số key`,
+					`Chỉ số key ${result.name} được thêm thành công!`,
+				);
 			} catch (error) {
 				setKeys(keys);
 				handleShowToast(`Thêm chỉ số key`, `Thêm Chỉ số key không thành công!`);
@@ -174,9 +175,7 @@ const KeyPage = () => {
 						<div className='row mb-4'>
 							<div className='col-12'>
 								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>
-										Danh sách chỉ số Key
-									</div>
+									<div className='display-6 fw-bold py-3'>Danh sách Key</div>
 								</div>
 							</div>
 						</div>

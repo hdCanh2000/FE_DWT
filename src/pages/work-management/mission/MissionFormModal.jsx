@@ -105,9 +105,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				name: '',
 				description: '',
 				kpiValue: '',
-				startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-				endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-				status: 0,
+				startTime: '',
+				endTime: '',
+				status: 1,
 			});
 			setKeysState([]);
 			setDepartmentOption([]);
@@ -206,8 +206,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			name: '',
 			description: '',
 			kpiValue: '',
-			startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
+			startTime: '',
+			endTime: '',
 			status: 0,
 		});
 		setKeysState([]);
@@ -227,7 +227,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					type: 2,
 					prevStatus: null,
 					nextStatus: `Thêm mới`,
-					missionId: mission?.id,
 					missionName: mission?.name,
 					time: moment().format('YYYY/MM/DD hh:mm'),
 				},
@@ -273,7 +272,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					type: 2,
 					prevStatus: null,
 					nextStatus: `Chỉnh sửa`,
-					missionId: mission?.id,
 					missionName: mission?.name,
 					time: moment().format('YYYY/MM/DD HH:mm'),
 				},
@@ -315,8 +313,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			name: '',
 			description: '',
 			kpiValue: '',
-			startTime: moment().add(0, 'days').format('YYYY-MM-DD'),
-			endTime: moment().add(0, 'days').format('YYYY-MM-DD'),
+			startTime: '',
+			endTime: '',
 			status: 0,
 		});
 		setKeysState([]);
@@ -341,6 +339,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 								<CardBody>
 									<div className='row g-4'>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='name'
 											label='Tên mục tiêu'>
@@ -359,6 +358,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<ErrorText>Vui lòng nhập tên mục tiêu</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='description'
 											label='Mô tả mục tiêu'>
@@ -373,6 +373,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											/>
 										</FormGroup>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='kpiValue'
 											label='Giá trị KPI'>
@@ -392,8 +393,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<ErrorText>Vui lòng nhập giá trị KPI hợp lệ</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
-											id='kpiValue'
+											id='department'
 											label='Phòng ban phụ trách'>
 											<Select
 												placeholder='Chọn phòng ban phụ trách'
@@ -421,10 +423,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													name='startTime'
 													placeholder='Ngày bắt đầu mục tiêu'
 													onChange={handleChange}
-													value={
-														mission.startTime ||
-														moment().add(0, 'days').format('YYYY-MM-DD')
-													}
+													value={mission.startTime || ''}
 													type='date'
 													size='lg'
 													className='border border-2 rounded-0 shadow-none'
@@ -440,10 +439,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													name='endTime'
 													placeholder='Ngày kết thúc mục tiêu'
 													onChange={handleChange}
-													value={
-														mission.endTime ||
-														moment().add(1, 'days').format('YYYY-MM-DD')
-													}
+													value={mission.endTime || ''}
 													type='date'
 													size='lg'
 													className='border border-2 rounded-0 shadow-none'

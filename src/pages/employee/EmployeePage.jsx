@@ -18,6 +18,7 @@ import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
@@ -81,13 +82,14 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Phòng ban',
-			id: 'departmentId',
-			key: 'departmentId',
+			id: 'department',
+			key: 'department',
 			type: 'select',
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
+			isMulti: false,
 		},
 		{
 			title: 'Email',
@@ -141,7 +143,7 @@ const EmployeePage = () => {
 			title: 'Chức vụ',
 			id: 'position',
 			key: 'position',
-			type: 'select',
+			type: 'singleSelect',
 			align: 'center',
 			isShow: true,
 			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
@@ -149,11 +151,13 @@ const EmployeePage = () => {
 				{
 					id: 1,
 					text: 'Quản lý',
+					label: 'Quản lý',
 					value: 1,
 				},
 				{
 					id: 2,
 					text: 'Nhân viên',
+					label: 'Nhân viên',
 					value: 0,
 				},
 			],
@@ -164,19 +168,28 @@ const EmployeePage = () => {
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<Button
-					isOutline={!darkModeStatus}
-					color='success'
-					isLight={darkModeStatus}
-					className='text-nowrap mx-1'
-					icon='Edit'
-					onClick={() => handleOpenForm(item)}
-				/>
+				<>
+					<Button
+						isOutline={!darkModeStatus}
+						color='success'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-1'
+						icon='Edit'
+						onClick={() => handleOpenForm(item)}
+					/>
+					{/* <Button
+						isOutline={!darkModeStatus}
+						color='primary'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='ArrowForward'
+						onClick={() => navigate(`/danh-sach-nhan-su/${item.id}`)}
+					/> */}
+				</>
 			),
 			isShow: false,
 		},
 	];
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -191,20 +204,24 @@ const EmployeePage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data.name,
-			departmentId: data.departmentId,
-			code: data.code,
-			email: data.email,
+			name: data?.name,
+			departmentId: data?.department?.value,
+			department: {
+				id: data?.department?.value,
+				name: data?.department?.label,
+			},
+			code: data?.code,
+			email: data?.email,
 			password: '123456',
-			dateOfBirth: data.dateOfBirth,
-			dateOfJoin: data.dateOfJoin,
-			phone: data.phone,
-			address: data.address,
-			position: Number.parseInt(data.position, 10),
-			status: Number(data.status),
-			roles: Number.parseInt(data.position, 10) === 1 ? ['manager'] : ['user'],
+			dateOfBirth: data?.dateOfBirth,
+			dateOfJoin: data?.dateOfJoin,
+			phone: data?.phone,
+			address: data?.address,
+			position: Number.parseInt(data?.position, 10),
+			status: Number(data?.status),
+			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
 		};
-		if (data.id) {
+		if (data?.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
@@ -236,7 +253,7 @@ const EmployeePage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.nhanVien.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='row mb-4'>
@@ -288,6 +305,7 @@ const EmployeePage = () => {
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}
+					validate={validate}
 				/>
 			</Page>
 		</PageWrapper>

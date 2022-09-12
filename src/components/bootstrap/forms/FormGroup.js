@@ -18,10 +18,12 @@ const FormGroup = ({
 	isColForLabel,
 	isHiddenLabel,
 	formText,
+	color,
 	...props
 }) => {
 	const _label = (
 		<Label
+			colors={color}
 			className={labelClassName}
 			htmlFor={id}
 			isHidden={isHiddenLabel}
@@ -67,6 +69,7 @@ const FormGroup = ({
 FormGroup.propTypes = {
 	children: PropTypes.node.isRequired,
 	className: PropTypes.string,
+	color: PropTypes.string,
 	labelClassName: PropTypes.string,
 	childWrapperClassName: PropTypes.string,
 	tag: PropTypes.oneOf(['div', 'section']),
@@ -87,6 +90,7 @@ FormGroup.defaultProps = {
 	isFloating: false,
 	id: null,
 	label: null,
+	color: null,
 	size: null,
 	isHiddenLabel: false,
 	isColForLabel: false,

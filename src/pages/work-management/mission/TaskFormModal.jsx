@@ -61,15 +61,15 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 	const departmentRef = useRef(null);
 	const userRef = useRef(null);
 
-	const onValidate = (message, value, name) => {
+	const onValidate = (value, name) => {
 		setErrors((prev) => ({
 			...prev,
-			[name]: { ...prev[name], error: value, errorMsg: value },
+			[name]: { ...prev[name], errorMsg: value },
 		}));
 	};
 
 	const validateFieldForm = (field, value) => {
-		if (!value) {
+		if (value === '' || !value || value === false) {
 			onValidate(true, field);
 		}
 	};
@@ -145,10 +145,10 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 				name: '',
 				description: '',
 				kpiValue: '',
-				estimateDate: moment().add(0, 'days').format('YYYY-MM-DD'),
-				estimateTime: '08:00',
-				deadlineDate: moment().add(0, 'days').format('YYYY-MM-DD'),
-				deadlineTime: '17:00',
+				estimateDate: '',
+				estimateTime: '',
+				deadlineDate: '',
+				deadlineTime: '',
 				status: 0,
 			});
 			setKeysState([]);
@@ -266,10 +266,10 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 	};
 
 	const handleChange = (e) => {
-		const { value } = e.target;
+		const { value, name } = e.target;
 		setTask({
 			...task,
-			[e.target.name]: value,
+			[name]: value,
 		});
 	};
 
@@ -305,9 +305,9 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 			name: '',
 			description: '',
 			kpiValue: '',
-			estimateDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			estimateDate: '',
 			estimateTime: '08:00',
-			deadlineDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			deadlineDate: '',
 			deadlineTime: '08:00',
 			status: 0,
 		});
@@ -327,9 +327,9 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 			name: '',
 			description: '',
 			kpiValue: '',
-			estimateDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			estimateDate: '',
 			estimateTime: '08:00',
-			deadlineDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			deadlineDate: '',
 			deadlineTime: '17:00',
 			status: 0,
 		});
@@ -442,12 +442,13 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 								<CardBody>
 									<div className='row g-4'>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='name'
 											label='Tên công việc'>
 											<Input
 												onChange={handleChange}
-												value={task.name || ''}
+												value={task?.name || ''}
 												name='name'
 												ref={nameRef}
 												required
@@ -486,6 +487,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											/>
 										</FormGroup>
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='kpiValue'
 											label='Giá trị KPI'>
@@ -505,6 +507,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											<ErrorText>Vui lòng nhập giá trị KPI hợp lệ</ErrorText>
 										)}
 										<FormGroup
+											color='red'
 											className='col-12'
 											id='priority'
 											label='Độ ưu tiên'>
@@ -529,45 +532,49 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											</ErrorText>
 										)}
 										{/* phòng ban phụ trách */}
-										<FormGroup
-											className='col-6'
-											id='departmentOption'
-											label='Phòng ban phụ trách'>
-											<SelectComponent
-												style={customStyles}
-												placeholder='Chọn phòng ban phụ trách'
-												defaultValue={departmentOption}
-												value={departmentOption}
-												onChange={setDepartmentOption}
-												options={departments}
-												ref={departmentRef}
-											/>
-										</FormGroup>
-										{errors?.departmentOption?.errorMsg && (
-											<ErrorText>
-												Vui lòng chọn phòng ban phụ trách cho công việc
-											</ErrorText>
-										)}
+										<div className='col-6'>
+											<FormGroup
+												color='red'
+												id='departmentOption'
+												label='Phòng ban phụ trách'>
+												<SelectComponent
+													style={customStyles}
+													placeholder='Chọn phòng ban phụ trách'
+													defaultValue={departmentOption}
+													value={departmentOption}
+													onChange={setDepartmentOption}
+													options={departments}
+													ref={departmentRef}
+												/>
+											</FormGroup>
+											{errors?.departmentOption?.errorMsg && (
+												<ErrorText>
+													Vui lòng chọn phòng ban phụ trách
+												</ErrorText>
+											)}
+										</div>
 										{/* nhân viên phụ trách chính */}
-										<FormGroup
-											className='col-6'
-											id='userOption'
-											label='Nhân viên phụ trách'>
-											<SelectComponent
-												style={customStyles}
-												placeholder='Chọn nhân viên phụ trách'
-												defaultValue={userOption}
-												value={userOption}
-												onChange={setUserOption}
-												options={users}
-												ref={userRef}
-											/>
-										</FormGroup>
-										{errors?.userOption?.errorMsg && (
-											<ErrorText>
-												Vui lòng chọn nhân viên phụ trách cho công việc
-											</ErrorText>
-										)}
+										<div className='col-6'>
+											<FormGroup
+												id='userOption'
+												label='Nhân viên phụ trách'
+												color='red'>
+												<SelectComponent
+													style={customStyles}
+													placeholder='Chọn nhân viên phụ trách'
+													defaultValue={userOption}
+													value={userOption}
+													onChange={setUserOption}
+													options={users}
+													ref={userRef}
+												/>
+											</FormGroup>
+											{errors?.userOption?.errorMsg && (
+												<ErrorText>
+													Vui lòng chọn nhân viên phụ trách
+												</ErrorText>
+											)}
+										</div>
 										{/* phòng ban liên quan */}
 										<FormGroup
 											className='col-12'
@@ -607,16 +614,12 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											<FormGroup
 												className='w-50 me-2'
 												id='estimateDate'
-												label='Ngày dự kiến hoàn thành'
-												isFloating>
+												label='Ngày dự kiến hoàn thành'>
 												<Input
 													name='estimateDate'
 													placeholder='Ngày dự kiến hoàn thành'
 													onChange={handleChange}
-													value={
-														task.estimateDate ||
-														moment().add(0, 'days').format('YYYY-MM-DD')
-													}
+													value={task.estimateDate || ''}
 													type='date'
 													size='lg'
 													className='border border-2 rounded-0 shadow-none'
@@ -625,13 +628,12 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											<FormGroup
 												className='w-50 ms-2'
 												id='estimateTime'
-												label='Thời gian dự kiến hoàn thành'
-												isFloating>
+												label='Thời gian dự kiến hoàn thành'>
 												<Input
 													name='estimateTime'
 													placeholder='Thời gian dự kiến hoàn thành'
 													type='time'
-													value={task.estimateTime || '08:00'}
+													value={task.estimateTime || ''}
 													onChange={handleChange}
 													size='lg'
 													className='border border-2 rounded-0 shadow-none'
@@ -642,16 +644,12 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											<FormGroup
 												className='w-50 me-2'
 												id='deadlineDate'
-												label='Hạn ngày hoàn thành'
-												isFloating>
+												label='Hạn ngày hoàn thành'>
 												<Input
 													name='deadlineDate'
 													placeholder='Hạn ngày hoàn thành'
 													onChange={handleChange}
-													value={
-														task.deadlineDate ||
-														moment().add(0, 'days').format('YYYY-MM-DD')
-													}
+													value={task.deadlineDate || ''}
 													type='date'
 													size='lg'
 													className='border border-2 rounded-0 shadow-none'
@@ -660,13 +658,12 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											<FormGroup
 												className='w-50 ms-2'
 												id='deadlineTime'
-												label='Hạn thời gian hoàn thành'
-												isFloating>
+												label='Hạn thời gian hoàn thành'>
 												<Input
 													name='deadlineTime'
 													placeholder='Hạn thời gian hoàn thành'
 													type='time'
-													value={task.deadlineTime || '08:00'}
+													value={task.deadlineTime || ''}
 													onChange={handleChange}
 													size='lg'
 													className='border border-2 rounded-0 shadow-none'

@@ -24,7 +24,7 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
 import Button from '../../../components/bootstrap/Button';
-import { addNewMission, deleteMissionById, updateMissionById } from './services';
+import { addNewMission, updateMissionById } from './services';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
@@ -56,7 +56,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`${demoPages.quanLyCongViec.path}/${id}`),
+		() => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -138,22 +138,18 @@ const MissionPage = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-
 	const [departmentSelect] = useState(1);
-
+	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const missions = useSelector((state) => state.mission?.missions);
 	const missionReport = useSelector((state) => state.mission?.missionReport);
 	const latestTasks = useSelector((state) => state.task?.taskLates);
 	const taskReport = useSelector((state) => state.task?.taskReport);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
-	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-
 	const navigateToDetailPage = useCallback(
 		(page) => navigate(`${demoPages.jobsPage.subMenu.target.path}/${page}`),
 		[navigate],
 	);
-
 	useEffect(() => {
 		dispatch(fetchMissionList());
 	}, [dispatch]);
@@ -181,7 +177,9 @@ const MissionPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
+				<Link
+					className='text-underline'
+					to={`${demoPages.jobsPage.subMenu.target.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
@@ -265,9 +263,9 @@ const MissionPage = () => {
 							color='danger'
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2'
-							icon='Trash'
-							onClick={() => handleOpenFormDelete(item)}>
-							Xoá
+							icon='Close'
+							onClick={() => handleOpenConfirmModal(item)}>
+							Đóng
 						</Button>
 					</div>,
 					['admin'],
@@ -275,12 +273,42 @@ const MissionPage = () => {
 		},
 	];
 
-	const handleDeleteItem = async (id) => {
-		try {
-			await deleteMissionById(id);
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
-		} catch (error) {
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
+	// confirm modal
+	const handleOpenConfirmModal = () => {
+		setOpenConfirmModal(true);
+	};
+
+	const handleCloseConfirmModal = () => {
+		setOpenConfirmModal(false);
+	};
+
+	const handleCloseItem = async (data) => {
+		if (data.status === 1) {
+			try {
+				const newData = data;
+				newData.status = 0;
+				await updateMissionById(data);
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
+				handleCloseConfirmModal();
+				handleShowToast(`Đóng mục tiêu`, `Đóng mục tiêu thành công!`);
+			} catch (error) {
+				handleCloseConfirmModal();
+				handleShowToast(`Đóng mục tiêu`, `Đóng mục tiêu không thành công!`);
+			}
+		} else {
+			try {
+				const newData = data;
+				newData.status = 1;
+				await updateMissionById(data);
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
+				handleCloseConfirmModal();
+				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu thành công!`);
+			} catch (error) {
+				handleCloseConfirmModal();
+				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu không thành công!`);
+			}
 		}
 	};
 
@@ -334,7 +362,7 @@ const MissionPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.jobsPage.subMenu.target.text}>
+		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
 				{missions?.length > 0 && (
 					<div className='row'>
@@ -469,6 +497,21 @@ const MissionPage = () => {
 														</span>
 													</div>
 												</div>
+												<div className='d-flex '>
+													<div>
+														Trạng thái:
+														<span
+															className={
+																item.status === 1
+																	? 'text-success fw-bold ps-2'
+																	: 'text-danger fw-bold ps-2'
+															}>
+															{item.status === 1
+																? 'ACTIVE'
+																: 'IN ACTIVE'}
+														</span>
+													</div>
+												</div>
 											</CardSubTitle>
 										</CardLabel>
 										{verifyPermissionHOC(
@@ -486,6 +529,7 @@ const MissionPage = () => {
 													<DropdownMenu isAlignmentEnd>
 														<DropdownItem>
 															<Button
+																disabled={item.status === 0}
 																icon='Edit'
 																tag='button'
 																onClick={() =>
@@ -496,12 +540,18 @@ const MissionPage = () => {
 														</DropdownItem>
 														<DropdownItem>
 															<Button
-																icon='Delete'
+																icon={
+																	item.status === 0
+																		? 'Check'
+																		: 'Close'
+																}
 																tag='button'
 																onClick={() =>
 																	handleOpenFormDelete(item)
 																}>
-																Xoá mục tiêu
+																{item.status === 0
+																	? 'Mở mục tiêu'
+																	: 'Đóng mục tiêu'}
 															</Button>
 														</DropdownItem>
 													</DropdownMenu>
@@ -623,37 +673,37 @@ const MissionPage = () => {
 						</div>
 					</div>
 				)}
-				{verifyPermissionHOC(
-					<div className='row mt-4'>
-						<div className='col-12'>
-							<div className='display-6 fw-bold py-3'>Công việc mới cập nhật</div>
-						</div>
-						{latestTasks?.map((item) => {
-							return (
-								<Item
-									key={item?.id}
-									keys={item?.keys}
-									departmentsRelated={item?.departments}
-									usersRelated={item?.users}
-									id={item?.id}
-									name={item?.name}
-									teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
-									dueDate={`${item?.deadlineDate}`}
-									percent={item.progress || 0}
-									data-tour='project-item'
-								/>
-							);
-						})}
-					</div>,
-					['admin'],
-				)}
-
+				<div className='row mt-4'>
+					<div className='col-12'>
+						<div className='display-6 fw-bold py-3'>Công việc mới cập nhật</div>
+					</div>
+					{latestTasks?.map((item) => {
+						return (
+							<Item
+								key={item?.id}
+								keys={item?.keys}
+								departmentsRelated={item?.departments?.slice(1)}
+								usersRelated={item?.users?.slice(1)}
+								id={item?.id}
+								name={item?.name}
+								teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
+								dueDate={`${item?.deadlineDate}`}
+								percent={item.progress || 0}
+								data-tour='project-item'
+							/>
+						);
+					})}
+				</div>
 				<MissionAlertConfirm
-					openModal={toggleFormDelete}
-					onCloseModal={handleCloseForm}
-					onConfirm={() => handleDeleteItem(itemEdit?.id)}
-					title='Xoá mục tiêu'
-					content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
+					openModal={openConfirmModal}
+					onCloseModal={handleCloseConfirmModal}
+					onConfirm={() => handleCloseItem(itemEdit)}
+					title={itemEdit?.status === 1 ? 'Đóng mục tiêu' : 'Mở mục tiêu'}
+					content={
+						itemEdit?.status === 1
+							? `Xác nhận đóng mục tiêu <strong>${itemEdit?.name}</strong> ?`
+							: `Xác nhận mở mục tiêu <strong>${itemEdit?.name}</strong> ?`
+					}
 				/>
 				<MissionFormModal
 					show={toggleFormEdit}

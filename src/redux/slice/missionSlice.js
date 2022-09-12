@@ -1,6 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getReportMisson } from '../../pages/dashboard/services';
-import { getAllMission, getMissionById } from '../../pages/work-management/mission/services';
+import {
+	getAllMission,
+	getMissionById,
+	updateMissionById,
+} from '../../pages/work-management/mission/services';
 
 const initialState = {
 	missions: [],
@@ -23,6 +27,11 @@ export const fetchMissionById = createAsyncThunk('mission/fetchId', async (id) =
 
 export const fetchMissionReport = createAsyncThunk('mission/fetchReport', async () => {
 	const response = await getReportMisson();
+	return response.data;
+});
+
+export const AddMissionList = createAsyncThunk('mission/AddList', async (data) => {
+	const response = await updateMissionById(data);
 	return response.data;
 });
 
@@ -69,7 +78,17 @@ export const missionSlice = createSlice({
 			state.error = action.error;
 		},
 		// add new
-
+		[AddMissionList.pending]: (state) => {
+			state.loading = true;
+		},
+		[AddMissionList.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.missions = [...state.missions, ...action.payload];
+		},
+		[AddMissionList.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
 		// update
 	},
 });

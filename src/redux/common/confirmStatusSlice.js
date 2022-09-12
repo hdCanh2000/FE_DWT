@@ -3,7 +3,12 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
 	open: false,
 	confirm: false,
-	data: {},
+	data: {
+		title: '',
+		subTitle: '',
+		status: null,
+		isShowNote: false,
+	},
 };
 
 // eslint-disable-next-line import/prefer-default-export

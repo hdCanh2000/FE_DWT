@@ -59,8 +59,6 @@
 		"axios": "^0.27.2",
 		"classnames": "^2.3.1",
 		"date-fns": "^2.29.2",
-		"dayjs": "^1.11.2",
-		"firebase": "^9.9.4",
 		"formik": "^2.2.9",
 		"framer-motion": "^6.3.3",
 		"i18next": "^21.8.0",
@@ -82,7 +80,6 @@
 		"react-credit-cards": "^0.8.3",
 		"react-date-range": "^1.4.0",
 		"react-dom": "^18.1.0",
-		"react-hot-toast": "^2.3.0",
 		"react-i18next": "^11.16.9",
 		"react-image-webp": "^0.8.0",
 		"react-input-mask": "^2.0.4",
@@ -104,7 +101,9 @@
 		"redux": "^4.2.0",
 		"styled-components": "^5.3.5",
 		"use-clipboard-copy": "^0.2.0",
-		"web-vitals": "^2.1.4"
+		"uuid": "^8.3.2",
+		"web-vitals": "^2.1.4",
+		"yup": "^0.32.11"
 	},
 	"devDependencies": {
 		"@svgr/cli": "^6.2.1",

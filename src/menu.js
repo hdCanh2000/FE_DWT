@@ -88,6 +88,11 @@ export const demoPages = {
 				text: 'Nhiệm vụ',
 				path: '/nhiem-vu',
 			},
+			task: {
+				id: 'task',
+				text: 'Đầu việc',
+				path: '/dau-viec',
+			},
 			process: {
 				id: 'process',
 				text: 'Quy trình',
@@ -99,7 +104,7 @@ export const demoPages = {
 		id: 'hrRecords',
 		text: 'Hồ sơ nhân sự',
 		path: '/ho-so-nhan-su',
-		icon: 'CustomChartBar',
+		icon: 'PersonOutline',
 		subMenu: {
 			hrList: {
 				id: 'hrList',
