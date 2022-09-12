@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
-import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
@@ -27,7 +26,6 @@ import { addEmployee, updateEmployee } from './services';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -84,13 +82,14 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Phòng ban',
-			id: 'departmentId',
-			key: 'departmentId',
+			id: 'department',
+			key: 'department',
 			type: 'select',
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
+			isMulti: false,
 		},
 		{
 			title: 'Email',
@@ -144,7 +143,7 @@ const EmployeePage = () => {
 			title: 'Chức vụ',
 			id: 'position',
 			key: 'position',
-			type: 'select',
+			type: 'singleSelect',
 			align: 'center',
 			isShow: true,
 			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
@@ -152,11 +151,13 @@ const EmployeePage = () => {
 				{
 					id: 1,
 					text: 'Quản lý',
+					label: 'Quản lý',
 					value: 1,
 				},
 				{
 					id: 2,
 					text: 'Nhân viên',
+					label: 'Nhân viên',
 					value: 0,
 				},
 			],
@@ -176,14 +177,14 @@ const EmployeePage = () => {
 						icon='Edit'
 						onClick={() => handleOpenForm(item)}
 					/>
-					<Button
+					{/* <Button
 						isOutline={!darkModeStatus}
 						color='primary'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='ArrowForward'
 						onClick={() => navigate(`/danh-sach-nhan-su/${item.id}`)}
-					/>
+					/> */}
 				</>
 			),
 			isShow: false,
@@ -204,7 +205,11 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			departmentId: data?.departmentId,
+			departmentId: data?.department?.value,
+			department: {
+				id: data?.department?.value,
+				name: data?.department?.label,
+			},
 			code: data?.code,
 			email: data?.email,
 			password: '123456',

@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { isEmpty } from 'lodash';
 import Chart from '../../../components/extras/Chart';
 
 const MissionChartReport = ({ data }) => {
@@ -59,12 +60,16 @@ const MissionChartReport = ({ data }) => {
 	return (
 		<div className='row align-items-start py-4'>
 			<div className='col-xl-7 col-md-12'>
-				<Chart
-					series={state.series}
-					options={state.options}
-					type={state.options.chart.type}
-					height={state.options.chart.height}
-				/>
+				{!isEmpty(data) ? (
+					<Chart
+						series={state.series}
+						options={state.options}
+						type={state.options.chart.type}
+						height={state.options.chart.height}
+					/>
+				) : (
+					<h1>Loading...</h1>
+				)}
 			</div>
 			<div className='col-xl-5 col-md-12'>
 				<div className='row'>
@@ -118,7 +123,7 @@ MissionChartReport.propTypes = {
 	data: PropTypes.object,
 };
 MissionChartReport.defaultProps = {
-	data: { completed: 0, completedExpired: 0, inprogress: 0, inprogressExpired: 0, total: 0 },
+	data: null,
 };
 
 export default memo(MissionChartReport, function areEqual(prevProps, nextProps) {
