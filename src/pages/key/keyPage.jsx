@@ -129,7 +129,6 @@ const KeyPage = () => {
 			name: data.name,
 			value: data.value,
 			unit: data.unit,
-			mission: data.mission,
 			status: Number(data.status),
 		};
 		if (data.id) {
@@ -143,12 +142,12 @@ const KeyPage = () => {
 				handleClearValueForm();
 				hanleCloseForm();
 				handleShowToast(
-					`Cập nhật phòng ban!`,
-					`Phòng ban ${result.name} được cập nhật thành công!`,
+					`Cập nhật chỉ số key!`,
+					`Chỉ số key ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
 				setKeys(keys);
-				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+				handleShowToast(`Cập nhật chỉ số key`, `Cập nhật chỉ số key không thành công!`);
 			}
 		} else {
 			try {
@@ -159,10 +158,10 @@ const KeyPage = () => {
 				setKeys(newKeys);
 				handleClearValueForm();
 				hanleCloseForm();
-				handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
+				handleShowToast(`Thêm chỉ số key`, `Chỉ số key ${result.name} được thêm thành công!`);
 			} catch (error) {
 				setKeys(keys);
-				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+				handleShowToast(`Thêm chỉ số key`, `Thêm Chỉ số key không thành công!`);
 			}
 		}
 	};
