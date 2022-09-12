@@ -103,6 +103,17 @@ const presentation = [
 		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
 		exact: true,
 	},
+	// trang danh sách phòng ban
+	{
+		path: `${demoPages.companyPage.subMenu.features.path}`,
+		element: <MANAGEMENT.DEPARTMENT />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.companyPage.subMenu.features.path}/:id`,
+		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
+		exact: true,
+	},
 	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,

@@ -79,15 +79,6 @@ const DepartmentPage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Số nhân viên',
-			id: 'totalEmployee',
-			key: 'totalEmployee',
-			type: 'number',
-			align: 'center',
-			isShow: false,
-			render: (item) => item?.users?.length || 0,
-		},
-		{
 			title: 'Trạng thái',
 			id: 'status',
 			key: 'status',
@@ -117,7 +108,9 @@ const DepartmentPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='ArrowForward'
-						onClick={() => navigate(`/phong-ban/${item.id}`)}
+						onClick={() =>
+							navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`)
+						}
 					/>
 				</>
 			),
@@ -172,7 +165,7 @@ const DepartmentPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.phongBan.text}>
+		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
