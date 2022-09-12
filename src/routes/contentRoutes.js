@@ -41,8 +41,8 @@ const AUTH = {
 };
 
 const KEY = {
-	KEY: lazy(()=> import('../pages/key/keyPage')),
-}
+	KEY: lazy(() => import('../pages/key/keyPage')),
+};
 
 const presentation = [
 	/**

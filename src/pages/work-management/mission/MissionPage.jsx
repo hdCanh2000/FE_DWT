@@ -56,7 +56,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`${demoPages.quanLyCongViec.path}/${id}`),
+		() => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -147,7 +147,7 @@ const MissionPage = () => {
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const navigateToDetailPage = useCallback(
-		(page) => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${page}`),
+		(page) => navigate(`${demoPages.jobsPage.subMenu.target.path}/${page}`),
 		[navigate],
 	);
 	useEffect(() => {
@@ -177,7 +177,9 @@ const MissionPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
+				<Link
+					className='text-underline'
+					to={`${demoPages.jobsPage.subMenu.target.path}/${item.id}`}>
 					{item.name}
 				</Link>
 			),
