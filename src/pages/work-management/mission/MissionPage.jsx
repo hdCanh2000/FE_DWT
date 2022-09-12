@@ -56,7 +56,7 @@ const Item = ({
 }) => {
 	const navigate = useNavigate();
 	const handleOnClickToProjectPage = useCallback(
-		() => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${id}`),
+		() => navigate(`${demoPages.quanLyCongViec.path}/${id}`),
 		[id, navigate],
 	);
 	return (
@@ -147,7 +147,7 @@ const MissionPage = () => {
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const navigateToDetailPage = useCallback(
-		(page) => navigate(`${demoPages.jobsPage.subMenu.target.path}/${page}`),
+		(page) => navigate(`${demoPages.jobsPage.subMenu.mission.path}/${page}`),
 		[navigate],
 	);
 	useEffect(() => {
@@ -360,7 +360,7 @@ const MissionPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.jobsPage.subMenu.target.text}>
+		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
 				{missions?.length > 0 && (
 					<div className='row'>
