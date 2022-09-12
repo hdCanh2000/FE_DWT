@@ -150,7 +150,6 @@ const MissionPage = () => {
 		(page) => navigate(`${demoPages.jobsPage.subMenu.target.path}/${page}`),
 		[navigate],
 	);
-	console.log(demoPages,'demoPages');
 	useEffect(() => {
 		dispatch(fetchMissionList());
 	}, [dispatch]);

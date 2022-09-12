@@ -1,4 +1,5 @@
 import React, { memo, useState } from 'react';
+import { isEmpty } from 'lodash';
 import PropTypes from 'prop-types';
 import Chart from '../../../components/extras/Chart';
 
@@ -59,12 +60,16 @@ const TaskChartReport = ({ data }) => {
 	return (
 		<div className='row align-items-start py-4'>
 			<div className='col-xl-8 col-md-12'>
-				<Chart
-					series={state.series}
-					options={state.options}
-					type={state.options.chart.type}
-					height={state.options.chart.height}
-				/>
+				{!isEmpty(data) ? (
+					<Chart
+						series={state.series}
+						options={state.options}
+						type={state.options.chart.type}
+						height={state.options.chart.height}
+					/>
+				) : (
+					<h1>Loading...</h1>
+				)}
 			</div>
 			<div className='col-xl-4 col-md-12'>
 				<div className='row'>
@@ -137,7 +142,7 @@ TaskChartReport.propTypes = {
 	data: PropTypes.object,
 };
 TaskChartReport.defaultProps = {
-	data: { inprogress: 0, completed: 0, solved: 2, rejected: 0, onhold: 0, other: 0 },
+	data: null,
 };
 
 export default memo(TaskChartReport);
