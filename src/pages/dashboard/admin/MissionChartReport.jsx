@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { isEmpty } from 'lodash';
+import { Spinner } from 'react-bootstrap';
 import Chart from '../../../components/extras/Chart';
 
 const MissionChartReport = ({ data }) => {
@@ -68,7 +69,18 @@ const MissionChartReport = ({ data }) => {
 						height={state.options.chart.height}
 					/>
 				) : (
-					<h1>Loading...</h1>
+					<div>
+						<Spinner
+							tag={String} // 'div' || 'span'
+							color={String} // 'primary' || 'secondary' || 'success' || 'info' || 'warning' || 'danger' || 'light' || 'dark'
+							isGrow={Boolean}
+							isSmall={Boolean}
+							size={Number || String} // Example: 10, '3vh', '5rem' etc.
+							inButton={Boolean || String} // true || false || 'onlyIcon'
+							className={String}
+							
+						/>
+					</div>
 				)}
 			</div>
 			<div className='col-xl-5 col-md-12'>

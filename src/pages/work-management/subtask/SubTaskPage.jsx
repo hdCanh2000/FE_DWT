@@ -195,7 +195,7 @@ const SubTaskPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.dauViec.text}>
+		<PageWrapper title={demoPages?.dauViec?.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
