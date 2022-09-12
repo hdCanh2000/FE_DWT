@@ -194,7 +194,6 @@ const TaskListPage = () => {
 		const response = await getAllTasksByDepartment(departmentSelect);
 		const result = await response.data;
 		setTasks(result);
-		console.log(result,'result');
 	}, [departmentSelect]);
 
 	useEffect(() => {
@@ -739,7 +738,10 @@ const TaskListPage = () => {
 													<tr>
 														<td
 															colSpan='12'
-															style={{ paddingLeft: 50 }}>
+															style={{
+																padding: '5px 0 5px 50px',
+																borderRadius: '0.5rem',
+															}}>
 															{expandedRows.includes(item?.id) && (
 																<>
 																	<ExpandRow

@@ -1,10 +1,14 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getReportTask } from '../../pages/dashboard/services';
-import { getLatestTasks } from '../../pages/work-management/mission/services';
+import {
+	getAllTaksByMissionID,
+	getLatestTasks,
+} from '../../pages/work-management/mission/services';
 import { getAllTasksByDepartment } from '../../pages/work-management/task-list/services';
 
 const initialState = {
 	tasks: [],
+	tasksByMisson: [],
 	taskLates: [],
 	taskReport: {},
 	loading: false,
@@ -14,6 +18,11 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchTaskList = createAsyncThunk('task/fetchList', async (id) => {
 	const response = await getAllTasksByDepartment(id);
+	return response.data;
+});
+
+export const fetchTaskListByMissionId = createAsyncThunk('task/fetchListByMission', async (id) => {
+	const response = await getAllTaksByMissionID(id);
 	return response.data;
 });
 
@@ -54,6 +63,18 @@ export const taskSlice = createSlice({
 			state.taskLates = [...action.payload];
 		},
 		[fetchTaskListLates.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list by mision
+		[fetchTaskListByMissionId.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchTaskListByMissionId.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.tasksByMisson = [...action.payload];
+		},
+		[fetchTaskListByMissionId.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
