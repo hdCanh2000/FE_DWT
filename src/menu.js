@@ -111,6 +111,11 @@ export const demoPages = {
 				text: 'Danh sách nhân sự',
 				path: '/danh-sach-nhan-su',
 			},
+			hrConfig: {
+				id: 'hrConfig',
+				text: 'Cấu hình cấp nhân sự',
+				path: '/cauhinh-cap-nhan-su',
+			},
 		},
 	},
 	reportPage: {
