@@ -5,7 +5,6 @@ import moment from 'moment';
 import React, { useEffect, useRef, useState, memo } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
 import styled from 'styled-components';
 import Card, {
 	CardBody,
@@ -17,8 +16,10 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Icon from '../../../components/icon/Icon';
+import Option from '../../../components/bootstrap/Option';
+import Select from '../../../components/bootstrap/forms/Select';
 import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
-import { getMissionById } from './services';
+import { getMissionById, getAllKeys } from './services';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -33,6 +34,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const [mission, setMission] = useState({});
 	const [keysState, setKeysState] = useState([]);
 	const [departmentOption, setDepartmentOption] = useState([]);
+	const [keyOption, setKeyOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
 		kpiValue: { errorMsg: '' },
@@ -123,7 +125,18 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mission]);
-
+	useEffect(() => {
+		async function getKey() {
+			try {
+				const response = await getAllKeys();
+				const data = await response.data;
+				setKeyOption(data);
+			} catch (error) {
+				setKeyOption([]);
+			}
+		}
+		getKey();
+	}, []);
 	// hàm validate cho dynamic field form
 	const prevIsValid = () => {
 		if (keysState.length === 0) {
@@ -453,31 +466,34 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
 										{keysState?.map((item, index) => {
+											console.log(item, keyOption);
 											return (
 												<div
 													// eslint-disable-next-line react/no-array-index-key
 													key={index}
 													className='mt-4 d-flex align-items-center justify-content-between'>
-													<div
-														style={{
-															width: '45%',
-															marginRight: 10,
-														}}>
+													<div style={{ width: '45%', marginRight: 10 }}>
 														<FormGroup
 															className='mr-2'
 															id='name'
 															label='Tên chỉ số key'>
-															<Input
-																onChange={(e) =>
-																	handleChangeKeysState(index, e)
-																}
-																value={item?.keyName || ''}
+															<Select
 																name='keyName'
 																required
 																size='lg'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='VD: Doanh thu, đơn hàng, ...'
-															/>
+																placeholder="Chọn chỉ số Key"
+																value={item?.keyName}
+																onChange={(e) =>
+																	handleChangeKeysState(index, e)
+																}
+															>
+																{keyOption.map((key) => (
+																	<Option key={`${key.name} (${key.unit})`} value={`${key.name} (${key.unit})`}>
+																		{`${key?.name} (${key?.unit})`}
+																	</Option>
+																))}
+															</Select>
 														</FormGroup>
 														{item.error?.keyName && (
 															<ErrorText>
@@ -499,7 +515,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																size='lg'
 																required
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
+																placeholder='VD: 100 , 1000 , ..'
 															/>
 														</FormGroup>
 														{item.error?.keyValue && (
