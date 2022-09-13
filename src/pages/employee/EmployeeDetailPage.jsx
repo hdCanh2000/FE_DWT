@@ -135,7 +135,7 @@ const EmployeePage = () => {
 					</div>
 					<div className='col-lg-8 col-md-6'>
 						{isEmpty(user) ? (
-							<h1>Loading...</h1>
+							<h1>zz.</h1>
 						) : (
 							<Formik initialValues={user} enableReinitialize>
 								<Card className='h-100'>

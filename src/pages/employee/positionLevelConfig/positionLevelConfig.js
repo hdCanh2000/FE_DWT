@@ -108,18 +108,18 @@ const KeyPage = () => {
 		if (!itemSubmit.id) {
 			const reponse = await addPositionLevel(itemSubmit);
 			const result = reponse.data;
-			handleShowToast('Thêm cấp nhân sự', `Thêm cấp nhân sự ${result.name} thành công !`);
 			fecthData();
 			handleCloseForm();
+			handleShowToast('Thêm cấp nhân sự', `Thêm cấp nhân sự ${result.name} thành công !`);
 		} else {
 			const reponse = await updatePositionLevel(itemSubmit);
 			const result = reponse.data;
+			fecthData();
+			handleCloseForm();
 			handleShowToast(
 				'Chỉnh sửa cấp nhân sự',
 				`Chỉnh sửa cấp nhân sự ${result.name} thành công !`,
 			);
-			fecthData();
-			handleCloseForm();
 		}
 	};
 	const handleOpenDelete = (item) => {
@@ -195,8 +195,8 @@ const KeyPage = () => {
 							openModal={isDelete}
 							onCloseModal={handleCloseDelete}
 							onConfirm={() => handleDeletePositionLevel(itemEdit?.id)}
-							title='Xoá công việc'
-							content={`Xác nhận xoá công việc <strong>${itemEdit?.name}</strong> ?`}
+							title='Xoá cấp nhân sự'
+							content={`Xác nhận xoá cấp nhân sự <strong>${itemEdit?.name}</strong> ?`}
 						/>
 					</>,
 					['admin', 'manager'],

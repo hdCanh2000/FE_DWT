@@ -410,7 +410,7 @@ const CommonTransActions = () => {
 								onClick={() => {
 									ref.current.blur();
 									setIsLoading(true);
-								}}>
+								}}>z
 								{isLoading && (
 									<Spinner color={isHovering ? 'light' : 'info'} inButton isSmall>
 										Loading...

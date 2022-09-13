@@ -1,7 +1,5 @@
 import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { isEmpty } from 'lodash';
-import { Spinner } from 'react-bootstrap';
 import Chart from '../../../components/extras/Chart';
 
 const MissionChartReport = ({ data }) => {
@@ -61,27 +59,12 @@ const MissionChartReport = ({ data }) => {
 	return (
 		<div className='row align-items-start py-4'>
 			<div className='col-xl-7 col-md-12'>
-				{!isEmpty(data) ? (
-					<Chart
-						series={state.series}
-						options={state.options}
-						type={state.options.chart.type}
-						height={state.options.chart.height}
-					/>
-				) : (
-					<div>
-						<Spinner
-							tag={String} // 'div' || 'span'
-							color={String} // 'primary' || 'secondary' || 'success' || 'info' || 'warning' || 'danger' || 'light' || 'dark'
-							isGrow={Boolean}
-							isSmall={Boolean}
-							size={Number || String} // Example: 10, '3vh', '5rem' etc.
-							inButton={Boolean || String} // true || false || 'onlyIcon'
-							className={String}
-							
-						/>
-					</div>
-				)}
+				<Chart
+					series={state.series}
+					options={state.options}
+					type={state.options.chart.type}
+					height={state.options.chart.height}
+				/>
 			</div>
 			<div className='col-xl-5 col-md-12'>
 				<div className='row'>
