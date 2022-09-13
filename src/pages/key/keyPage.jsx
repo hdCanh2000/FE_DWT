@@ -127,7 +127,6 @@ const KeyPage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data.name,
-			value: data.value,
 			unit: data.unit,
 			status: Number(data.status),
 		};
