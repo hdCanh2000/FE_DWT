@@ -125,7 +125,7 @@ const DepartmentDetailPage = () => {
 			title: 'Chức vụ',
 			id: 'position',
 			key: 'position',
-			type: 'select',
+			type: 'singleSelect',
 			align: 'center',
 			isShow: true,
 			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
@@ -279,7 +279,7 @@ const DepartmentDetailPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.nhanVien.text}>
+		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
 			<SubHeaderCommon />
 			<Page container='fluid'>
 				{verifyPermissionHOC(
@@ -470,7 +470,7 @@ const DepartmentDetailPage = () => {
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitEmployeeForm}
 					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
+					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viênn'}
 					fields={columns}
 				/>
 			</Page>

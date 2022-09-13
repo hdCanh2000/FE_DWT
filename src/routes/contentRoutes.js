@@ -34,11 +34,16 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
+	EMPLOYEE_CONFIG: lazy(() => import('../pages/employee/employeeConfig/positionLevelConfig')),
 };
 
 const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
 	LOGIN: lazy(() => import('../pages/presentation/auth/Login')),
+};
+
+const KEY = {
+	KEY: lazy(() => import('../pages/key/keyPage')),
 };
 
 const presentation = [
@@ -76,15 +81,62 @@ const presentation = [
 		element: <TASK.TASKDETAIL />,
 		exact: true,
 	},
+	// trang danh sách đầu việc
+	{
+		path: `${demoPages.jobsPage.subMenu.task.path}`,
+		element: <TASK.SUBTASK />,
+		exact: true,
+	},
+	// trang chi tiết đầu việc (nhiệm vụ con)
+	{
+		path: `${demoPages.jobsPage.subMenu.mission.path}/dau-viec/:id`,
+		element: <TASK.SUBTASK_STEP />,
+		exact: true,
+	},
+	// trang danh sách nhân sự
+	{
+		path: `${demoPages.hrRecords.subMenu.hrList.path}`,
+		element: <MANAGEMENT.EMPLOYEE />,
+		exact: true,
+	},
+	// trang quản lí cấp nhân sư
+	{
+		path: `${demoPages.hrRecords.subMenu.hrConfig.path}`,
+		element: <MANAGEMENT.EMPLOYEE_CONFIG />,
+		exact: true,
+	},
+	// trang danh sách nhân sự
+	{
+		path: `${demoPages.hrRecords.subMenu.hrList.path}/:id`,
+		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
+		exact: true,
+	},
+	// trang danh sách phòng ban
+	{
+		path: `${demoPages.companyPage.subMenu.features.path}`,
+		element: <MANAGEMENT.DEPARTMENT />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.companyPage.subMenu.features.path}/:id`,
+		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
+		exact: true,
+	},
 	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,
 		exact: true,
 	},
+<<<<<<< HEAD
 	// Quản lý Vị Trí
 	{
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
+=======
+	{
+		path: demoPages.cauHinh.subMenu.kpi.path,
+		element: <KEY.KEY />,
+>>>>>>> 49104c4be03f2416272181bc65bf95561568d2d4
 		exact: true,
 	},
 ];

@@ -88,6 +88,11 @@ export const demoPages = {
 				text: 'Nhiệm vụ',
 				path: '/nhiem-vu',
 			},
+			task: {
+				id: 'task',
+				text: 'Đầu việc',
+				path: '/dau-viec',
+			},
 			process: {
 				id: 'process',
 				text: 'Quy trình',
@@ -99,7 +104,7 @@ export const demoPages = {
 		id: 'hrRecords',
 		text: 'Hồ sơ nhân sự',
 		path: '/ho-so-nhan-su',
-		icon: 'CustomChartBar',
+		icon: 'PersonOutline',
 		subMenu: {
 			hrList: {
 				id: 'hrList',
@@ -110,6 +115,10 @@ export const demoPages = {
 				id: 'position',
 				text: 'Vị trí công việc',
 				path: '/vi-tri-cong-viec',
+			hrConfig: {
+				id: 'hrConfig',
+				text: 'Cấu hình cấp nhân sự',
+				path: '/cauhinh-cap-nhan-su',
 			},
 		},
 	},
@@ -141,7 +150,7 @@ export const demoPages = {
 		id: 'cauHinh',
 		text: 'Cấu hình',
 		path: 'cau-hinh',
-		icon: 'CustomCompass',
+		icon: 'Settings',
 		subMenu: {
 			overall: {
 				id: 'overall',

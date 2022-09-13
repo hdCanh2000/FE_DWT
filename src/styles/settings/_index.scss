@@ -152,7 +152,8 @@ $box-shadow-lg: 0 1.6rem 3rem rgba($black, 0.175);
 //	stylelint-disable-next-line no-invalid-position-at-import-rule
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 // $font-family-base: 'Montserrat', sans-serif;
-$font-family-base: 'Poppins', var(--bs-font-sans-serif);
+// $font-family-base: 'Poppins', var(--bs-font-sans-serif);
+$font-family: 'Roboto Mono', monospace;
 
 // $font-size-root effects the value of `rem`, which is used for as well font sizes, paddings and margins
 // $font-size-base effects the font size of the body text

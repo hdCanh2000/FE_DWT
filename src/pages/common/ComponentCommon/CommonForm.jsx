@@ -5,9 +5,10 @@ import classNames from 'classnames';
 import { Button, Modal } from 'react-bootstrap';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
-import Select from '../../../components/bootstrap/forms/Select';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Checks from '../../../components/bootstrap/forms/Checks';
+import CustomSelect from '../../../components/form/CustomSelect';
+import Select from '../../../components/bootstrap/forms/Select';
 
 const CommonForm = ({
 	className,
@@ -24,7 +25,7 @@ const CommonForm = ({
 	const formik = useFormik({
 		initialValues: { ...item },
 		enableReinitialize: true,
-		validate,
+		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
 			handleSubmit(values);
 			resetForm();
@@ -48,99 +49,162 @@ const CommonForm = ({
 						<div className='col-md-12'>
 							<div className='row g-4'>
 								{fields?.map((field) => {
+									if (field.type === 'singleSelect') {
+										return (
+											<React.Fragment key={field.id}>
+												<FormGroup
+													key={field.id}
+													className='col-12'
+													id={field.id}
+													label={field.title}>
+													<Select
+														ariaLabel={field.title || ''}
+														placeholder={`Chọn ${field.title}`}
+														list={field.options}
+														required
+														name={field.id}
+														size='lg'
+														className='border border-2 rounded-0 shadow-none'
+														onChange={formik.handleChange}
+														onBlur={formik.handleBlur}
+														value={formik.values[field.id]}
+														defaultValue={formik.values[field.id]}
+														isValid={formik.isValid}
+													/>
+												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
+											</React.Fragment>
+										);
+									}
 									if (field.type === 'select') {
 										return (
-											<FormGroup
-												key={field.id}
-												className='col-12'
-												id={field.id}
-												label={field.title}>
-												<Select
-													ariaLabel={field.title || ''}
-													placeholder={`Chọn ${field.title}`}
-													list={field.options}
-													required
-													name={field.id}
-													className='border border-2 rounded-0 shadow-none'
-													onChange={formik.handleChange}
-													onBlur={formik.handleBlur}
-													value={formik.values[field.id]}
-													defaultValue={formik.values[field.id] || ''}
-													isValid={formik.isValid}
-												/>
-											</FormGroup>
+											<React.Fragment key={field.id}>
+												<FormGroup
+													key={field.id}
+													className='col-12'
+													id={field.id}
+													label={field.title}>
+													<CustomSelect
+														placeholder={`Chọn ${field.title}`}
+														value={formik.values[field.id]}
+														onChange={(value) => {
+															formik.setFieldValue(field.id, value);
+														}}
+														isMulti={!!field.isMulti}
+														options={field.options}
+													/>
+												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
+											</React.Fragment>
 										);
 									}
 									if (!field.isShow) {
-										return '';
+										return null;
 									}
 									if (field.type === 'textarea') {
 										return (
-											<FormGroup
-												key={field.id}
-												className='col-12'
-												id={field.id}
-												label={field.title}>
-												<Textarea
-													rows={5}
-													ariaLabel={field.title}
-													placeholder={`Nhập ${field.title}`}
-													list={options}
-													required
-													size='lg'
-													name={field.id}
-													className='border border-2 rounded-0 shadow-none'
-													onChange={formik.handleChange}
-													onBlur={formik.handleBlur}
-													value={formik.values[field.id]}
-													isValid={formik.isValid}
-												/>
-											</FormGroup>
+											<React.Fragment key={field.id}>
+												<FormGroup
+													key={field.id}
+													className='col-12'
+													id={field.id}
+													label={field.title}>
+													<Textarea
+														rows={5}
+														ariaLabel={field.title}
+														placeholder={`Nhập ${field.title}`}
+														list={options}
+														required
+														size='lg'
+														name={field.id}
+														className='border border-2 rounded-0 shadow-none'
+														onChange={formik.handleChange}
+														onBlur={formik.handleBlur}
+														value={formik.values[field.id]}
+														isValid={formik.isValid}
+													/>
+												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
+											</React.Fragment>
 										);
 									}
 									if (field.type === 'switch') {
 										return (
-											<FormGroup
-												key={field.id}
-												className='col-12'
-												id={field.id}
-												label={field.title}>
-												<Checks
+											<React.Fragment key={field.id}>
+												<FormGroup
+													key={field.id}
+													className='col-12'
 													id={field.id}
-													type='switch'
-													size='lg'
-													label={
-														Number(formik.values[field.id]) === 1
-															? 'Đang hoạt động'
-															: 'Không hoạt động'
-													}
-													onChange={formik.handleChange}
-													checked={formik.values[field.id]}
-												/>
-											</FormGroup>
+													label={field.title}>
+													<Checks
+														id={field.id}
+														type='switch'
+														size='lg'
+														label={
+															Number(formik.values[field.id]) === 1
+																? 'Đang hoạt động'
+																: 'Không hoạt động'
+														}
+														onChange={formik.handleChange}
+														checked={formik.values[field.id]}
+													/>
+												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
+											</React.Fragment>
 										);
 									}
 									return (
-										<FormGroup
-											key={field.id}
-											className='col-12'
-											id={field.id}
-											label={field.title}>
-											<Input
-												type={field.type || 'text'}
-												name={field.id}
-												onChange={formik.handleChange}
-												value={formik.values[field.id] || ''}
-												required
-												size='lg'
-												placeholder={`Nhập ${field.placeholder ? field.placeholder : field.title }`}
-												className='border border-2 rounded-0 shadow-none'
-												onBlur={formik.handleBlur}
-												isValid={formik.isValid}
-												isTouched={formik.touched[field.id]}
-												invalidFeedback={formik.errors[field.id]}
-											/>
-										</FormGroup>
+										<React.Fragment key={field.id}>
+											<FormGroup
+												className='col-12'
+												id={field.id}
+												label={field.title}>
+												<Input
+													type={field.type || 'text'}
+													name={field.id}
+													onChange={formik.handleChange}
+													value={formik.values[field.id] || ''}
+													required
+													size='lg'
+													placeholder={`Nhập ${field.title}`}
+													className='border border-2 rounded-0 shadow-none'
+													onBlur={formik.handleBlur}
+													isValid={formik.isValid}
+													isTouched={formik.touched[field.id]}
+												/>
+											</FormGroup>
+											<div className='text-danger mt-1'>
+												{formik.errors[field.id] && (
+													<span className='error'>
+														{formik.errors[field.id]}
+													</span>
+												)}
+											</div>
+										</React.Fragment>
 									);
 								})}
 							</div>
@@ -171,7 +235,8 @@ CommonForm.propTypes = {
 	item: PropTypes.object,
 	// eslint-disable-next-line react/forbid-prop-types
 	fields: PropTypes.array,
-	validate: PropTypes.func,
+	// eslint-disable-next-line react/forbid-prop-types
+	validate: PropTypes.object,
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,

@@ -38,7 +38,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 			status: groups.status,
 			partner: '',
 		},
-		onSubmit: (values) => {
+		onSubmit: (values, { resetForm }) => {
 			const valuesClone = { ...values };
 			const subtaskClone = { ...subtask };
 			const { steps } = subtaskClone;
@@ -50,6 +50,7 @@ const BoardGroup = ({ groups, data, setData, subtask, onAddStep }) => {
 			subtaskClone.steps = stepsClone;
 			onAddStep(subtaskClone);
 			setEditModalStatus(false);
+			resetForm();
 		},
 	});
 
