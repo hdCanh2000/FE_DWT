@@ -115,6 +115,7 @@ export const demoPages = {
 				id: 'position',
 				text: 'Vị trí công việc',
 				path: '/vi-tri-cong-viec',
+			},
 			hrConfig: {
 				id: 'hrConfig',
 				text: 'Cấu hình cấp nhân sự',

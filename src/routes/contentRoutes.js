@@ -122,21 +122,19 @@ const presentation = [
 		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
 		exact: true,
 	},
-	{
-		path: '*',
-		element: <AUTH.PAGE_404 />,
-		exact: true,
-	},
-<<<<<<< HEAD
 	// Quản lý Vị Trí
 	{
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
-=======
+	},
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
->>>>>>> 49104c4be03f2416272181bc65bf95561568d2d4
+		exact: true,
+	},
+	{
+		path: '*',
+		element: <AUTH.PAGE_404 />,
 		exact: true,
 	},
 ];
