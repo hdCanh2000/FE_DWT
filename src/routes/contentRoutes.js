@@ -33,6 +33,10 @@ const MANAGEMENT = {
 	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
+	POSITION: lazy(() => import('../pages/position/PositionPage')),
+	EMPLOYEE_CONFIG: lazy(() =>
+		import('../pages/employee/positionLevelConfig/positionLevelConfig'),
+	),
 };
 
 const AUTH = {
@@ -97,20 +101,42 @@ const presentation = [
 		element: <MANAGEMENT.EMPLOYEE />,
 		exact: true,
 	},
+	// trang quản lí cấp nhân sư
+	{
+		path: `${demoPages.hrRecords.subMenu.hrConfig.path}`,
+		element: <MANAGEMENT.EMPLOYEE_CONFIG />,
+		exact: true,
+	},
 	// trang danh sách nhân sự
 	{
 		path: `${demoPages.hrRecords.subMenu.hrList.path}/:id`,
 		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
 		exact: true,
 	},
+	// trang danh sách phòng ban
 	{
-		path: '*',
-		element: <AUTH.PAGE_404 />,
+		path: `${demoPages.companyPage.subMenu.features.path}`,
+		element: <MANAGEMENT.DEPARTMENT />,
 		exact: true,
+	},
+	{
+		path: `${demoPages.companyPage.subMenu.features.path}/:id`,
+		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
+		exact: true,
+	},
+	// Quản lý Vị Trí
+	{
+		path: demoPages.hrRecords.subMenu.position.path,
+		element: <MANAGEMENT.POSITION />,
 	},
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
+		exact: true,
+	},
+	{
+		path: '*',
+		element: <AUTH.PAGE_404 />,
 		exact: true,
 	},
 ];

@@ -66,6 +66,14 @@ const getAllDepartments = () => {
 	});
 };
 
+const getAllPositions = () => {
+	// lấy danh sách positions
+	return axiosClient({
+		method: 'GET',
+		url: '/positions',
+	});
+};
+
 // task services
 
 const getAllTaksByMissionID = (id) => {
@@ -148,6 +156,7 @@ export {
 	getAllMission,
 	getLatestTasks,
 	getAllDepartments,
+	getAllPositions,
 	getMissionById,
 	addNewMission,
 	updateMissionById,

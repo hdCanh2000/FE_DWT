@@ -7,7 +7,7 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 		<table className={classNames(className)} {...props}>
 			<thead>
 				<tr>
-					{columns.map((column) => {
+					{columns?.map((column) => {
 						return (
 							<th
 								style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
@@ -41,7 +41,7 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 				{data?.map((row) => {
 					return (
 						<tr key={row.id}>
-							{columns.map((column) => {
+							{columns?.map((column) => {
 								const value = row[column.id];
 								if (column.render) {
 									return (
