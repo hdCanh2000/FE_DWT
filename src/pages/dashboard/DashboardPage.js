@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import moment from 'moment';
 import { Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
+import { Spinner } from 'react-bootstrap';
 import { dashboardMenu, demoPages } from '../../menu';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Page from '../../layout/Page/Page';
@@ -47,16 +48,16 @@ const DashboardPage = () => {
 	// departments
 	const [dataDepartments, setDataDepartments] = useState([]);
 	// mission
-	const [missionReport, setMissionReport] = useState({});
+	const [missionReport, setMissionReport] = useState(null);
 
 	// task
 	const [tasks, setTasks] = useState([]);
-	const [taskReport, setTaskReport] = useState({});
+	const [taskReport, setTaskReport] = useState(null);
 
 	// subtask
 	const [subtasks, setSubTasks] = useState([]);
-	const [subTaskReport, setSubTaskReport] = useState({});
-	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState({});
+	const [subTaskReport, setSubTaskReport] = useState(null);
+	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState(null);
 
 	// select department
 	const [departmentSelect, setDepartmentSelect] = useState(1);
@@ -347,7 +348,7 @@ const DashboardPage = () => {
 								<CardHeader className='py-0'>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
-											Thống kê mục tiêu
+											Thống kê mục tiêuu
 										</CardTitle>
 										<CardSubTitle tag='h5' className='h6'>
 											Báo cáo
@@ -366,8 +367,24 @@ const DashboardPage = () => {
 								</CardHeader>
 								<CardBody className='py-0'>
 									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											<MissionChartReport data={missionReport} />
+										<div
+											className='col-xl-12 col-xxl-12'
+											style={{ textAlign: 'center' }}>
+											{missionReport === null ? (
+												<div style={{ height: '262px' }}>
+													<Spinner
+														animation='border'
+														variant='primary'
+														style={{
+															marginTop: '15%',
+															width: '50px',
+															height: '50px',
+														}}
+													/>
+												</div>
+											) : (
+												<MissionChartReport data={missionReport} />
+											)}
 										</div>
 									</div>
 								</CardBody>
@@ -422,7 +439,22 @@ const DashboardPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={taskReport} />
+											{taskReport === null ? (
+												<div style={{ height: '262px' }}>
+													<Spinner
+														animation='border'
+														variant='primary'
+														style={{
+															marginTop: '15%',
+															marginLeft: '42%',
+															width: '50px',
+															height: '50px',
+														}}
+													/>
+												</div>
+											) : (
+												<TaskChartReport data={taskReport} />
+											)}
 										</div>
 									</div>
 								</CardBody>
@@ -446,7 +478,11 @@ const DashboardPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={subTaskReportDepartment} />
+											{subTaskReportDepartment === null ? (
+												<Spinner animation='border' />
+											) : (
+												<TaskChartReport data={subTaskReportDepartment} />
+											)}
 										</div>
 									</div>
 								</CardBody>
@@ -472,7 +508,22 @@ const DashboardPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={subTaskReport} />
+											{subTaskReport === null ? (
+												<div style={{ height: '262px' }}>
+													<Spinner
+														animation='border'
+														variant='primary'
+														style={{
+															marginLeft: '42%',
+															marginTop: '15%',
+															width: '50px',
+															height: '50px',
+														}}
+													/>
+												</div>
+											) : (
+												<TaskChartReport data={subTaskReport} />
+											)}
 										</div>
 									</div>
 								</CardBody>

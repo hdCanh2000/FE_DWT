@@ -33,7 +33,9 @@ const MANAGEMENT = {
 	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
-	EMPLOYEE_CONFIG: lazy(() => import('../pages/employee/employeeConfig/positionLevelConfig')),
+	EMPLOYEE_CONFIG: lazy(() =>
+		import('../pages/employee/positionLevelConfig/positionLevelConfig'),
+	),
 };
 
 const AUTH = {
