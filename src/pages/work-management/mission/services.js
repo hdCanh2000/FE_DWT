@@ -66,6 +66,14 @@ const getAllDepartments = () => {
 	});
 };
 
+const getAllPositions = () => {
+	// lấy danh sách positions
+	return axiosClient({
+		method: 'GET',
+		url: '/positions',
+	});
+};
+
 // task services
 
 const getAllTaksByMissionID = (id) => {
@@ -117,10 +125,38 @@ const getAllUser = () => {
 	});
 };
 
+const getAllKeys = () => {
+	return axiosClient({
+		method: 'GET',
+		url: '/keys',
+	});
+};
+
+const addKey = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/keys`,
+		data,
+	});
+};
+
+const updateKey = (data) => {
+	return axiosClient({
+		method: 'PUT',
+		url: `/keys/${data.id}`,
+		data,
+	});
+};
+
+
 export {
+	addKey,
+	updateKey,
+	getAllKeys,
 	getAllMission,
 	getLatestTasks,
 	getAllDepartments,
+	getAllPositions,
 	getMissionById,
 	addNewMission,
 	updateMissionById,

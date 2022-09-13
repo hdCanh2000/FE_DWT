@@ -1,5 +1,8 @@
+// goij api  theem suwra xoas thuong viet controller
+
+
 import React, { useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+// import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
@@ -16,16 +19,18 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addDepartment, updateDepartment } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
+import { fetchPositionList } from '../../redux/slice/positionSlice';
+import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
+import { addPosition, updatePosition } from './services';
+import { formatPosition } from '../../utils/constants';
 
-const DepartmentPage = () => {
+
+const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
-	const navigate = useNavigate();
 
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -34,28 +39,41 @@ const DepartmentPage = () => {
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
+	const positions = useSelector((state) => state.position.positions);
+	console.log(positions);
 	const departments = useSelector((state) => state.department.departments);
+	console.log(departments);
 
 	useEffect(() => {
-		dispatch(fetchDepartmentWithUserList());
+		dispatch(fetchPositionList());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchDepartmentList());
 	}, [dispatch]);
 
 	const columns = [
 		{
-			title: 'Tên phòng ban',
+			title: 'Tên Vị Trí',
+			placeholder: 'tên vị trí',
 			id: 'name',
 			key: 'name',
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			render: (item) => (
-				<Link className='text-underline' to={`/phong-ban/${item.id}`}>
-					{item.name}
-				</Link>
-			),
 		},
 		{
-			title: 'Mô tả',
+			title: 'Mã Vị Trí',
+			placeholder: 'mã vị trí',
+			id: 'code',
+			key: 'code',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+		},
+		{
+			title: 'Mô Tả Vị Trí',
+			placeholder: 'mô tả vị trí',
 			id: 'description',
 			key: 'description',
 			type: 'textarea',
@@ -63,32 +81,77 @@ const DepartmentPage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Code',
-			id: 'slug',
-			key: 'slug',
-			type: 'text',
+			title: 'Cấp Nhân Sự',
+			id: 'position',
+			key: 'position',
+			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
+			format: (value) => (formatPosition(value)),
+			options: [
+				{
+					id: 1,
+					text: 'Lao Động Phổ Thông',
+					value: 0,
+				},
+				{
+					id: 2,
+					text: 'Lao động kĩ thuật - NV văn phòng',
+					value: 1,
+				},
+				{
+					id: 3,
+					text: 'Chuyên viên',
+					value: 2,
+				},
+				{
+					id: 4,
+					text: 'Trưởng nhóm',
+					value: 3,
+				},
+				{
+					id: 5,
+					text: 'Trưởng phòng',
+					value: 4,
+				},
+				{
+					id: 6,
+					text: 'QL cấp trung',
+					value: 5,
+				},
+				{
+					id: 7,
+					text: 'QL cấp cao',
+					value: 6,
+				},
+				{
+					id: 8,
+					text: 'Lãnh Đạo',
+					value: 7,
+				},
+			],
 		},
 		{
-			title: 'Địa chỉ',
-			id: 'address',
-			key: 'address',
-			type: 'textarea',
+			title: 'Phòng Ban',
+			id: 'departmentId',
+			key: 'departmentId',
+			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
+			options: departments,
 		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'switch',
+		// 	align: 'center',
+		// 	isShow: true,
+		// 	format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		// },
 		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'switch',
-			align: 'center',
-			isShow: true,
-			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		},
-		{
-			title: 'Hành động',
+			title: 'Hành Động',
 			id: 'action',
 			key: 'action',
 			align: 'center',
@@ -102,16 +165,14 @@ const DepartmentPage = () => {
 						icon='Edit'
 						onClick={() => handleOpenForm(item)}
 					/>
-					<Button
+					{/* <Button
 						isOutline={!darkModeStatus}
 						color='primary'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='ArrowForward'
-						onClick={() =>
-							navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`)
-						}
-					/>
+						onClick={() => navigate(`/quan-ly-vi-tri/${item.id}`)}
+					/> */}
 				</>
 			),
 			isShow: false,
@@ -133,39 +194,42 @@ const DepartmentPage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data.name,
+			code: data.code,
 			description: data.description,
-			slug: data.slug,
-			address: data.address,
-			status: Number(data.status),
+			position: Number.parseInt(data.position, 10),
+			departmentId: data.departmentId,
 		};
+		console.log(dataSubmit);
 		if (data.id) {
 			try {
-				const response = await updateDepartment(dataSubmit);
+				const response = await updatePosition(dataSubmit);
 				const result = await response.data;
-				dispatch(fetchDepartmentWithUserList());
+				dispatch(fetchPositionList());
+				// handleClearValueForm();
 				handleCloseForm();
 				handleShowToast(
-					`Cập nhật phòng ban!`,
-					`Phòng ban ${result.name} được cập nhật thành công!`,
+					`Cập nhật vị trí!`,
+					`Vị trí ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
 				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
 			}
 		} else {
 			try {
-				const response = await addDepartment(dataSubmit);
+				const response = await addPosition(dataSubmit);
 				const result = await response.data;
-				dispatch(fetchDepartmentWithUserList());
+				dispatch(fetchPositionList());
+				// handleClearValueForm();
 				handleCloseForm();
-				handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
+				handleShowToast(`Thêm vị trí`, `Vị trí ${result.name} được thêm thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+				handleShowToast(`Thêm vị trí`, `Thêm vị trí không thành công!`);
 			}
 		}
 	};
 
 	return (
-		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.position.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
@@ -173,7 +237,7 @@ const DepartmentPage = () => {
 							<div className='col-12'>
 								<div className='d-flex justify-content-between align-items-center'>
 									<div className='display-6 fw-bold py-3'>
-										Danh sách phòng ban
+										Quản Lý Vị Trí
 									</div>
 								</div>
 							</div>
@@ -184,7 +248,7 @@ const DepartmentPage = () => {
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách phòng ban</CardLabel>
+												<CardLabel>Quản Lý Vị Trí</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions>
@@ -193,7 +257,7 @@ const DepartmentPage = () => {
 												icon='PersonPlusFill'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
-												Thêm phòng ban
+												Thêm vị trí
 											</Button>
 										</CardActions>
 									</CardHeader>
@@ -201,7 +265,7 @@ const DepartmentPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columns}
-											data={departments}
+											data={positions}
 										/>
 									</div>
 								</Card>
@@ -212,16 +276,16 @@ const DepartmentPage = () => {
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
+							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
 							validate={validate}
 						/>
 					</>,
-					['admin', 'manager'],
+					['admin'],
 				)}
 			</Page>
 		</PageWrapper>
 	);
 };
 
-export default DepartmentPage;
+export default PositionPage;

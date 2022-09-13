@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { employeeSlice } from '../slice/employeeSlice';
 import { toggleFormSlice } from '../common/toggleFormSlice';
 import { departmentSlice } from '../slice/departmentSlice';
+import { positionSlice } from '../slice/positionSlice';
 import { missionSlice } from '../slice/missionSlice';
 import { taskSlice } from '../slice/taskSlice';
 
@@ -10,6 +11,7 @@ const reducer = combineReducers({
 	task: taskSlice.reducer,
 	employee: employeeSlice.reducer,
 	department: departmentSlice.reducer,
+	position: positionSlice.reducer,
 	toggleForm: toggleFormSlice.reducer,
 });
 

@@ -25,7 +25,7 @@ const KeyPage = () => {
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [keys, setKeys] = useState([]);
+	const [ keys, setKeys] = useState([]);
 	useEffect(() => {
 		async function getKey() {
 			try {
@@ -41,7 +41,7 @@ const KeyPage = () => {
 
 	const columns = [
 		{
-			title: 'Tên Key',
+			title: 'Tên chỉ số Key',
 			id: 'name',
 			key: 'name',
 			type: 'text',
@@ -62,7 +62,7 @@ const KeyPage = () => {
 		// 	isShow: true,
 		// },
 		{
-			title: 'Unit',
+			title: 'Đơn vị',
 			id: 'unit',
 			key: 'unit',
 			type: 'text',
@@ -185,7 +185,7 @@ const KeyPage = () => {
 									<CardHeader>
 										<CardLabel icon='VpnKey' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách Key</CardLabel>
+												<CardLabel>Danh sách chỉ số Key</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions>
