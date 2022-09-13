@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { dashboardMenu, demoPages } from '../../menu';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Page from '../../layout/Page/Page';
-import Button from '../../components/bootstrap/Button';
+import Button, { ButtonGroup } from '../../components/bootstrap/Button';
 import Card, {
 	CardActions,
 	CardBody,
@@ -31,6 +31,9 @@ import {
 } from './services';
 import MissionChartReport from './admin/MissionChartReport';
 import TaskChartReport from './admin/TaskChartReport';
+
+import Chart from '../../components/extras/Chart';
+
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
@@ -271,6 +274,393 @@ const DashboardPage = () => {
 		},
 	];
 
+	const [year, setYear] = useState(Number(moment().format('YYYY')));
+	const companies = [
+		{ name: 'Kênh OTC' },
+		{ name: 'Kênh ETC' },
+		{ name: 'Kênh MT' },
+		{ name: 'Kênh Online' },
+	];
+	const COMPANIES_TAB = {
+		COMP1: companies[0].name,
+		COMP2: companies[1].name,
+		COMP3: companies[2].name,
+		COMP4: companies[3].name,
+	};
+	const [activeCompanyTab, setActiveCompanyTab] = useState(COMPANIES_TAB.COMP1);
+
+	function randomize(value, x = year) {
+		if (x === 2019) {
+			if (value.toFixed(0) % 2) {
+				return (value * 1.5).toFixed(2);
+			}
+			return (value / 1.4).toFixed(2);
+		}
+		if (x === 2020) {
+			if (value.toFixed(0) % 2) {
+				return (value / 1.5).toFixed(2);
+			}
+			return (value * 1.4).toFixed(2);
+		}
+		if (x === 2021) {
+			if (value.toFixed(0) % 2) {
+				return (value / 2).toFixed(2);
+			}
+			return (value * 1.4).toFixed(2);
+		}
+		return value.toFixed(2);
+	}
+
+	const salesByStoreOptions = {
+		chart: {
+			height: 370,
+			type: 'line',
+			stacked: false,
+			toolbar: { show: false },
+		},
+		colors: [
+			process.env.REACT_APP_INFO_COLOR,
+			process.env.REACT_APP_SUCCESS_COLOR,
+			process.env.REACT_APP_WARNING_COLOR,
+		],
+		dataLabels: {
+			enabled: false,
+		},
+		stroke: {
+			width: [1, 1, 4],
+			curve: 'smooth',
+		},
+		plotOptions: {
+			bar: {
+				borderRadius: 5,
+				columnWidth: '20px',
+			},
+		},
+		xaxis: {
+			categories: [
+				'Jan',
+				'Feb',
+				'Mar',
+				'Apr',
+				'May',
+				'Jun',
+				'Jul',
+				'Aug',
+				'Sep',
+				'Oct',
+				'Nov',
+				'Dec',
+			],
+		},
+		yaxis: [
+			{
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_INFO_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập ( Triệu )',
+					style: {
+						color: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				tooltip: {
+					enabled: true,
+				},
+			},
+			{
+				seriesName: 'Thu Nhập Năm Ngoái',
+				opposite: true,
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_SUCCESS_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập Năm Ngoái',
+					style: {
+						color: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+			},
+			// {
+			// 	seriesName: 'Revenue',
+			// 	opposite: true,
+			// 	axisTicks: {
+			// 		show: true,
+			// 	},
+			// 	axisBorder: {
+			// 		show: true,
+			// 		color: process.env.REACT_APP_WARNING_COLOR,
+			// 	},
+			// 	labels: {
+			// 		style: {
+			// 			colors: process.env.REACT_APP_WARNING_COLOR,
+			// 		},
+			// 	},
+			// 	title: {
+			// 		text: 'Revenue (thousand cores)',
+			// 		style: {
+			// 			color: process.env.REACT_APP_WARNING_COLOR,
+			// 		},
+			// 	},
+			// },
+		],
+		tooltip: {
+			theme: 'dark',
+			fixed: {
+				enabled: true,
+				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				offsetY: 30,
+				offsetX: 60,
+			},
+		},
+		legend: {
+			horizontalAlign: 'left',
+			offsetX: 40,
+		},
+	};
+
+	const salesByStoreSeries1 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(140),
+				randomize(200),
+				randomize(250),
+				randomize(275),
+				randomize(295),
+				randomize(314),
+				randomize(388),
+				randomize(406),
+				randomize(410),
+				randomize(356),
+				randomize(468),
+				randomize(555),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(150),
+				randomize(200),
+				randomize(200),
+				randomize(200),
+				randomize(267),
+				randomize(300),
+				randomize(350),
+				randomize(360),
+				randomize(300),
+				randomize(400),
+				randomize(488),
+			],
+		},
+		// {
+		// 	name: 'Revenue',
+		// 	type: 'line',
+		// 	data: [
+		// 		randomize(20),
+		// 		randomize(29),
+		// 		randomize(37),
+		// 		randomize(36),
+		// 		randomize(44),
+		// 		randomize(45),
+		// 		randomize(50),
+		// 		randomize(58),
+		// 		randomize(60),
+		// 		randomize(67),
+		// 		randomize(73),
+		// 		randomize(80),
+		// 	],
+		// },
+	];
+	const salesByStoreSeries2 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(234),
+				randomize(456),
+				randomize(371),
+				randomize(499),
+				randomize(378),
+				randomize(678),
+				randomize(567),
+				randomize(789),
+				randomize(460),
+				randomize(575),
+				randomize(661),
+				randomize(515),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(150),
+				randomize(200),
+				randomize(200),
+				randomize(200),
+				randomize(250),
+				randomize(300),
+				randomize(300),
+				randomize(400),
+				randomize(300),
+				randomize(400),
+				randomize(444),
+			],
+		},
+		// {
+		// 	name: 'Revenue',
+		// 	type: 'line',
+		// 	data: [
+		// 		randomize(34),
+		// 		randomize(54),
+		// 		randomize(43),
+		// 		randomize(63),
+		// 		randomize(35),
+		// 		randomize(63),
+		// 		randomize(46),
+		// 		randomize(53),
+		// 		randomize(70),
+		// 		randomize(65),
+		// 		randomize(52),
+		// 		randomize(82),
+		// 	],
+		// },
+	];
+	const salesByStoreSeries3 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(477),
+				randomize(323),
+				randomize(241),
+				randomize(478),
+				randomize(268),
+				randomize(379),
+				randomize(344),
+				randomize(486),
+				randomize(580),
+				randomize(680),
+				randomize(480),
+				randomize(370),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(155),
+				randomize(200),
+				randomize(200),
+				randomize(200),
+				randomize(300),
+				randomize(300),
+				randomize(355),
+				randomize(356),
+				randomize(299),
+				randomize(400),
+				randomize(499),
+			],
+		},
+		// {
+		// 	name: 'Revenue',
+		// 	type: 'line',
+		// 	data: [
+		// 		randomize(34),
+		// 		randomize(21),
+		// 		randomize(54),
+		// 		randomize(56),
+		// 		randomize(34),
+		// 		randomize(43),
+		// 		randomize(37),
+		// 		randomize(43),
+		// 		randomize(55),
+		// 		randomize(62),
+		// 		randomize(70),
+		// 		randomize(68),
+		// 	],
+		// },
+	];
+	const salesByStoreSeries4 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(354),
+				randomize(366),
+				randomize(264),
+				randomize(575),
+				randomize(313),
+				randomize(278),
+				randomize(470),
+				randomize(420),
+				randomize(579),
+				randomize(615),
+				randomize(311),
+				randomize(692),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(180),
+				randomize(200),
+				randomize(200),
+				randomize(200),
+				randomize(300),
+				randomize(300),
+				randomize(388),
+				randomize(377),
+				randomize(300),
+				randomize(400),
+				randomize(478),
+			],
+		},
+		// {
+		// 	name: 'Revenue',
+		// 	type: 'line',
+		// 	data: [
+		// 		randomize(30),
+		// 		randomize(43),
+		// 		randomize(51),
+		// 		randomize(19),
+		// 		randomize(32),
+		// 		randomize(25),
+		// 		randomize(39),
+		// 		randomize(42),
+		// 		randomize(50),
+		// 		randomize(60),
+		// 		randomize(55),
+		// 		randomize(80),
+		// 	],
+		// },
+	];
+
 	// all department
 	useEffect(() => {
 		const fetchData = async () => {
@@ -341,6 +731,95 @@ const DashboardPage = () => {
 		<PageWrapper title={dashboardMenu.dashboard.text}>
 			<Page container='fluid overflow-hidden'>
 				<div className='row'>
+					{verifyPermissionHOC(
+						<div className='col-xxl-12'>
+							<Card className='h-100'>
+								<CardHeader>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống Kê Doanh Thu 
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+									<CardActions>
+										<ButtonGroup>
+											<Button
+												color='primary'
+												isLight
+												icon='ChevronLeft'
+												aria-label='Previous Year'
+												isDisable={year <= 2019}
+												onClick={() => setYear(year - 1)}
+											/>
+											<Button color='primary' isLight isDisable>
+												{year}
+											</Button>
+											<Button
+												color='primary'
+												isLight
+												icon='ChevronRight'
+												aria-label='Next Year'
+												isDisable={year >= 2021}
+												onClick={() => setYear(year + 1)}
+											/>
+										</ButtonGroup>
+									</CardActions>
+								</CardHeader>
+								<CardBody>
+									<div className='row'>
+										<div className='col-xl-3 col-xxl-2'>
+											<div className='row g-3'>
+												{companies.map((company) => (
+													<div
+														key={company.name}
+														className='col-xl-12 col-lg-6 col-sm-12'>
+														<Button
+															isLight={activeCompanyTab !== company.name}
+															onClick={() =>
+																setActiveCompanyTab(company.name)
+															}
+															color={themeStatus}
+															className='w-100 py-4'
+															shadow='sm'
+															hoverShadow='none'>
+															{/* <img
+															src={company.img}
+															alt={company.name}
+															width='auto'
+															height={24}
+														/> */}
+															{company.name}
+														</Button>
+													</div>
+												))}
+											</div>
+										</div>
+										<div className='col-xl-9 col-xxl-10'>
+											<Chart
+												series={
+													(activeCompanyTab === COMPANIES_TAB.COMP1 &&
+														salesByStoreSeries1) ||
+													(activeCompanyTab === COMPANIES_TAB.COMP2 &&
+														salesByStoreSeries2) ||
+													(activeCompanyTab === COMPANIES_TAB.COMP3 &&
+														salesByStoreSeries3) ||
+													salesByStoreSeries4
+												}
+												options={salesByStoreOptions}
+												type={salesByStoreOptions.chart.type}
+												height={salesByStoreOptions.chart.height}
+											/>
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['admin'],
+					)}
+				</div>
+				<div className='row mt-4'>
 					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
 							<Card className='mb-8'>
@@ -455,7 +934,7 @@ const DashboardPage = () => {
 						['manager'],
 					)}
 				</div>
-				<div className='row mt-4'>
+				<div className='row mt-0'>
 					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
 							<Card className='mb-0'>

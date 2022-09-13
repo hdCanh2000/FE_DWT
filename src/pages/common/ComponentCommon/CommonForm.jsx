@@ -133,7 +133,7 @@ const CommonForm = ({
 												value={formik.values[field.id] || ''}
 												required
 												size='lg'
-												placeholder={`Nhập ${field.title}`}
+												placeholder={`Nhập ${field.placeholder ? field.placeholder : field.title }`}
 												className='border border-2 rounded-0 shadow-none'
 												onBlur={formik.handleBlur}
 												isValid={formik.isValid}
