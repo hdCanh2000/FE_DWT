@@ -25,7 +25,7 @@ const KeyPage = () => {
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [ keys, setKeys] = useState([]);
+	const [keys, setKeys] = useState([]);
 	useEffect(() => {
 		async function getKey() {
 			try {
