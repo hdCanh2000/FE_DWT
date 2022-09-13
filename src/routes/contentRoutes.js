@@ -33,6 +33,7 @@ const MANAGEMENT = {
 	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
+	POSITION: lazy(() => import('../pages/position/PositionPage')),
 	EMPLOYEE_CONFIG: lazy(() => import('../pages/employee/employeeConfig/positionLevelConfig')),
 };
 
@@ -121,14 +122,19 @@ const presentation = [
 		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
 		exact: true,
 	},
+	// Quản lý Vị Trí
 	{
-		path: '*',
-		element: <AUTH.PAGE_404 />,
-		exact: true,
+		path: demoPages.hrRecords.subMenu.position.path,
+		element: <MANAGEMENT.POSITION />,
 	},
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
+		exact: true,
+	},
+	{
+		path: '*',
+		element: <AUTH.PAGE_404 />,
 		exact: true,
 	},
 ];
