@@ -6,7 +6,13 @@ import moment from 'moment';
 import styled from 'styled-components';
 import SelectComponent from 'react-select';
 import { Button, Modal } from 'react-bootstrap';
-import { getAllDepartments, getAllKeys, getAllTasks, getAllUser, getSubTaskById } from '../services';
+import {
+	getAllDepartments,
+	getAllKeys,
+	getAllTasks,
+	getAllUser,
+	getSubTaskById,
+} from '../services';
 import Option from '../../../../components/bootstrap/Option';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
@@ -314,7 +320,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 			};
 		});
 		dataSubmit.userId = valueUser.id;
-		dataSubmit.taskId = item.taskId || null;
+		dataSubmit.taskId = parseInt(item.taskId, 10) || null;
 		dataSubmit.users = valueUsers;
 		dataSubmit.departmentId = valueDepartment.id;
 		dataSubmit.departments = valueDepartments;
@@ -564,14 +570,13 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 												required
 												size='lg'
 												className='border border-2 rounded-0 shadow-none'
-												placeholder="Chọn chỉ số Key"
+												placeholder='Chọn chỉ số Key'
 												value={item?.keyName}
-												onChange={(e) =>
-													handleChangeKeysState(index, e)
-												}
-											>
+												onChange={(e) => handleChangeKeysState(index, e)}>
 												{keyOption.map((key) => (
-													<Option key={`${key?.name} (${key?.unit})`} value={`${key?.name} (${key?.unit})`}>
+													<Option
+														key={`${key?.name} (${key?.unit})`}
+														value={`${key?.name} (${key?.unit})`}>
 														{`${key?.name} (${key?.unit})`}
 													</Option>
 												))}

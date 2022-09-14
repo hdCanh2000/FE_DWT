@@ -1780,16 +1780,23 @@
     "loader-utils" "^2.0.0"
 
 "@tanstack/query-core@4.3.4":
+  "integrity" "sha512-NLAe3j5Vk1yYEtoPP5fPGPjRzkZPx67KUM3f14L3InziJZJ0wVecCh7uKfgYkbRKJSeq6PlbND7iuCGdTplN6Q=="
+  "resolved" "https://registry.npmjs.org/@tanstack/query-core/-/query-core-4.3.4.tgz"
   "version" "4.3.4"
 
 "@tanstack/react-query@^4.3.4":
+  "integrity" "sha512-IiAo+B8bxphEpO7xwLQaCptd2rY4Ef3pW1q9J3pT66G+J/st4QpGQ+cSm9iESp9ccRy1YNUk3klk/hQtWewl6g=="
+  "resolved" "https://registry.npmjs.org/@tanstack/react-query/-/react-query-4.3.4.tgz"
+
   "version" "4.3.4"
   dependencies:
     "@tanstack/query-core" "4.3.4"
     "use-sync-external-store" "^1.2.0"
 
 "@testing-library/dom@^8.5.0", "@testing-library/dom@>=7.21.4":
-  "version" "8.13.0"
+  "integrity" "sha512-KnH2MnJUzmFNPW6RIKfd+zf2Wue8mEKX0M3cpX6aKl5ZXrJM1/c/Pc8c2xDNYQCnJO48Sm5ITbMXgqTr3h4jxQ=="
+  "resolved" "https://registry.npmjs.org/@testing-library/dom/-/dom-8.17.1.tgz"
+  "version" "8.17.1"
   dependencies:
     "@babel/code-frame" "^7.10.4"
     "@babel/runtime" "^7.12.5"
@@ -2259,6 +2266,8 @@
   "version" "1.2.0"
 
 "@xtuc/long@4.2.2":
+  "integrity" "sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ=="
+  "resolved" "https://registry.npmjs.org/@xtuc/long/-/long-4.2.2.tgz"
   "version" "4.2.2"
 
 "abab@^2.0.3", "abab@^2.0.5":
@@ -3160,6 +3169,8 @@
   "version" "1.0.2"
 
 "cosmiconfig@^6.0.0":
+  "integrity" "sha512-xb3ZL6+L8b9JLLCx3ZdoZy4+2ECphCMo2PwqgP1tlfVq6M6YReyzBJtvWWtbDSpNr9hn96pkCiZqUcFEc+54Qg=="
+  "resolved" "https://registry.npmjs.org/cosmiconfig/-/cosmiconfig-6.0.0.tgz"
   "version" "6.0.0"
   dependencies:
     "@types/parse-json" "^4.0.0"
@@ -3551,7 +3562,9 @@
   "version" "1.0.0"
 
 "dns-packet@^5.2.2":
-  "version" "5.3.1"
+  "integrity" "sha512-EgqGeaBB8hLiHLZtp/IbaDQTL8pZ0+IvwzSHA6d7VyMDM+B9hgddEMa9xjK5oYnw0ci0JQ6g2XCD7/f6cafU6g=="
+  "resolved" "https://registry.npmjs.org/dns-packet/-/dns-packet-5.4.0.tgz"
+  "version" "5.4.0"
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
@@ -4110,7 +4123,9 @@
   "version" "1.2.0"
 
 "fast-glob@^3.2.11", "fast-glob@^3.2.9":
-  "version" "3.2.11"
+  "integrity" "sha512-DVj4CQIYYow0BlaelwK1pHl5n5cRSJfM60UA0zK891sVInoPri2Ekj7+e1CT3/3qxXenpI+nBBmQAcJPJgaj4w=="
+  "resolved" "https://registry.npmjs.org/fast-glob/-/fast-glob-3.2.12.tgz"
+  "version" "3.2.12"
   dependencies:
     "@nodelib/fs.stat" "^2.0.2"
     "@nodelib/fs.walk" "^1.2.3"
@@ -4784,7 +4799,9 @@
   dependencies:
     "@babel/runtime" "^7.17.2"
 
-"iconv-lite@^0.4.5", "iconv-lite@0.4.24":
+"iconv-lite@^0.4.5":
+  "integrity" "sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA=="
+  "resolved" "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz"
   "version" "0.4.24"
   dependencies:
     "safer-buffer" ">= 2.1.2 < 3"
@@ -5594,8 +5611,10 @@
     "json-schema" "0.4.0"
     "verror" "1.10.0"
 
-"jss-plugin-camel-case@10.9.1-alpha.2":
-  "version" "10.9.1-alpha.2"
+"jss-plugin-camel-case@10.9.2":
+  "integrity" "sha512-wgBPlL3WS0WDJ1lPJcgjux/SHnDuu7opmgQKSraKs4z8dCCyYMx9IDPFKBXQ8Q5dVYij1FFV0WdxyhuOOAXuTg=="
+  "resolved" "https://registry.npmjs.org/jss-plugin-camel-case/-/jss-plugin-camel-case-10.9.2.tgz"
+  "version" "10.9.2"
   dependencies:
     "@babel/runtime" "^7.3.1"
     "hyphenate-style-name" "^1.0.3"
@@ -6340,7 +6359,6 @@
   "version" "3.1.0"
   dependencies:
     "yocto-queue" "^0.1.0"
-
 "p-locate@^2.0.0":
   "version" "2.0.0"
   dependencies:
@@ -6783,10 +6801,12 @@
     "@csstools/postcss-normalize-display-values" "^1.0.0"
     "@csstools/postcss-oklab-function" "^1.1.0"
     "@csstools/postcss-progressive-custom-properties" "^1.3.0"
-    "@csstools/postcss-stepped-value-functions" "^1.0.0"
-    "@csstools/postcss-unset-value" "^1.0.0"
-    "autoprefixer" "^10.4.6"
-    "browserslist" "^4.20.3"
+    "@csstools/postcss-stepped-value-functions" "^1.0.1"
+    "@csstools/postcss-text-decoration-shorthand" "^1.0.0"
+    "@csstools/postcss-trigonometric-functions" "^1.0.2"
+    "@csstools/postcss-unset-value" "^1.0.2"
+    "autoprefixer" "^10.4.8"
+    "browserslist" "^4.21.3"
     "css-blank-pseudo" "^3.0.3"
     "css-has-pseudo" "^3.0.4"
     "css-prefers-color-scheme" "^6.0.3"
@@ -7064,7 +7084,9 @@
     "whatwg-fetch" "^3.6.2"
 
 "react-big-calendar@^0.40.1":
-  "version" "0.40.1"
+  "integrity" "sha512-siY5Eiu3pRGcbjmZzaMizdUOkuZOOYUPoIhu5G7v8Kmxoko2brmD4iFYkrlobCOk7rWDN6ZPPgSOJUgrQst2uw=="
+  "resolved" "https://registry.npmjs.org/react-big-calendar/-/react-big-calendar-0.40.8.tgz"
+  "version" "0.40.8"
   dependencies:
     "@babel/runtime" "^7.17.2"
     "clsx" "^1.1.1"
@@ -7770,11 +7792,22 @@
     "lru-cache" "^6.0.0"
 
 "semver@^7.3.5":
+  "integrity" "sha512-QlYTucUYOews+WeEujDoEGziz4K6c47V/Bd+LjSSYcA94p+DmINdf7ncaUinThfvZyu13lN9OY1XDxt8C0Tw0g=="
+  "resolved" "https://registry.npmjs.org/semver/-/semver-7.3.7.tgz"
+  "version" "7.3.7"
+  dependencies:
+    "lru-cache" "^6.0.0"
+
+"semver@^7.3.7":
+  "integrity" "sha512-QlYTucUYOews+WeEujDoEGziz4K6c47V/Bd+LjSSYcA94p+DmINdf7ncaUinThfvZyu13lN9OY1XDxt8C0Tw0g=="
+  "resolved" "https://registry.npmjs.org/semver/-/semver-7.3.7.tgz"
   "version" "7.3.7"
   dependencies:
     "lru-cache" "^6.0.0"
 
 "semver@2 || 3 || 4 || 5":
+  "integrity" "sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ=="
+  "resolved" "https://registry.npmjs.org/semver/-/semver-5.7.1.tgz"
   "version" "5.7.1"
 
 "semver@7.0.0":
@@ -8776,6 +8809,8 @@
     "clipboard-copy" "^3.0.0"
 
 "use-sync-external-store@^1.0.0", "use-sync-external-store@^1.2.0":
+  "integrity" "sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA=="
+  "resolved" "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz"
   "version" "1.2.0"
 
 "util-deprecate@^1.0.1", "util-deprecate@^1.0.2", "util-deprecate@~1.0.1":
@@ -8886,7 +8921,9 @@
     "schema-utils" "^4.0.0"
 
 "webpack-dev-server@^4.6.0", "webpack-dev-server@3.x || 4.x":
-  "version" "4.9.0"
+  "integrity" "sha512-L5S4Q2zT57SK7tazgzjMiSMBdsw+rGYIX27MgPgx7LDhWO0lViPrHKoLS7jo5In06PWYAhlYu3PbyoC6yAThbw=="
+  "resolved" "https://registry.npmjs.org/webpack-dev-server/-/webpack-dev-server-4.11.0.tgz"
+  "version" "4.11.0"
   dependencies:
     "@types/bonjour" "^3.5.9"
     "@types/connect-history-api-fallback" "^1.3.5"
@@ -8946,7 +8983,7 @@
     "@webassemblyjs/ast" "1.11.1"
     "@webassemblyjs/wasm-edit" "1.11.1"
     "@webassemblyjs/wasm-parser" "1.11.1"
-    "acorn" "^8.4.1"
+    "acorn" "^8.7.1"
     "acorn-import-assertions" "^1.7.6"
     "browserslist" "^4.14.5"
     "chrome-trace-event" "^1.0.2"
@@ -9037,19 +9074,25 @@
 "word-wrap@^1.2.3", "word-wrap@~1.2.3":
   "version" "1.2.3"
 
-"workbox-background-sync@6.5.3":
-  "version" "6.5.3"
+"workbox-background-sync@6.5.4":
+  "integrity" "sha512-0r4INQZMyPky/lj4Ou98qxcThrETucOde+7mRGJl13MPJugQNKeZQOdIJe/1AchOP23cTqHcN/YVpD6r8E6I8g=="
+  "resolved" "https://registry.npmjs.org/workbox-background-sync/-/workbox-background-sync-6.5.4.tgz"
+  "version" "6.5.4"
   dependencies:
-    "idb" "^6.1.4"
-    "workbox-core" "6.5.3"
+    "idb" "^7.0.1"
+    "workbox-core" "6.5.4"
 
-"workbox-broadcast-update@6.5.3":
-  "version" "6.5.3"
+"workbox-broadcast-update@6.5.4":
+  "integrity" "sha512-I/lBERoH1u3zyBosnpPEtcAVe5lwykx9Yg1k6f8/BGEPGaMMgZrwVrqL1uA9QZ1NGGFoyE6t9i7lBjOlDhFEEw=="
+  "resolved" "https://registry.npmjs.org/workbox-broadcast-update/-/workbox-broadcast-update-6.5.4.tgz"
+  "version" "6.5.4"
   dependencies:
-    "workbox-core" "6.5.3"
+    "workbox-core" "6.5.4"
 
-"workbox-build@6.5.3":
-  "version" "6.5.3"
+"workbox-build@6.5.4":
+  "integrity" "sha512-kgRevLXEYvUW9WS4XoziYqZ8Q9j/2ziJYEtTrjdz5/L/cTUa2XfyMP2i7c3p34lgqJ03+mTiz13SdFef2POwbA=="
+  "resolved" "https://registry.npmjs.org/workbox-build/-/workbox-build-6.5.4.tgz"
+  "version" "6.5.4"
   dependencies:
     "@apideck/better-ajv-errors" "^0.3.1"
     "@babel/core" "^7.11.1"
@@ -9170,7 +9213,7 @@
   "version" "6.5.3"
   dependencies:
     "@types/trusted-types" "^2.0.2"
-    "workbox-core" "6.5.3"
+    "workbox-core" "6.5.4"
 
 "wrap-ansi@^7.0.0":
   "version" "7.0.0"
@@ -9250,6 +9293,11 @@
 
 "yocto-queue@^0.1.0":
   "version" "0.1.0"
+
+"yocto-queue@^1.0.0":
+  "integrity" "sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g=="
+  "resolved" "https://registry.npmjs.org/yocto-queue/-/yocto-queue-1.0.0.tgz"
+  "version" "1.0.0"
 
 "yup@^0.32.11":
   "version" "0.32.11"
