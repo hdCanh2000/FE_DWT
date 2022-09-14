@@ -61,7 +61,6 @@ const CommonForm = ({
 														ariaLabel={field.title || ''}
 														placeholder={`Chọn ${field.title}`}
 														list={field.options}
-														required
 														name={field.id}
 														size='lg'
 														className='border border-2 rounded-0 shadow-none'
@@ -126,7 +125,6 @@ const CommonForm = ({
 														ariaLabel={field.title}
 														placeholder={`Nhập ${field.title}`}
 														list={options}
-														required
 														size='lg'
 														name={field.id}
 														className='border border-2 rounded-0 shadow-none'
@@ -188,7 +186,6 @@ const CommonForm = ({
 													name={field.id}
 													onChange={formik.handleChange}
 													value={formik.values[field.id] || ''}
-													required
 													size='lg'
 													placeholder={`Nhập ${field.title}`}
 													className='border border-2 rounded-0 shadow-none'

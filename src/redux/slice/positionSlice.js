@@ -14,11 +14,13 @@ export const fetchPositionList = createAsyncThunk('position/fetchList', async ()
 	return response.data;
 });
 
-export const fetchPositionWithUserList = createAsyncThunk('position/fetchWithUserList', async () => {
-	const response = await getAllPositionWithUser();
-	return response.data;
-});
-
+export const fetchPositionWithUserList = createAsyncThunk(
+	'position/fetchWithUserList',
+	async () => {
+		const response = await getAllPositionWithUser();
+		return response.data;
+	},
+);
 
 // export const fetchDepartmentWithUserList = createAsyncThunk(
 // 	'department/fetchWithUserList',

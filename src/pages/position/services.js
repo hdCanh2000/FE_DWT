@@ -30,5 +30,4 @@ const updatePosition = (data) => {
 	});
 };
 
-
 export { getAllPositionWithUser, getPositionByIdWithUser, addPosition, updatePosition };

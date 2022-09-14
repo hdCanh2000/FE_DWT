@@ -5,6 +5,7 @@ import { departmentSlice } from '../slice/departmentSlice';
 import { positionSlice } from '../slice/positionSlice';
 import { missionSlice } from '../slice/missionSlice';
 import { taskSlice } from '../slice/taskSlice';
+import { roleSlice } from '../slice/roleSlice';
 
 const reducer = combineReducers({
 	mission: missionSlice.reducer,
@@ -12,6 +13,7 @@ const reducer = combineReducers({
 	employee: employeeSlice.reducer,
 	department: departmentSlice.reducer,
 	position: positionSlice.reducer,
+	role: roleSlice.reducer,
 	toggleForm: toggleFormSlice.reducer,
 });
 

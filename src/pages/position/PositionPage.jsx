@@ -1,6 +1,5 @@
 // goij api  theem suwra xoas thuong viet controller
 
-
 import React, { useEffect } from 'react';
 // import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,7 +26,6 @@ import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { addPosition, updatePosition } from './services';
 import { formatPosition } from '../../utils/constants';
 
-
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
@@ -40,9 +38,7 @@ const PositionPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const positions = useSelector((state) => state.position.positions);
-	console.log(positions);
 	const departments = useSelector((state) => state.department.departments);
-	console.log(departments);
 
 	useEffect(() => {
 		dispatch(fetchPositionList());
@@ -87,7 +83,7 @@ const PositionPage = () => {
 			type: 'select',
 			align: 'center',
 			isShow: true,
-			format: (value) => (formatPosition(value)),
+			format: (value) => formatPosition(value),
 			options: [
 				{
 					id: 1,
@@ -199,7 +195,6 @@ const PositionPage = () => {
 			position: Number.parseInt(data.position, 10),
 			departmentId: data.departmentId,
 		};
-		console.log(dataSubmit);
 		if (data.id) {
 			try {
 				const response = await updatePosition(dataSubmit);
@@ -236,9 +231,7 @@ const PositionPage = () => {
 						<div className='row mb-4'>
 							<div className='col-12'>
 								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>
-										Quản Lý Vị Trí
-									</div>
+									<div className='display-6 fw-bold py-3'>Quản Lý Vị Trí</div>
 								</div>
 							</div>
 						</div>

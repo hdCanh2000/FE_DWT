@@ -78,7 +78,6 @@ const MissionChartReport = ({ data }) => {
 							size={Number || String} // Example: 10, '3vh', '5rem' etc.
 							inButton={Boolean || String} // true || false || 'onlyIcon'
 							className={String}
-							
 						/>
 					</div>
 				)}

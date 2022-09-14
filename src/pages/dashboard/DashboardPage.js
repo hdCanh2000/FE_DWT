@@ -737,7 +737,7 @@ const DashboardPage = () => {
 								<CardHeader>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
-											Thống Kê Doanh Thu 
+											Thống Kê Doanh Thu
 										</CardTitle>
 										<CardSubTitle tag='h5' className='h6'>
 											Báo cáo
@@ -776,7 +776,9 @@ const DashboardPage = () => {
 														key={company.name}
 														className='col-xl-12 col-lg-6 col-sm-12'>
 														<Button
-															isLight={activeCompanyTab !== company.name}
+															isLight={
+																activeCompanyTab !== company.name
+															}
 															onClick={() =>
 																setActiveCompanyTab(company.name)
 															}

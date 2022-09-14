@@ -113,7 +113,6 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 					label: response.data.departments[0].name,
 					value: response.data.departments[0].id,
 				});
-				
 				setUserOption({
 					...response.data.users[0],
 					id: response.data.users[0].id,
@@ -705,12 +704,13 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 																value={item?.keyName}
 																name='keyName'
 																required
-																size = 'lg'
+																size='lg'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder="Chọn chỉ số Key"
-															>
+																placeholder='Chọn chỉ số Key'>
 																{keyOption.map((key) => (
-																	<Option key={`${key?.name} (${key?.unit})`} value={`${key?.name} (${key?.unit})`}>
+																	<Option
+																		key={`${key?.name} (${key?.unit})`}
+																		value={`${key?.name} (${key?.unit})`}>
 																		{`${key?.name} (${key?.unit})`}
 																	</Option>
 																))}
@@ -728,7 +728,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 															id='name'
 															label='Giá trị key'>
 															<Input
-																type="number"
+																type='number'
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
 																}

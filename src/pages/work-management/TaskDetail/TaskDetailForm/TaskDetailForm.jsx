@@ -301,7 +301,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 			};
 		});
 		dataSubmit.userId = valueUser.id;
-		dataSubmit.taskId = item.taskId || null;
+		dataSubmit.taskId = parseInt(item.taskId, 10) || null;
 		dataSubmit.users = valueUsers;
 		dataSubmit.departmentId = valueDepartment.id;
 		dataSubmit.departments = valueDepartments;

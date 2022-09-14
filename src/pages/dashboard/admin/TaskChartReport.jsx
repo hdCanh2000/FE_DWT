@@ -160,7 +160,7 @@ const TaskChartReport = ({ data }) => {
 			) : (
 				<Spinner
 					// tag={String} // 'div' || 'span'
-					color='primary'// 'primary' || 'secondary' || 'success' || 'info' || 'warning' || 'danger' || 'light' || 'dark'
+					color='primary' // 'primary' || 'secondary' || 'success' || 'info' || 'warning' || 'danger' || 'light' || 'dark'
 					// isGrow={Boolean}
 					// isSmall={Boolean}
 					size={50} // Example: 10, '3vh', '5rem' etc.
