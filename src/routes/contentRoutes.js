@@ -34,6 +34,7 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
+	POSITION_DETAIL: lazy(() => import('../pages/position/PositionDetailPage')),
 	EMPLOYEE_CONFIG: lazy(() => import('../pages/employee/employeeConfig/positionLevelConfig')),
 };
 
@@ -127,6 +128,12 @@ const presentation = [
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
 	},
+	{
+		path: `${demoPages.hrRecords.subMenu.position.path}/:id`,
+		element: <MANAGEMENT.POSITION_DETAIL />,
+		exact: true,
+	},
+	// Quản lý Keys
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
