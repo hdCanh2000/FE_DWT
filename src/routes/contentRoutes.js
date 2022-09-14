@@ -47,6 +47,10 @@ const AUTH = {
 const KEY = {
 	KEY: lazy(() => import('../pages/key/keyPage')),
 };
+const UNIT = {
+	UNIT: lazy(() => import('../pages/unit/unitPage')),
+};
+
 
 const presentation = [
 	/**
@@ -129,9 +133,16 @@ const presentation = [
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
 	},
+	// Quản lý chỉ số key
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
+		exact: true,
+	},
+	// Quản lý đơn vị
+	{
+		path: demoPages.cauHinh.subMenu.unit.path,
+		element: <UNIT.UNIT />,
 		exact: true,
 	},
 	{
