@@ -38,6 +38,10 @@ const MANAGEMENT = {
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
 
+const CHART = {
+	ORGANIZATIONAL: lazy(() => import('../pages/chart/organizational/OrganizationalChartPage')),
+};
+
 const POSITION_LEVEL_CONFIG = {
 	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
 };
@@ -148,11 +152,6 @@ const presentation = [
 		element: <MANAGEMENT.PERMISSION />,
 	},
 	{
-		path: '*',
-		element: <AUTH.PAGE_404 />,
-		exact: true,
-	},
-	{
 		path: demoPages.cauHinh.subMenu.kpiNorm.path,
 		element: <KPINORM.KPINORM />,
 		exact: true,
@@ -161,6 +160,16 @@ const presentation = [
 	{
 		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
+		exact: true,
+	},
+	{
+		path: demoPages.companyPage.subMenu.organizational.path,
+		element: <CHART.ORGANIZATIONAL />,
+		exact: true,
+	},
+	{
+		path: '*',
+		element: <AUTH.PAGE_404 />,
 		exact: true,
 	},
 ];
