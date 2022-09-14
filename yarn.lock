@@ -2215,6 +2215,10 @@
 "@tanstack/react-query@^4.3.4":
   "integrity" "sha512-IiAo+B8bxphEpO7xwLQaCptd2rY4Ef3pW1q9J3pT66G+J/st4QpGQ+cSm9iESp9ccRy1YNUk3klk/hQtWewl6g=="
   "resolved" "https://registry.npmjs.org/@tanstack/react-query/-/react-query-4.3.4.tgz"
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8b49d20f480814ae8b96c6e485e6cffb2a51511f
   "version" "4.3.4"
   dependencies:
     "@tanstack/query-core" "4.3.4"
@@ -8609,6 +8613,13 @@
   "version" "3.1.0"
   dependencies:
     "yocto-queue" "^0.1.0"
+<<<<<<< HEAD
+=======
+"p-locate@^2.0.0":
+  "version" "2.0.0"
+  dependencies:
+    "p-limit" "^1.1.0"
+>>>>>>> 8b49d20f480814ae8b96c6e485e6cffb2a51511f
 
 "p-locate@^3.0.0":
   "integrity" "sha512-x+12w/To+4GFfgJhBEpiDcLozRJGegY+Ei7/z0tSLkMmxGZNybVMSfWj9aJn8Z5Fc7dBUNJOOVgPv2H7IwulSQ=="

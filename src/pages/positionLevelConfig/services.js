@@ -4,27 +4,27 @@ const getAllPositionLevel = () => {
 	// lấy danh sách quản lí nhân sự
 	return axiosClient({
 		method: 'GET',
-		url: `/positonLevel`,
+		url: `/positionLevels`,
 	});
 };
 const addPositionLevel = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/positonLevel`,
+		url: `/positionLevels`,
 		data,
 	});
 };
 const updatePositionLevel = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/positonLevel/${data.id}`,
+		url: `/positionLevels/${data.id}`,
 		data,
 	});
 };
 const deletePositionLevel = (id) => {
 	return axiosClient({
 		method: 'DELETE',
-		url: `/positonLevel/${id}`,
+		url: `/positionLevels/${id}`,
 	});
 };
 export { getAllPositionLevel, addPositionLevel, updatePositionLevel, deletePositionLevel };

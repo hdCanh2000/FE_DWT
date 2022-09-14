@@ -97,7 +97,7 @@ const EmployeePage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Parent',
+			title: 'Nhiệm vụ cha',
 			id: 'parent',
 			key: 'parent',
 			type: 'select',
@@ -174,11 +174,11 @@ const EmployeePage = () => {
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
 				handleShowToast(
-					`Cập nhật định mức kpi!`,
-					`Định mức kpi ${result?.name} được cập nhật thành công!`,
+					`Cập nhật định mức KPI!`,
+					`Định mức KPI ${result?.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				handleShowToast(`Cập nhật định mức kpi`, `Cập nhật định mức kpi không thành công!`);
+				handleShowToast(`Cập nhật định mức KPI`, `Cập nhật định mức KPI không thành công!`);
 				throw error;
 			}
 		} else {
@@ -188,11 +188,11 @@ const EmployeePage = () => {
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
 				handleShowToast(
-					`Thêm định mức kpi`,
-					`Định mức kpi ${result?.user?.name} được thêm thành công!`,
+					`Thêm định mức KPI`,
+					`Định mức KPI ${result?.user?.name} được thêm thành công!`,
 				);
 			} catch (error) {
-				handleShowToast(`Thêm định mức kpi`, `Thêm định mức không thành công!`);
+				handleShowToast(`Thêm định mức KPI`, `Thêm định mức KPI không thành công!`);
 				throw error;
 			}
 		}
@@ -208,9 +208,9 @@ const EmployeePage = () => {
 		try {
 			deleteKpiNorm(item);
 			dispatch(fetchKpiNormList());
-			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự thành công!`);
+			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI thành công!`);
 		} catch (error) {
-			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
+			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI không thành công!`);
 		}
 		handleCloseDelete();
 	};
@@ -243,7 +243,7 @@ const EmployeePage = () => {
 											icon='PersonPlusFill'
 											tag='button'
 											onClick={() => handleOpenForm(null)}>
-											Thêm định mức kpi
+											Thêm định mức KPI
 										</Button>
 									</CardActions>
 								</CardHeader>
@@ -326,7 +326,7 @@ const EmployeePage = () => {
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
+					label={itemEdit?.id ? 'Cập nhật định mức KPI' : 'Thêm mới định mức KPI'}
 					fields={columns}
 					validate={validate}
 				/>
@@ -334,8 +334,8 @@ const EmployeePage = () => {
 					openModal={isDelete}
 					onCloseModal={handleCloseDelete}
 					onConfirm={() => handleDeleteKpiNorm(itemDelete?.id)}
-					title='Xoá cấp nhân sự'
-					content={`Xác nhận xoá cấp nhân sự <strong>${itemDelete?.name}</strong> ?`}
+					title='Xoá định mức KPI'
+					content={`Xác nhận xoá định mức <strong>${itemDelete?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>

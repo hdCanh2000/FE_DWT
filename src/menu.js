@@ -195,7 +195,7 @@ export const demoPages = {
 			},
 			kpiNorm: {
 				id: 'kpiNorm',
-				text: 'Danh mục định mức Kpi',
+				text: 'Danh mục định mức KPI',
 				path: '/danh-muc-dinh-muc-kpi',
 			},
 		},
