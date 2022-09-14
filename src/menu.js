@@ -116,8 +116,8 @@ export const demoPages = {
 				text: 'Vị trí công việc',
 				path: '/vi-tri-cong-viec',
 			},
-			hrConfig: {
-				id: 'hrConfig',
+			positionLevelConfig: {
+				id: 'positionLevelConfig',
 				text: 'Cấu hình cấp nhân sự',
 				path: '/cauhinh-cap-nhan-su',
 			},
@@ -192,6 +192,11 @@ export const demoPages = {
 				id: 'authorization',
 				text: 'Cấu hình phân quyền',
 				path: '/cau-hinh-phan-quyen',
+			},
+			kpiNorm: {
+				id: 'kpiNorm',
+				text: 'Danh mục định mức KPI',
+				path: '/danh-muc-dinh-muc-kpi',
 			},
 		},
 	},
