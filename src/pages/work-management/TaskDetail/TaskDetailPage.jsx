@@ -684,7 +684,7 @@ const TaskDetailPage = () => {
 			try {
 				const response = await addNewSubtask({
 					...data,
-					taskId: params.id,
+					taskId: parseInt(params.id, 10),
 				});
 				const result = await response.data;
 				const newSubtasks = [...subtasks];
@@ -812,22 +812,11 @@ const TaskDetailPage = () => {
 													<div className='d-flex align-items-center pb-3'>
 														<div className='flex-grow-1'>
 															<div className='fw-bold fs-3 mb-0'>
-																{(
-																	(taskReport.completed /
-																		(taskReport.total -
-																			taskReport.pending)) *
-																	100
-																).toFixed(0)}
-																%
+																{taskReport.progress}%
 																<div>
 																	<Progress
 																		isAutoColor
-																		value={(
-																			(taskReport.completed /
-																				(taskReport.total -
-																					taskReport.pending)) *
-																			100
-																		).toFixed(0)}
+																		value={taskReport.progress}
 																		height={10}
 																	/>
 																</div>
@@ -838,8 +827,7 @@ const TaskDetailPage = () => {
 																</span>
 																trên tổng số
 																<span className='fw-bold text-danger fs-5 mx-2'>
-																	{taskReport.total -
-																		taskReport.pending}
+																	{taskReport.total}
 																</span>
 																đầu việc.
 															</div>

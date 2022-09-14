@@ -438,7 +438,7 @@ const MissionPage = () => {
 						</div>,
 						['admin'],
 					)}
-					{verifyPermissionHOC(
+					{/* {verifyPermissionHOC(
 						<div className='col-xxl-12'>
 							<Card className='mb-8'>
 								<CardHeader className='py-0'>
@@ -461,7 +461,7 @@ const MissionPage = () => {
 							</Card>
 						</div>,
 						['manager'],
-					)}
+					)} */}
 				</div>
 				{parseInt(searchParams.get('view'), 10) === 1 || !searchParams.get('view') ? (
 					<div className='row'>

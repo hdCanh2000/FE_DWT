@@ -34,7 +34,9 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
+	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
+
 const POSITION_LEVEL_CONFIG = {
 	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
 };
@@ -126,10 +128,17 @@ const presentation = [
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
 	},
+	// cấu hình - configure
+	// cấu hình kpi
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
 		exact: true,
+	},
+	// cấu hình role & permission
+	{
+		path: demoPages.cauHinh.subMenu.authorization.path,
+		element: <MANAGEMENT.PERMISSION />,
 	},
 	{
 		path: '*',

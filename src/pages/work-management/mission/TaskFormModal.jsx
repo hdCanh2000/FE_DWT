@@ -113,7 +113,6 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 					label: response.data.departments[0].name,
 					value: response.data.departments[0].id,
 				});
-
 				setUserOption({
 					...response.data.users[0],
 					id: response.data.users[0].id,
