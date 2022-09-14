@@ -54,6 +54,10 @@ const AUTH = {
 const KEY = {
 	KEY: lazy(() => import('../pages/key/keyPage')),
 };
+const UNIT = {
+	UNIT: lazy(() => import('../pages/unit/unitPage')),
+};
+
 const KPINORM = {
 	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
 };
@@ -133,6 +137,7 @@ const presentation = [
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
 	},
+	// Quản lý chỉ số key
 	// cấu hình - configure
 	// cấu hình kpi
 	{
@@ -146,7 +151,12 @@ const presentation = [
 		element: <KEY.KEY />,
 		exact: true,
 	},
+	// Quản lý đơn vị
+	{
+		path: demoPages.cauHinh.subMenu.unit.path,
+		element: <UNIT.UNIT />,
 	// cấu hình role & permission
+	},
 	{
 		path: demoPages.cauHinh.subMenu.authorization.path,
 		element: <MANAGEMENT.PERMISSION />,

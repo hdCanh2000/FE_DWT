@@ -173,6 +173,11 @@ export const demoPages = {
 				text: 'Cấu hình KPI',
 				path: '/cau-hinh-kpi',
 			},
+			unit: {
+				id: 'unit',
+				text: 'Cấu hình đơn vị',
+				path: '/cau-hinh-don-vi',
+			},
 			role: {
 				id: 'role',
 				text: 'Cầu hình vai trò',
