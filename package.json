@@ -105,6 +105,7 @@
 		"use-clipboard-copy": "^0.2.0",
 		"uuid": "^8.3.2",
 		"web-vitals": "^2.1.4",
+		"yocto-queue": "^1.0.0",
 		"yup": "^0.32.11"
 	},
 	"devDependencies": {

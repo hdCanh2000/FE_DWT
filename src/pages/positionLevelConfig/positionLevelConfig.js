@@ -1,33 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
-import Page from '../../../layout/Page/Page';
-import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../../common/ComponentCommon/TableCommon';
-import { demoPages } from '../../../menu';
+
+import { useDispatch, useSelector } from 'react-redux';
 import Card, {
 	CardActions,
 	CardHeader,
 	CardLabel,
 	CardTitle,
-} from '../../../components/bootstrap/Card';
-import Button from '../../../components/bootstrap/Button';
-import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
-import {
-	addPositionLevel,
-	deletePositionLevel,
-	getAllPositionLevel,
-	updatePositionLevel,
-} from './services';
-import useDarkMode from '../../../hooks/useDarkMode';
-import CommonForm from '../../common/ComponentCommon/CommonForm';
-import Toasts from '../../../components/bootstrap/Toasts';
-import TaskAlertConfirm from '../../work-management/mission/TaskAlertConfirm';
+} from '../../components/bootstrap/Card';
+import Button from '../../components/bootstrap/Button';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import { addPositionLevel, deletePositionLevel, updatePositionLevel } from './services';
+import useDarkMode from '../../hooks/useDarkMode';
+import CommonForm from '../common/ComponentCommon/CommonForm';
+import Toasts from '../../components/bootstrap/Toasts';
+import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
+import PageWrapper from '../../layout/PageWrapper/PageWrapper';
+import { demoPages } from '../../menu';
+import Page from '../../layout/Page/Page';
+import TableCommon from '../common/ComponentCommon/TableCommon';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 
 const KeyPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	// const { addToast } = useToasts();
+	const [itemDelete, setItemDelete] = React.useState({});
+	const [isDelete, setIsDelete] = React.useState(false);
+	const dispatch = useDispatch();
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const columns = [
 		{
 			title: 'Tên cấp nhân sự',
@@ -73,18 +76,12 @@ const KeyPage = () => {
 			isShow: false,
 		},
 	];
-	const [data, setData] = React.useState();
-	const [openForm, setOpenForm] = React.useState(false);
-	const [itemEdit, setItemEdit] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
-	const fecthData = async () => {
-		const reponse = await getAllPositionLevel();
-		const resutl = await reponse.data;
-		setData(resutl);
-	};
-	React.useEffect(() => {
-		fecthData();
-	}, []);
+	useEffect(() => {
+		dispatch(fetchPositionLevelList());
+	}, [dispatch]);
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+	const data = useSelector((state) => state.positionLevel.positionLevels);
 	const { addToast } = useToasts();
 	const handleShowToast = (title, content) => {
 		addToast(
@@ -96,35 +93,27 @@ const KeyPage = () => {
 			},
 		);
 	};
-	const handleOpenForm = (item) => {
-		setOpenForm(true);
-		setItemEdit({ ...item });
-	};
-	const handleCloseForm = () => {
-		setOpenForm(false);
-		setItemEdit(null);
-	};
 	const handleSubmitForm = async (itemSubmit) => {
 		if (!itemSubmit.id) {
 			const reponse = await addPositionLevel(itemSubmit);
 			const result = reponse.data;
-			handleShowToast('Thêm cấp nhân sự', `Thêm cấp nhân sự ${result.name} thành công !`);
-			fecthData();
+			dispatch(fetchPositionLevelList());
 			handleCloseForm();
+			handleShowToast('Thêm cấp nhân sự', `Thêm cấp nhân sự ${result.name} thành công !`);
 		} else {
 			const reponse = await updatePositionLevel(itemSubmit);
 			const result = reponse.data;
+			dispatch(fetchPositionLevelList());
+			handleCloseForm();
 			handleShowToast(
 				'Chỉnh sửa cấp nhân sự',
 				`Chỉnh sửa cấp nhân sự ${result.name} thành công !`,
 			);
-			fecthData();
-			handleCloseForm();
 		}
 	};
 	const handleOpenDelete = (item) => {
 		setIsDelete(true);
-		setItemEdit({ ...item });
+		setItemDelete({ ...item });
 	};
 	const handleCloseDelete = () => {
 		setIsDelete(false);
@@ -132,7 +121,7 @@ const KeyPage = () => {
 	const handleDeletePositionLevel = (item) => {
 		try {
 			deletePositionLevel(item);
-			fecthData();
+			dispatch(fetchPositionLevelList());
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
@@ -183,7 +172,7 @@ const KeyPage = () => {
 							</div>
 						</div>
 						<CommonForm
-							show={openForm}
+							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
@@ -194,9 +183,9 @@ const KeyPage = () => {
 						<TaskAlertConfirm
 							openModal={isDelete}
 							onCloseModal={handleCloseDelete}
-							onConfirm={() => handleDeletePositionLevel(itemEdit?.id)}
-							title='Xoá công việc'
-							content={`Xác nhận xoá công việc <strong>${itemEdit?.name}</strong> ?`}
+							onConfirm={() => handleDeletePositionLevel(itemDelete?.id)}
+							title='Xoá cấp nhân sự'
+							content={`Xác nhận xoá cấp nhân sự <strong>${itemDelete?.name}</strong> ?`}
 						/>
 					</>,
 					['admin', 'manager'],

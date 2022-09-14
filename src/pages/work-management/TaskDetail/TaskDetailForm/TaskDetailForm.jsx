@@ -6,7 +6,13 @@ import moment from 'moment';
 import styled from 'styled-components';
 import SelectComponent from 'react-select';
 import { Button, Modal } from 'react-bootstrap';
-import { getAllDepartments, getAllTasks, getAllUser, getSubTaskById } from '../services';
+import {
+	getAllDepartments,
+	getAllKeys,
+	getAllTasks,
+	getAllUser,
+	getSubTaskById,
+} from '../services';
 import Option from '../../../../components/bootstrap/Option';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
@@ -31,6 +37,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 	const [valueTask, setValueTask] = useState({});
 	const [usersRelated, setUsersRelated] = useState([]);
 	const [departmentRelated, setDepartmentRelated] = useState([]);
+	const [keyOption, setKeyOption] = useState([]);
 	const PRIORITIES = [5, 4, 3, 2, 1];
 	const initError = {
 		name: { errorMsg: '' },
@@ -145,6 +152,18 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		});
 	}, []);
 
+	useEffect(() => {
+		async function getKey() {
+			try {
+				const response = await getAllKeys();
+				const data = await response.data;
+				setKeyOption(data);
+			} catch (error) {
+				setKeyOption([]);
+			}
+		}
+		getKey();
+	}, []);
 	// valueDalite
 	const onValidate = (value, name) => {
 		setErrors((prev) => ({
@@ -546,15 +565,22 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 											className='mr-2'
 											id='name'
 											label='Tên chỉ số key'>
-											<Input
-												onChange={(e) => handleChangeKeysState(index, e)}
-												value={item?.keyName || ''}
+											<Select
 												name='keyName'
 												required
 												size='lg'
 												className='border border-2 rounded-0 shadow-none'
-												placeholder='VD: Doanh thu, đơn hàng, ...'
-											/>
+												placeholder='Chọn chỉ số Key'
+												value={item?.keyName}
+												onChange={(e) => handleChangeKeysState(index, e)}>
+												{keyOption.map((key) => (
+													<Option
+														key={`${key?.name} (${key?.unit})`}
+														value={`${key?.name} (${key?.unit})`}>
+														{`${key?.name} (${key?.unit})`}
+													</Option>
+												))}
+											</Select>
 										</FormGroup>
 										{item.error?.keyName && (
 											<ErrorText>{item.error?.keyName}</ErrorText>
@@ -569,7 +595,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 												size='lg'
 												required
 												className='border border-2 rounded-0 shadow-none'
-												placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
+												placeholder='VD: 100 , 1000 , ..'
 											/>
 										</FormGroup>
 										{item.error?.keyValue && (

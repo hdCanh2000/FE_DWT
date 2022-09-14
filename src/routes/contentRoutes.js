@@ -34,8 +34,11 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
-	EMPLOYEE_CONFIG: lazy(() => import('../pages/employee/employeeConfig/positionLevelConfig')),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
+};
+
+const POSITION_LEVEL_CONFIG = {
+	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
 };
 
 const AUTH = {
@@ -45,6 +48,9 @@ const AUTH = {
 
 const KEY = {
 	KEY: lazy(() => import('../pages/key/keyPage')),
+};
+const KPINORM = {
+	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
 };
 
 const presentation = [
@@ -100,12 +106,6 @@ const presentation = [
 		element: <MANAGEMENT.EMPLOYEE />,
 		exact: true,
 	},
-	// trang quản lí cấp nhân sư
-	{
-		path: `${demoPages.hrRecords.subMenu.hrConfig.path}`,
-		element: <MANAGEMENT.EMPLOYEE_CONFIG />,
-		exact: true,
-	},
 	// trang danh sách nhân sự
 	{
 		path: `${demoPages.hrRecords.subMenu.hrList.path}/:id`,
@@ -143,6 +143,17 @@ const presentation = [
 	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,
+		exact: true,
+	},
+	{
+		path: demoPages.cauHinh.subMenu.kpiNorm.path,
+		element: <KPINORM.KPINORM />,
+		exact: true,
+	},
+	// trang quản lí cấp nhân sư
+	{
+		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
+		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
 		exact: true,
 	},
 ];

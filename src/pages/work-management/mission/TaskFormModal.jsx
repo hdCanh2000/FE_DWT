@@ -315,7 +315,6 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		setDepartmentRelatedOption([]);
 		setUserOption({});
 		setUserRelatedOption([]);
-		setKeyOption([]);
 	};
 
 	// close form
@@ -338,7 +337,6 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		setDepartmentRelatedOption([]);
 		setUserRelatedOption([]);
 		setErrors({});
-		setKeyOption([]);
 	};
 	const person = window.localStorage.getItem('name');
 	const handleSubmit = () => {
@@ -679,34 +677,22 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											return (
 												<div
 													// eslint-disable-next-line react/no-array-index-key
-													key={index}
 													className='mt-4 d-flex align-items-center justify-content-between'>
 													<div style={{ width: '45%', marginRight: 10 }}>
 														<FormGroup
 															className='mr-2'
 															id='name'
 															label='Tên chỉ số key'>
-															{/* <Input
-																onChange={(e) =>
-																	handleChangeKeysState(index, e)
-																}
-																value={item?.keyName || ''}
-																name='keyName'
-																required
-																size='lg'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='VD: Doanh thu, đơn hàng, ...'
-															/> */}
 															<Select
-																onChange={(e) =>
-																	handleChangeKeysState(index, e)
-																}
-																value={item?.keyName}
 																name='keyName'
 																required
 																size='lg'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='Chọn chỉ số Key'>
+																placeholder='Chọn chỉ số Key'
+																value={item?.keyName}
+																onChange={(e) =>
+																	handleChangeKeysState(index, e)
+																}>
 																{keyOption.map((key) => (
 																	<Option
 																		key={`${key?.name} (${key?.unit})`}
@@ -737,7 +723,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 																size='lg'
 																required
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
+																placeholder='VD: 100 , 1000 , ..'
 															/>
 														</FormGroup>
 														{item.error?.keyValue && (
