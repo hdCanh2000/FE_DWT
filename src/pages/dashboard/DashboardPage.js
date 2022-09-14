@@ -829,7 +829,7 @@ const DashboardPage = () => {
 								<CardHeader className='py-0'>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
-											Thống kê mục tiêuu
+											Thống kê mục tiêu
 										</CardTitle>
 										<CardSubTitle tag='h5' className='h6'>
 											Báo cáo
