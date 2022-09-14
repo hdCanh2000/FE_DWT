@@ -10,8 +10,9 @@ const validate = Yup.object().shape({
 		.required('Vui lòng nhập tên vị trí'),
 	// dateOfBirth: Yup.string().required('Vui lòng nhập ngày sinh'),
 	// dateOfJoin: Yup.string().required('Vui lòng nhập ngày tham gia'),
+	description: Yup.string().required('Vui lòng nhập mô tả vị trí'),
 	departmentId: Yup.string().required('Vui lòng chọn phòng ban'),
-	position: Yup.number().required('Vui lòng chọn cấp nhân sự'),
+	positionLevelId: Yup.string().required('Vui lòng chọn cấp nhân sự'),
 	// email: Yup.string().email('Email không đúng định dạng').required('Vui lòng nhập email'),
 	// password: Yup.string().required('Vui lòng nhập mật khẩu'),
 	// confirmPassword: Yup.string().when('password', {

@@ -7,10 +7,10 @@ const getAllPositionWithUser = () => {
 	});
 };
 
-const getPositionByIdWithUser = (id) => {
+const getPositionById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/positions/${id}?_embed=users`,
+		url: `/positions/${id}`,
 	});
 };
 
@@ -30,4 +30,4 @@ const updatePosition = (data) => {
 	});
 };
 
-export { getAllPositionWithUser, getPositionByIdWithUser, addPosition, updatePosition };
+export { getAllPositionWithUser, getPositionById, addPosition, updatePosition };

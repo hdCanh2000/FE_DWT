@@ -34,6 +34,7 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
+	POSITION_DETAIL: lazy(() => import('../pages/position/PositionDetailPage')),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
 
@@ -130,6 +131,12 @@ const presentation = [
 	},
 	// cấu hình - configure
 	// cấu hình kpi
+	{
+		path: `${demoPages.hrRecords.subMenu.position.path}/:id`,
+		element: <MANAGEMENT.POSITION_DETAIL />,
+		exact: true,
+	},
+	// Quản lý Keys
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
