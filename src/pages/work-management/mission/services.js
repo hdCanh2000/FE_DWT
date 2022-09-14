@@ -148,7 +148,6 @@ const updateKey = (data) => {
 	});
 };
 
-
 export {
 	addKey,
 	updateKey,

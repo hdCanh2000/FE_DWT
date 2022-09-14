@@ -34,9 +34,16 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
-	EMPLOYEE_CONFIG: lazy(() =>
-		import('../pages/employee/positionLevelConfig/positionLevelConfig'),
-	),
+	POSITION_DETAIL: lazy(() => import('../pages/position/PositionDetailPage')),
+	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
+};
+
+const CHART = {
+	ORGANIZATIONAL: lazy(() => import('../pages/chart/organizational/OrganizationalChartPage')),
+};
+
+const POSITION_LEVEL_CONFIG = {
+	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
 };
 
 const AUTH = {
@@ -51,6 +58,9 @@ const UNIT = {
 	UNIT: lazy(() => import('../pages/unit/unitPage')),
 };
 
+const KPINORM = {
+	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
+};
 
 const presentation = [
 	/**
@@ -105,12 +115,6 @@ const presentation = [
 		element: <MANAGEMENT.EMPLOYEE />,
 		exact: true,
 	},
-	// trang quản lí cấp nhân sư
-	{
-		path: `${demoPages.hrRecords.subMenu.hrConfig.path}`,
-		element: <MANAGEMENT.EMPLOYEE_CONFIG />,
-		exact: true,
-	},
 	// trang danh sách nhân sự
 	{
 		path: `${demoPages.hrRecords.subMenu.hrList.path}/:id`,
@@ -134,6 +138,14 @@ const presentation = [
 		element: <MANAGEMENT.POSITION />,
 	},
 	// Quản lý chỉ số key
+	// cấu hình - configure
+	// cấu hình kpi
+	{
+		path: `${demoPages.hrRecords.subMenu.position.path}/:id`,
+		element: <MANAGEMENT.POSITION_DETAIL />,
+		exact: true,
+	},
+	// Quản lý Keys
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
@@ -143,6 +155,26 @@ const presentation = [
 	{
 		path: demoPages.cauHinh.subMenu.unit.path,
 		element: <UNIT.UNIT />,
+	// cấu hình role & permission
+	},
+	{
+		path: demoPages.cauHinh.subMenu.authorization.path,
+		element: <MANAGEMENT.PERMISSION />,
+	},
+	{
+		path: demoPages.cauHinh.subMenu.kpiNorm.path,
+		element: <KPINORM.KPINORM />,
+		exact: true,
+	},
+	// trang quản lí cấp nhân sư
+	{
+		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
+		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
+		exact: true,
+	},
+	{
+		path: demoPages.companyPage.subMenu.organizational.path,
+		element: <CHART.ORGANIZATIONAL />,
 		exact: true,
 	},
 	{

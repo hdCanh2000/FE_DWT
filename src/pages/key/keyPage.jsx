@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -25,7 +24,7 @@ const KeyPage = () => {
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [ keys, setKeys] = useState([]);
+	const [keys, setKeys] = useState([]);
 	useEffect(() => {
 		async function getKey() {
 			try {
@@ -126,8 +125,8 @@ const KeyPage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data.name,
-			unit: data.unit,
+			name: data?.name,
+			unit: data?.unit,
 			status: Number(data.status),
 		};
 		if (data.id) {

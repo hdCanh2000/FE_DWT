@@ -8,6 +8,37 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 			<thead>
 				<tr>
 					{columns?.map((column) => {
+						if (column?.key === 'action') {
+							return (
+								<th
+									style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
+									key={column.key}
+									className={classNames(
+										column.className,
+										`text-${
+											// eslint-disable-next-line no-nested-ternary
+											column.align === 'right'
+												? 'right'
+												: column.align === 'center'
+												? 'center'
+												: 'left'
+										}`,
+									)}
+									align={
+										// eslint-disable-next-line no-nested-ternary
+										column.align === 'right'
+											? 'right'
+											: column.align === 'center'
+											? 'center'
+											: 'left'
+									}>
+									{column.title}
+								</th>
+							);
+						}
+						if (column?.isShow === false) {
+							return null;
+						}
 						return (
 							<th
 								style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
@@ -43,6 +74,36 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 						<tr key={row.id}>
 							{columns?.map((column) => {
 								const value = row[column.id];
+								if (column?.key === 'action') {
+									if (column.render) {
+										return (
+											<td
+												key={column.key}
+												align={
+													// eslint-disable-next-line no-nested-ternary
+													column.align === 'right'
+														? 'right'
+														: column.align === 'center'
+														? 'center'
+														: 'left'
+												}
+												className={`text-${
+													// eslint-disable-next-line no-nested-ternary
+													column.align === 'right'
+														? 'right'
+														: column.align === 'center'
+														? 'center'
+														: 'left'
+												}`}
+												style={{ fontSize: 14 }}>
+												{column.render(row, value)}
+											</td>
+										);
+									}
+								}
+								if (column?.isShow === false) {
+									return null;
+								}
 								if (column.render) {
 									return (
 										<td
