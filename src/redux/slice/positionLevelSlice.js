@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllPositionLevel } from '../../pages/employee/employeeConfig/services';
+import { getAllPositionLevel } from '../../pages/positionLevelConfig/services';
 
 const initialState = {
 	positionLevels: [],
