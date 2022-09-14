@@ -466,7 +466,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
 										{keysState?.map((item, index) => {
-											console.log(item, keyOption);
 											return (
 												<div
 													// eslint-disable-next-line react/no-array-index-key
@@ -482,14 +481,15 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																required
 																size='lg'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder="Chọn chỉ số Key"
+																placeholder='Chọn chỉ số Key'
 																value={item?.keyName}
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
-																}
-															>
+																}>
 																{keyOption.map((key) => (
-																	<Option key={`${key.name} (${key.unit})`} value={`${key.name} (${key.unit})`}>
+																	<Option
+																		key={`${key.name} (${key.unit})`}
+																		value={`${key.name} (${key.unit})`}>
 																		{`${key?.name} (${key?.unit})`}
 																	</Option>
 																))}

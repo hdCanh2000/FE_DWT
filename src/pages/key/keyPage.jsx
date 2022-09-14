@@ -25,7 +25,7 @@ const KeyPage = () => {
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [ keys, setKeys] = useState([]);
+	const [keys, setKeys] = useState([]);
 	useEffect(() => {
 		async function getKey() {
 			try {
@@ -126,8 +126,8 @@ const KeyPage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data.name,
-			unit: data.unit,
+			name: data?.name,
+			unit: data?.unit,
 			status: Number(data.status),
 		};
 		if (data.id) {

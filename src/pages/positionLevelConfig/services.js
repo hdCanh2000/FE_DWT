@@ -1,4 +1,4 @@
-import axiosClient from '../../../utils/axiosClient';
+import axiosClient from '../../utils/axiosClient';
 
 const getAllPositionLevel = () => {
 	// lấy danh sách quản lí nhân sự
