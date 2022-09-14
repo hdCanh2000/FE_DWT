@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -15,17 +15,21 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { getAllUnits, addUnit, updateUnit } from './services';
+import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
+import { getAllUnits, addUnit, updateUnit, deleteUnit } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
+	const params = useParams();
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [ units, setUnits] = useState([]);
+	const [deletes, setDeletes] = React.useState({});
+	const [openConfirm, set0penConfirm] = React.useState(false);
 	useEffect(() => {
 		async function getUnit() {
 			try {
@@ -38,6 +42,31 @@ const UnitPage = () => {
 		}
 		getUnit();
 	}, []);
+	const handleOpenConfirm = (item) => {
+		setDeletes({
+			id: item.id,
+			name: item.name,
+		});
+		set0penConfirm(true);
+	};
+	const handleCloseDeleteComfirm = () => {
+		setDeletes({});
+		set0penConfirm(false);
+	};
+	async function fetchUnits() {
+		const res = await getAllUnits();
+		setUnits(res.data);
+	};
+	const handleDelete = async (valueDelete) => {
+		console.log(valueDelete);
+		try {
+			await deleteUnit(valueDelete?.id);
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+		}
+		fetchUnits(params?.id);
+	};
 	const columns = [
 		{
 			title: 'Mã đơn vị',
@@ -75,14 +104,14 @@ const UnitPage = () => {
 						icon='Edit'
 						onClick={() => handleOpenActionForm(item)}
 					/>
-					{/* <Button
-						isOutline={!darkModeStatus}
-						color='primary'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => navigate(`/phong-ban/${item.id}`)}
-					/> */}
+					<Button
+							isOutline={!darkModeStatus}
+							color='danger'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2 '
+							icon='Delete'
+							onClick={() => handleOpenConfirm(item)}
+					/>
 				</>
 			),
 			isShow: false,
@@ -210,6 +239,13 @@ const UnitPage = () => {
 					</>,
 					['admin', 'manager'],
 				)}
+				<ComfirmSubtask
+					openModal={openConfirm}
+					onCloseModal={handleCloseDeleteComfirm}
+					onConfirm={() => handleDelete(deletes)}
+					title='Xoá đơn vị'
+					content={`Xác nhận xoá đơn vị <strong>${deletes?.name}</strong> ?`}
+				/>
 			</Page>
 		</PageWrapper>
 	);

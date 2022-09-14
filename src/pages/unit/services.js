@@ -29,5 +29,11 @@ const updateUnit = (data) => {
 		data,
 	});
 };
+const deleteUnit = (id) => {
+	return axiosClient({
+		method: 'DELETE',
+		url: `/deleteUnit/${id}`,
+	});
+};
 
-export { getAllUnits, getUnitByIdWithUser, addUnit, updateUnit };
+export { getAllUnits, getUnitByIdWithUser, addUnit, updateUnit, deleteUnit };
