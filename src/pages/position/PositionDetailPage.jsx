@@ -4,12 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // import { useParams } from 'react-router-dom';
 import { Formik } from 'formik';
 import Button from '../../components/bootstrap/Button';
-import Card, {
-	CardBody,
-	CardHeader,
-	CardLabel,
-	CardTitle,
-} from '../../components/bootstrap/Card';
+import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -20,7 +15,6 @@ import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
-
 
 const PositionDetailPage = () => {
 	// const params = useParams();
@@ -36,8 +30,6 @@ const PositionDetailPage = () => {
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const positions = useSelector((state) => state.position.positions);
-	console.log(positions);
-
 	useEffect(() => {
 		dispatch(fetchPositionList());
 	}, [dispatch]);
@@ -131,7 +123,9 @@ const PositionDetailPage = () => {
 									<Card className='h-100 mb-0'>
 										<CardHeader>
 											<CardLabel icon='Contacts' iconColor='warning'>
-												<CardTitle>Thông tin nhiệm vụ cho từng vị trí</CardTitle>
+												<CardTitle>
+													Thông tin nhiệm vụ cho từng vị trí
+												</CardTitle>
 											</CardLabel>
 										</CardHeader>
 										<div className='p-4'>

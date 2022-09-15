@@ -53,3 +53,10 @@
 	margin-left: 5px;
 	font-weight: normal;
 }
+
+.css-oalq6z:first-of-type::after {
+	border-top-left-radius: 10px !important;
+}
+.css-oalq6z:last-of-type::before {
+	border-top-right-radius: 10px !important;
+}
