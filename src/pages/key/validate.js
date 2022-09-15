@@ -1,22 +1,11 @@
-const validate = (values) => {
-	const errors = {};
-	if (!values.unit) {
-		errors.unit = 'Vui lòng nhập đơn vị đo lường chỉ số key';
-	} else if (typeof values.value === 'number') {
-		errors.unit = 'Đơn vị đo lường chỉ số key không phải là số !';
-	}
-	if (typeof values.value !== 'number') {
-		errors.value = 'Value phải là một số !';
-	}
-	if (!values.name) {
-		errors.name = 'Vui lòng nhập tên key';
-	} else if (values.name.length < 3) {
-		errors.name = 'Tên key tối thiểu 3 ký tự';
-	}
-	if (!values.mission) {
-		errors.mission = 'Vui lòng chọn nhiệm vụ cho chỉ số key';
-	}
-	return errors;
-};
+import * as Yup from 'yup';
+
+const validate = Yup.object().shape({
+	unit: Yup.number().required('Vui lòng chọn đơn vị đo lường chỉ số key'),
+	name: Yup.string()
+		.max(30, 'Tên chỉ số key tối đa 30 kí tự')
+		.min(3, 'Tên chỉ số key tối thiểu 3 kí tự')
+		.required('Vui lòng nhập tên key'),
+});
 
 export default validate;

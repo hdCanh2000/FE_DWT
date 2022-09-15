@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllPositionWithUser } from '../../pages/position/services';
+import { getPositionById } from '../../pages/position/services';
 import { getAllPositions } from '../../pages/work-management/mission/services';
 
 const initialState = {
@@ -14,31 +14,10 @@ export const fetchPositionList = createAsyncThunk('position/fetchList', async ()
 	return response.data;
 });
 
-export const fetchPositionWithUserList = createAsyncThunk(
-	'position/fetchWithUserList',
-	async () => {
-		const response = await getAllPositionWithUser();
-		return response.data;
-	},
-);
-
-// export const fetchDepartmentWithUserList = createAsyncThunk(
-// 	'department/fetchWithUserList',
-// 	async () => {
-// 		const response = await getAllDepartmentWithUser();
-// 		return response.data;
-// 	},
-// );
-
-// export const fetchDepartmentById = createAsyncThunk(
-// 	'department/fetchDepartmentById',
-// 	async (id) => {
-// 		const response = await getDepartmentByIdWithUser(id);
-// 		return response.data;
-// 	},
-// );
-
-// eslint-disable-next-line import/prefer-default-export
+export const fetchPositionById = createAsyncThunk('position/fetchById', async () => {
+	const response = await getPositionById();
+	return response.data;
+});
 
 export const positionSlice = createSlice({
 	name: 'positionSlice',
@@ -57,29 +36,18 @@ export const positionSlice = createSlice({
 			state.loading = false;
 			state.error = action.error;
 		},
-		// fetch list with user
-		[fetchPositionWithUserList.pending]: (state) => {
+
+		// fetch position by id
+		[fetchPositionById.pending]: (state) => {
 			state.loading = true;
 		},
-		[fetchPositionWithUserList.fulfilled]: (state, action) => {
+		[fetchPositionById.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.positions = [...action.payload];
 		},
-		[fetchPositionWithUserList.rejected]: (state, action) => {
+		[fetchPositionById.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
-		// // fetch by id with user
-		// [fetchDepartmentById.pending]: (state) => {
-		// 	state.loading = true;
-		// },
-		// [fetchDepartmentById.fulfilled]: (state, action) => {
-		// 	state.loading = false;
-		// 	state.department = { ...action.payload };
-		// },
-		// [fetchDepartmentById.rejected]: (state, action) => {
-		// 	state.loading = false;
-		// 	state.error = action.error;
-		// },
 	},
 });

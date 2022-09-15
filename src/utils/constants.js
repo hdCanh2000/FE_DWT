@@ -353,34 +353,3 @@ export const formatColorPriority = (priority) => {
 	}
 	return result;
 };
-
-export const formatPosition = (position) => {
-	let result = '';
-	switch (position) {
-		case 1:
-			result = 'Lao động kĩ thuật - NV văn phòng';
-			break;
-		case 2:
-			result = 'Chuyên viên';
-			break;
-		case 3:
-			result = 'Trưởng nhóm';
-			break;
-		case 4:
-			result = 'Trưởng phòng';
-			break;
-		case 5:
-			result = 'QL cấp trung';
-			break;
-		case 6:
-			result = 'QL cấp cao';
-			break;
-		case 7:
-			result = 'Lãnh Đạo';
-			break;
-		default:
-			result = 'Lao Động Phổ Thông';
-			break;
-	}
-	return result;
-};
