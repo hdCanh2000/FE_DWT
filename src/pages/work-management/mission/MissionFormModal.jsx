@@ -4,6 +4,7 @@
 import moment from 'moment';
 import React, { useEffect, useRef, useState, memo } from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Card, {
@@ -33,7 +34,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	const [mission, setMission] = useState({});
 	const [keysState, setKeysState] = useState([]);
-	const [departmentOption, setDepartmentOption] = useState([]);
+	const [departmentOption, setDepartmentOption] = useState({ label: '', value: '' });
+	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
 	const [keyOption, setKeyOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
@@ -67,11 +69,11 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		validateFieldForm('name', mission?.name);
 		validateFieldForm('kpiValue', mission?.kpiValue);
 		validateFieldForm('kpiValue', parseInt(mission?.kpiValue, 10) > 0);
-		validateFieldForm('departmentOption', departmentOption.length);
+		validateFieldForm('departmentOption', departmentOption?.value);
 	};
 
 	const handleClearErrorMsgAfterChange = (name) => {
-		if (mission?.[name] || departmentOption?.length > 0) {
+		if (mission?.[name] || departmentOption?.value) {
 			setErrors((prev) => ({
 				...prev,
 				[name]: { ...prev[name], errorMsg: '' },
@@ -84,19 +86,25 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		handleClearErrorMsgAfterChange('kpiValue');
 		handleClearErrorMsgAfterChange('departmentOption');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mission?.name, mission?.kpiValue, departmentOption?.length]);
+	}, [mission?.name, mission?.kpiValue, departmentOption?.value]);
 
 	useEffect(() => {
 		if (item?.id) {
 			getMissionById(item?.id).then((res) => {
 				setMission(res.data?.data);
 				setKeysState(res.data?.data?.keys);
-				setDepartmentOption(
-					res.data?.data?.departments?.map((department) => {
+				setDepartmentOption({
+					...res.data?.data?.departments?.[0],
+					id: res.data?.data?.departments?.[0].id,
+					label: res.data?.data?.departments?.[0].name,
+					value: res.data?.data?.departments?.[0].id,
+				});
+				setDepartmentRelatedOption(
+					res.data?.data?.departments?.slice(1)?.map((department) => {
 						return {
 							id: department.id,
 							label: department.name,
-							value: department.slug,
+							value: department.id,
 						};
 					}),
 				);
@@ -112,7 +120,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				status: 1,
 			});
 			setKeysState([]);
-			setDepartmentOption([]);
+			setDepartmentOption({});
+			setDepartmentRelatedOption([]);
 		}
 	}, [item?.id]);
 
@@ -224,7 +233,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			status: 0,
 		});
 		setKeysState([]);
-		setDepartmentOption([]);
+		setDepartmentOption({});
+		setDepartmentRelatedOption([]);
 		setErrors({});
 	};
 
@@ -251,16 +261,21 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					keyValue: key.keyValue,
 				};
 			});
-			data.status = 0;
+			data.status = 1;
 			data.kpiValue = parseInt(data.kpiValue, 10);
-			const departmentClone = [...departmentOption];
-			data.departments = departmentClone.map((department) => {
-				return {
-					id: department.id,
-					name: department.label,
-					slug: department.value,
-				};
-			});
+			data.departmentId = departmentOption.id;
+			data.departments = [
+				{
+					id: departmentOption.id,
+					name: departmentOption.label,
+				},
+				...departmentReplatedOption.map((department) => {
+					return {
+						id: department.id,
+						name: department.label,
+					};
+				}),
+			];
 			validateForm();
 			if (!mission?.name) {
 				nameRef.current.focus();
@@ -296,16 +311,21 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					keyValue: key.keyValue,
 				};
 			});
-			data.status = 0;
+			data.status = 1;
 			data.kpiValue = parseInt(data.kpiValue, 10);
-			const departmentClone = [...departmentOption];
-			data.departments = departmentClone.map((department) => {
-				return {
-					id: department.id,
-					name: department.label,
-					slug: department.value,
-				};
-			});
+			data.departmentId = departmentOption.id;
+			data.departments = [
+				{
+					id: departmentOption.id,
+					name: departmentOption.label,
+				},
+				...departmentReplatedOption.map((department) => {
+					return {
+						id: department.id,
+						name: department.label,
+					};
+				}),
+			];
 			validateForm();
 			if (!mission?.name) {
 				nameRef.current.focus();
@@ -320,7 +340,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			}
 			onSubmit(data);
 		}
-
 		setMission({
 			id: null,
 			name: '',
@@ -331,7 +350,8 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			status: 0,
 		});
 		setKeysState([]);
-		setDepartmentOption([]);
+		setDepartmentOption({});
+		setDepartmentRelatedOption([]);
 	};
 
 	return (
@@ -410,21 +430,34 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											className='col-12'
 											id='department'
 											label='Phòng ban phụ trách'>
-											<Select
+											<SelectComponent
 												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
 												onChange={setDepartmentOption}
-												isMulti
 												options={departments}
 												ref={departmentRef}
 											/>
 										</FormGroup>
 										{errors?.departmentOption?.errorMsg && (
-											<ErrorText>
-												Vui lòng chọn phòng ban cho nhiệm vụ
-											</ErrorText>
+											<ErrorText>Vui lòng chọn phòng ban phụ trách</ErrorText>
 										)}
+										<FormGroup
+											className='col-12'
+											id='departmentReplatedOption'
+											label='Phòng ban liên quan'>
+											<SelectComponent
+												placeholder=''
+												defaultValue={departmentReplatedOption}
+												value={departmentReplatedOption}
+												onChange={setDepartmentRelatedOption}
+												options={departments.filter(
+													(department) =>
+														department.id !== departmentOption?.id,
+												)}
+												isMulti
+											/>
+										</FormGroup>
 										<div className='d-flex align-items-center justify-content-between'>
 											<FormGroup
 												className='w-50 mr-2'
@@ -475,11 +508,14 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 														<FormGroup
 															className='mr-2'
 															id='name'
-															label='Tên chỉ số key'>
+															label={`Chỉ số key ${index + 1}`}>
 															<Select
 																name='keyName'
 																required
 																size='lg'
+																ariaLabel={`Chỉ số key ${
+																	index + 1
+																}`}
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='Chọn chỉ số Key'
 																value={item?.keyName}
@@ -514,6 +550,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																name='keyValue'
 																size='lg'
 																required
+																ariaLabel='Giá trị key'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 , 1000 , ..'
 															/>

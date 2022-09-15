@@ -155,8 +155,8 @@ const presentation = [
 	{
 		path: demoPages.cauHinh.subMenu.unit.path,
 		element: <UNIT.UNIT />,
-	// cấu hình role & permission
 	},
+	// cấu hình role & permission
 	{
 		path: demoPages.cauHinh.subMenu.authorization.path,
 		element: <MANAGEMENT.PERMISSION />,
