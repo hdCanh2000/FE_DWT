@@ -10,4 +10,3 @@ const validate = Yup.object().shape({
 });
 
 export default validate;
-

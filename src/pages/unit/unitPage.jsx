@@ -27,7 +27,7 @@ const UnitPage = () => {
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [ units, setUnits] = useState([]);
+	const [units, setUnits] = useState([]);
 	const [deletes, setDeletes] = React.useState({});
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	useEffect(() => {
@@ -56,9 +56,8 @@ const UnitPage = () => {
 	async function fetchUnits() {
 		const res = await getAllUnits();
 		setUnits(res.data);
-	};
+	}
 	const handleDelete = async (valueDelete) => {
-		console.log(valueDelete);
 		try {
 			await deleteUnit(valueDelete?.id);
 			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
@@ -105,12 +104,12 @@ const UnitPage = () => {
 						onClick={() => handleOpenActionForm(item)}
 					/>
 					<Button
-							isOutline={!darkModeStatus}
-							color='danger'
-							isLight={darkModeStatus}
-							className='text-nowrap mx-2 '
-							icon='Delete'
-							onClick={() => handleOpenConfirm(item)}
+						isOutline={!darkModeStatus}
+						color='danger'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2 '
+						icon='Delete'
+						onClick={() => handleOpenConfirm(item)}
 					/>
 				</>
 			),
@@ -175,10 +174,7 @@ const UnitPage = () => {
 				setUnits(newUnits);
 				handleClearValueForm();
 				hanleCloseForm();
-				handleShowToast(
-					`Thêm đơn vị`,
-					`Đơn vị ${result.name} được thêm thành công!`,
-				);
+				handleShowToast(`Thêm đơn vị`, `Đơn vị ${result.name} được thêm thành công!`);
 			} catch (error) {
 				setUnits(units);
 				handleShowToast(`Thêm đơn vị`, `Thêm đơn vị không thành công!`);

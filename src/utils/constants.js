@@ -353,4 +353,3 @@ export const formatColorPriority = (priority) => {
 	}
 	return result;
 };
-
