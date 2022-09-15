@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
+import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -17,27 +18,35 @@ import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addKey, getAllKeys, updateKey } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import { fetchUnitList } from '../../redux/slice/unitSlice';
 
 const KeyPage = () => {
+	const dispatch = useDispatch();
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [keys, setKeys] = useState([]);
+	
+	const units = useSelector((state) => state.unit.units);
+
 	useEffect(() => {
-		async function getKey() {
-			try {
-				const response = await getAllKeys();
-				const data = await response.data;
-				setKeys(data);
-			} catch (error) {
-				setKeys([]);
-			}
+		dispatch(fetchUnitList());
+	}, [dispatch]);
+
+	async function getKey() {
+		try {
+			const response = await getAllKeys();
+			const data = await response.data;
+			setKeys(data);
+		} catch (error) {
+			setKeys([]);
 		}
+	}
+	useEffect(() => {
 		getKey();
 	}, []);
-
 	const columns = [
 		{
 			title: 'Tên chỉ số Key',
@@ -62,11 +71,13 @@ const KeyPage = () => {
 		// },
 		{
 			title: 'Đơn vị',
-			id: 'unit',
-			key: 'unit',
-			type: 'text',
+			id: 'unitId',
+			key: 'unitId',
+			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.unit?.name}</span>,
+			options: units
 		},
 		{
 			title: 'Hành động',
@@ -126,7 +137,7 @@ const KeyPage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			unit: data?.unit,
+			unitId: parseInt(data?.unitId, 10),
 			status: Number(data.status),
 		};
 		if (data.id) {
@@ -137,6 +148,7 @@ const KeyPage = () => {
 				setKeys(newKeys.map((item) => (item.id === data.id ? { ...result } : item)));
 				handleClearValueForm();
 				hanleCloseForm();
+				getKey();
 				handleShowToast(
 					`Cập nhật chỉ số key!`,
 					`Chỉ số key ${result.name} được cập nhật thành công!`,
@@ -154,6 +166,7 @@ const KeyPage = () => {
 				setKeys(newKeys);
 				handleClearValueForm();
 				hanleCloseForm();
+				getKey();
 				handleShowToast(
 					`Thêm chỉ số key`,
 					`Chỉ số key ${result.name} được thêm thành công!`,

@@ -3,7 +3,7 @@ import axiosClient from '../../utils/axiosClient';
 const getAllKeys = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/keys',
+		url: '/keys?_expand=unit',
 	});
 };
 
