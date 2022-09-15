@@ -53,7 +53,6 @@ import MissionFormModal from './MissionFormModal';
 import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
 import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
-import Popovers from '../../../components/bootstrap/Popovers';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
@@ -532,6 +531,7 @@ const MissionDetailPage = () => {
 			try {
 				const response = await updateMissionById(data);
 				const result = await response.data;
+				dispatch(fetchMissionById(id));
 				handleClearValueForm();
 				handleCloseEditMissionForm();
 				handleShowToast(
@@ -818,21 +818,13 @@ const MissionDetailPage = () => {
 										icon: 'Pen',
 										color: 'primary',
 										children: (
-											<Popovers
-												desc={mission?.data?.description}
-												trigger='hover'>
-												<div
-													className='fs-5'
-													style={{
-														WebkitLineClamp: '2',
-														overflow: 'hidden',
-														textOverflow: 'ellipsis',
-														display: '-webkit-box',
-														WebkitBoxOrient: 'vertical',
-													}}>
-													{mission?.data?.description}
-												</div>
-											</Popovers>
+											<p
+												className='fs-5'
+												// eslint-disable-next-line react/no-danger
+												dangerouslySetInnerHTML={{
+													__html: mission?.data?.description,
+												}}
+											/>
 										),
 									},
 									{
@@ -879,8 +871,10 @@ const MissionDetailPage = () => {
 												<div className='fw-bold fs-5 mb-1'>
 													{key?.keyName}
 												</div>
-												<div className='mt-n2' style={{ fontSize: 14 }}>
-													{key?.keyValue}
+												<div
+													className='mt-n2 fs-5'
+													style={{ fontSize: 14 }}>
+													{`${key?.keyType} ${key?.keyValue}`}
 												</div>
 											</div>
 										),

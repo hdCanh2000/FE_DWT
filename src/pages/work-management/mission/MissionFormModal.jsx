@@ -151,7 +151,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		if (keysState.length === 0) {
 			return true;
 		}
-		const someEmpty = keysState.some((key) => key.keyName === '' || key.keyValue === '');
+		const someEmpty = keysState.some(
+			(key) => key.keyName === '' || key.keyValue === '' || key.keyType === '',
+		);
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
@@ -162,6 +164,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				}
 				if (keysState[index].keyValue === '') {
 					allPrev[index].error.keyValue = 'Nhập giá trị key!';
+				}
+				if (keysState[index].keyType === '') {
+					allPrev[index].error.keyType = 'Nhập loại key!';
 				}
 				setKeysState(allPrev);
 			});
@@ -175,12 +180,14 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		const initKeyState = {
 			keyName: '',
 			keyValue: '',
+			keyType: '',
 			error: {
 				keyName: null,
 				keyValue: null,
+				keyType: null,
 			},
 		};
-		if (prevIsValid() && keysState?.length <= 3) {
+		if (prevIsValid()) {
 			setKeysState((prev) => [...prev, initKeyState]);
 		}
 	};
@@ -259,6 +266,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				return {
 					keyName: key.keyName,
 					keyValue: key.keyValue,
+					keyType: key.keyType,
 				};
 			});
 			data.status = 1;
@@ -309,6 +317,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				return {
 					keyName: key.keyName,
 					keyValue: key.keyValue,
+					keyType: key.keyType,
 				};
 			});
 			data.status = 1;
@@ -504,7 +513,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													// eslint-disable-next-line react/no-array-index-key
 													key={index}
 													className='mt-4 d-flex align-items-center justify-content-between'>
-													<div style={{ width: '45%', marginRight: 10 }}>
+													<div style={{ width: '40%', marginRight: 5 }}>
 														<FormGroup
 															className='mr-2'
 															id='name'
@@ -537,7 +546,31 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 															</ErrorText>
 														)}
 													</div>
-													<div style={{ width: '45%', marginLeft: 10 }}>
+													<div style={{ width: '15%' }}>
+														<FormGroup
+															className='ml-2'
+															id='type'
+															label='So sánh'>
+															<Input
+																onChange={(e) =>
+																	handleChangeKeysState(index, e)
+																}
+																value={item?.keyType || ''}
+																name='keyType'
+																size='lg'
+																required
+																ariaLabel='So sánh'
+																className='border border-2 rounded-0 shadow-none'
+																placeholder='> = <'
+															/>
+														</FormGroup>
+														{item.error?.keyType && (
+															<ErrorText>
+																{item.error?.keyType}
+															</ErrorText>
+														)}
+													</div>
+													<div style={{ width: '30%', marginLeft: 5 }}>
 														<FormGroup
 															className='ml-2'
 															id='name'
