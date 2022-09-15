@@ -146,6 +146,7 @@ const MissionPage = () => {
 	const taskReport = useSelector((state) => state.task?.taskReport);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+
 	const navigateToDetailPage = useCallback(
 		(page) => navigate(`${demoPages.jobsPage.subMenu.target.path}/${page}`),
 		[navigate],

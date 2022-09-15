@@ -1,8 +1,7 @@
 import * as Yup from 'yup';
 
 const validate = Yup.object().shape({
-	unit: Yup.number()
-		.required('Vui lòng chọn đơn vị đo lường chỉ số key'),
+	unit: Yup.number().required('Vui lòng chọn đơn vị đo lường chỉ số key'),
 	name: Yup.string()
 		.max(30, 'Tên chỉ số key tối đa 30 kí tự')
 		.min(3, 'Tên chỉ số key tối thiểu 3 kí tự')
@@ -10,4 +9,3 @@ const validate = Yup.object().shape({
 });
 
 export default validate;
-
