@@ -1,15 +1,16 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllKpiNorm = () => {
+const getAllKpiNorm = (params) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/kpiNorm`,
+		url: `/kpiNorms?_expand=department`,
+		params,
 	});
 };
 const addKpiNorm = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/kpiNorm`,
+		url: `/kpiNorms`,
 		data,
 	});
 };
@@ -23,7 +24,7 @@ const updateKpiNorm = (data) => {
 const deleteKpiNorm = (id) => {
 	return axiosClient({
 		method: 'DELETE',
-		url: `/kpiNorm/${id}`,
+		url: `/kpiNorms/${id}`,
 	});
 };
 export { getAllKpiNorm, addKpiNorm, updateKpiNorm, deleteKpiNorm };

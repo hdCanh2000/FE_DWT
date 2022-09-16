@@ -10,8 +10,30 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () => {
 	const response = await getAllKpiNorm();
-	return response.data;
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+		};
+	});
 });
+
+export const fetchKpiNormListByDepartment = createAsyncThunk(
+	'kpiNorm/fetchListByDepartment',
+	async (departmentId) => {
+		const response = await getAllKpiNorm({ departmentId });
+		return response.data.map((item) => {
+			return {
+				...item,
+				label: item.name,
+				value: item.id,
+				text: item.name,
+			};
+		});
+	},
+);
 
 export const onAddKpiNorm = createAsyncThunk('kpiNorm/addNew', async (data) => {
 	const response = await addKpiNorm(data);
@@ -38,6 +60,18 @@ export const kpiNormSlice = createSlice({
 			state.kpiNorms = [...action.payload];
 		},
 		[fetchKpiNormList.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list
+		[fetchKpiNormListByDepartment.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchKpiNormListByDepartment.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.kpiNorms = [...action.payload];
+		},
+		[fetchKpiNormListByDepartment.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},

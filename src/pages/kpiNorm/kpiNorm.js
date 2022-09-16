@@ -76,7 +76,7 @@ const EmployeePage = () => {
 			type: 'select',
 			align: 'center',
 			isShow: true,
-			render: (item) => <span>{item?.department?.label || ''}</span>,
+			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
 			isMulti: false,
 		},
@@ -159,9 +159,9 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			departmentId: data?.department?.id,
+			departmentId: parseInt(data?.department?.id, 10),
 			department: data?.department,
-			parentId: data?.parent?.id,
+			parentId: parseInt(data?.parent?.id, 10),
 			parent: data?.parent,
 			unit: data?.unit,
 			point: data?.point,
@@ -274,7 +274,7 @@ const EmployeePage = () => {
 															<td
 																className='cursor-pointer'
 																align='center'>
-																{item?.department?.label}
+																{item?.department?.name}
 															</td>
 															<td
 																className='cursor-pointer'

@@ -5,6 +5,7 @@ import { missionSlice } from '../slice/missionSlice';
 import { taskSlice } from '../slice/taskSlice';
 import { kpiNormSlice } from '../slice/kpiNormSlice';
 import { positionLevelSlice } from '../slice/positionLevelSlice';
+import { keySlice } from '../slice/keySlice';
 
 const rootReducer = combineReducers({
 	employee: employeeSlice,
@@ -13,7 +14,7 @@ const rootReducer = combineReducers({
 	toggleForm: toggleFormSlice,
 	kpiNorm: kpiNormSlice,
 	positionLevel: positionLevelSlice,
-
+	key: keySlice,
 });
 
 export default rootReducer;
