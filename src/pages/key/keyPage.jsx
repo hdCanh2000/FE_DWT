@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
+import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -14,30 +15,59 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addKey, getAllKeys, updateKey } from './services';
+import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
+import { addKey, getAllKeys, updateKey, deleteKey } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import { fetchUnitList } from '../../redux/slice/unitSlice';
 
 const KeyPage = () => {
+	const dispatch = useDispatch();
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [keys, setKeys] = useState([]);
+	const [deletes, setDeletes] = React.useState({});
+	const [openConfirm, set0penConfirm] = React.useState(false);
+	const units = useSelector((state) => state.unit.units);
+
 	useEffect(() => {
-		async function getKey() {
-			try {
-				const response = await getAllKeys();
-				const data = await response.data;
-				setKeys(data);
-			} catch (error) {
-				setKeys([]);
-			}
+		dispatch(fetchUnitList());
+	}, [dispatch]);
+	const handleOpenConfirm = (item) => {
+		setDeletes({
+			id: item.id,
+			name: item.name,
+		});
+		set0penConfirm(true);
+	};
+	const handleCloseDeleteComfirm = () => {
+		setDeletes({});
+		set0penConfirm(false);
+	};
+	async function getKey() {
+		try {
+			const response = await getAllKeys();
+			const data = await response.data;
+			setKeys(data);
+		} catch (error) {
+			setKeys([]);
+		}
+	}
+	const handleDelete = async (valueDelete) => {
+		try {
+			await deleteKey(valueDelete?.id);
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
 		}
 		getKey();
+	};
+	useEffect(() => {
+		getKey();
 	}, []);
-
 	const columns = [
 		{
 			title: 'Tên chỉ số Key',
@@ -62,11 +92,13 @@ const KeyPage = () => {
 		// },
 		{
 			title: 'Đơn vị',
-			id: 'unit',
-			key: 'unit',
-			type: 'text',
+			id: 'unitId',
+			key: 'unitId',
+			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.unit?.name}</span>,
+			options: units,
 		},
 		{
 			title: 'Hành động',
@@ -83,14 +115,14 @@ const KeyPage = () => {
 						icon='Edit'
 						onClick={() => handleOpenActionForm(item)}
 					/>
-					{/* <Button
+					<Button
 						isOutline={!darkModeStatus}
-						color='primary'
+						color='danger'
 						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => navigate(`/phong-ban/${item.id}`)}
-					/> */}
+						className='text-nowrap mx-2 '
+						icon='Delete'
+						onClick={() => handleOpenConfirm(item)}
+					/>
 				</>
 			),
 			isShow: false,
@@ -126,7 +158,7 @@ const KeyPage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			unit: data?.unit,
+			unitId: parseInt(data?.unitId, 10),
 			status: Number(data.status),
 		};
 		if (data.id) {
@@ -137,6 +169,7 @@ const KeyPage = () => {
 				setKeys(newKeys.map((item) => (item.id === data.id ? { ...result } : item)));
 				handleClearValueForm();
 				hanleCloseForm();
+				getKey();
 				handleShowToast(
 					`Cập nhật chỉ số key!`,
 					`Chỉ số key ${result.name} được cập nhật thành công!`,
@@ -154,6 +187,7 @@ const KeyPage = () => {
 				setKeys(newKeys);
 				handleClearValueForm();
 				hanleCloseForm();
+				getKey();
 				handleShowToast(
 					`Thêm chỉ số key`,
 					`Chỉ số key ${result.name} được thêm thành công!`,
@@ -218,6 +252,13 @@ const KeyPage = () => {
 					</>,
 					['admin', 'manager'],
 				)}
+				<ComfirmSubtask
+					openModal={openConfirm}
+					onCloseModal={handleCloseDeleteComfirm}
+					onConfirm={() => handleDelete(deletes)}
+					title='Xoá chỉ số key'
+					content={`Xác nhận xoá chỉ số key <strong>${deletes?.name}</strong> ?`}
+				/>
 			</Page>
 		</PageWrapper>
 	);

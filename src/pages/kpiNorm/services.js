@@ -17,7 +17,7 @@ const addKpiNorm = (data) => {
 const updateKpiNorm = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/kpiNorm/${data.id}`,
+		url: `/kpiNorms/${data.id}`,
 		data,
 	});
 };
