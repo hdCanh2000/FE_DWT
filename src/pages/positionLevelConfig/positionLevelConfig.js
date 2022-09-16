@@ -94,6 +94,12 @@ const KeyPage = () => {
 		);
 	};
 	const handleSubmitForm = async (itemSubmit) => {
+		// const itemSubmit = {
+		// 	id: items?.id,
+		// 	code: items?.value,
+		// 	label: items?.label,
+		// }
+		console.log(itemSubmit,'itemSubmit');
 		if (!itemSubmit.id) {
 			const reponse = await addPositionLevel(itemSubmit);
 			const result = reponse.data;

@@ -167,7 +167,7 @@ const EmployeePage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: data?.id,
+			id: parseInt(data?.id, 10),
 			name: data?.name,
 			departmentId: data?.department?.value,
 			parentId: data?.parent?.value,
@@ -198,7 +198,7 @@ const EmployeePage = () => {
 				handleCloseForm();
 				handleShowToast(
 					`Thêm định mức KPI`,
-					`Định mức KPI ${result?.user?.name} được thêm thành công!`,
+					`Định mức KPI ${result?.name} được thêm thành công!`,
 				);
 			} catch (error) {
 				handleShowToast(`Thêm định mức KPI`, `Thêm định mức KPI không thành công!`);
