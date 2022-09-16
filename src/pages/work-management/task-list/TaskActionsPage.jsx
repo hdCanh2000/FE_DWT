@@ -20,7 +20,7 @@ import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormListByDepartment } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
@@ -125,10 +125,6 @@ const TaskActionsPage = () => {
 	}, [params?.id]);
 
 	useEffect(() => {
-		dispatch(fetchMissionList());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
 
@@ -145,7 +141,12 @@ const TaskActionsPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(fetchKpiNormListByDepartment(parseInt(departmentOption.value, 10)));
+		dispatch(
+			fetchKpiNormListByParams({
+				departmentId: parseInt(departmentOption.value, 10),
+				parentId: 'null',
+			}),
+		);
 	}, [departmentOption.value, dispatch]);
 
 	// show toast

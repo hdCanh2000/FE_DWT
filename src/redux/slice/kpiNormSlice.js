@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllKpiNorm, addKpiNorm, updateKpiNorm } from '../../pages/kpiNorm/services';
+import {
+	getAllKpiNorm,
+	addKpiNorm,
+	updateKpiNorm,
+	fetchAllKpiNorms,
+} from '../../pages/kpiNorm/services';
 
 const initialState = {
 	kpiNorms: [],
@@ -20,10 +25,10 @@ export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () =
 	});
 });
 
-export const fetchKpiNormListByDepartment = createAsyncThunk(
-	'kpiNorm/fetchListByDepartment',
-	async (departmentId) => {
-		const response = await getAllKpiNorm({ departmentId });
+export const fetchKpiNormListByParams = createAsyncThunk(
+	'kpiNorm/fetchKpiNormListByParams',
+	async (params) => {
+		const response = await fetchAllKpiNorms(params);
 		return response.data.map((item) => {
 			return {
 				...item,
@@ -64,14 +69,14 @@ export const kpiNormSlice = createSlice({
 			state.error = action.error;
 		},
 		// fetch list
-		[fetchKpiNormListByDepartment.pending]: (state) => {
+		[fetchKpiNormListByParams.pending]: (state) => {
 			state.loading = true;
 		},
-		[fetchKpiNormListByDepartment.fulfilled]: (state, action) => {
+		[fetchKpiNormListByParams.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.kpiNorms = [...action.payload];
 		},
-		[fetchKpiNormListByDepartment.rejected]: (state, action) => {
+		[fetchKpiNormListByParams.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
