@@ -25,7 +25,6 @@ const CommonForm = ({
 	const formik = useFormik({
 		initialValues: { ...item },
 		enableReinitialize: true,
-		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
 			handleSubmit(values);
 			resetForm();
