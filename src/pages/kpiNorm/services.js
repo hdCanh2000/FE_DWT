@@ -1,9 +1,10 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllKpiNorm = () => {
+const getAllKpiNorm = (params) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/kpiNorms`,
+		url: `/kpiNorms?_expand=department`,
+		params,
 	});
 };
 const addKpiNorm = (data) => {

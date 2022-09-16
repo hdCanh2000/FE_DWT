@@ -16,6 +16,8 @@ const TASK = {
 		import('../pages/work-management/task-management/TaskManagementPage'),
 	),
 	TASKDETAIL: lazy(() => import('../pages/work-management/TaskDetail/TaskDetailPage')),
+	ADD_OR_UPDATE_TASK: lazy(() => import('../pages/work-management/task-list/TaskActionsPage')),
+	ADD_NEW_TASK: lazy(() => import('../pages/work-management/task-list/AddTaskPage')),
 	TASKLIST: lazy(() => import('../pages/work-management/task-list/TaskListPage')),
 	SUBTASK: lazy(() => import('../pages/work-management/subtask/SubTaskPage')),
 	TASKLISTDEPARTMENT: lazy(() =>
@@ -95,6 +97,18 @@ const presentation = [
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/:id`,
 		element: <TASK.TASKDETAIL />,
+		exact: true,
+	},
+	// trang thêm mới công việc (nhiệm vụ)
+	{
+		path: `${demoPages.jobsPage.subMenu.mission.path}/them-moi`,
+		element: <TASK.ADD_OR_UPDATE_TASK />,
+		exact: true,
+	},
+	// trang cập nhật công việc (nhiệm vụ)
+	{
+		path: `${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/:id`,
+		element: <TASK.ADD_OR_UPDATE_TASK />,
 		exact: true,
 	},
 	// trang danh sách đầu việc
