@@ -29,5 +29,12 @@ const updateKey = (data) => {
 		data,
 	});
 };
+const deleteKey = (id) => {
+	return axiosClient({
+		method: 'DELETE',
+		url: `/keys/${id}`,
+	});
+};
 
-export { getAllKeys, getKeyByIdWithUser, addKey, updateKey };
+
+export { getAllKeys, getKeyByIdWithUser, addKey, updateKey, deleteKey };

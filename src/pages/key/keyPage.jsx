@@ -15,7 +15,8 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addKey, getAllKeys, updateKey } from './services';
+import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
+import { addKey, getAllKeys, updateKey, deleteKey } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
@@ -28,13 +29,24 @@ const KeyPage = () => {
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [keys, setKeys] = useState([]);
-	
+	const [deletes, setDeletes] = React.useState({});
+	const [openConfirm, set0penConfirm] = React.useState(false);
 	const units = useSelector((state) => state.unit.units);
 
 	useEffect(() => {
 		dispatch(fetchUnitList());
 	}, [dispatch]);
-
+	const handleOpenConfirm = (item) => {
+		setDeletes({
+			id: item.id,
+			name: item.name,
+		});
+		set0penConfirm(true);
+	};
+	const handleCloseDeleteComfirm = () => {
+		setDeletes({});
+		set0penConfirm(false);
+	};
 	async function getKey() {
 		try {
 			const response = await getAllKeys();
@@ -44,6 +56,15 @@ const KeyPage = () => {
 			setKeys([]);
 		}
 	}
+	const handleDelete = async (valueDelete) => {
+		try {
+			await deleteKey(valueDelete?.id);
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+		}
+		getKey();
+	};
 	useEffect(() => {
 		getKey();
 	}, []);
@@ -94,14 +115,14 @@ const KeyPage = () => {
 						icon='Edit'
 						onClick={() => handleOpenActionForm(item)}
 					/>
-					{/* <Button
+					<Button
 						isOutline={!darkModeStatus}
-						color='primary'
+						color='danger'
 						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => navigate(`/phong-ban/${item.id}`)}
-					/> */}
+						className='text-nowrap mx-2 '
+						icon='Delete'
+						onClick={() => handleOpenConfirm(item)}
+					/>
 				</>
 			),
 			isShow: false,
@@ -231,6 +252,13 @@ const KeyPage = () => {
 					</>,
 					['admin', 'manager'],
 				)}
+				<ComfirmSubtask
+					openModal={openConfirm}
+					onCloseModal={handleCloseDeleteComfirm}
+					onConfirm={() => handleDelete(deletes)}
+					title='Xoá chỉ số key'
+					content={`Xác nhận xoá chỉ số key <strong>${deletes?.name}</strong> ?`}
+				/>
 			</Page>
 		</PageWrapper>
 	);
