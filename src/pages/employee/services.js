@@ -4,14 +4,14 @@ const getAllEmployee = () => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
-		url: `/users?_expand=department`,
+		url: `/users?_expand=departments`,
 	});
 };
 
 const getUserById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/users/${id}?_expand=department`,
+		url: `/users/${id}?_expand=departments`,
 	});
 };
 

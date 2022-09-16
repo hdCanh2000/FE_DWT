@@ -231,9 +231,9 @@ const EmployeePage = () => {
 		setOpenDetail(false);
 		setDataDetail({});
 	};
-	const handleDeleteKpiNorm = (item) => {
+	const handleDeleteKpiNorm = async (item) => {
 		try {
-			deleteKpiNorm(item);
+			await deleteKpiNorm(item);
 			dispatch(fetchKpiNormList());
 			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI thành công!`);
 		} catch (error) {
@@ -255,17 +255,37 @@ const EmployeePage = () => {
 	};
 	const handleOpenForm = (item) => {
 		setOpenForm(true);
-		setItemEdit({
-			...item,
-			department: {
-				label: showDepartment(item?.departmentId),
-				value: item?.departmentId,
-			},
-			parent: {
-				label: showParent(item?.parentId),
-				value: item?.parent,
-			},
-		});
+		if (item?.departmentId && item?.parentId) {
+			setItemEdit({
+				...item,
+				department: {
+					label: showDepartment(item?.departmentId),
+					value: item?.departmentId,
+				},
+				parent: {
+					label: showParent(item?.parentId),
+					value: item?.parent,
+				},
+			});
+		}
+		if (item?.departmentId && !item?.parentId) {
+			setItemEdit({
+				...item,
+				department: {
+					label: showDepartment(item?.departmentId),
+					value: item?.departmentId,
+				},
+			});
+		}
+		if (!item?.departmentId && item?.parentId) {
+			setItemEdit({
+				...item,
+				department: {
+					label: showDepartment(item?.departmentId),
+					value: item?.departmentId,
+				},
+			});
+		}
 	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>

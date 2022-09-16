@@ -99,7 +99,6 @@ const KeyPage = () => {
 		// 	code: items?.value,
 		// 	label: items?.label,
 		// }
-		console.log(itemSubmit,'itemSubmit');
 		if (!itemSubmit.id) {
 			const reponse = await addPositionLevel(itemSubmit);
 			const result = reponse.data;
@@ -124,9 +123,9 @@ const KeyPage = () => {
 	const handleCloseDelete = () => {
 		setIsDelete(false);
 	};
-	const handleDeletePositionLevel = (item) => {
+	const handleDeletePositionLevel = async (item) => {
 		try {
-			deletePositionLevel(item);
+			await deletePositionLevel(item);
 			dispatch(fetchPositionLevelList());
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự thành công!`);
 		} catch (error) {

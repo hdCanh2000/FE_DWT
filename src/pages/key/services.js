@@ -36,5 +36,4 @@ const deleteKey = (id) => {
 	});
 };
 
-
 export { getAllKeys, getKeyByIdWithUser, addKey, updateKey, deleteKey };
