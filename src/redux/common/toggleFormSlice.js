@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
 	open: false,
+	openDetail: false,
 	confirm: false,
 	data: {},
 };
@@ -19,6 +20,12 @@ export const toggleFormSlice = createSlice({
 				...action.payload,
 			};
 		},
+		openDetail: (state, action) => {
+			state.data = {
+				...state.data,
+				...action.payload,
+			};
+		},
 		confirmForm: (state, action) => {
 			state.open = false;
 			state.confirm = true;
@@ -30,6 +37,9 @@ export const toggleFormSlice = createSlice({
 		closeForm: (state) => {
 			state.open = false;
 			state.confirm = false;
+			state.data = {};
+		},
+		closeDetail: (state) => {
 			state.data = {};
 		},
 		// openFormCloseMission: (state) => {
