@@ -22,21 +22,33 @@ import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import KpiNormDetail from './kpiNormDetail';
+import { getAllKeys } from '../key/services';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
-	// const toggleForm = useSelector((state) => state.toggleForm.open);
-	// const itemEdit = useSelector((state) => state.toggleForm.data);
-	// const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	// const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const departments = useSelector((state) => state.department.departments);
 	const [openDetail, setOpenDetail] = useState(false);
 	const [dataDetail, setDataDetail] = useState(false);
 	const [openForm, setOpenForm] = React.useState(false);
 	const [itemEdit, setItemEdit] = React.useState({});
+	const [units, setUnit] = React.useState([]);
+
+	useEffect(() => {
+		const fecthKey = async () => {
+			const reponse = await getAllKeys();
+			const result = reponse.data.map((item) => {
+				return {
+					label: item.name,
+					value: item.id,
+				};
+			});
+			setUnit(result);
+		};
+		fecthKey();
+	}, []);
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
@@ -86,9 +98,12 @@ const EmployeePage = () => {
 			title: 'Đơn vị',
 			id: 'unit',
 			key: 'unit',
-			type: 'string',
+			type: 'select',
 			align: 'center',
+			options: units,
 			isShow: true,
+			render: (item) => <span>{showUnit(item?.unitId) || ''}</span>,
+			isMulti: false,
 		},
 		{
 			title: 'Điểm KPI trên 1 đơn vị',
@@ -169,14 +184,15 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			departmentId: parseInt(data?.department?.id, 10),
-			department: data?.department,
-			parentId: parseInt(data?.parent?.id, 10),
-			parent: data?.parent,
-			unit: data?.unit,
+			departmentId: data?.department?.value,
+			parentId: data?.parent?.value,
 			point: data?.point,
 			description: data?.description,
 			evaluationDescription: data?.evaluationDescription,
+			unitId: data?.unit?.value,
+			parent: data?.parent,
+			department: data?.department,
+			unit: data?.unit,
 		};
 		if (data?.id) {
 			try {
@@ -251,43 +267,17 @@ const EmployeePage = () => {
 		const newParent = kpiNorm.filter((item) => item?.id === idParent);
 		return newParent[0]?.name;
 	};
+	const showUnit = (idUnit) => {
+		const newUnit = units.filter((item) => item?.value === idUnit);
+		return newUnit[0]?.label;
+	};
 	const handleCloseForm = () => {
 		setOpenForm(false);
 		setItemEdit({});
 	};
 	const handleOpenForm = (item) => {
 		setOpenForm(true);
-		if (item?.departmentId && item?.parentId) {
-			setItemEdit({
-				...item,
-				department: {
-					label: showDepartment(item?.departmentId),
-					value: item?.departmentId,
-				},
-				parent: {
-					label: showParent(item?.parentId),
-					value: item?.parent,
-				},
-			});
-		}
-		if (item?.departmentId && !item?.parentId) {
-			setItemEdit({
-				...item,
-				department: {
-					label: showDepartment(item?.departmentId),
-					value: item?.departmentId,
-				},
-			});
-		}
-		if (!item?.departmentId && item?.parentId) {
-			setItemEdit({
-				...item,
-				department: {
-					label: showDepartment(item?.departmentId),
-					value: item?.departmentId,
-				},
-			});
-		}
+		setItemEdit(item)
 	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
@@ -348,12 +338,12 @@ const EmployeePage = () => {
 															<td
 																className='cursor-pointer'
 																align='center'>
-																{item?.department?.name}
+																{showDepartment(item?.departmentId)}
 															</td>
 															<td
 																className='cursor-pointer'
 																align='center'>
-																{item?.unit}
+																{showUnit(item?.unitId)}
 															</td>
 															<td
 																className='cursor-pointer'
