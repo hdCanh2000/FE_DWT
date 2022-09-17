@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllPositionLevel } from '../../pages/employee/employeeConfig/services';
+import { getAllPositionLevel } from '../../pages/positionLevelConfig/services';
 
 const initialState = {
 	positionLevels: [],
@@ -11,6 +11,7 @@ export const fetchPositionLevelList = createAsyncThunk('positionLevel/fetchLevel
 	const response = await getAllPositionLevel();
 	return response.data?.map((positionLevel) => {
 		return {
+			...positionLevel,
 			id: positionLevel?.id,
 			value: positionLevel?.id,
 			label: positionLevel?.name,

@@ -466,6 +466,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
 										{keysState?.map((item, index) => {
+											console.log(item);
 											return (
 												<div
 													// eslint-disable-next-line react/no-array-index-key
@@ -488,7 +489,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																}>
 																{keyOption.map((key) => (
 																	<Option
-																		key={`${key.name} (${key.unit})`}
+																		key={`(${key.name} (${key.unit})`}
 																		value={`${key.name} (${key.unit})`}>
 																		{`${key?.name} (${key?.unit})`}
 																	</Option>

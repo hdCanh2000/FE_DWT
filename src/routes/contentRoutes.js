@@ -148,11 +148,6 @@ const presentation = [
 		element: <MANAGEMENT.PERMISSION />,
 	},
 	{
-		path: '*',
-		element: <AUTH.PAGE_404 />,
-		exact: true,
-	},
-	{
 		path: demoPages.cauHinh.subMenu.kpiNorm.path,
 		element: <KPINORM.KPINORM />,
 		exact: true,
@@ -163,6 +158,11 @@ const presentation = [
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
 		exact: true,
 	},
+	{
+		path: '*',
+		element: <AUTH.PAGE_404 />,
+		exact: true,
+	}
 ];
 
 const documentation = [

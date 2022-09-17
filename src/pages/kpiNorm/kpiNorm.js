@@ -21,7 +21,7 @@ import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
-import validate from './validate';
+// import validate from './validate';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -71,12 +71,12 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Phòng ban',
-			id: 'department',
-			key: 'department',
-			type: 'select',
+			id: 'departmentId',
+			key: 'departmentId',
+			type: 'singleSelect',
 			align: 'center',
 			isShow: true,
-			render: (item) => <span>{item?.department?.label || ''}</span>,
+			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
 			isMulti: false,
 		},
@@ -100,7 +100,7 @@ const EmployeePage = () => {
 			title: 'Nhiệm vụ cha',
 			id: 'parent',
 			key: 'parent',
-			type: 'select',
+			type: 'singleSelect',
 			align: 'center',
 			render: (item) => (
 				<span>{item?.parent?.label === '' ? 'không' : item?.parent?.label}</span>
@@ -159,8 +159,8 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			departmentId: data?.department?.id,
-			department: data?.department,
+			departmentId: data?.departmentId?.id,
+			// department: data?.department,
 			parentId: data?.parent?.id,
 			parent: data?.parent,
 			unit: data?.unit,
@@ -215,7 +215,7 @@ const EmployeePage = () => {
 		handleCloseDelete();
 	};
 	return (
-		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
+		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='row mb-4'>
@@ -328,7 +328,7 @@ const EmployeePage = () => {
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật định mức KPI' : 'Thêm mới định mức KPI'}
 					fields={columns}
-					validate={validate}
+					// validate={validate}
 				/>
 				<TaskAlertConfirm
 					openModal={isDelete}

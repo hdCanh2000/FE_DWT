@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { useToasts } from 'react-toast-notifications';
-// import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Formik } from 'formik';
 import Button from '../../components/bootstrap/Button';
 import Card, {
@@ -13,17 +13,29 @@ import Card, {
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
+import Select from '../../components/bootstrap/forms/Select';
+import Icon from '../../components/icon/Icon';
+import Option from '../../components/bootstrap/Option';
+import FormGroup from '../../components/bootstrap/forms/FormGroup';
+import styled from '../../components/bootstrap/Button';
 // import Toasts from '../../components/bootstrap/Toasts';
-import CommonForm from '../common/ComponentCommon/CommonForm';
+// import CommonForm from '../common/ComponentCommon/CommonForm';
 // import validate from './validate';
 import SubHeaderCommon from '../common/SubHeaders/SubHeaderCommon';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchPositionList } from '../../redux/slice/positionSlice';
+// import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import { fetchPositionById } from '../../redux/slice/positionSlice';
+import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
+import { getAllKpiNorm } from '../kpiNorm/services';
 
+const ErrorText = styled.span`
+	font-size: 14px;
+	color: #e22828;
+	margin-top: 5px;
+`;
 
 const PositionDetailPage = () => {
-	// const params = useParams();
+	const params = useParams();
 	// const { addToast } = useToasts();
 	const TABS = {
 		INFOR: 'Thông tin',
@@ -31,18 +43,94 @@ const PositionDetailPage = () => {
 	};
 
 	const [activeTab, setActiveTab] = useState(TABS.INFOR);
+	const [keysState, setKeysState] = useState([]);
+	const [keyOption, setKeyOption] = useState([]);
 
 	const dispatch = useDispatch();
-	const toggleForm = useSelector((state) => state.toggleForm.open);
-	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const positions = useSelector((state) => state.position.positions);
-	console.log(positions);
+	// const toggleForm = useSelector((state) => state.toggleForm.open);
+	// const itemEdit = useSelector((state) => state.toggleForm.data);
+	const position = useSelector((state) => state.position.position);
+	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+
 
 	useEffect(() => {
-		dispatch(fetchPositionList());
+		dispatch(fetchPositionById(params.id));
+	}, [dispatch, params.id]);
+
+	useEffect(() => {
+		dispatch(fetchKpiNormList());
 	}, [dispatch]);
 
-	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+	useEffect(() => {
+		async function getKpiNorm() {
+			try {
+				const response = await getAllKpiNorm();
+				const data = await response.data;
+				setKeyOption(data);
+			} catch (error) {
+				setKeyOption([]);
+			}
+		}
+		getKpiNorm();
+	}, []);
+
+	const prevIsValid = () => {
+		if (keysState.length === 0) {
+			return true;
+		}
+		const someEmpty = keysState.some((key) => key.keyValue === '');
+
+		if (someEmpty) {
+			keysState.map((key, index) => {
+				const allPrev = [...keysState];
+				if (keysState[index].keyValue === '') {
+					allPrev[index].error.keyValue = 'Nhập giá trị key!';
+				}
+				setKeysState(allPrev);
+			});
+		}
+
+		return !someEmpty;
+	};
+
+	const handleAddFieldKey = () => {
+		const initKeyState = {
+			keyValue: '',
+			error: {
+				keyValue: null,
+			},
+		};
+		if (prevIsValid() && keysState?.length <= 3) {
+			setKeysState((prev) => [...prev, initKeyState]);
+		}
+	};
+
+	// hàm onchange cho input key
+	const handleChangeKeysState = (index, event) => {
+		event.preventDefault();
+		event.persist();
+		setKeysState((prev) => {
+			return prev.map((key, i) => {
+				if (i !== index) return key;
+				return {
+					...key,
+					[event.target.name]: event.target.value,
+					error: {
+						...key.error,
+						[event.target.name]:
+							event.target.value.length > 0
+								? null
+								: `Vui lòng nhập đầy đủ thông tin!`,
+					},
+				};
+			});
+		});
+	};
+
+	// xoá các key theo index
+	const handleRemoveKeyField = (e, index) => {
+		setKeysState((prev) => prev.filter((state) => state !== prev[index]));
+	};
 
 	// const handleShowToast = (title, content) => {
 	// 	addToast(
@@ -55,39 +143,10 @@ const PositionDetailPage = () => {
 	// 	);
 	// };
 
-	// const handleSubmitEmployeeForm = async (data) => {
-	// 	const dataSubmit = {};
-	// 	if (data.id) {
-	// 		try {
-	// 			// const response = await updateEmployee(dataSubmit);
-	// 			const result = await response.data;
-	// 			dispatch(fetchDepartmentById(params.id));
-	// 			handleCloseForm();
-	// 			handleShowToast(
-	// 				`Cập nhật nhân viên!`,
-	// 				`Nhân viên ${result?.name} được cập nhật thành công!`,
-	// 			);
-	// 		} catch (error) {
-	// 			handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
-	// 		}
-	// 	} else {
-	// 		try {
-	// 			// const response = await addEmployee(dataSubmit);
-	// 			const result = await response.data;
-	// 			dispatch(fetchDepartmentById(params.id));
-	// 			handleCloseForm();
-	// 			handleShowToast(
-	// 				`Thêm nhân viên`,
-	// 				`Nhân viên ${result?.user?.name} được thêm thành công!`,
-	// 			);
-	// 		} catch (error) {
-	// 			handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
-	// 		}
-	// 	}
-	// };
+
 
 	return (
-		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.position.text}>
 			<SubHeaderCommon />
 			<Page container='fluid'>
 				{verifyPermissionHOC(
@@ -133,137 +192,101 @@ const PositionDetailPage = () => {
 											<CardLabel icon='Contacts' iconColor='warning'>
 												<CardTitle>Thông tin nhiệm vụ cho từng vị trí</CardTitle>
 											</CardLabel>
+											{/* <CardActions>
+												<Button
+													color='info'
+													icon='Edit'
+													tag='button'
+													onClick={() => handleOpenForm(null)}>
+													Thêm nhiệm vụ
+												</Button>
+											</CardActions> */}
 										</CardHeader>
 										<div className='p-4'>
-											{/* <TableCommon
-												className='table table-modern mb-0'
-												columns={positions?.name}
-												data={(item) => <span>{item?.position?.name || 'No data'}</span>}
-											/>
 											<ul>
-												<h2>Tên Vị Trí</h2>
-												<li data={(item) => <span>{item?.position?.name || 'No data'}</span>}/>
+												<h4>Tên Vị Trí: <strong>{position?.name}</strong></h4>
 											</ul>
 											<ul>
-												<h2>Nhiệm vụ cụ thể</h2>
-												<li data={positions?.address}/>
-
-											</ul> */}
+												<h4>Nhiệm vụ cụ thể</h4>
+											</ul>
 										</div>
 									</Card>
 								</Card>
 							)}
 							{TABS.MISSiONS === activeTab && (
-								<Formik initialValues={positions} enableReinitialize>
+								<Formik initialValues={position} enableReinitialize>
 									<Card className='h-100'>
 										<Card className='h-100 mb-0'>
 											<CardHeader>
 												<CardLabel icon='Edit' iconColor='warning'>
 													<CardTitle>Thêm nhiệm vụ</CardTitle>
 												</CardLabel>
+												<FormGroup>
+													<Button variant='success' onClick={handleAddFieldKey}>
+														Thêm chỉ số key
+													</Button>
+												</FormGroup>
 											</CardHeader>
-											{/* <CardBody className='pt-0'>
-												<div className='row g-4'>
-													<div className='col-md-6'>
-														<FormGroup id='name' label='Tên phòng ban'>
-															<Input
-																placeholder='Tên phòng ban'
-																onChange={formik.handleChange}
-																onBlur={formik.handleBlur}
-																value={formik.values.name}
-																isValid={formik.isValid}
-																isTouched={formik.touched.name}
-																invalidFeedback={formik.errors.name}
-																size='lg'
-																className='border border-2 shadow-none'
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-md-6'>
-														<FormGroup id='slug' label='Mã phòng ban'>
-															<Input
-																type='text'
-																placeholder='Mã phòng ban'
-																onChange={formik.handleChange}
-																onBlur={formik.handleBlur}
-																value={formik.values.slug}
-																isValid={formik.isValid}
-																isTouched={formik.touched.slug}
-																size='lg'
-																className='border border-2 shadow-none'
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-md-12'>
-														<FormGroup id='description' label='Mô tả'>
-															<Textarea
-																rows={5}
-																placeholder='Mô tả'
-																onChange={formik.handleChange}
-																onBlur={formik.handleBlur}
-																value={formik.values.description}
-																isValid={formik.isValid}
-																isTouched={
-																	formik.touched.description
-																}
-																size='lg'
-																className='border border-2 shadow-none'
-																name='description'
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-12'>
-														<FormGroup id='address' label='Địa chỉ'>
-															<Textarea
-																rows={5}
-																placeholder='Địa chỉ'
-																onChange={formik.handleChange}
-																onBlur={formik.handleBlur}
-																value={formik.values.address}
-																isValid={formik.isValid}
-																isTouched={formik.touched.address}
-																invalidFeedback={
-																	formik.errors.address
-																}
-																size='lg'
-																className='border border-2 shadow-none'
-																name='address'
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-12'>
-														<FormGroup
-															id='status'
-															label='Trạng thái hoạt động'>
-															<Checks
-																id='status'
-																type='switch'
-																size='lg'
-																label={
-																	Number(formik.values.status) ===
-																		1
-																		? 'Đang hoạt động'
-																		: 'Không hoạt động'
-																}
-																onChange={formik.handleChange}
-																checked={formik.values.status}
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-12'>
-														<div className='w-100 mt-4 text-center'>
-															<Button
-																color='primary'
-																size='lg'
-																className='w-50 p-3'
-																type='submit'
-																onClick={formik.handleSubmit}>
-																Lưu thông tin
-															</Button>
-														</div>
-													</div>
+											<CardBody className='pt-0'>
+												<div className='p-4'>
+													{keysState?.map((item, index) => {
+														return (
+															<div
+																key={index}
+																className='mt-4 d-flex align-items-center justify-content-between'>
+																<div style={{ width: '45%', marginRight: 10 }}>
+																	<FormGroup
+																		className='mr-2'
+																		id='name'
+																		label='Tên chỉ số key'>
+																		<Select
+																			name='keyName'
+																			required
+																			size='lg'
+																			className='border border-2 rounded-0 shadow-none'
+																			placeholder='Chọn chỉ số Key'
+																			value={item?.keyName}
+																			onChange={(e) =>
+																				handleChangeKeysState(index, e)
+																			}>
+																			{kpiNorm.map((key) => (
+																				<Option
+																					key={`${key.name}`}
+																					value={`${key.name}`}>
+																					{`${key?.name}`}
+																				</Option>
+																			))}
+																		</Select>
+																	</FormGroup>
+																	{item.error?.keyName && (
+																		<ErrorText>
+																			{item.error?.keyName}
+																		</ErrorText>
+																	)}
+																</div>
+																<div style={{ width: '45%', marginLeft: 10 }}>
+																</div>
+																<FormGroup>
+																	<Button
+																		color='light'
+																		variant='light'
+																		style={{
+																			background: 'transparent',
+																			border: 0,
+																		}}
+																		size='lg'
+																		className='mt-4 h-100'
+																		onClick={(e) =>
+																			handleRemoveKeyField(e, index)
+																		}>
+																		<Icon icon='Trash' size='lg' />
+																	</Button>
+																</FormGroup>
+															</div>
+														);
+													})}
 												</div>
-											</CardBody> */}
+											</CardBody>
 										</Card>
 									</Card>
 								</Formik>
@@ -273,14 +296,14 @@ const PositionDetailPage = () => {
 					['admin'],
 				)}
 
-				<CommonForm
+				{/* <CommonForm
 					show={toggleForm}
 					onClose={handleCloseForm}
 					// handleSubmit={handleSubmitEmployeeForm}
 					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viênn'}
-					// fields={columns}
-				/>
+					label={itemEdit?.id ? 'Cập nhật nhiệm vụ' : 'Thêm nhiệm vụ'}
+				// fields={columns}
+				/> */}
 			</Page>
 		</PageWrapper>
 	);

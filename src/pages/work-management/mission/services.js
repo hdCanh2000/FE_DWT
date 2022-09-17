@@ -74,6 +74,14 @@ const getAllPositions = () => {
 	});
 };
 
+const getPositionById = (id) => {
+	// lấy danh sách positions
+	return axiosClient({
+		method: 'GET',
+		url: `/positions/${id}`,
+	});
+};
+
 // task services
 
 const getAllTaksByMissionID = (id) => {
@@ -167,4 +175,5 @@ export {
 	updateTaskByID,
 	getAllUser,
 	getAllTasks,
+	getPositionById,
 };
