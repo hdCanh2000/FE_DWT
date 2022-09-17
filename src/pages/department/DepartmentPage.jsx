@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
+// import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -13,18 +13,19 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
+// import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
-import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addDepartment, updateDepartment } from './services';
+// import CommonForm from '../common/ComponentCommon/CommonForm';
+// import { addDepartment, updateDepartment } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
+import DetailForm from './DepartmentDetail';
 
 const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
+	// const { addToast } = useToasts();
 	const navigate = useNavigate();
 
 	const dispatch = useDispatch();
@@ -32,6 +33,7 @@ const DepartmentPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleOpenDetail = (data) => dispatch(toggleFormSlice.actions.openDetail(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const departments = useSelector((state) => state.department.departments);
@@ -48,11 +50,6 @@ const DepartmentPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			render: (item) => (
-				<Link className='text-underline' to={`/phong-ban/${item.id}`}>
-					{item.name}
-				</Link>
-			),
 		},
 		{
 			title: 'Mô tả',
@@ -99,7 +96,7 @@ const DepartmentPage = () => {
 						color='success'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='Edit'
+						icon='RemoveRedEye'
 						onClick={() => handleOpenForm(item)}
 					/>
 					<Button
@@ -108,61 +105,62 @@ const DepartmentPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='ArrowForward'
-						onClick={() =>
-							navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`)
-						}
+						onClick={() => handleOpenDetails(item)}
 					/>
 				</>
 			),
 			isShow: false,
 		},
 	];
-
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
+	const handleOpenDetails = (item) => {
+		handleOpenDetail(item);
+		navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`);
 	};
+	// const handleShowToast = (title, content) => {
+	// 	addToast(
+	// 		<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+	// 			{content}
+	// 		</Toasts>,
+	// 		{
+	// 			autoDismiss: true,
+	// 		},
+	// 	);
+	// };
 
-	const handleSubmitForm = async (data) => {
-		const dataSubmit = {
-			id: data?.id,
-			name: data.name,
-			description: data.description,
-			slug: data.slug,
-			address: data.address,
-			status: Number(data.status),
-		};
-		if (data.id) {
-			try {
-				const response = await updateDepartment(dataSubmit);
-				const result = await response.data;
-				dispatch(fetchDepartmentWithUserList());
-				handleCloseForm();
-				handleShowToast(
-					`Cập nhật phòng ban!`,
-					`Phòng ban ${result.name} được cập nhật thành công!`,
-				);
-			} catch (error) {
-				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
-			}
-		} else {
-			try {
-				const response = await addDepartment(dataSubmit);
-				const result = await response.data;
-				dispatch(fetchDepartmentWithUserList());
-				handleCloseForm();
-				handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
-			} catch (error) {
-				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
-			}
-		}
-	};
+	// const handleSubmitForm = async (data) => {
+	// 	const dataSubmit = {
+	// 		id: data?.id,
+	// 		name: data.name,
+	// 		description: data.description,
+	// 		slug: data.slug,
+	// 		address: data.address,
+	// 		status: Number(data.status),
+	// 	};
+	// 	if (data.id) {
+	// 		try {
+	// 			const response = await updateDepartment(dataSubmit);
+	// 			const result = await response.data;
+	// 			dispatch(fetchDepartmentWithUserList());
+	// 			handleCloseForm();
+	// 			handleShowToast(
+	// 				`Cập nhật phòng ban!`,
+	// 				`Phòng ban ${result.name} được cập nhật thành công!`,
+	// 			);
+	// 		} catch (error) {
+	// 			handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+	// 		}
+	// 	} else {
+	// 		try {
+	// 			const response = await addDepartment(dataSubmit);
+	// 			const result = await response.data;
+	// 			dispatch(fetchDepartmentWithUserList());
+	// 			handleCloseForm();
+	// 			handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
+	// 		} catch (error) {
+	// 			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+	// 		}
+	// 	}
+	// };
 
 	return (
 		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
@@ -207,12 +205,21 @@ const DepartmentPage = () => {
 								</Card>
 							</div>
 						</div>
-						<CommonForm
+						{/* <CommonForm
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
 							label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
+							fields={columns}
+							validate={validate}
+							disable='true'
+						/> */}
+						<DetailForm
+							show={toggleForm}
+							onClose={handleCloseForm}
+							item={itemEdit}
+							label='Chi tiết phòng ban'
 							fields={columns}
 							validate={validate}
 						/>

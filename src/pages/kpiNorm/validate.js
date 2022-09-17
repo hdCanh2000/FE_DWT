@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-const validate = Yup.object({
+const validate = Yup.object().shape({
 	name: Yup.string().required('Vui lòng nhập tên định mức KPI'),
 	department: Yup.string().required('Vui lòng chọn phòng ban'),
 	// description: Yup.string().required('Vui lòng nhập mô tả'),

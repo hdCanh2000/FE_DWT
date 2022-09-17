@@ -8,6 +8,8 @@ import { missionSlice } from '../slice/missionSlice';
 import { taskSlice } from '../slice/taskSlice';
 import { roleSlice } from '../slice/roleSlice';
 import { kpiNormSlice } from '../slice/kpiNormSlice';
+import { keySlice } from '../slice/keySlice';
+import { unitSlice } from '../slice/unitSlice';
 
 const reducer = combineReducers({
 	mission: missionSlice.reducer,
@@ -16,9 +18,11 @@ const reducer = combineReducers({
 	department: departmentSlice.reducer,
 	position: positionSlice.reducer,
 	role: roleSlice.reducer,
+	positionLevel:positionLevelSlice.reducer,
 	toggleForm: toggleFormSlice.reducer,
 	kpiNorm: kpiNormSlice.reducer,
-	positionLevel: positionLevelSlice.reducer,
+	key: keySlice.reducer,
+	unit: unitSlice.reducer,
 });
 
 // eslint-disable-next-line import/prefer-default-export

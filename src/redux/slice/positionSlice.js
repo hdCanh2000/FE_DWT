@@ -26,7 +26,6 @@ export const fetchPositionById = createAsyncThunk('position/fetchId', async (id)
 	return response.data;
 });
 
-
 export const positionSlice = createSlice({
 	name: 'positionSlice',
 	initialState,

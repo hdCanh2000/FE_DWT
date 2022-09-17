@@ -3,7 +3,7 @@ import axiosClient from '../../utils/axiosClient';
 const getAllKeys = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/keys',
+		url: '/keys?_expand=unit',
 	});
 };
 
@@ -29,5 +29,11 @@ const updateKey = (data) => {
 		data,
 	});
 };
+const deleteKey = (id) => {
+	return axiosClient({
+		method: 'DELETE',
+		url: `/keys/${id}`,
+	});
+};
 
-export { getAllKeys, getKeyByIdWithUser, addKey, updateKey };
+export { getAllKeys, getKeyByIdWithUser, addKey, updateKey, deleteKey };

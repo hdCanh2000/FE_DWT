@@ -10,7 +10,14 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchEmployeeList = createAsyncThunk('employee/fetchList', async () => {
 	const response = await getAllEmployee();
-	return response.data;
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+		};
+	});
 });
 
 export const onAddEmployee = createAsyncThunk('employee/addNew', async (data) => {

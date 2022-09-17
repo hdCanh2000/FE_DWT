@@ -214,6 +214,12 @@ const TaskListPage = () => {
 		};
 		fetchDataSubtasksReportDepartment();
 	}, []);
+
+	const handleOnClickToActionPage = useCallback(
+		() => navigate(`${demoPages.jobsPage.subMenu.mission.path}/them-moi`),
+		[navigate],
+	);
+
 	// Handle
 	const handleOpenModalExpand = (taskId) => {
 		setEditModalStatusExpand(true);
@@ -294,10 +300,10 @@ const TaskListPage = () => {
 			const newState = [...tasks];
 			setTasks(newState.filter((item) => item.id !== taskId));
 			handleCloseConfirmModal();
-			handleShowToast(`Xoá công việc`, `Xoá công việc thành công!`);
+			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ thành công!`);
 		} catch (error) {
 			handleCloseConfirmModal();
-			handleShowToast(`Xoá công việc`, `Xoá công việc không thành công!`);
+			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ không thành công!`);
 		}
 	};
 
@@ -312,12 +318,12 @@ const TaskListPage = () => {
 				handleClearValueForm();
 				handleCloseEditForm();
 				handleShowToast(
-					`Cập nhật công việc!`,
-					`Công việc ${result.name} được cập nhật thành công!`,
+					`Cập nhật nhiệm vụ!`,
+					`nhiệm vụ ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
 				setTasks(tasks);
-				handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+				handleShowToast(`Cập nhật nhiệm vụ`, `Cập nhật nhiệm vụ không thành công!`);
 			}
 		} else {
 			try {
@@ -329,10 +335,10 @@ const TaskListPage = () => {
 				fetchDataAllTasks();
 				handleClearValueForm();
 				handleCloseEditForm();
-				handleShowToast(`Thêm công việc`, `Công việc ${result.name} được thêm thành công!`);
+				handleShowToast(`Thêm nhiệm vụ`, `nhiệm vụ ${result.name} được thêm thành công!`);
 			} catch (error) {
 				setTasks(tasks);
-				handleShowToast(`Thêm công việc`, `Thêm công việc không thành công!`);
+				handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
 			}
 		}
 	};
@@ -349,14 +355,14 @@ const TaskListPage = () => {
 			handleCloseEditForm();
 			handleCloseConfirmStatusTask();
 			handleShowToast(
-				`Cập nhật trạng thái công việc!`,
-				`Công việc ${result.name} được cập nhật trạng thái thành công!`,
+				`Cập nhật trạng thái nhiệm vụ!`,
+				`nhiệm vụ ${result.name} được cập nhật trạng thái thành công!`,
 			);
 		} catch (error) {
 			setTasks(tasks);
 			handleShowToast(
-				`Cập nhật trạng thái công việc`,
-				`Cập nhật trạng thái công việc không thành công!`,
+				`Cập nhật trạng thái nhiệm vụ`,
+				`Cập nhật trạng thái nhiệm vụ không thành công!`,
 			);
 		}
 	};
@@ -377,7 +383,7 @@ const TaskListPage = () => {
 		setOpenConfirmModalStatus(true);
 		setItemEdit({ ...item });
 		setInfoConfirmModalStatus({
-			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} nhiệm vụ`.toUpperCase(),
 			subTitle: item?.name,
 			status: nextStatus,
 			isShowNote,
@@ -409,7 +415,7 @@ const TaskListPage = () => {
 				<div className='row'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold pt-3'>Danh sách công việc</div>
+							<div className='display-6 fw-bold pt-3'>Danh sách nhiệm vụ</div>
 							<div>
 								<Button
 									size='lg'
@@ -436,7 +442,7 @@ const TaskListPage = () => {
 								<CardHeader className='py-0'>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
-											Thống kê công việc
+											Thống kê nhiệm vụ
 										</CardTitle>
 										<CardSubTitle tag='h5' className='h6'>
 											Báo cáo
@@ -487,7 +493,7 @@ const TaskListPage = () => {
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
 										<CardTitle>
-											<CardLabel>Danh sách công việc</CardLabel>
+											<CardLabel>Danh sách nhiệm vụ</CardLabel>
 										</CardTitle>
 									</CardLabel>
 									{verifyPermissionHOC(
@@ -496,8 +502,9 @@ const TaskListPage = () => {
 												color='info'
 												icon='Plus'
 												tag='button'
-												onClick={() => handleOpenEditForm(null)}>
-												Thêm công việc
+												// onClick={() => handleOpenEditForm(null)}>
+												onClick={handleOnClickToActionPage}>
+												Thêm nhiệm vụ
 											</Button>
 											{verifyPermissionHOC(
 												<Dropdown>
@@ -540,13 +547,13 @@ const TaskListPage = () => {
 										<thead>
 											<tr>
 												<th className='text-center'>STT</th>
-												<th>Tên công việc</th>
+												<th>Tên nhiệm vụ</th>
 												<th className='text-center'>Số đầu việc</th>
 												<th>Phòng ban</th>
 												{/* <th className='text-center'>Nhân viên</th> */}
 												<th className='text-center'>Hạn hoàn thành</th>
 												<th className='text-center'>Giá trị KPI</th>
-												<th className='text-center'>KPI thực tế</th>
+												{/* <th className='text-center'>KPI thực tế</th> */}
 												<th className='text-center'>Độ ưu tiên</th>
 												<th className='text-center'>Trạng thái</th>
 												<th className='text-center'>Tiến độ</th>
@@ -597,7 +604,7 @@ const TaskListPage = () => {
 															)}
 														</td>
 														<td align='center'>{item?.kpiValue}</td>
-														<td align='center'>{item?.currentKPI}</td>
+														{/* <td align='center'>{item?.currentKPI}</td> */}
 														<td>
 															<div className='d-flex align-items-center'>
 																<span
@@ -705,13 +712,10 @@ const TaskListPage = () => {
 																		isLight={darkModeStatus}
 																		className='text-nowrap mx-2'
 																		icon='Edit'
-																		isDisable={
-																			item.status === 4 ||
-																			item.status === 7 ||
-																			item.status === 3
-																		}
 																		onClick={() =>
-																			handleOpenEditForm(item)
+																			navigate(
+																				`${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/${item.id}`,
+																			)
 																		}
 																	/>
 																	<Button
@@ -773,7 +777,7 @@ const TaskListPage = () => {
 								</div>
 								{!tasks?.length && (
 									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										Không có công việc!
+										Không có nhiệm vụ!
 									</Alert>
 								)}
 							</Card>
@@ -806,7 +810,7 @@ const TaskListPage = () => {
 													className='w-100 h-100'
 													icon='AddCircle'
 													onClick={() => handleOpenEditForm(null)}>
-													Thêm công việc
+													Thêm nhiệm vụ
 												</Button>
 											</CardBody>
 										</Card>
@@ -821,8 +825,8 @@ const TaskListPage = () => {
 					openModal={openConfirmModal}
 					onCloseModal={handleCloseConfirmModal}
 					onConfirm={() => handleCloseItem(itemEdit?.id)}
-					title='Đóng công việc'
-					content={`Xác nhận đóng công việc <strong>${itemEdit?.name}</strong> ?`}
+					title='Đóng nhiệm vụ'
+					content={`Xác nhận đóng nhiệm vụ <strong>${itemEdit?.name}</strong> ?`}
 				/>
 				<TaskFormModal
 					show={editModalStatus}

@@ -251,7 +251,6 @@ const EmployeePage = () => {
 			}
 		}
 	};
-
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>

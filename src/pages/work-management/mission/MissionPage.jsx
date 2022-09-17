@@ -71,7 +71,7 @@ const Item = ({
 				<CardBody>
 					<div className='row g-2 align-items-center'>
 						<div className='col-auto mb-3'>
-							<span>Hạn hoàn thành:</span>
+							<span>Thời hạn hoàn thành:</span>
 						</div>
 						<div className='col-auto mb-3'>
 							<small
@@ -146,6 +146,7 @@ const MissionPage = () => {
 	const taskReport = useSelector((state) => state.task?.taskReport);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+
 	const navigateToDetailPage = useCallback(
 		(page) => navigate(`${demoPages.jobsPage.subMenu.target.path}/${page}`),
 		[navigate],
@@ -682,8 +683,8 @@ const MissionPage = () => {
 							<Item
 								key={item?.id}
 								keys={item?.keys}
-								departmentsRelated={item?.departments?.slice(1)}
-								usersRelated={item?.users?.slice(1)}
+								departmentsRelated={item?.departments}
+								usersRelated={item?.users}
 								id={item?.id}
 								name={item?.name}
 								teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}

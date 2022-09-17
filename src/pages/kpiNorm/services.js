@@ -6,6 +6,7 @@ const getAllKpiNorm = () => {
 		url: `/kpiNorms`,
 	});
 };
+
 const addKpiNorm = (data) => {
 	return axiosClient({
 		method: 'POST',
@@ -13,6 +14,7 @@ const addKpiNorm = (data) => {
 		data,
 	});
 };
+
 const updateKpiNorm = (data) => {
 	return axiosClient({
 		method: 'PUT',
@@ -20,10 +22,20 @@ const updateKpiNorm = (data) => {
 		data,
 	});
 };
+
 const deleteKpiNorm = (id) => {
 	return axiosClient({
 		method: 'DELETE',
 		url: `/kpiNorms/${id}`,
 	});
 };
-export { getAllKpiNorm, addKpiNorm, updateKpiNorm, deleteKpiNorm };
+
+const fetchAllKpiNorms = (params) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/api/kpiNorms?_expand=department`,
+		params,
+	});
+};
+
+export { getAllKpiNorm, addKpiNorm, updateKpiNorm, deleteKpiNorm, fetchAllKpiNorms };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
-import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -16,26 +16,32 @@ import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
-import { addKey, getAllKeys, updateKey, deleteKey } from './services';
+import { getAllUnits, addUnit, updateUnit, deleteUnit } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { fetchUnitList } from '../../redux/slice/unitSlice';
 
-const KeyPage = () => {
-	const dispatch = useDispatch();
+const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
+	const params = useParams();
 	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [keys, setKeys] = useState([]);
+	const [units, setUnits] = useState([]);
 	const [deletes, setDeletes] = React.useState({});
 	const [openConfirm, set0penConfirm] = React.useState(false);
-	const units = useSelector((state) => state.unit.units);
-
 	useEffect(() => {
-		dispatch(fetchUnitList());
-	}, [dispatch]);
+		async function getUnit() {
+			try {
+				const response = await getAllUnits();
+				const data = await response.data;
+				setUnits(data);
+			} catch (error) {
+				setUnits([]);
+			}
+		}
+		getUnit();
+	}, []);
 	const handleOpenConfirm = (item) => {
 		setDeletes({
 			id: item.id,
@@ -47,30 +53,30 @@ const KeyPage = () => {
 		setDeletes({});
 		set0penConfirm(false);
 	};
-	async function getKey() {
-		try {
-			const response = await getAllKeys();
-			const data = await response.data;
-			setKeys(data);
-		} catch (error) {
-			setKeys([]);
-		}
+	async function fetchUnits() {
+		const res = await getAllUnits();
+		setUnits(res.data);
 	}
 	const handleDelete = async (valueDelete) => {
 		try {
-			await deleteKey(valueDelete?.id);
+			await deleteUnit(valueDelete?.id);
 			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
 		}
-		getKey();
+		fetchUnits(params?.id);
 	};
-	useEffect(() => {
-		getKey();
-	}, []);
 	const columns = [
 		{
-			title: 'Tên chỉ số đánh giá',
+			title: 'Mã đơn vị',
+			id: 'code',
+			key: 'code',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+		},
+		{
+			title: 'Tên đơn vị',
 			id: 'name',
 			key: 'name',
 			type: 'text',
@@ -81,24 +87,6 @@ const KeyPage = () => {
 			// 		{item.name}
 			// 	</Link>
 			// ),
-		},
-		// {
-		// 	title: 'Value',
-		// 	id: 'value',
-		// 	key: 'value',
-		// 	type: 'number',
-		// 	align: 'left',
-		// 	isShow: true,
-		// },
-		{
-			title: 'Đơn vị',
-			id: 'unitId',
-			key: 'unitId',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: true,
-			render: (item) => <span>{item?.unit?.name}</span>,
-			options: units,
 		},
 		{
 			title: 'Hành động',
@@ -157,57 +145,52 @@ const KeyPage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data?.name,
-			unitId: parseInt(data?.unitId, 10),
+			name: data.name,
+			code: data.code,
 			status: Number(data.status),
 		};
 		if (data.id) {
 			try {
-				const response = await updateKey(dataSubmit);
+				const response = await updateUnit(dataSubmit);
 				const result = await response.data;
-				const newKeys = [...keys];
-				setKeys(newKeys.map((item) => (item.id === data.id ? { ...result } : item)));
+				const newUnits = [...units];
+				setUnits(newUnits.map((item) => (item.id === data.id ? { ...result } : item)));
 				handleClearValueForm();
 				hanleCloseForm();
-				getKey();
 				handleShowToast(
-					`Cập nhật chỉ số key!`,
-					`Chỉ số key ${result.name} được cập nhật thành công!`,
+					`Cập nhật đơn vị!`,
+					`Đơn vị ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				setKeys(keys);
-				handleShowToast(`Cập nhật chỉ số key`, `Cập nhật chỉ số key không thành công!`);
+				setUnits(units);
+				handleShowToast(`Cập nhật đơn vị`, `Cập nhật đơn vị không thành công!`);
 			}
 		} else {
 			try {
-				const response = await addKey(dataSubmit);
+				const response = await addUnit(dataSubmit);
 				const result = await response.data;
-				const newKeys = [...keys];
-				newKeys.push(result);
-				setKeys(newKeys);
+				const newUnits = [...units];
+				newUnits.push(result);
+				setUnits(newUnits);
 				handleClearValueForm();
 				hanleCloseForm();
-				getKey();
-				handleShowToast(
-					`Thêm chỉ số key`,
-					`Chỉ số key ${result.name} được thêm thành công!`,
-				);
+				handleShowToast(`Thêm đơn vị`, `Đơn vị ${result.name} được thêm thành công!`);
 			} catch (error) {
-				setKeys(keys);
-				handleShowToast(`Thêm chỉ số key`, `Thêm Chỉ số key không thành công!`);
+				setUnits(units);
+				handleShowToast(`Thêm đơn vị`, `Thêm đơn vị không thành công!`);
 			}
 		}
 	};
 
 	return (
-		<PageWrapper title={demoPages.cauHinh.subMenu.kpi.text}>
+		<PageWrapper title={demoPages.cauHinh.subMenu.unit.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
 						<div className='row mb-4'>
 							<div className='col-12'>
 								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Danh sách Key</div>
+									<div className='display-6 fw-bold py-3'>Danh sách đơn vị</div>
 								</div>
 							</div>
 						</div>
@@ -215,18 +198,18 @@ const KeyPage = () => {
 							<div className='col-12'>
 								<Card className='w-100'>
 									<CardHeader>
-										<CardLabel icon='VpnKey' iconColor='primary'>
+										<CardLabel icon='ReceiptLong' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách chỉ số Key</CardLabel>
+												<CardLabel>Danh sách đơn vị</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions>
 											<Button
 												color='info'
-												icon='VpnKey'
+												icon='ReceiptLong'
 												tag='button'
 												onClick={() => handleOpenActionForm(null)}>
-												Tạo Key
+												Tạo đơn vị
 											</Button>
 										</CardActions>
 									</CardHeader>
@@ -234,7 +217,7 @@ const KeyPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columns}
-											data={keys}
+											data={units}
 										/>
 									</div>
 								</Card>
@@ -245,7 +228,7 @@ const KeyPage = () => {
 							onClose={hanleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật key' : 'Tạo key mới'}
+							label={itemEdit?.id ? 'Cập nhật đơn vị' : 'Tạo đơn vị mới'}
 							fields={columns}
 							validate={validate}
 						/>
@@ -256,12 +239,12 @@ const KeyPage = () => {
 					openModal={openConfirm}
 					onCloseModal={handleCloseDeleteComfirm}
 					onConfirm={() => handleDelete(deletes)}
-					title='Xoá chỉ số key'
-					content={`Xác nhận xoá chỉ số key <strong>${deletes?.name}</strong> ?`}
+					title='Xoá đơn vị'
+					content={`Xác nhận xoá đơn vị <strong>${deletes?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>
 	);
 };
 
-export default KeyPage;
+export default UnitPage;

@@ -16,6 +16,8 @@ const TASK = {
 		import('../pages/work-management/task-management/TaskManagementPage'),
 	),
 	TASKDETAIL: lazy(() => import('../pages/work-management/TaskDetail/TaskDetailPage')),
+	ADD_OR_UPDATE_TASK: lazy(() => import('../pages/work-management/task-list/TaskActionsPage')),
+	ADD_NEW_TASK: lazy(() => import('../pages/work-management/task-list/AddTaskPage')),
 	TASKLIST: lazy(() => import('../pages/work-management/task-list/TaskListPage')),
 	SUBTASK: lazy(() => import('../pages/work-management/subtask/SubTaskPage')),
 	TASKLISTDEPARTMENT: lazy(() =>
@@ -34,8 +36,12 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
-	POSITION_DETAIL: lazy(() => import('../pages/position/PositionDetailPage')),
+	// POSITION_DETAIL: lazy(() => import('../pages/position/PositionDetailPage')),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
+};
+
+const CHART = {
+	ORGANIZATIONAL: lazy(() => import('../pages/chart/organizational/OrganizationalChartPage')),
 };
 
 const POSITION_LEVEL_CONFIG = {
@@ -50,6 +56,10 @@ const AUTH = {
 const KEY = {
 	KEY: lazy(() => import('../pages/key/keyPage')),
 };
+const UNIT = {
+	UNIT: lazy(() => import('../pages/unit/unitPage')),
+};
+
 const KPINORM = {
 	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
 };
@@ -87,6 +97,18 @@ const presentation = [
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/:id`,
 		element: <TASK.TASKDETAIL />,
+		exact: true,
+	},
+	// trang thêm mới công việc (nhiệm vụ)
+	{
+		path: `${demoPages.jobsPage.subMenu.mission.path}/them-moi`,
+		element: <TASK.ADD_OR_UPDATE_TASK />,
+		exact: true,
+	},
+	// trang cập nhật công việc (nhiệm vụ)
+	{
+		path: `${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/:id`,
+		element: <TASK.ADD_OR_UPDATE_TASK />,
 		exact: true,
 	},
 	// trang danh sách đầu việc
@@ -129,18 +151,24 @@ const presentation = [
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
 	},
+	// Quản lý chỉ số key
 	// cấu hình - configure
 	// cấu hình kpi
-	{
-		path: `${demoPages.hrRecords.subMenu.position.path}/:id`,
-		element: <MANAGEMENT.POSITION_DETAIL />,
-		exact: true,
-	},
+	// {
+	// 	path: `${demoPages.hrRecords.subMenu.position.path}/:id`,
+	// 	element: <MANAGEMENT.POSITION_DETAIL />,
+	// 	exact: true,
+	// },
 	// Quản lý Keys
 	{
 		path: demoPages.cauHinh.subMenu.kpi.path,
 		element: <KEY.KEY />,
 		exact: true,
+	},
+	// Quản lý đơn vị
+	{
+		path: demoPages.cauHinh.subMenu.unit.path,
+		element: <UNIT.UNIT />,
 	},
 	// cấu hình role & permission
 	{
@@ -159,10 +187,15 @@ const presentation = [
 		exact: true,
 	},
 	{
+		path: demoPages.companyPage.subMenu.organizational.path,
+		element: <CHART.ORGANIZATIONAL />,
+		exact: true,
+	},
+	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,
 		exact: true,
-	}
+	},
 ];
 
 const documentation = [
