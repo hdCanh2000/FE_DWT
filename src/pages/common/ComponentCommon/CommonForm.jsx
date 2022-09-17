@@ -24,6 +24,7 @@ const CommonForm = ({
 }) => {
 	const formik = useFormik({
 		initialValues: { ...item },
+		validationSchema: validate,
 		enableReinitialize: true,
 		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
@@ -31,6 +32,7 @@ const CommonForm = ({
 			resetForm();
 		},
 	});
+	console.log(formik);
 	return (
 		<Modal
 			className={classNames(className, 'p-4')}

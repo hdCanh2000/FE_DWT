@@ -128,7 +128,7 @@ const getAllUser = () => {
 const getAllKeys = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/keys',
+		url: '/keys?_expand=unit',
 	});
 };
 

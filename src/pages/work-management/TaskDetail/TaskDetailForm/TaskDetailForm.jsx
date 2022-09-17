@@ -187,17 +187,20 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		if (keysState?.length === 0 || !keysState) {
 			return true;
 		}
-		const someEmpty = keysState?.some((key) => key?.keyName === '' || key?.keyValue === '');
+		const someEmpty = keysState?.some((key) => key?.keyName === '' || key?.keyValue === '' || key.keyType === '');
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
 			keysState?.map((_key, index) => {
 				const allPrev = [...keysState] || [];
 				if (keysState[index]?.keyName === '') {
-					allPrev[index].error.keyName = 'Nhập tên chỉ số key!';
+					allPrev[index].error.keyName = 'Nhập Tên chỉ số đánh giá!';
 				}
 				if (keysState[index]?.keyValue === '') {
 					allPrev[index].error.keyValue = 'Nhập giá trị key!';
+				}
+				if (keysState[index].keyType === '') {
+					allPrev[index].error.keyType = 'Nhập loại key!';
 				}
 				setKeysState(allPrev);
 			});
@@ -231,9 +234,11 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		const initKeyState = {
 			keyName: '',
 			keyValue: '',
+			keyType: '',
 			error: {
 				keyName: null,
 				keyValue: null,
+				keyType: null
 			},
 		};
 		if (prevIsValid()) {
@@ -317,6 +322,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 			return {
 				keyName: key.keyName,
 				keyValue: key.keyValue,
+				keyType: key.keyType,
 			};
 		});
 		dataSubmit.userId = valueUser.id;
@@ -341,7 +347,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		setValueUser({});
 		setErrors({});
 	};
-
+	const compare = ['>', '=', '<', '<=', '>='];
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
@@ -546,7 +552,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 								onClick={handleAddFieldKey}
 								icon='AddCircle'
 								color='success'>
-								Thêm chỉ số key
+								Thêm tiêu chí đánh giá
 							</Button>
 						</FormGroup>
 						{/* eslint-disable-next-line no-shadow */}
@@ -558,13 +564,13 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 									className='mt-4 d-flex align-items-center justify-content-between'>
 									<div
 										style={{
-											width: '45%',
+											width: '40%',
 											marginRight: 10,
 										}}>
 										<FormGroup
 											className='mr-2'
 											id='name'
-											label='Tên chỉ số key'>
+											label={`Chỉ số key ${index + 1}`}>
 											<Select
 												name='keyName'
 												required
@@ -575,9 +581,9 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 												onChange={(e) => handleChangeKeysState(index, e)}>
 												{keyOption.map((key) => (
 													<Option
-														key={`${key?.name} (${key?.unit})`}
-														value={`${key?.name} (${key?.unit})`}>
-														{`${key?.name} (${key?.unit})`}
+														key={`${key.name} (${key?.unit?.name})`}
+														value={`${key.name} (${key?.unit?.name})`}>
+														{`${key?.name} (${key?.unit?.name})`}
 													</Option>
 												))}
 											</Select>
@@ -586,7 +592,39 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 											<ErrorText>{item.error?.keyName}</ErrorText>
 										)}
 									</div>
-									<div style={{ width: '45%', marginLeft: 10 }}>
+									<div style={{ width: '15%' }}>
+										<FormGroup
+											className='ml-2'
+											id='type'
+											label='So sánh'>
+											<Select
+												onChange={(e) =>
+													handleChangeKeysState(index, e)
+												}
+												value={item?.keyType}
+												name='keyType'
+												size='lg'
+												required
+												ariaLabel='So sánh'
+												className='border border-2 rounded-0 shadow-none'
+												placeholder='> = <'
+											>
+												{compare.map((element) => (
+													<Option
+														key={`${element}`}
+														value={`${element}`}>
+														{`${element}`}
+													</Option>
+												))}
+											</Select>
+										</FormGroup>
+										{item.error?.keyType && (
+											<ErrorText>
+												{item.error?.keyType}
+											</ErrorText>
+										)}
+									</div>
+									<div style={{ width: '30%', marginLeft: 10 }}>
 										<FormGroup className='ml-2' id='name' label='Giá trị key'>
 											<Input
 												onChange={(e) => handleChangeKeysState(index, e)}
