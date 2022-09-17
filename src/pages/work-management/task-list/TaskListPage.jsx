@@ -553,7 +553,7 @@ const TaskListPage = () => {
 												{/* <th className='text-center'>Nhân viên</th> */}
 												<th className='text-center'>Hạn hoàn thành</th>
 												<th className='text-center'>Giá trị KPI</th>
-												<th className='text-center'>KPI thực tế</th>
+												{/* <th className='text-center'>KPI thực tế</th> */}
 												<th className='text-center'>Độ ưu tiên</th>
 												<th className='text-center'>Trạng thái</th>
 												<th className='text-center'>Tiến độ</th>
@@ -604,7 +604,7 @@ const TaskListPage = () => {
 															)}
 														</td>
 														<td align='center'>{item?.kpiValue}</td>
-														<td align='center'>{item?.currentKPI}</td>
+														{/* <td align='center'>{item?.currentKPI}</td> */}
 														<td>
 															<div className='d-flex align-items-center'>
 																<span

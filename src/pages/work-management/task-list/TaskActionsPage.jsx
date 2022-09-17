@@ -113,14 +113,17 @@ const TaskActionsPage = () => {
 				name: '',
 				description: '',
 				kpiValue: '',
-				estimateDate: '',
-				estimateTime: '',
+				startDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+				startTime: '08:00',
+				deadlineDate: moment().add(1, 'days').format('YYYY-MM-DD'),
+				deadlineTime: '17:00',
 				status: 0,
 			});
 			setDepartmentOption({});
 			setUserOption({});
 			setDepartmentRelatedOption([]);
 			setUserRelatedOption([]);
+			setMissionOption({});
 		}
 	}, [params?.id]);
 
@@ -183,6 +186,7 @@ const TaskActionsPage = () => {
 				return {
 					...key,
 					...event,
+					[event?.target?.name]: event?.target?.value,
 				};
 			});
 		});
@@ -206,7 +210,7 @@ const TaskActionsPage = () => {
 			keysState.map((key, index) => {
 				const allPrev = [...keysState];
 				if (keysState[index].keyName === '') {
-					allPrev[index].error.keyName = 'Nhập tên chỉ số key!';
+					allPrev[index].error.keyName = 'Nhập tên tiêu chí đánh giá!';
 				}
 				if (keysState[index].keyValue === '') {
 					allPrev[index].error.keyValue = 'Nhập giá trị key!';
@@ -273,8 +277,8 @@ const TaskActionsPage = () => {
 			description: '',
 			priority: '',
 			kpiValue: '',
-			estimateDate: '',
-			estimateTime: '',
+			startDate: '',
+			startTime: '',
 			deadlineDate: '',
 			deadlineTime: '',
 			status: 0,
@@ -285,6 +289,15 @@ const TaskActionsPage = () => {
 		setUserRelatedOption([]);
 		setKeysState([]);
 		setKpiNormOptions([]);
+		setMissionOption({});
+	};
+
+	const calcTotalKpiValue = (arr = []) => {
+		let result = 0;
+		arr.forEach((item) => {
+			result += parseInt(item.quantity, 10) * parseInt(item.point, 10);
+		});
+		return result || '';
 	};
 
 	const person = window.localStorage.getItem('name');
@@ -306,30 +319,33 @@ const TaskActionsPage = () => {
 			},
 		];
 		const data = { ...task };
-		data.kpiValue = parseInt(task?.kpiValue, 10);
+		data.kpiValue = parseInt(task?.kpiValue, 10) || calcTotalKpiValue(kpiNormOptions);
 		data.priority = parseInt(task?.priority, 10);
 		data.estimateMD = parseInt(task?.estimateMD, 10);
 		data.keys = keysState.map((key) => {
 			return {
 				keyName: key.keyName,
-				keyValue: key.keyValue,
+				keyValue: parseInt(key.keyValue, 10),
 				keyType: key.keyType,
 			};
 		});
-		data.mission =
-			{
-				id: missionOption?.value,
-				name: missionOption?.label,
-			} || null;
+		data.mission = missionOption?.value
+			? {
+					id: missionOption?.value,
+					name: missionOption?.label,
+			  }
+			: null;
 		data.missionId = missionOption?.id || null;
 		data.kpiNormIds = kpiNormOptions.map((item) => item.id);
 		data.kpiNorms = kpiNormOptions.map((item) => {
 			return {
 				name: item.name,
 				id: item.id,
+				quantity: parseInt(item.quantity, 10),
+				total: parseInt(item.quantity * item.point, 10),
 			};
 		});
-		data.departmentId = departmentOption.id;
+		data.departmentId = departmentOption.id || null;
 		data.departments = [
 			{
 				id: departmentOption.id,
@@ -342,7 +358,7 @@ const TaskActionsPage = () => {
 				};
 			}),
 		];
-		data.userId = userOption.value;
+		data.userId = userOption.value || null;
 		data.users = [
 			{
 				id: userOption.id,
@@ -382,7 +398,7 @@ const TaskActionsPage = () => {
 	return (
 		<PageWrapper title={demoPages.jobsPage.subMenu.mission.text}>
 			<Page container='fluid'>
-				<div className='row mx-4 px-4'>
+				<div className='row mx-4 px-4 my-4'>
 					<Card className='p-4 w-100 m-auto'>
 						<CardHeader className='py-2'>
 							<CardLabel>
@@ -443,7 +459,10 @@ const TaskActionsPage = () => {
 												type='number'
 												name='kpiValue'
 												onChange={handleChange}
-												value={task.kpiValue || ''}
+												value={
+													task.kpiValue ||
+													calcTotalKpiValue(kpiNormOptions)
+												}
 												ariaLabel='Giá trị KPI'
 												placeholder='Giá trị KPI'
 												className='border border-2 rounded-0 shadow-none'
@@ -573,41 +592,44 @@ const TaskActionsPage = () => {
 										</FormGroup>
 									</div>
 								</div>
-								{/* Ngày dự kiến hoàn thành - Thời gian dự kiến */}
+								{/* Thời gian bắt đầu - Thời gian dự kiến */}
 								<div className='row g-2'>
 									<div className='d-flex align-items-center justify-content-between'>
 										<FormGroup
 											className='w-50 me-2'
-											id='estimateDate'
-											label='Ngày dự kiến hoàn thành'>
+											id='startDate'
+											label='Ngày bắt đầu'>
 											<Input
-												name='estimateDate'
-												placeholder='Ngày dự kiến hoàn thành'
+												name='startDate'
+												placeholder='Ngày bắt đầu'
 												onChange={handleChange}
-												value={task.estimateDate || ''}
+												value={
+													task.startDate ||
+													moment().add(0, 'days').format('YYYY-MM-DD')
+												}
 												type='date'
-												ariaLabel='Ngày dự kiến hoàn thành'
+												ariaLabel='Ngày bắt đầu'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										<FormGroup
 											className='w-50 ms-2'
-											id='estimateTime'
-											label='Thời gian dự kiến hoàn thành'>
+											id='startTime'
+											label='Thời gian bắt đầu'>
 											<Input
-												name='estimateTime'
-												placeholder='Thời gian dự kiến hoàn thành'
+												name='startTime'
+												placeholder='Thời gian bắt đầu'
 												type='time'
-												value={task.estimateTime || ''}
+												value={task.startTime || '08:00'}
 												onChange={handleChange}
-												ariaLabel='Thời gian dự kiến hoàn thành'
+												ariaLabel='Thời gian bắt đầu'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 									</div>
 								</div>
 								{/* Hạn ngày hoàn thành - Thời hạn hoàn thành */}
-								{/* <div className='row g-2'>
+								<div className='row g-2'>
 									<div className='d-flex align-items-center justify-content-between'>
 										<FormGroup
 											className='w-50 me-2'
@@ -617,7 +639,10 @@ const TaskActionsPage = () => {
 												name='deadlineDate'
 												placeholder='Hạn ngày hoàn thành'
 												onChange={handleChange}
-												value={task.deadlineDate || ''}
+												value={
+													task.deadlineDate ||
+													moment().add(1, 'days').format('YYYY-MM-DD')
+												}
 												type='date'
 												ariaLabel='Hạn ngày hoàn thành'
 												className='border border-2 rounded-0 shadow-none'
@@ -631,22 +656,21 @@ const TaskActionsPage = () => {
 												name='deadlineTime'
 												placeholder='Hạn thời gian hoàn thành'
 												type='time'
-												value={task.deadlineTime || ''}
+												value={task.deadlineTime || '17:30'}
 												onChange={handleChange}
-												
 												ariaLabel='Hạn thời gian hoàn thành'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 									</div>
-								</div> */}
+								</div>
 								<div className='row g-2'>
-									<div className='col-5'>
+									<div className='col-12'>
 										<FormGroup>
 											<Button
 												color='success'
 												type='button'
-												className='d-block w-50 py-3'
+												className='d-block w-25 py-3'
 												onClick={handleAddFieldKPINorm}>
 												Thêm nhiệm vụ phụ
 											</Button>
@@ -657,49 +681,108 @@ const TaskActionsPage = () => {
 												<div
 													// eslint-disable-next-line react/no-array-index-key
 													key={index}
-													className='mt-4 d-flex align-items-center justify-content-between'>
-													<div className='w-75'>
+													className='row mt-4 d-flex align-items-center justify-content-between'>
+													<div className='col-5'>
+														<div className='w-100'>
+															<FormGroup
+																className='mr-2'
+																id='name'
+																label={`Nhiệm vụ phụ ${index + 1}`}>
+																<CustomSelect
+																	placeholder='Chọn nhiệm vụ phụ'
+																	value={item}
+																	onChange={(e) => {
+																		handleChangeKpiNormOption(
+																			index,
+																			e,
+																		);
+																	}}
+																	options={kpiNorms}
+																/>
+															</FormGroup>
+														</div>
+													</div>
+													<div className='col-3'>
 														<FormGroup
-															className='mr-2'
-															id='name'
-															label={`Nhiệm vụ phụ ${index + 1}`}>
-															<CustomSelect
-																placeholder='Chọn nhiệm vụ phụ'
-																value={item}
-																onChange={(e) => {
+															className='ml-2'
+															id='quantity'
+															label='Số lượng'>
+															<Input
+																onChange={(e) =>
 																	handleChangeKpiNormOption(
 																		index,
 																		e,
-																	);
-																}}
-																options={kpiNorms}
+																	)
+																}
+																type='number'
+																value={item?.quantity || ''}
+																name='quantity'
+																size='lg'
+																ariaLabel='Số lượng'
+																className='border border-2 rounded-0 shadow-none'
+																placeholder='Số lượng'
 															/>
 														</FormGroup>
 													</div>
-													<div className='w-25'>
-														<Button
-															color='light'
-															variant='light'
-															size='lg'
-															className='mt-4 h-100 bg-transparent border-0'
-															onClick={(e) =>
-																handleRemoveKpiNormField(e, index)
-															}>
-															<Icon icon='Trash' size='lg' />
-														</Button>
+													<div className='col-3'>
+														<FormGroup
+															className='ml-2'
+															id='total'
+															label='Quy đổi'>
+															<Input
+																onChange={(e) =>
+																	handleChangeKpiNormOption(
+																		index,
+																		e,
+																	)
+																}
+																type='number'
+																value={
+																	parseInt(
+																		item.quantity * item.point,
+																		10,
+																	) || ''
+																}
+																name='total'
+																size='lg'
+																readOnly
+																ariaLabel='Quy đổi'
+																className='border border-2 rounded-0 shadow-none'
+																placeholder='Quy đổi'
+															/>
+														</FormGroup>
+													</div>
+													<div className='col-1'>
+														<div className='w-100'>
+															<Button
+																color='light'
+																variant='light'
+																size='lg'
+																className='mt-4 h-100 bg-transparent border-0'
+																onClick={(e) =>
+																	handleRemoveKpiNormField(
+																		e,
+																		index,
+																	)
+																}>
+																<Icon icon='Trash' size='lg' />
+															</Button>
+														</div>
 													</div>
 												</div>
 											);
 										})}
 									</div>
-									<div className='col-7'>
+								</div>
+								<div className='row g-2'>
+									<div className='col-12'>
 										<FormGroup>
 											<Button
 												color='success'
 												type='button'
-												className='d-block w-50 py-3'
+												className='d-block w-25 py-3'
 												onClick={handleAddFieldKey}>
-												Thêm chỉ số key
+												Thêm tiêu chí đánh giá
 											</Button>
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
@@ -713,16 +796,17 @@ const TaskActionsPage = () => {
 														<FormGroup
 															className='mr-2'
 															id='name'
-															label={`Chỉ số key ${index + 1}`}>
+															label={`Tiêu chí đánh giá ${
+																index + 1
+															}`}>
 															<Select
 																name='keyName'
-																required
 																size='lg'
-																ariaLabel={`Chỉ số key ${
+																ariaLabel={`tiêu chí đánh giá ${
 																	index + 1
 																}`}
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='Chọn chỉ số Key'
+																placeholder='Chọn tiêu chí đánh giá'
 																value={item?.keyName}
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
@@ -731,7 +815,7 @@ const TaskActionsPage = () => {
 																	<Option
 																		key={`${key.name} (${key.unit})`}
 																		value={`${key.name} (${key.unit})`}>
-																		{`${key?.name} (${key?.unit})`}
+																		{`${key?.name} (${key.unit})`}
 																	</Option>
 																))}
 															</Select>
@@ -742,17 +826,33 @@ const TaskActionsPage = () => {
 															className='ml-2'
 															id='type'
 															label='So sánh'>
-															<Input
+															<Select
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
 																}
 																value={item?.keyType || ''}
 																name='keyType'
 																size='lg'
-																required
 																ariaLabel='So sánh'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='>,=,<'
+																placeholder='So sánh'
+																list={[
+																	{
+																		id: 1,
+																		text: '>',
+																		value: '>',
+																	},
+																	{
+																		id: 2,
+																		text: '=',
+																		value: '=',
+																	},
+																	{
+																		id: 3,
+																		text: '<',
+																		value: '<',
+																	},
+																]}
 															/>
 														</FormGroup>
 													</div>
@@ -768,7 +868,7 @@ const TaskActionsPage = () => {
 																value={item?.keyValue || ''}
 																name='keyValue'
 																size='lg'
-																required
+																type='number'
 																ariaLabel='Giá trị key'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 , 1000 , ..'

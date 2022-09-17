@@ -1041,9 +1041,23 @@ const TaskDetailPage = () => {
 											color: 'primary',
 											children: (
 												<div className='fs-5'>
-													<span className='me-2'>Thời gian dự kiến:</span>
+													<span className='me-2'>Thời gian bắt đầu:</span>
 													{moment(
-														`${task?.estimateDate} ${task.estimateTime}`,
+														`${task?.startDate} ${task.startTime}`,
+													).format('DD-MM-YYYY, HH:mm')}
+												</div>
+											),
+										},
+										{
+											icon: 'CalendarCheck',
+											color: 'primary',
+											children: (
+												<div className='fs-5'>
+													<span className='me-2'>
+														Thời hạn hoàn thành:
+													</span>
+													{moment(
+														`${task?.deadlineDate} ${task.deadlineTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
 												</div>
 											),
