@@ -3,14 +3,14 @@ import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import { Button, Modal } from 'react-bootstrap';
-import FormGroup from '../../../components/bootstrap/forms/FormGroup';
-import Input from '../../../components/bootstrap/forms/Input';
-import Textarea from '../../../components/bootstrap/forms/Textarea';
-import Checks from '../../../components/bootstrap/forms/Checks';
-import CustomSelect from '../../../components/form/CustomSelect';
-import Select from '../../../components/bootstrap/forms/Select';
+import FormGroup from '../../components/bootstrap/forms/FormGroup';
+import Select from '../../components/bootstrap/forms/Select';
+import CustomSelect from '../../components/form/CustomSelect';
+import Textarea from '../../components/bootstrap/forms/Textarea';
+import Checks from '../../components/bootstrap/forms/Checks';
+import Input from '../../components/bootstrap/forms/Input';
 
-const CommonForm = ({
+const DetailForm = ({
 	className,
 	show,
 	onClose,
@@ -25,14 +25,13 @@ const CommonForm = ({
 }) => {
 	const formik = useFormik({
 		initialValues: { ...item },
-		validationSchema: validate,
 		enableReinitialize: true,
+		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
 			handleSubmit(values);
 			resetForm();
 		},
 	});
-	console.log(formik);
 	return (
 		<Modal
 			className={classNames(className, 'p-4')}
@@ -123,6 +122,7 @@ const CommonForm = ({
 													id={field.id}
 													label={field.title}>
 													<Textarea
+                                                    disabled
 														rows={5}
 														ariaLabel={field.title}
 														placeholder={`Nhập ${field.title}`}
@@ -155,6 +155,7 @@ const CommonForm = ({
 													id={field.id}
 													label={field.title}>
 													<Checks
+                                                    disabled
 														id={field.id}
 														type='switch'
 														size='lg'
@@ -184,7 +185,7 @@ const CommonForm = ({
 												id={field.id}
 												label={field.title}>
 												<Input
-													disabled
+                                                    disabled
 													type={field.type || 'text'}
 													name={field.id}
 													onChange={formik.handleChange}
@@ -216,15 +217,12 @@ const CommonForm = ({
 				<Button size='lg' variant='secondary' onClick={onClose}>
 					Đóng
 				</Button>
-				<Button size='lg' variant='primary' type='submit' onClick={formik.handleSubmit}>
-					Xác nhận
-				</Button>
 			</Modal.Footer>
 		</Modal>
 	);
 };
 
-CommonForm.propTypes = {
+DetailForm.propTypes = {
 	className: PropTypes.string,
 	disable: PropTypes.string,
 	show: PropTypes.bool,
@@ -242,7 +240,7 @@ CommonForm.propTypes = {
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
 };
-CommonForm.defaultProps = {
+DetailForm.defaultProps = {
 	className: null,
 	disable: null,
 	show: false,
@@ -256,4 +254,4 @@ CommonForm.defaultProps = {
 	label: '',
 };
 
-export default CommonForm;
+export default DetailForm;
