@@ -3,27 +3,40 @@ import axiosClient from '../../utils/axiosClient';
 const getAllKpiNorm = () => {
 	return axiosClient({
 		method: 'GET',
-		url: `/kpiNorm`,
+		url: `/kpiNorms`,
 	});
 };
+
+
 const addKpiNorm = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/kpiNorm`,
+		url: `/kpiNorms`,
 		data,
 	});
 };
+
 const updateKpiNorm = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/kpiNorm/${data.id}`,
+		url: `/kpiNorms/${data.id}`,
 		data,
 	});
 };
+
 const deleteKpiNorm = (id) => {
 	return axiosClient({
 		method: 'DELETE',
-		url: `/kpiNorm/${id}`,
+		url: `/kpiNorms/${id}`,
 	});
 };
-export { getAllKpiNorm, addKpiNorm, updateKpiNorm, deleteKpiNorm };
+
+const fetchAllKpiNorms = (params) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/api/kpiNorms?_expand=department`,
+		params,
+	});
+};
+
+export { getAllKpiNorm, addKpiNorm, updateKpiNorm, deleteKpiNorm, fetchAllKpiNorms };

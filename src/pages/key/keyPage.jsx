@@ -70,7 +70,7 @@ const KeyPage = () => {
 	}, []);
 	const columns = [
 		{
-			title: 'Tên chỉ số Key',
+			title: 'Tên chỉ số đánh giá',
 			id: 'name',
 			key: 'name',
 			type: 'text',
@@ -98,7 +98,7 @@ const KeyPage = () => {
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.unit?.name}</span>,
-			options: units
+			options: units,
 		},
 		{
 			title: 'Hành động',

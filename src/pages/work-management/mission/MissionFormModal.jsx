@@ -160,10 +160,10 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			keysState.map((key, index) => {
 				const allPrev = [...keysState];
 				if (keysState[index].keyName === '') {
-					allPrev[index].error.keyName = 'Nhập tên chỉ số key!';
+					allPrev[index].error.keyName = 'Nhập Tên chỉ số đánh giá!';
 				}
 				if (keysState[index].keyValue === '') {
-					allPrev[index].error.keyValue = 'Nhập giá trị key!';
+					allPrev[index].error.keyValue = 'Nhập giá trị!';
 				}
 				if (keysState[index].keyType === '') {
 					allPrev[index].error.keyType = 'Nhập loại key!';
@@ -362,7 +362,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		setDepartmentOption({});
 		setDepartmentRelatedOption([]);
 	};
-
+	const compare = ['>','=','<','<=','>='];
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
@@ -503,7 +503,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 										</div>
 										<FormGroup>
 											<Button variant='success' onClick={handleAddFieldKey}>
-												Thêm chỉ số key
+												Thêm tiêu chí đánh giá
 											</Button>
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
@@ -533,9 +533,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																}>
 																{keyOption.map((key) => (
 																	<Option
-																		key={`${key.name} (${key.unit})`}
-																		value={`${key.name} (${key.unit})`}>
-																		{`${key?.name} (${key?.unit})`}
+																		key={`${key.name} (${key?.unit?.name})`}
+																		value={`${key.name} (${key?.unit?.name})`}>
+																		{`${key?.name} (${key?.unit?.name})`}
 																	</Option>
 																))}
 															</Select>
@@ -551,18 +551,27 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 															className='ml-2'
 															id='type'
 															label='So sánh'>
-															<Input
+															<Select
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
 																}
-																value={item?.keyType || ''}
+																value={item?.keyType}
 																name='keyType'
 																size='lg'
 																required
 																ariaLabel='So sánh'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='> = <'
-															/>
+															>
+																{compare.map((element) => (
+																	<Option
+																		key={`${element}`}
+																		value={`${element}`}>
+																		{`${element}`}
+																	</Option>
+																))}
+																
+															</Select>
 														</FormGroup>
 														{item.error?.keyType && (
 															<ErrorText>
@@ -574,7 +583,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 														<FormGroup
 															className='ml-2'
 															id='name'
-															label='Giá trị key'>
+															label='Giá trị'>
 															<Input
 																onChange={(e) =>
 																	handleChangeKeysState(index, e)
@@ -583,7 +592,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																name='keyValue'
 																size='lg'
 																required
-																ariaLabel='Giá trị key'
+																ariaLabel='Giá trị'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 , 1000 , ..'
 															/>

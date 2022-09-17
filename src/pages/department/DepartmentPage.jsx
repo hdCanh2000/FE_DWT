@@ -32,6 +32,7 @@ const DepartmentPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleOpenDetail = (data) => dispatch(toggleFormSlice.actions.openDetail(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const departments = useSelector((state) => state.department.departments);
@@ -108,16 +109,17 @@ const DepartmentPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='ArrowForward'
-						onClick={() =>
-							navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`)
-						}
+						onClick={() => handleOpenDetails(item)}
 					/>
 				</>
 			),
 			isShow: false,
 		},
 	];
-
+	const handleOpenDetails = (item) => {
+		handleOpenDetail(item);
+		navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`);
+	};
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
