@@ -24,6 +24,7 @@ import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
+import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
 
 const customStyles = {
 	control: (provided) => ({
@@ -397,6 +398,7 @@ const TaskActionsPage = () => {
 
 	return (
 		<PageWrapper title={demoPages.jobsPage.subMenu.mission.text}>
+			<SubHeaderCommon />
 			<Page container='fluid'>
 				<div className='row mx-4 px-4 my-4'>
 					<Card className='p-4 w-100 m-auto'>
@@ -741,7 +743,7 @@ const TaskActionsPage = () => {
 																	parseInt(
 																		item.quantity * item.point,
 																		10,
-																	) || ''
+																	) || item.total
 																}
 																name='total'
 																size='lg'

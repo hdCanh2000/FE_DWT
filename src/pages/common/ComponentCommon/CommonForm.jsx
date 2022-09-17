@@ -31,7 +31,6 @@ const CommonForm = ({
 			resetForm();
 		},
 	});
-	console.log(formik);
 	return (
 		<Modal
 			className={classNames(className, 'p-4')}

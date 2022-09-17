@@ -1,8 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-
-import moment from 'moment';
 import React, { useEffect, useRef, useState, memo } from 'react';
+import moment from 'moment';
 import { Button, Modal } from 'react-bootstrap';
 import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
@@ -362,7 +361,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		setDepartmentOption({});
 		setDepartmentRelatedOption([]);
 	};
-	const compare = ['>','=','<','<=','>='];
+	const compare = ['>', '=', '<', '<=', '>='];
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
@@ -561,8 +560,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																required
 																ariaLabel='So sánh'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='> = <'
-															>
+																placeholder='> = <'>
 																{compare.map((element) => (
 																	<Option
 																		key={`${element}`}
@@ -570,7 +568,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																		{`${element}`}
 																	</Option>
 																))}
-																
 															</Select>
 														</FormGroup>
 														{item.error?.keyType && (

@@ -7,7 +7,6 @@ const getAllKpiNorm = () => {
 	});
 };
 
-
 const addKpiNorm = (data) => {
 	return axiosClient({
 		method: 'POST',
