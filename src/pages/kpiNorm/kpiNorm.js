@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-// import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -16,25 +15,40 @@ import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+// import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
+import KpiNormDetail from './kpiNormDetail';
+import { getAllKeys } from '../key/services';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
-	const toggleForm = useSelector((state) => state.toggleForm.open);
-	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const departments = useSelector((state) => state.department.departments);
+	const [openDetail, setOpenDetail] = useState(false);
+	const [dataDetail, setDataDetail] = useState(false);
+	const [openForm, setOpenForm] = React.useState(false);
+	const [itemEdit, setItemEdit] = React.useState({});
+	const [units, setUnit] = React.useState([]);
 
+	useEffect(() => {
+		const fecthKey = async () => {
+			const reponse = await getAllKeys();
+			const result = reponse.data.map((item) => {
+				return {
+					label: item.name,
+					value: item.id,
+				};
+			});
+			setUnit(result);
+		};
+		fecthKey();
+	}, []);
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
@@ -76,7 +90,7 @@ const EmployeePage = () => {
 			type: 'select',
 			align: 'center',
 			isShow: true,
-			render: (item) => <span>{item?.department?.label || ''}</span>,
+			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
 			isMulti: false,
 		},
@@ -84,9 +98,12 @@ const EmployeePage = () => {
 			title: 'Đơn vị',
 			id: 'unit',
 			key: 'unit',
-			type: 'string',
+			type: 'select',
 			align: 'center',
+			options: units,
 			isShow: true,
+			render: (item) => <span>{showUnit(item?.unitId) || ''}</span>,
+			isMulti: false,
 		},
 		{
 			title: 'Điểm KPI trên 1 đơn vị',
@@ -112,7 +129,15 @@ const EmployeePage = () => {
 			title: 'Mô tả',
 			id: 'description',
 			key: 'description',
-			type: 'string',
+			type: 'textarea',
+			align: 'center',
+			isShow: true,
+		},
+		{
+			title: 'Cách đánh giá đo lường',
+			id: 'evaluationDescription',
+			key: 'evaluationDescription',
+			type: 'textarea',
 			align: 'center',
 			isShow: true,
 		},
@@ -157,15 +182,17 @@ const EmployeePage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: data?.id,
+			id: parseInt(data?.id, 10),
 			name: data?.name,
-			departmentId: data?.department?.id,
-			department: data?.department,
-			parentId: data?.parent?.id,
-			parent: data?.parent,
-			unit: data?.unit,
+			departmentId: data?.department?.value,
+			parentId: data?.parent?.value,
 			point: data?.point,
 			description: data?.description,
+			evaluationDescription: data?.evaluationDescription,
+			unitId: data?.unit?.value,
+			parent: data?.parent,
+			department: data?.department,
+			unit: data?.unit,
 		};
 		if (data?.id) {
 			try {
@@ -189,7 +216,7 @@ const EmployeePage = () => {
 				handleCloseForm();
 				handleShowToast(
 					`Thêm định mức KPI`,
-					`Định mức KPI ${result?.user?.name} được thêm thành công!`,
+					`Định mức KPI ${result?.name} được thêm thành công!`,
 				);
 			} catch (error) {
 				handleShowToast(`Thêm định mức KPI`, `Thêm định mức KPI không thành công!`);
@@ -204,15 +231,53 @@ const EmployeePage = () => {
 	const handleCloseDelete = () => {
 		setIsDelete(false);
 	};
-	const handleDeleteKpiNorm = (item) => {
+	const handleOpenDetail = (item) => {
+		setOpenDetail(true);
+		setDataDetail({
+			...item,
+			department: {
+				label: showDepartment(item?.departmentId),
+				value: item?.departmentId,
+			},
+			parent: {
+				label: showParent(item?.parentId),
+				value: item?.parent,
+			},
+		});
+	};
+	const handleCloseDetail = () => {
+		setOpenDetail(false);
+		setDataDetail({});
+	};
+	const handleDeleteKpiNorm = async (item) => {
 		try {
-			deleteKpiNorm(item);
+			await deleteKpiNorm(item);
 			dispatch(fetchKpiNormList());
 			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI không thành công!`);
 		}
 		handleCloseDelete();
+	};
+	const showDepartment = (idDepartment) => {
+		const newDepartment = departments.filter((item) => item?.id === idDepartment);
+		return newDepartment[0]?.label;
+	};
+	const showParent = (idParent) => {
+		const newParent = kpiNorm.filter((item) => item?.id === idParent);
+		return newParent[0]?.name;
+	};
+	const showUnit = (idUnit) => {
+		const newUnit = units.filter((item) => item?.value === idUnit);
+		return newUnit[0]?.label;
+	};
+	const handleCloseForm = () => {
+		setOpenForm(false);
+		setItemEdit({});
+	};
+	const handleOpenForm = (item) => {
+		setOpenForm(true);
+		setItemEdit(item)
 	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
@@ -261,7 +326,6 @@ const EmployeePage = () => {
 														Điểm KPI trên 1 đơn vị
 													</th>
 													<th className='text-center'>Hành động</th>
-													<td />
 												</tr>
 											</thead>
 											<tbody>
@@ -274,12 +338,12 @@ const EmployeePage = () => {
 															<td
 																className='cursor-pointer'
 																align='center'>
-																{item?.department?.label}
+																{showDepartment(item?.departmentId)}
 															</td>
 															<td
 																className='cursor-pointer'
 																align='center'>
-																{item?.unit}
+																{showUnit(item?.unitId)}
 															</td>
 															<td
 																className='cursor-pointer'
@@ -307,6 +371,16 @@ const EmployeePage = () => {
 																		handleOpenDelete(item)
 																	}
 																/>
+																<Button
+																	isOutline={!darkModeStatus}
+																	color='primary'
+																	isLight={darkModeStatus}
+																	className='text-nowrap mx-1'
+																	icon='RemoveRedEye'
+																	onClick={() =>
+																		handleOpenDetail(item)
+																	}
+																/>
 															</td>
 														</tr>
 													</React.Fragment>
@@ -320,15 +394,21 @@ const EmployeePage = () => {
 					</div>,
 					['admin', 'manager'],
 				)}
-
 				<CommonForm
-					show={toggleForm}
+					show={openForm}
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật định mức KPI' : 'Thêm mới định mức KPI'}
 					fields={columns}
 					validate={validate}
+				/>
+				<KpiNormDetail
+					show={openDetail}
+					onClose={handleCloseDetail}
+					item={dataDetail}
+					label={`Chi tiết định mức KPI ${dataDetail.name}`}
+					fields={columns}
 				/>
 				<TaskAlertConfirm
 					openModal={isDelete}

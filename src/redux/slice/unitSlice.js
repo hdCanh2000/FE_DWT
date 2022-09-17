@@ -15,7 +15,7 @@ export const fetchUnitList = createAsyncThunk('unit/fetchList', async () => {
 			value: unit?.id,
 			label: unit?.name,
 		};
-	})
+	});
 });
 
 export const unitSlice = createSlice({

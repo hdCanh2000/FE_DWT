@@ -98,7 +98,7 @@ const KeyPage = () => {
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.unit?.name}</span>,
-			options: units
+			options: units,
 		},
 		{
 			title: 'Hành động',

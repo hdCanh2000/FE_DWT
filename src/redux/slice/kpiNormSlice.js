@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllKpiNorm, addKpiNorm, updateKpiNorm } from '../../pages/kpiNorm/services';
+import {
+	getAllKpiNorm,
+	addKpiNorm,
+	updateKpiNorm,
+	fetchAllKpiNorms,
+} from '../../pages/kpiNorm/services';
 
 const initialState = {
 	kpiNorms: [],
@@ -10,8 +15,30 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () => {
 	const response = await getAllKpiNorm();
-	return response.data;
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+		};
+	});
 });
+
+export const fetchKpiNormListByParams = createAsyncThunk(
+	'kpiNorm/fetchKpiNormListByParams',
+	async (params) => {
+		const response = await fetchAllKpiNorms(params);
+		return response.data.map((item) => {
+			return {
+				...item,
+				label: item.name,
+				value: item.id,
+				text: item.name,
+			};
+		});
+	},
+);
 
 export const onAddKpiNorm = createAsyncThunk('kpiNorm/addNew', async (data) => {
 	const response = await addKpiNorm(data);
@@ -38,6 +65,18 @@ export const kpiNormSlice = createSlice({
 			state.kpiNorms = [...action.payload];
 		},
 		[fetchKpiNormList.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list
+		[fetchKpiNormListByParams.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchKpiNormListByParams.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.kpiNorms = [...action.payload];
+		},
+		[fetchKpiNormListByParams.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
