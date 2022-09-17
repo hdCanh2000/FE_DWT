@@ -76,7 +76,7 @@ const getAllTasks = () => {
 const getAllKeys = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/keys',
+		url: '/keys?_expand=unit',
 	});
 };
 export {

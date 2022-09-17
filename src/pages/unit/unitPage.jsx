@@ -71,7 +71,7 @@ const UnitPage = () => {
 			title: 'Mã đơn vị',
 			id: 'code',
 			key: 'code',
-			type: 'number',
+			type: 'text',
 			align: 'left',
 			isShow: true,
 		},

@@ -230,17 +230,20 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		if (keysState?.length === 0 || keysState === null) {
 			return true;
 		}
-		const someEmpty = keysState?.some((key) => key.keyName === '' || key.keyValue === '');
+		const someEmpty = keysState?.some((key) => key.keyName === '' || key.keyValue === '' || key.keyType === '');
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
 			keysState?.map((key, index) => {
 				const allPrev = [...keysState];
 				if (keysState[index].keyName === '') {
-					allPrev[index].error.keyName = 'Nhập tên chỉ số key!';
+					allPrev[index].error.keyName = 'Nhập Tên chỉ số đánh giá!';
 				}
 				if (keysState[index].keyValue === '') {
-					allPrev[index].error.keyValue = 'Nhập giá trị key!';
+					allPrev[index].error.keyValue = 'Nhập giá trị!';
+				}
+				if (keysState[index].keyType === '') {
+					allPrev[index].error.keyType = 'Nhập loại key!';
 				}
 				setKeysState(allPrev);
 			});
@@ -254,9 +257,11 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		const initKeyState = {
 			keyName: '',
 			keyValue: '',
+			keyType: '',
 			error: {
 				keyName: null,
 				keyValue: null,
+				keyType: null,
 			},
 		};
 		if (prevIsValid() && keysState?.length <= 3) {
@@ -387,6 +392,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 			return {
 				keyName: key.keyName,
 				keyValue: key.keyValue,
+				keyType: key.keyType,
 			};
 		});
 		data.missionId = valueMission.id || null;
@@ -420,7 +426,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		onSubmit(newData);
 		handleClearForm();
 	};
-
+	const compare = ['>','=','<','<=','>='];
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
@@ -669,7 +675,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 										</div>
 										<FormGroup>
 											<Button variant='success' onClick={handleAddFieldKey}>
-												Thêm chỉ số key
+												Thêm tiêu chí đánh giá											
 											</Button>
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
@@ -677,12 +683,13 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 											return (
 												<div
 													// eslint-disable-next-line react/no-array-index-key
+													key={index}
 													className='mt-4 d-flex align-items-center justify-content-between'>
-													<div style={{ width: '45%', marginRight: 10 }}>
+													<div style={{ width: '40%', marginRight: 10 }}>
 														<FormGroup
 															className='mr-2'
 															id='name'
-															label='Tên chỉ số key'>
+															label={`Chỉ số key ${index + 1}`}>
 															<Select
 																name='keyName'
 																required
@@ -695,9 +702,9 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 																}>
 																{keyOption.map((key) => (
 																	<Option
-																		key={`${key?.name} (${key?.unit})`}
-																		value={`${key?.name} (${key?.unit})`}>
-																		{`${key?.name} (${key?.unit})`}
+																		key={`${key?.name} (${key?.unit?.name})`}
+																		value={`${key?.name} (${key?.unit?.name})`}>
+																		{`${key?.name} (${key?.unit?.name})`}
 																	</Option>
 																))}
 															</Select>
@@ -708,11 +715,43 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 															</ErrorText>
 														)}
 													</div>
-													<div style={{ width: '45%', marginLeft: 10 }}>
+													<div style={{ width: '15%' }}>
+														<FormGroup
+															className='ml-2'
+															id='type'
+															label='So sánh'>
+															<Select
+																onChange={(e) =>
+																	handleChangeKeysState(index, e)
+																}
+																value={item?.keyType}
+																name='keyType'
+																size='lg'
+																required
+																ariaLabel='So sánh'
+																className='border border-2 rounded-0 shadow-none'
+																placeholder='> = <'
+															>
+																{compare.map((element) => (
+																	<Option
+																		key={`${element}`}
+																		value={`${element}`}>
+																		{`${element}`}
+																	</Option>
+																))}
+															</Select>
+														</FormGroup>
+														{item.error?.keyType && (
+															<ErrorText>
+																{item.error?.keyType}
+															</ErrorText>
+														)}
+													</div>
+													<div style={{ width: '30 %', marginLeft: 10 }}>
 														<FormGroup
 															className='ml-2'
 															id='name'
-															label='Giá trị key'>
+															label='Giá trị'>
 															<Input
 																type='number'
 																onChange={(e) =>
