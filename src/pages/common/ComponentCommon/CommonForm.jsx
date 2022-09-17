@@ -26,7 +26,6 @@ const CommonForm = ({
 		initialValues: { ...item },
 		validationSchema: validate,
 		enableReinitialize: true,
-		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
 			handleSubmit(values);
 			resetForm();
