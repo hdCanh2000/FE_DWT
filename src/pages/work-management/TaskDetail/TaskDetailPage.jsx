@@ -519,10 +519,10 @@ const TaskDetailPage = () => {
 
 	// ------------------	UPDATE AND DELETE TASK	-------------------
 	// form task modal
-	const handleOpenEditTaskForm = (item) => {
-		setEditModalTaskStatus(true);
-		setTaskEdit({ ...item });
-	};
+	// const handleOpenEditTaskForm = (item) => {
+	// 	setEditModalTaskStatus(true);
+	// 	setTaskEdit({ ...item });
+	// };
 
 	const handleCloseEditTaskForm = () => {
 		setEditModalTaskStatus(false);
@@ -715,8 +715,11 @@ const TaskDetailPage = () => {
 										isLight={darkModeStatus}
 										className='text-nowrap mx-2'
 										icon='Edit'
-										isDisable={task?.status === 4 || task?.status === 7}
-										onClick={() => handleOpenEditTaskForm(task)}>
+										onClick={() =>
+											navigate(
+												`${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/${task.id}`,
+											)
+										}>
 										Sửa
 									</Button>
 									<Button
@@ -1041,18 +1044,6 @@ const TaskDetailPage = () => {
 													<span className='me-2'>Thời gian dự kiến:</span>
 													{moment(
 														`${task?.estimateDate} ${task.estimateTime}`,
-													).format('DD-MM-YYYY, HH:mm')}
-												</div>
-											),
-										},
-										{
-											icon: 'CalendarCheck',
-											color: 'primary',
-											children: (
-												<div className='fs-5'>
-													<span className='me-2'>Hạn hoàn thành:</span>
-													{moment(
-														`${task?.deadlineDate} ${task.deadlineTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
 												</div>
 											),

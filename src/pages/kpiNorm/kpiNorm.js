@@ -90,7 +90,7 @@ const EmployeePage = () => {
 			type: 'select',
 			align: 'center',
 			isShow: true,
-			render: (item) => <span>{showDepartment(item?.departmentId) || ''}</span>,
+			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
 			isMulti: false,
 		},
