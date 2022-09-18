@@ -1,6 +1,6 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -129,7 +129,7 @@ const MissionDetailPage = () => {
 	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
-	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	// const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	// const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
@@ -159,9 +159,9 @@ const MissionDetailPage = () => {
 			),
 		},
 		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
+			title: 'Thời gian bắt đầu',
+			id: 'startDate',
+			key: 'startDate',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
@@ -202,14 +202,14 @@ const MissionDetailPage = () => {
 			type: 'number',
 			align: 'center',
 		},
-		{
-			title: 'KPI thực tế',
-			id: 'currentKpi',
-			key: 'currentKpi',
-			type: 'number',
-			render: (item) => <span>{item?.currentKPI}</span>,
-			align: 'center',
-		},
+		// {
+		// 	title: 'KPI thực tế',
+		// 	id: 'currentKpi',
+		// 	key: 'currentKpi',
+		// 	type: 'number',
+		// 	render: (item) => <span>{item?.currentKPI}</span>,
+		// 	align: 'center',
+		// },
 		{
 			title: 'Độ ưu tiên',
 			id: 'priority',
@@ -281,8 +281,7 @@ const MissionDetailPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						isDisable={item.status === 4 || item.status === 7 || item.status === 3}
-						onClick={() => handleOpenFormEdit(item)}
+						onClick={() => handleOnClickToEditPage(item.id)}
 					/>
 					<Button
 						isDisable={item.status === 7}
@@ -434,6 +433,16 @@ const MissionDetailPage = () => {
 
 	const { themeStatus, darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
+
+	const handleOnClickToActionPage = useCallback(
+		() => navigate(`${demoPages.jobsPage.subMenu.mission.path}/them-moi`),
+		[navigate],
+	);
+
+	const handleOnClickToEditPage = useCallback(
+		(taskId) => navigate(`${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/${taskId}`),
+		[navigate],
+	);
 
 	const handleClearValueForm = () => {
 		setMissionEdit({
@@ -930,7 +939,7 @@ const MissionDetailPage = () => {
 													color='info'
 													icon='Plus'
 													tag='button'
-													onClick={() => handleOpenFormEdit(null)}>
+													onClick={handleOnClickToActionPage}>
 													Thêm công việc
 												</Button>
 											</CardActions>

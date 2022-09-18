@@ -71,7 +71,7 @@ const Item = ({
 				<CardBody>
 					<div className='row g-2 align-items-center'>
 						<div className='col-auto mb-3'>
-							<span>Thời gian dự kiến:</span>
+							<span>Thời hạn hoàn thành:</span>
 						</div>
 						<div className='col-auto mb-3'>
 							<small
@@ -688,7 +688,7 @@ const MissionPage = () => {
 								id={item?.id}
 								name={item?.name}
 								teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
-								dueDate={`${item?.estimateDate}`}
+								dueDate={`${item?.deadlineDate}`}
 								percent={item.progress || 0}
 								data-tour='project-item'
 							/>

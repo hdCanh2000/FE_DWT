@@ -278,7 +278,7 @@ const EmployeePage = () => {
 	};
 	const handleOpenForm = (item) => {
 		setOpenForm(true);
-		setItemEdit(item)
+		setItemEdit(item);
 	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>

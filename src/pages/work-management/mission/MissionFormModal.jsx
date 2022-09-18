@@ -1,8 +1,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-
-import moment from 'moment';
 import React, { useEffect, useRef, useState, memo } from 'react';
+import moment from 'moment';
 import { Button, Modal } from 'react-bootstrap';
 import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
