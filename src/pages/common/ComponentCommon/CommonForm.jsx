@@ -183,7 +183,6 @@ const CommonForm = ({
 												id={field.id}
 												label={field.title}>
 												<Input
-													disabled
 													type={field.type || 'text'}
 													name={field.id}
 													onChange={formik.handleChange}

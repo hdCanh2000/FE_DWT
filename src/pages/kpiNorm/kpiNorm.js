@@ -169,7 +169,6 @@ const EmployeePage = () => {
 			isShow: false,
 		},
 	];
-	console.log(kpiNorm);
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
