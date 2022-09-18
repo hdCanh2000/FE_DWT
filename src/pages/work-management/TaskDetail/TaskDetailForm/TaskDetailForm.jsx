@@ -187,7 +187,9 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		if (keysState?.length === 0 || !keysState) {
 			return true;
 		}
-		const someEmpty = keysState?.some((key) => key?.keyName === '' || key?.keyValue === '' || key.keyType === '');
+		const someEmpty = keysState?.some(
+			(key) => key?.keyName === '' || key?.keyValue === '' || key.keyType === '',
+		);
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
@@ -238,7 +240,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 			error: {
 				keyName: null,
 				keyValue: null,
-				keyType: null
+				keyType: null,
 			},
 		};
 		if (prevIsValid()) {
@@ -593,35 +595,25 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 										)}
 									</div>
 									<div style={{ width: '15%' }}>
-										<FormGroup
-											className='ml-2'
-											id='type'
-											label='So sánh'>
+										<FormGroup className='ml-2' id='type' label='So sánh'>
 											<Select
-												onChange={(e) =>
-													handleChangeKeysState(index, e)
-												}
+												onChange={(e) => handleChangeKeysState(index, e)}
 												value={item?.keyType}
 												name='keyType'
 												size='lg'
 												required
 												ariaLabel='So sánh'
 												className='border border-2 rounded-0 shadow-none'
-												placeholder='> = <'
-											>
+												placeholder='> = <'>
 												{compare.map((element) => (
-													<Option
-														key={`${element}`}
-														value={`${element}`}>
+													<Option key={`${element}`} value={`${element}`}>
 														{`${element}`}
 													</Option>
 												))}
 											</Select>
 										</FormGroup>
 										{item.error?.keyType && (
-											<ErrorText>
-												{item.error?.keyType}
-											</ErrorText>
+											<ErrorText>{item.error?.keyType}</ErrorText>
 										)}
 									</div>
 									<div style={{ width: '30%', marginLeft: 10 }}>

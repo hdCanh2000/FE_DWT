@@ -362,7 +362,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		setDepartmentOption({});
 		setDepartmentRelatedOption([]);
 	};
-	const compare = ['>','=','<','<=','>='];
+	const compare = ['>', '=', '<', '<=', '>='];
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
@@ -561,8 +561,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																required
 																ariaLabel='So sánh'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='> = <'
-															>
+																placeholder='> = <'>
 																{compare.map((element) => (
 																	<Option
 																		key={`${element}`}
@@ -570,7 +569,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																		{`${element}`}
 																	</Option>
 																))}
-																
 															</Select>
 														</FormGroup>
 														{item.error?.keyType && (

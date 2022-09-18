@@ -230,7 +230,9 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		if (keysState?.length === 0 || keysState === null) {
 			return true;
 		}
-		const someEmpty = keysState?.some((key) => key.keyName === '' || key.keyValue === '' || key.keyType === '');
+		const someEmpty = keysState?.some(
+			(key) => key.keyName === '' || key.keyValue === '' || key.keyType === '',
+		);
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
@@ -426,7 +428,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 		onSubmit(newData);
 		handleClearForm();
 	};
-	const compare = ['>','=','<','<=','>='];
+	const compare = ['>', '=', '<', '<=', '>='];
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
@@ -675,7 +677,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 										</div>
 										<FormGroup>
 											<Button variant='success' onClick={handleAddFieldKey}>
-												Thêm tiêu chí đánh giá											
+												Thêm tiêu chí đánh giá
 											</Button>
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
@@ -730,8 +732,7 @@ const TaskFormModal = ({ show, onClose, item, onSubmit, isShowMission }) => {
 																required
 																ariaLabel='So sánh'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='> = <'
-															>
+																placeholder='> = <'>
 																{compare.map((element) => (
 																	<Option
 																		key={`${element}`}
