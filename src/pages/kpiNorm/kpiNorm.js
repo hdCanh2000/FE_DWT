@@ -85,12 +85,12 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Phòng ban',
-			id: 'department',
-			key: 'department',
-			type: 'select',
+			id: 'departmentId',
+			key: 'departmentId',
+			type: 'singleSelect',
 			align: 'center',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''}</span>,
+			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
 			isMulti: false,
 		},
@@ -117,7 +117,7 @@ const EmployeePage = () => {
 			title: 'Nhiệm vụ cha',
 			id: 'parent',
 			key: 'parent',
-			type: 'select',
+			type: 'singleSelect',
 			align: 'center',
 			render: (item) => (
 				<span>{item?.parent?.label === '' ? 'không' : item?.parent?.label}</span>
@@ -140,6 +140,15 @@ const EmployeePage = () => {
 			type: 'textarea',
 			align: 'center',
 			isShow: true,
+		},
+		{
+			title: 'Đây có phải là Key ?',
+			id: 'isKey',
+			key: 'isKey',
+			type: 'key',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === true ? 'Là Key' : 'Không phải Key'),
 		},
 		{
 			title: 'Hành động',
@@ -193,6 +202,7 @@ const EmployeePage = () => {
 			parent: data?.parent,
 			department: data?.department,
 			unit: data?.unit,
+			isKey : data.isKey,
 		};
 		if (data?.id) {
 			try {
@@ -280,7 +290,7 @@ const EmployeePage = () => {
 		setItemEdit(item);
 	};
 	return (
-		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
+		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='row mb-4'>

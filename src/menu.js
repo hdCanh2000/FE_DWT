@@ -153,6 +153,26 @@ export const demoPages = {
 		path: 'cau-hinh',
 		icon: 'Settings',
 		subMenu: {
+			kpi: {
+				id: 'kpi',
+				text: 'Cấu hình KPI',
+				path: '/cau-hinh-kpi',
+			},
+			unit: {
+				id: 'unit',
+				text: 'Cấu hình đơn vị',
+				path: '/cau-hinh-don-vi',
+			},
+			authorization: {
+				id: 'authorization',
+				text: 'Cấu hình phân quyền',
+				path: '/cau-hinh-phan-quyen',
+			},
+			kpiNorm: {
+				id: 'kpiNorm',
+				text: 'Danh mục định mức KPI',
+				path: '/danh-muc-dinh-muc-kpi',
+			},
 			overall: {
 				id: 'overall',
 				text: 'Cấu hình chung',
@@ -168,16 +188,6 @@ export const demoPages = {
 				text: 'Cấu hình mục tiêu',
 				path: '/cau-hinh-muc-tieu',
 			},
-			kpi: {
-				id: 'kpi',
-				text: 'Cấu hình KPI',
-				path: '/cau-hinh-kpi',
-			},
-			unit: {
-				id: 'unit',
-				text: 'Cấu hình đơn vị',
-				path: '/cau-hinh-don-vi',
-			},
 			role: {
 				id: 'role',
 				text: 'Cầu hình vai trò',
@@ -192,16 +202,6 @@ export const demoPages = {
 				id: 'table',
 				text: 'Cấu hình bảng số liệu',
 				path: '/cau-hinh-bang-so-lieu',
-			},
-			authorization: {
-				id: 'authorization',
-				text: 'Cấu hình phân quyền',
-				path: '/cau-hinh-phan-quyen',
-			},
-			kpiNorm: {
-				id: 'kpiNorm',
-				text: 'Danh mục định mức KPI',
-				path: '/danh-muc-dinh-muc-kpi',
 			},
 		},
 	},
