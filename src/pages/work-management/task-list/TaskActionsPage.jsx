@@ -43,11 +43,9 @@ const TaskActionsPage = () => {
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
-	const keys = useSelector((state) => state.key.keys);
 	const missions = useSelector((state) => state.mission.missions);
 
 	const [task, setTask] = useState({});
-	const [keysState, setKeysState] = useState([]);
 	const [kpiNormOptions, setKpiNormOptions] = useState([]);
 	const [missionOption, setMissionOption] = useState({});
 	const [departmentOption, setDepartmentOption] = useState({ label: null, value: null });
@@ -60,7 +58,7 @@ const TaskActionsPage = () => {
 			getTaskById(params.id).then((res) => {
 				const response = res.data;
 				setTask(response?.data);
-				setKeysState(response.data?.keys || []);
+				// setKeysState(response.data?.keys || []);
 				setMissionOption(
 					{
 						...response.data.mission,
@@ -198,78 +196,6 @@ const TaskActionsPage = () => {
 		setKpiNormOptions((prev) => prev.filter((state) => state !== prev[index]));
 	};
 
-	const prevIsValid = () => {
-		if (keysState.length === 0) {
-			return true;
-		}
-		const someEmpty = keysState.some(
-			(key) => key.keyName === '' || key.keyValue === '' || key.keyType === '',
-		);
-
-		if (someEmpty) {
-			// eslint-disable-next-line array-callback-return
-			keysState.map((key, index) => {
-				const allPrev = [...keysState];
-				if (keysState[index].keyName === '') {
-					allPrev[index].error.keyName = 'Nhập tên tiêu chí đánh giá!';
-				}
-				if (keysState[index].keyValue === '') {
-					allPrev[index].error.keyValue = 'Nhập giá trị key!';
-				}
-				if (keysState[index].keyType === '') {
-					allPrev[index].error.keyType = 'Nhập loại key!';
-				}
-				setKeysState(allPrev);
-			});
-		}
-
-		return !someEmpty;
-	};
-
-	// thêm field cho các giá trị key
-	const handleAddFieldKey = () => {
-		const initKeyState = {
-			keyName: '',
-			keyValue: '',
-			keyType: '',
-			error: {
-				keyName: null,
-				keyValue: null,
-				keyType: null,
-			},
-		};
-		if (prevIsValid()) {
-			setKeysState((prev) => [...prev, initKeyState]);
-		}
-	};
-
-	// hàm onchange cho input key
-	const handleChangeKeysState = (index, event) => {
-		event.preventDefault();
-		event.persist();
-		setKeysState((prev) => {
-			return prev.map((key, i) => {
-				if (i !== index) return key;
-				return {
-					...key,
-					[event.target.name]: event.target.value,
-					error: {
-						...key.error,
-						[event.target.name]:
-							event.target.value.length > 0
-								? null
-								: `Vui lòng nhập đầy đủ thông tin!`,
-					},
-				};
-			});
-		});
-	};
-
-	// xoá các key theo index
-	const handleRemoveKeyField = (e, index) => {
-		setKeysState((prev) => prev.filter((state) => state !== prev[index]));
-	};
-
 	// clear form
 	const handleClearForm = () => {
 		setTask({
@@ -288,7 +214,7 @@ const TaskActionsPage = () => {
 		setDepartmentRelatedOption([]);
 		setUserOption({});
 		setUserRelatedOption([]);
-		setKeysState([]);
+		// setKeysState([]);
 		setKpiNormOptions([]);
 		setMissionOption({});
 	};
@@ -323,13 +249,6 @@ const TaskActionsPage = () => {
 		data.kpiValue = parseInt(task?.kpiValue, 10) || calcTotalKpiValue(kpiNormOptions);
 		data.priority = parseInt(task?.priority, 10);
 		data.estimateMD = parseInt(task?.estimateMD, 10);
-		data.keys = keysState.map((key) => {
-			return {
-				keyName: key.keyName,
-				keyValue: parseInt(key.keyValue, 10),
-				keyType: key.keyType,
-			};
-		});
 		data.mission = missionOption?.value
 			? {
 					id: missionOption?.value,
@@ -401,7 +320,7 @@ const TaskActionsPage = () => {
 			<SubHeaderCommon />
 			<Page container='fluid'>
 				<div className='row mx-4 px-4 my-4'>
-					<Card className='p-4 w-100 m-auto'>
+					<Card className='p-4 w-75 m-auto'>
 						<CardHeader className='py-2'>
 							<CardLabel>
 								<CardTitle className='fs-4 ml-0'>Thêm nhiệm vụ</CardTitle>
@@ -555,6 +474,7 @@ const TaskActionsPage = () => {
 												defaultValue={departmentReplatedOption}
 												value={departmentReplatedOption}
 												onChange={setDepartmentRelatedOption}
+												isDisabled={!departmentOption.value}
 												options={departments.filter(
 													(department) =>
 														department.id !== departmentOption?.id,
@@ -571,6 +491,7 @@ const TaskActionsPage = () => {
 												defaultValue={userReplatedOption}
 												value={userReplatedOption}
 												onChange={setUserRelatedOption}
+												isDisabled={!userOption.value}
 												options={users.filter(
 													(user) => user.id !== userOption?.id,
 												)}
@@ -693,6 +614,9 @@ const TaskActionsPage = () => {
 																<CustomSelect
 																	placeholder='Chọn nhiệm vụ phụ'
 																	value={item}
+																	disabled={
+																		!departmentOption.value
+																	}
 																	onChange={(e) => {
 																		handleChangeKpiNormOption(
 																			index,
@@ -716,6 +640,7 @@ const TaskActionsPage = () => {
 																		e,
 																	)
 																}
+																disabled={!item.value}
 																type='number'
 																value={item?.quantity || ''}
 																name='quantity'
@@ -730,7 +655,7 @@ const TaskActionsPage = () => {
 														<FormGroup
 															className='ml-2'
 															id='total'
-															label='Quy đổi'>
+															label='Quy đổi (điểm)'>
 															<Input
 																onChange={(e) =>
 																	handleChangeKpiNormOption(
@@ -750,7 +675,7 @@ const TaskActionsPage = () => {
 																readOnly
 																ariaLabel='Quy đổi'
 																className='border border-2 rounded-0 shadow-none'
-																placeholder='Quy đổi'
+																placeholder='Quy đổi (điểm)'
 															/>
 														</FormGroup>
 													</div>
@@ -770,126 +695,6 @@ const TaskActionsPage = () => {
 																<Icon icon='Trash' size='lg' />
 															</Button>
 														</div>
-													</div>
-												</div>
-											);
-										})}
-									</div>
-								</div>
-								<div className='row g-2'>
-									<div className='col-12'>
-										<FormGroup>
-											<Button
-												color='success'
-												type='button'
-												className='d-block w-25 py-3'
-												onClick={handleAddFieldKey}>
-												Thêm tiêu chí đánh giá
-											</Button>
-										</FormGroup>
-										{/* eslint-disable-next-line no-shadow */}
-										{keysState?.map((item, index) => {
-											return (
-												<div
-													// eslint-disable-next-line react/no-array-index-key
-													key={index}
-													className='row mt-4 d-flex align-items-center justify-content-between'>
-													<div className='col-4'>
-														<FormGroup
-															className='mr-2'
-															id='name'
-															label={`Tiêu chí đánh giá ${
-																index + 1
-															}`}>
-															<Select
-																name='keyName'
-																size='lg'
-																ariaLabel={`tiêu chí đánh giá ${
-																	index + 1
-																}`}
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='Chọn tiêu chí đánh giá'
-																value={item?.keyName}
-																onChange={(e) =>
-																	handleChangeKeysState(index, e)
-																}>
-																{keys.map((key) => (
-																	<Option
-																		key={`${key.name} (${key.unit})`}
-																		value={`${key.name} (${key.unit})`}>
-																		{`${key?.name} (${key.unit})`}
-																	</Option>
-																))}
-															</Select>
-														</FormGroup>
-													</div>
-													<div className='col-2'>
-														<FormGroup
-															className='ml-2'
-															id='type'
-															label='So sánh'>
-															<Select
-																onChange={(e) =>
-																	handleChangeKeysState(index, e)
-																}
-																value={item?.keyType || ''}
-																name='keyType'
-																size='lg'
-																ariaLabel='So sánh'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='So sánh'
-																list={[
-																	{
-																		id: 1,
-																		text: '>',
-																		value: '>',
-																	},
-																	{
-																		id: 2,
-																		text: '=',
-																		value: '=',
-																	},
-																	{
-																		id: 3,
-																		text: '<',
-																		value: '<',
-																	},
-																]}
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-5'>
-														<FormGroup
-															className='ml-2'
-															id='name'
-															label='Giá trị key'>
-															<Input
-																onChange={(e) =>
-																	handleChangeKeysState(index, e)
-																}
-																value={item?.keyValue || ''}
-																name='keyValue'
-																size='lg'
-																type='number'
-																ariaLabel='Giá trị key'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='VD: 100 , 1000 , ..'
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-1'>
-														<FormGroup>
-															<Button
-																color='light'
-																variant='light'
-																size='lg'
-																className='mt-4 bg-transparent border-0'
-																onClick={(e) =>
-																	handleRemoveKeyField(e, index)
-																}>
-																<Icon icon='Trash' size='lg' />
-															</Button>
-														</FormGroup>
 													</div>
 												</div>
 											);

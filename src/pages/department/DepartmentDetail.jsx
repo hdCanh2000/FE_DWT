@@ -122,7 +122,7 @@ const DetailForm = ({
 													id={field.id}
 													label={field.title}>
 													<Textarea
-                                                    disabled
+														disabled
 														rows={5}
 														ariaLabel={field.title}
 														placeholder={`Nhập ${field.title}`}
@@ -155,7 +155,7 @@ const DetailForm = ({
 													id={field.id}
 													label={field.title}>
 													<Checks
-                                                    disabled
+														disabled
 														id={field.id}
 														type='switch'
 														size='lg'
@@ -185,7 +185,7 @@ const DetailForm = ({
 												id={field.id}
 												label={field.title}>
 												<Input
-                                                    disabled
+													disabled
 													type={field.type || 'text'}
 													name={field.id}
 													onChange={formik.handleChange}
