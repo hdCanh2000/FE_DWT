@@ -481,7 +481,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						</FormGroup>
 					</div>
 					<div className='col-12'>
-						<FormGroup id='user' label='Nhân viên liên quan'>
+						<FormGroup id='user' label=''>
 							<SelectComponent
 								isMulti
 								defaultValue={usersRelated}

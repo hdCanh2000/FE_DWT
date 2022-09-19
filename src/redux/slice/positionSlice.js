@@ -4,18 +4,25 @@ import { getAllPositions } from '../../pages/work-management/mission/services';
 
 const initialState = {
 	positions: [],
-	// position: {},
+	position: {},
 	loading: false,
 	error: false,
 };
 
 export const fetchPositionList = createAsyncThunk('position/fetchList', async () => {
 	const response = await getAllPositions();
-	return response.data;
+	return response.data?.map((position) => {
+		return {
+			...position,
+			id: position?.id,
+			value: position?.id,
+			label: position?.name,
+		};
+	});
 });
 
-export const fetchPositionById = createAsyncThunk('position/fetchById', async () => {
-	const response = await getPositionById();
+export const fetchPositionById = createAsyncThunk('position/fetchId', async (id) => {
+	const response = await getPositionById(id);
 	return response.data;
 });
 
@@ -43,7 +50,7 @@ export const positionSlice = createSlice({
 		},
 		[fetchPositionById.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.positions = [...action.payload];
+			state.position = { ...action.payload };
 		},
 		[fetchPositionById.rejected]: (state, action) => {
 			state.loading = false;
