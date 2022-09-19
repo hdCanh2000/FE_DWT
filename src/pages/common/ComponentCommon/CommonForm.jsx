@@ -145,6 +145,37 @@ const CommonForm = ({
 											</React.Fragment>
 										);
 									}
+									if (field.type === 'key') {
+										return (
+											<React.Fragment key={field.id}>
+												<FormGroup
+													key={field.id}
+													className='col-12'
+													id={field.id}
+													label={field.title}>
+													<Checks
+														id={field.id}
+														type='switch'
+														size='lg'
+														label={
+															Number(formik.values[field.id]) === 1
+																? 'Là Key'
+																: 'Không phải Key'
+														}
+														onChange={formik.handleChange}
+														checked={formik.values[field.id]}
+													/>
+												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
+											</React.Fragment>
+										);
+									}
 									if (field.type === 'switch') {
 										return (
 											<React.Fragment key={field.id}>
