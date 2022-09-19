@@ -1193,6 +1193,11 @@
   "resolved" "https://registry.npmjs.org/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz"
   "version" "2.0.2"
 
+"@denq/iron-tree@^1.3.3":
+  "integrity" "sha512-cnem4EfvcwXzt+p4y3dBJTCUH1lAYgWG0JJywola0HlEj8fh+SBKrdNuvej1TC4Z0VUmDOdD5hEoM4tkiHRgXg=="
+  "resolved" "https://registry.npmjs.org/@denq/iron-tree/-/iron-tree-1.3.3.tgz"
+  "version" "1.3.3"
+
 "@devexpress/dx-core@3.0.5":
   "integrity" "sha512-LIMzInUVtc2u8ajI4Dn0WJOrCrHfq6KE+D5sOoJlR/5TWxQ46C4FT9qrryJwYp1SlYQO2auAybcmPzmM82svsQ=="
   "resolved" "https://registry.npmjs.org/@devexpress/dx-core/-/dx-core-3.0.5.tgz"
@@ -7853,6 +7858,13 @@
   "resolved" "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.2.4.tgz"
   "version" "1.2.4"
 
+"list-to-tree@^2.2.5":
+  "integrity" "sha512-hfpfHlFcXlz1GmXN6GKWZZZfwZKxn+7GmHNWAoOCE8l3cY4Le5VG1uyHs+tUItlBVIbNlXmnFHpzs6Q9HRtE4A=="
+  "resolved" "https://registry.npmjs.org/list-to-tree/-/list-to-tree-2.2.5.tgz"
+  "version" "2.2.5"
+  dependencies:
+    "@denq/iron-tree" "^1.3.3"
+
 "loader-runner@^4.2.0":
   "integrity" "sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg=="
   "resolved" "https://registry.npmjs.org/loader-runner/-/loader-runner-4.3.0.tgz"
@@ -8796,6 +8808,11 @@
   "integrity" "sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow=="
   "resolved" "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz"
   "version" "2.1.0"
+
+"performant-array-to-tree@^1.11.0":
+  "integrity" "sha512-YwCqIDvnaebXaKuKQhI5yJD6ryDc3FxvoeX/5ougXTKDUWb7s5S2BuBgIyftCa4sBe1+ZU5Kmi4RJy+pjjjrpw=="
+  "resolved" "https://registry.npmjs.org/performant-array-to-tree/-/performant-array-to-tree-1.11.0.tgz"
+  "version" "1.11.0"
 
 "picocolors@^0.2.1":
   "integrity" "sha512-cMlDqaLEqfSaW8Z7N5Jw+lyIW869EzT73/F5lhtY9cLGoVxSXznfgfXMO0Z5K0o0Q2TkTXq+0KFsdnSe3jDViA=="
