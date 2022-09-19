@@ -62,6 +62,7 @@ import { formatDateFromMiliseconds } from '../../../utils/utils';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
 import { demoPages } from '../../../menu';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import styles from './circle.module.css';
 
 const TaskDetailPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -983,7 +984,7 @@ const TaskDetailPage = () => {
 															},
 														]}
 													/>
-													{subtasks?.length > 0 && (
+													{subtasks?.length > 0 ? (
 														<div className='row align-items-center'>
 															<div
 																className='col-xl-12 col-md-12'
@@ -997,6 +998,16 @@ const TaskDetailPage = () => {
 																			?.height
 																	}
 																/>
+															</div>
+														</div>
+													) : (
+														<div className='row align-items-center' style={{ opacity: 0.5 }}>
+															<div className='col-xl-12 col-md-12'>
+																<center>
+																	<div className={styles.circle} />
+																	<br />
+																	<h2>Chưa có công việc cho mục tiêu này</h2>
+																</center>
 															</div>
 														</div>
 													)}
@@ -1132,9 +1143,8 @@ const TaskDetailPage = () => {
 						<Tabs defaultActiveKey='DetailSubtask' id='uncontrolled-tab-example'>
 							<Tab
 								eventKey='DetailSubtask'
-								title={`Danh sách đầu việc (${
-									subtasks?.filter((item) => item.status !== 3).length
-								})`}
+								title={`Danh sách đầu việc (${subtasks?.filter((item) => item.status !== 3).length
+									})`}
 								className='mb-3'>
 								{/* Danh sách đầu việc */}
 								<CardHeader>
@@ -1187,9 +1197,8 @@ const TaskDetailPage = () => {
 							</Tab>
 							<Tab
 								eventKey='SubmitSubtask'
-								title={`Đầu việc chờ xác nhận (${
-									subtasks?.filter((item) => item.status === 3).length
-								})`}>
+								title={`Đầu việc chờ xác nhận (${subtasks?.filter((item) => item.status === 3).length
+									})`}>
 								<CardHeader>
 									<CardLabel icon='ContactSupport' iconColor='secondary'>
 										<CardTitle tag='h4' className='h5'>
