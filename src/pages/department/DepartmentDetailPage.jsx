@@ -193,7 +193,7 @@ const DepartmentDetailPage = () => {
 			status: department?.status,
 		},
 		enableReinitialize: true,
-		validate,
+		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
 			handleSubmitForm(values);
 			resetForm();

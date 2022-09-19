@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -15,20 +15,22 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
-import CommonForm from '../common/ComponentCommon/CommonForm';
+// import CommonForm from '../common/ComponentCommon/CommomForm';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
+import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addPosition, updatePosition } from './services';
+import PositionForm from '../common/ComponentCommon/PositionForm';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -40,7 +42,9 @@ const PositionPage = () => {
 	const positions = useSelector((state) => state.position.positions);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
+	// const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 
+	const [nvs] = React.useState(true);
 	useEffect(() => {
 		dispatch(fetchPositionList());
 	}, [dispatch]);
@@ -51,6 +55,10 @@ const PositionPage = () => {
 
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchKpiNormList());
 	}, [dispatch]);
 
 	const columns = [
@@ -76,10 +84,10 @@ const PositionPage = () => {
 			title: 'Mã Vị Trí',
 			// placeholder: 'mã vị trí',
 			// id: 'code',
-			// key: 'code',
+			key: 'code',
 			// type: 'text',
 			align: 'left',
-			isShow: false,
+			// isShow: true,
 			render: (item) => <span>{item?.positionLevel?.code || 'No data'}</span>,
 		},
 		{
@@ -121,6 +129,16 @@ const PositionPage = () => {
 			options: departments,
 		},
 		{
+			// title: 'Nhiệm vụ',
+			// // id: 'kpiNormId',
+			// // key: 'kpiNormId',
+			// type: 'singleSelect',
+			// align: 'left',
+			// isShow: true,
+			// render: (item) => <span>{item?.kpiNorm?.name || 'No data'}</span>,
+			// options: kpiNorms,
+		},
+		{
 			title: 'Hành Động',
 			id: 'action',
 			key: 'action',
@@ -135,14 +153,14 @@ const PositionPage = () => {
 						icon='Edit'
 						onClick={() => handleOpenForm(item)}
 					/>
-					<Button
+					{/* <Button
 						isOutline={!darkModeStatus}
-						color='primary'
+						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => navigate(`/vi-tri-cong-viec/${item.id}`)}
-					/>
+						icon='Trash'
+						// onClick={() => handleOpenDelete(item)}
+					/> */}
 				</>
 			),
 			isShow: false,
@@ -162,14 +180,14 @@ const PositionPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: data?.id,
+			id: parseInt(data?.id, 10),
 			name: data.name,
 			address: data.address,
-			code: data.code,
 			description: data.description,
-			departmentId: data.departmentId,
-			positionLevelId: data.positionLevelId,
+			departmentId: parseInt(data.departmentId, 10),
+			positionLevelId: parseInt(data.positionLevelId, 10),
 			jobType: data.jobType,
+			kpiNormId: data.kpiName,
 		};
 		if (data.id) {
 			try {
@@ -239,13 +257,14 @@ const PositionPage = () => {
 								</Card>
 							</div>
 						</div>
-						<CommonForm
+						<PositionForm
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
 							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
+							nv={nvs}
 							validate={validate}
 						/>
 					</>,

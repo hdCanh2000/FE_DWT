@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
+import styled from 'styled-components';
 import { Button, Modal } from 'react-bootstrap';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
@@ -9,6 +11,15 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Checks from '../../../components/bootstrap/forms/Checks';
 import CustomSelect from '../../../components/form/CustomSelect';
 import Select from '../../../components/bootstrap/forms/Select';
+import Option from '../../../components/bootstrap/Option';
+import Icon from '../../../components/icon/Icon';
+import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
+
+const ErrorText = styled.span`
+	font-size: 14px;
+	color: #e22828;
+	margin-top: 5px;
+`;
 
 const CommonForm = ({
 	className,
@@ -20,18 +31,69 @@ const CommonForm = ({
 	fields,
 	options,
 	validate,
-	disable,
+	nv,
 	...props
 }) => {
 	const formik = useFormik({
 		initialValues: { ...item },
-		validationSchema: validate,
 		enableReinitialize: true,
+		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
-			handleSubmit(values);
+			const result = {
+				...values,
+				kpiName: kpiNormId.map((key) => {
+					return {
+						kpiName: key.kpiName,
+					};
+				}),
+			};
+			handleSubmit(result);
 			resetForm();
 		},
 	});
+
+	const dispatch = useDispatch();
+
+	const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
+	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
+
+	useEffect(() => {
+		dispatch(fetchKpiNormList());
+	}, [dispatch]);
+
+	// xoá các key theo index
+	const handleRemoveKeyField = (e, index) => {
+		setKpiNormId((prev) => prev.filter((state) => state !== prev[index]));
+	};
+
+	const handleChangeKeysState = (index, event) => {
+		event.preventDefault();
+		event.persist();
+		setKpiNormId((prev) => {
+			return prev?.map((key, i) => {
+				if (i !== index) return key;
+				return {
+					...key,
+					[event.target.name]: event.target.value,
+					error: {
+						...key.error,
+						[event.target.name]:
+							event.target.value.length > 0
+								? null
+								: `Vui lòng nhập đầy đủ thông tin!`,
+					},
+				};
+			});
+		});
+	};
+
+	const handleAddFieldKey = () => {
+		const initState = {};
+		if (kpiNormId?.length <= 11) {
+			setKpiNormId((prev) => [...prev, initState]);
+		}
+	};
+
 	return (
 		<Modal
 			className={classNames(className, 'p-4')}
@@ -40,6 +102,7 @@ const CommonForm = ({
 			size='lg'
 			scrollable
 			centered
+			nv={nv}
 			{...props}>
 			<Modal.Header closeButton className='p-4'>
 				<Modal.Title>{label}</Modal.Title>
@@ -205,6 +268,80 @@ const CommonForm = ({
 										</React.Fragment>
 									);
 								})}
+								<div>
+									{nv && (
+										<>
+											<FormGroup>
+												<Button
+													variant='success'
+													onClick={handleAddFieldKey}>
+													Thêm nhiệm vụ
+												</Button>
+											</FormGroup>
+											{kpiNormId?.map((element, index) => {
+												return (
+													<div
+														key={element.name}
+														className='mt-4 d-flex align-items-center justify-content-between'>
+														<div
+															style={{
+																width: '100%',
+																marginRight: 10,
+															}}>
+															<FormGroup
+																className='mr-2'
+																id='kpiName'
+																label='Tên nhiệm vụ'>
+																<Select
+																	name='kpiName'
+																	required
+																	size='lg'
+																	className='border border-2 rounded-0 shadow-none'
+																	placeholder='Chọn nhiệm vụ'
+																	value={element?.kpiName}
+																	onChange={(e) =>
+																		handleChangeKeysState(
+																			index,
+																			e,
+																		)
+																	}>
+																	{kpiNorms.map((key) => (
+																		<Option
+																			key={`${key.name}`}
+																			value={`${key.name}`}>
+																			{`${key?.name}`}
+																		</Option>
+																	))}
+																</Select>
+															</FormGroup>
+															{element.error?.kpiName && (
+																<ErrorText>
+																	{element.error?.kpiName}
+																</ErrorText>
+															)}
+														</div>
+														<FormGroup>
+															<Button
+																color='light'
+																variant='light'
+																style={{
+																	background: 'transparent',
+																	border: 0,
+																}}
+																size='lg'
+																className='mt-4 h-100'
+																onClick={(e) =>
+																	handleRemoveKeyField(e, index)
+																}>
+																<Icon icon='Trash' size='lg' />
+															</Button>
+														</FormGroup>
+													</div>
+												);
+											})}
+										</>
+									)}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -224,7 +361,6 @@ const CommonForm = ({
 
 CommonForm.propTypes = {
 	className: PropTypes.string,
-	disable: PropTypes.string,
 	show: PropTypes.bool,
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
@@ -239,10 +375,10 @@ CommonForm.propTypes = {
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
+	nv: PropTypes.bool,
 };
 CommonForm.defaultProps = {
 	className: null,
-	disable: null,
 	show: false,
 	columns: [],
 	options: [],
@@ -252,6 +388,7 @@ CommonForm.defaultProps = {
 	onClose: null,
 	handleSubmit: null,
 	label: '',
+	nv: false,
 };
 
 export default CommonForm;
