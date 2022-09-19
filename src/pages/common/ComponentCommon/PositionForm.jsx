@@ -47,16 +47,12 @@ const CommonForm = ({
 					};
 				})
 			};
-			console.log(result);
 			handleSubmit(result);
 			resetForm();
 		},
 	});
 
 	const dispatch = useDispatch();
-
-	console.log(item);
-
 	const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 
