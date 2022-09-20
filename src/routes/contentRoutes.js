@@ -17,6 +17,9 @@ const TASK = {
 	),
 	TASKDETAIL: lazy(() => import('../pages/work-management/TaskDetail/TaskDetailPage')),
 	ADD_OR_UPDATE_TASK: lazy(() => import('../pages/work-management/task-list/TaskActionsPage')),
+	ADD_OR_UPDATE_SUB_TASK: lazy(() =>
+		import('../pages/work-management/subtask/TaskDetailActionPage'),
+	),
 	ADD_NEW_TASK: lazy(() => import('../pages/work-management/task-list/AddTaskPage')),
 	TASKLIST: lazy(() => import('../pages/work-management/task-list/TaskListPage')),
 	SUBTASK: lazy(() => import('../pages/work-management/subtask/SubTaskPage')),
@@ -36,7 +39,6 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
-	// POSITION_DETAIL: lazy(() => import('../pages/position/PositionDetailPage')),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
 
@@ -73,7 +75,6 @@ const presentation = [
 		element: <LANDING.DASHBOARD />,
 		exact: true,
 	},
-
 	/** Trang quản lý mục tiêu */
 	{
 		path: demoPages.jobsPage.subMenu.target.path,
@@ -86,7 +87,6 @@ const presentation = [
 		element: <MISSION.MISSION_DETAIL />,
 		exact: true,
 	},
-
 	/** * Trang danh sách công việc (nhiệm vụ cha) */
 	{
 		path: demoPages.jobsPage.subMenu.mission.path,
@@ -108,7 +108,31 @@ const presentation = [
 	// trang cập nhật công việc (nhiệm vụ)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/:id`,
-		element: <TASK.ADD_OR_UPDATE_TASK />,
+		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+		exact: true,
+	},
+	// trang thêm mới đầu việc (nhiệm vụ con) với nhiệm vụ
+	{
+		path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/them-moi`,
+		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+		exact: true,
+	},
+	// trang thêm mới đầu việc (nhiệm vụ con)
+	{
+		path: `${demoPages.jobsPage.subMenu.task.path}/them-moi`,
+		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+		exact: true,
+	},
+	// trang cập nhật đầu việc (nhiệm vụ con) với nhiệm vụ
+	{
+		path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/cap-nhat/:id`,
+		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+		exact: true,
+	},
+	// trang cập nhật đầu việc (nhiệm vụ con)
+	{
+		path: `${demoPages.jobsPage.subMenu.task.path}/cap-nhat/:id`,
+		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
 		exact: true,
 	},
 	// trang danh sách đầu việc
