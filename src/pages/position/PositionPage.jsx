@@ -123,7 +123,7 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: false,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels, 
+			options: positionLevels,
 		},
 		{
 			title: 'Phòng Ban',
@@ -185,7 +185,7 @@ const PositionPage = () => {
 			positionLevelId: parseInt(data.positionLevelId, 10),
 			manager: parseInt(data.manager, 10),
 			jobType: data.jobType,
-			kpiNormId: data.kpiName
+			kpiNormId: data.kpiName,
 		};
 		if (data.id) {
 			try {

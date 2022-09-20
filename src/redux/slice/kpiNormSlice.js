@@ -4,6 +4,7 @@ import {
 	addKpiNorm,
 	updateKpiNorm,
 	fetchAllKpiNorms,
+	fetchAllSubKpiNorms,
 } from '../../pages/kpiNorm/services';
 
 const initialState = {
@@ -39,6 +40,18 @@ export const fetchKpiNormListByParams = createAsyncThunk(
 		});
 	},
 );
+
+export const fetchKpiSubNormList = createAsyncThunk('kpiNorm/fetchKpiSubNormList', async (data) => {
+	const response = await fetchAllSubKpiNorms(data);
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+		};
+	});
+});
 
 export const onAddKpiNorm = createAsyncThunk('kpiNorm/addNew', async (data) => {
 	const response = await addKpiNorm(data);
@@ -77,6 +90,18 @@ export const kpiNormSlice = createSlice({
 			state.kpiNorms = [...action.payload];
 		},
 		[fetchKpiNormListByParams.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch sub list
+		[fetchKpiSubNormList.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchKpiSubNormList.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.kpiNorms = [...action.payload];
+		},
+		[fetchKpiSubNormList.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},

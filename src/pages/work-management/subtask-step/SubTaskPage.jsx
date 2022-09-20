@@ -607,9 +607,9 @@ const SubTaskPage = () => {
 										color: 'primary',
 										children: (
 											<div className='fs-5'>
-												<span className='me-2'>Thời gian dự kiến:</span>
+												<span className='me-2'>Thời gian bắt đầu:</span>
 												{moment(
-													`${subtask?.estimateDate} ${subtask.estimateTime}`,
+													`${subtask?.startDate} ${subtask.startTime}`,
 												).format('DD-MM-YYYY, HH:mm')}
 											</div>
 										),
@@ -619,7 +619,7 @@ const SubTaskPage = () => {
 										color: 'primary',
 										children: (
 											<div className='fs-5'>
-												<span className='me-2'>Hạn hoàn thành:</span>
+												<span className='me-2'>Thời hạn hoàn thành:</span>
 												{moment(
 													`${subtask?.deadlineDate} ${subtask.deadlineTime}`,
 												).format('DD-MM-YYYY, HH:mm')}

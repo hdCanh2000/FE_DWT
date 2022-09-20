@@ -137,7 +137,10 @@ const RecruitmentRequirementPage = () => {
 					`Yêu câu năng lực ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				handleShowToast(`Cập nhật yêu cầu năng lực`, `Cập nhật yêu cầu năng lực không thành công!`);
+				handleShowToast(
+					`Cập nhật yêu cầu năng lực`,
+					`Cập nhật yêu cầu năng lực không thành công!`,
+				);
 			}
 		} else {
 			try {
@@ -145,7 +148,10 @@ const RecruitmentRequirementPage = () => {
 				const result = await response.data;
 				dispatch(fetchRequirementList());
 				handleCloseForm();
-				handleShowToast(`Thêm yêu cầu năng lực`, `Yêu cầu năng lực ${result.name} được thêm thành công!`);
+				handleShowToast(
+					`Thêm yêu cầu năng lực`,
+					`Yêu cầu năng lực ${result.name} được thêm thành công!`,
+				);
 			} catch (error) {
 				handleShowToast(`Thêm yêu cầu năng lực`, `Thêm yêu cầu năng lực không thành công!`);
 			}
@@ -160,7 +166,9 @@ const RecruitmentRequirementPage = () => {
 						<div className='row mb-4'>
 							<div className='col-12'>
 								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Quản lý yêu cầu tuyển dụng</div>
+									<div className='display-6 fw-bold py-3'>
+										Quản lý yêu cầu tuyển dụng
+									</div>
 								</div>
 							</div>
 						</div>
@@ -198,7 +206,11 @@ const RecruitmentRequirementPage = () => {
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật yêu cầu năng lực' : 'Thêm mới yêu cầu năng lực'}
+							label={
+								itemEdit?.id
+									? 'Cập nhật yêu cầu năng lực'
+									: 'Thêm mới yêu cầu năng lực'
+							}
 							fields={columns}
 							validate={validate}
 						/>

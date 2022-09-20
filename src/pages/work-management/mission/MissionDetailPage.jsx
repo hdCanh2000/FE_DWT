@@ -147,7 +147,7 @@ const MissionDetailPage = () => {
 
 	const columns = [
 		{
-			title: 'Tên công việc',
+			title: 'Tên nhiệm vụ',
 			id: 'name',
 			key: 'name',
 			type: 'text',
@@ -300,7 +300,7 @@ const MissionDetailPage = () => {
 
 	const columnsPending = [
 		{
-			title: 'Tên công việc',
+			title: 'Tên nhiệm vụ',
 			id: 'name',
 			key: 'name',
 			type: 'text',
@@ -516,11 +516,11 @@ const MissionDetailPage = () => {
 				const result = await response.data;
 				handleClearValueForm();
 				handleShowToast(
-					`Cập nhật công việc!`,
-					`Công việc ${result.name} được cập nhật thành công!`,
+					`Cập nhật nhiệm vụ!`,
+					`nhiệm vụ ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+				handleShowToast(`Cập nhật nhiệm vụ`, `Cập nhật nhiệm vụ không thành công!`);
 			}
 		} else {
 			try {
@@ -530,9 +530,9 @@ const MissionDetailPage = () => {
 				});
 				const result = await response.data;
 				handleClearValueForm();
-				handleShowToast(`Thêm công việc`, `Công việc ${result.name} được thêm thành công!`);
+				handleShowToast(`Thêm nhiệm vụ`, `nhiệm vụ ${result.name} được thêm thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm công việc`, `Thêm công việc không thành công!`);
+				handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
 			}
 		}
 	};
@@ -563,11 +563,11 @@ const MissionDetailPage = () => {
 			handleClearValueForm();
 			handleCloseConfirmStatusTask();
 			handleShowToast(
-				`Cập nhật công việc!`,
-				`Công việc ${result.name} được cập nhật thành công!`,
+				`Cập nhật nhiệm vụ!`,
+				`nhiệm vụ ${result.name} được cập nhật thành công!`,
 			);
 		} catch (error) {
-			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
+			handleShowToast(`Cập nhật nhiệm vụ`, `Cập nhật nhiệm vụ không thành công!`);
 		}
 		setOpenConfirmMissionModal(false);
 	};
@@ -578,7 +578,7 @@ const MissionDetailPage = () => {
 	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
 		setOpenConfirmModalStatus(true);
 		setInfoConfirmModalStatus({
-			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} nhiệm vụ`.toUpperCase(),
 			subTitle: item?.name,
 			status: nextStatus,
 			isShowNote,
@@ -665,11 +665,11 @@ const MissionDetailPage = () => {
 															<span className='fw-bold text-danger fs-5 me-2'>
 																{mission?.report?.completed}
 															</span>
-															cv hoàn thành trên tổng số
+															nv hoàn thành trên tổng số
 															<span className='fw-bold text-danger fs-5 mx-2'>
 																{mission?.report?.total}
 															</span>
-															cv.
+															nv.
 														</div>
 													</div>
 												</div>
@@ -741,7 +741,7 @@ const MissionDetailPage = () => {
 										<Card className='h-100'>
 											<CardHeader className='py-2'>
 												<CardLabel icon='DoubleArrow' iconColor='success'>
-													<CardTitle>Thống kê công việc</CardTitle>
+													<CardTitle>Thống kê nhiệm vụ</CardTitle>
 												</CardLabel>
 											</CardHeader>
 											<CardBody className='py-2'>
@@ -750,7 +750,7 @@ const MissionDetailPage = () => {
 													col={4}
 													data={[
 														{
-															label: 'Số công việc',
+															label: 'Số nhiệm vụ',
 															value: mission?.report?.total,
 														},
 														{
@@ -807,12 +807,17 @@ const MissionDetailPage = () => {
 														</div>
 													</div>
 												) : (
-													<div className='row align-items-center' style={{ opacity: 0.5 }}>
+													<div
+														className='row align-items-center'
+														style={{ opacity: 0.5 }}>
 														<div className='col-xl-12 col-md-12'>
 															<center>
-																<div className={styles.circle}/>
-																<br/>
-																<h2>Chưa có công việc cho mục tiêu này</h2>
+																<div className={styles.circle} />
+																<br />
+																<h2>
+																	Chưa có công việc cho mục tiêu
+																	này
+																</h2>
 															</center>
 														</div>
 													</div>
@@ -934,14 +939,15 @@ const MissionDetailPage = () => {
 							<Tabs defaultActiveKey='ListTask' id='uncontrolled-tab-example'>
 								<Tab
 									eventKey='ListTask'
-									title={`Danh sách công việc (${tasks.filter((item) => item.status !== 3)?.length || 0
-										})`}
+									title={`Danh sách nhiệm vụ (${
+										tasks.filter((item) => item.status !== 3)?.length || 0
+									})`}
 									className='mb-3'>
 									<Card>
 										<CardHeader>
 											<CardLabel icon='Task' iconColor='danger'>
 												<CardTitle>
-													<CardLabel>Danh sách công việc</CardLabel>
+													<CardLabel>Danh sách nhiệm vụ</CardLabel>
 												</CardTitle>
 											</CardLabel>
 											<CardActions>
@@ -950,7 +956,7 @@ const MissionDetailPage = () => {
 													icon='Plus'
 													tag='button'
 													onClick={handleOnClickToActionPage}>
-													Thêm công việc
+													Thêm nhiệm vụ
 												</Button>
 											</CardActions>
 										</CardHeader>
@@ -969,22 +975,23 @@ const MissionDetailPage = () => {
 												isLight
 												icon='Report'
 												className='mt-3'>
-												Không có công việc đang chờ xác nhận!
+												Không có nhiệm vụ đang chờ xác nhận!
 											</Alert>
 										)}
 									</div>
 								</Tab>
 								<Tab
 									eventKey='ListPendingTask'
-									title={`Công việc chờ xác nhận (${tasks.filter((item) => item.status === 3)?.length || 0
-										})`}
+									title={`Nhiệm vụ chờ xác nhận (${
+										tasks.filter((item) => item.status === 3)?.length || 0
+									})`}
 									className='mb-3'>
 									<Card stretch>
 										<CardHeader>
 											<CardLabel icon='ContactSupport' iconColor='secondary'>
 												<CardTitle>
 													<CardLabel>
-														Danh sách công việc chờ xác nhận
+														Danh sách nhiệm vụ chờ xác nhận
 													</CardLabel>
 												</CardTitle>
 											</CardLabel>
@@ -1004,7 +1011,7 @@ const MissionDetailPage = () => {
 												isLight
 												icon='Report'
 												className='mt-3'>
-												Không có công việc đang chờ xác nhận!
+												Không có nhiệm vụ đang chờ xác nhận!
 											</Alert>
 										)}
 									</div>
@@ -1017,8 +1024,8 @@ const MissionDetailPage = () => {
 					openModal={toggleFormDelete}
 					onCloseModal={handleCloseForm}
 					onConfirm={() => handleDeleteItem(itemEdit?.id)}
-					title='Xoá công việc'
-					content={`Xác nhận xoá công việc <strong>${itemEdit?.name}</strong> ?`}
+					title='Xoá nhiệm vụ'
+					content={`Xác nhận xoá nhiệm vụ <strong>${itemEdit?.name}</strong> ?`}
 				/>
 				<TaskFormModal
 					show={toggleFormEdit}

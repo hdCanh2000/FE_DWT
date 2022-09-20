@@ -37,4 +37,10 @@ const deleteRequirement = (id) => {
 	});
 };
 
-export { getAllRequirement, getRequirementById, addRequirement, updateRequirement, deleteRequirement };
+export {
+	getAllRequirement,
+	getRequirementById,
+	addRequirement,
+	updateRequirement,
+	deleteRequirement,
+};

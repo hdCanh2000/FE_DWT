@@ -25,35 +25,6 @@ const ModalConfirmCommon = ({
 	item,
 	...props
 }) => {
-	// const person = window.localStorage.getItem('name');
-
-	// const handleSubmit = () => {
-	// 	const newWorks = JSON.parse(JSON.stringify(item?.logs || []));
-
-	// 	const newLogs = [
-	// 		...newWorks,
-
-	// 		{
-	// 			user: person,
-
-	// 			type: 1,
-
-	// 			prev_status: FORMAT_TASK_STATUS(item?.status),
-
-	// 			next_status: FORMAT_TASK_STATUS(status),
-
-	// 			[item?.mission_id ? 'task_id' : 'subtask_id']: item?.id,
-
-	// 			[item?.mission_id ? 'task_name' : 'subtask_name']: item?.name,
-
-	// 			time: moment().format('YYYY/MM/DD hh:mm'),
-	// 		},
-	// 	];
-
-	// 	const newItem = { ...item, logs: newLogs };
-
-	// 	onSubmit(status, newItem);
-	// };
 	const formik = useFormik({
 		initialValues: {
 			note: '',

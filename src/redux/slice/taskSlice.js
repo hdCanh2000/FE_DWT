@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getReportTask } from '../../pages/dashboard/services';
+import { getAllTasks, getReportTask } from '../../pages/dashboard/services';
 import {
 	getAllTaksByMissionID,
 	getLatestTasks,
 } from '../../pages/work-management/mission/services';
 import { getAllTasksByDepartment } from '../../pages/work-management/task-list/services';
+import { getTaskById } from '../../pages/work-management/TaskDetail/services';
 
 const initialState = {
 	tasks: [],
@@ -13,12 +14,32 @@ const initialState = {
 	taskReport: {},
 	loading: false,
 	error: false,
+	task: {},
 };
 
 // Đầu tiên, tạo thunk
 export const fetchTaskList = createAsyncThunk('task/fetchList', async (id) => {
 	const response = await getAllTasksByDepartment(id);
-	return response.data;
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+		};
+	});
+});
+
+export const fetchAllTask = createAsyncThunk('task/fetchAll', async () => {
+	const response = await getAllTasks();
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+		};
+	});
 });
 
 export const fetchTaskListByMissionId = createAsyncThunk('task/fetchListByMission', async (id) => {
@@ -36,13 +57,29 @@ export const fetchTaskReport = createAsyncThunk('task/fetchReport', async (depar
 	return response.data;
 });
 
-// eslint-disable-next-line import/prefer-default-export
+export const fetchTaskById = createAsyncThunk('task/fetchById', async (id) => {
+	const response = await getTaskById(id);
+	return response.data;
+});
+
 export const taskSlice = createSlice({
 	name: 'taskSlice',
 	initialState,
 	reducers: {},
 	extraReducers: {
-		// fetch list
+		// fetch all
+		[fetchAllTask.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchAllTask.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.tasks = [...action.payload];
+		},
+		[fetchAllTask.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list by department
 		[fetchTaskList.pending]: (state) => {
 			state.loading = true;
 		},
@@ -87,6 +124,22 @@ export const taskSlice = createSlice({
 			state.taskReport = { ...action.payload };
 		},
 		[fetchTaskReport.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch by id
+		[fetchTaskById.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchTaskById.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.task = {
+				...action.payload.data,
+				label: action.payload.data?.name,
+				value: action.payload.data?.id,
+			};
+		},
+		[fetchTaskById.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
