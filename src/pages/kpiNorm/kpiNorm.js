@@ -14,8 +14,6 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-// import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
@@ -23,6 +21,7 @@ import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import KpiNormDetail from './kpiNormDetail';
 import { getAllKeys } from '../key/services';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -193,8 +192,8 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			departmentId: data?.department?.value,
-			parentId: data?.parent?.value,
+			departmentId: parseInt(data?.departmentId, 10),
+			parentId: parseInt(data?.parent, 10),
 			point: data?.point,
 			description: data?.description,
 			evaluationDescription: data?.evaluationDescription,
@@ -202,7 +201,7 @@ const EmployeePage = () => {
 			parent: data?.parent,
 			department: data?.department,
 			unit: data?.unit,
-			isKey : data.isKey,
+			isKey: data.isKey,
 		};
 		if (data?.id) {
 			try {

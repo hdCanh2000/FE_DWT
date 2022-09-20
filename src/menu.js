@@ -64,11 +64,11 @@ export const demoPages = {
 				text: 'Sơ đồ phòng ban',
 				path: '/so-do-phong-ban',
 			},
-			areas: {
-				id: 'areas',
-				text: 'Sơ đồ khu vực',
-				path: '/so-do-khu-vuc',
-			},
+			// areas: {
+			// 	id: 'areas',
+			// 	text: 'Sơ đồ khu vực',
+			// 	path: '/so-do-khu-vuc',
+			// },
 		},
 	},
 	jobsPage: {

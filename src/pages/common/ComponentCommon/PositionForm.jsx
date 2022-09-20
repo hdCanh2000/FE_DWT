@@ -43,9 +43,9 @@ const CommonForm = ({
 				...values,
 				kpiName: kpiNormId.map((key) => {
 					return {
-						kpiName: key.kpiName
+						kpiName: key.kpiName,
 					};
-				})
+				}),
 			};
 			handleSubmit(result);
 			resetForm();
@@ -268,11 +268,12 @@ const CommonForm = ({
 									);
 								})}
 								<div>
-									{
-										nv &&
+									{nv && (
 										<>
 											<FormGroup>
-												<Button variant='success' onClick={handleAddFieldKey}>
+												<Button
+													variant='success'
+													onClick={handleAddFieldKey}>
 													Thêm nhiệm vụ
 												</Button>
 											</FormGroup>
@@ -281,7 +282,11 @@ const CommonForm = ({
 													<div
 														key={element.name}
 														className='mt-4 d-flex align-items-center justify-content-between'>
-														<div style={{ width: '100%', marginRight: 10 }}>
+														<div
+															style={{
+																width: '100%',
+																marginRight: 10,
+															}}>
 															<FormGroup
 																className='mr-2'
 																id='kpiName'
@@ -294,9 +299,11 @@ const CommonForm = ({
 																	placeholder='Chọn nhiệm vụ'
 																	value={element?.kpiName}
 																	onChange={(e) =>
-																		handleChangeKeysState(index, e)
-																	}
-																>
+																		handleChangeKeysState(
+																			index,
+																			e,
+																		)
+																	}>
 																	{kpiNorms.map((key) => (
 																		<Option
 																			key={`${key.name}`}
@@ -330,10 +337,9 @@ const CommonForm = ({
 														</FormGroup>
 													</div>
 												);
-											})
-											}
+											})}
 										</>
-									}
+									)}
 								</div>
 							</div>
 						</div>
