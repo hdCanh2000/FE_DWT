@@ -42,7 +42,7 @@ const KpiNormDetail = ({ className, show, onClose, item, label, fields, options,
 													id={field.id}
 													label={field.title}>
 													<Select
-														readOnly
+														disabled
 														ariaLabel={field.title || ''}
 														list={field.options}
 														name={field.id}

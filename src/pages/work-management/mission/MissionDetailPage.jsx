@@ -60,6 +60,7 @@ import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import { fetchMissionById } from '../../../redux/slice/missionSlice';
 import { fetchTaskListByMissionId } from '../../../redux/slice/taskSlice';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
+import styles from './circle.module.css';
 
 const chartOptions = {
 	chart: {
@@ -805,7 +806,22 @@ const MissionDetailPage = () => {
 															/>
 														</div>
 													</div>
-												) : null}
+												) : (
+													<div
+														className='row align-items-center'
+														style={{ opacity: 0.5 }}>
+														<div className='col-xl-12 col-md-12'>
+															<center>
+																<div className={styles.circle} />
+																<br />
+																<h2>
+																	Chưa có công việc cho mục tiêu
+																	này
+																</h2>
+															</center>
+														</div>
+													</div>
+												)}
 											</CardBody>
 										</Card>
 									</div>

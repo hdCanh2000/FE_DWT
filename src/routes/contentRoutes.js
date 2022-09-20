@@ -39,6 +39,9 @@ const MANAGEMENT = {
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
+	RECRUITMENT_REQUIREMENT: lazy(() =>
+		import('../pages/recruitmentRequirements/RecruitmentRequirementsPage'),
+	),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
 
@@ -214,6 +217,11 @@ const presentation = [
 		path: demoPages.companyPage.subMenu.organizational.path,
 		element: <CHART.ORGANIZATIONAL />,
 		exact: true,
+	},
+	// yêu cầu năng luc tuyển dụng
+	{
+		path: demoPages.hrRecords.subMenu.recruitmentRequirements.path,
+		element: <MANAGEMENT.RECRUITMENT_REQUIREMENT />,
 	},
 	{
 		path: '*',

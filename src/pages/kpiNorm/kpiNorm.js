@@ -96,9 +96,9 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Đơn vị',
-			id: 'unit',
-			key: 'unit',
-			type: 'select',
+			id: 'unitId',
+			key: 'unitId',
+			type: 'singleSelect',
 			align: 'center',
 			options: units,
 			isShow: true,
@@ -140,6 +140,15 @@ const EmployeePage = () => {
 			type: 'textarea',
 			align: 'center',
 			isShow: true,
+		},
+		{
+			title: 'Đây có phải là Key ?',
+			id: 'isKey',
+			key: 'isKey',
+			type: 'key',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === true ? 'Là Key' : 'Không phải Key'),
 		},
 		{
 			title: 'Hành động',
@@ -184,15 +193,14 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			departmentId: data?.department?.value,
+			departmentId: parseInt(data.departmentId, 10),
 			parentId: data?.parent?.value,
 			point: data?.point,
 			description: data?.description,
 			evaluationDescription: data?.evaluationDescription,
-			unitId: data?.unit?.value,
+			unitId: parseInt(data?.unitId, 10),
 			parent: data?.parent,
-			department: data?.department,
-			unit: data?.unit,
+			isKey: data.isKey,
 		};
 		if (data?.id) {
 			try {
