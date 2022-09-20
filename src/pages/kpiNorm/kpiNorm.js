@@ -198,7 +198,7 @@ const EmployeePage = () => {
 			point: data?.point,
 			description: data?.description,
 			evaluationDescription: data?.evaluationDescription,
-			unitId: data?.unit?.value,
+			unitId: parseInt(data?.unitId, 10),
 			parent: data?.parent,
 			department: data?.department,
 			unit: data?.unit,

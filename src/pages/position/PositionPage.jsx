@@ -122,9 +122,7 @@ const PositionPage = () => {
 			type: 'singleSelect',
 			align: 'left',
 			isShow: false,
-			render: (item) => (
-				<span>{item?.positionLevel?.name? 'không' : item?.positionLevel?.name}</span>
-			),
+			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
 			options: positionLevels, 
 		},
 		{
