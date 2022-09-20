@@ -9,6 +9,8 @@ import {
 	useLocation,
 } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { isEmpty } from 'lodash';
+import { Spinner } from 'react-bootstrap';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
@@ -407,7 +409,25 @@ const MissionPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<MissionChartReport data={missionReport} />
+											{isEmpty(missionReport) ? (
+												<div
+													className='col-xl-12 col-xxl-12'
+													style={{ textAlign: 'center' }}>
+													<div style={{ height: '290px' }}>
+														<Spinner
+															animation='border'
+															variant='primary'
+															style={{
+																marginTop: '15%',
+																width: '50px',
+																height: '50px',
+															}}
+														/>
+													</div>
+												</div>
+											) : (
+												<MissionChartReport data={missionReport} />
+											)}
 										</div>
 									</div>
 								</CardBody>
@@ -431,7 +451,25 @@ const MissionPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={taskReport} />
+											{isEmpty(taskReport) ? (
+												<div
+													className='col-xl-12 col-xxl-12'
+													style={{ textAlign: 'center' }}>
+													<div style={{ height: '290px' }}>
+														<Spinner
+															animation='border'
+															variant='primary'
+															style={{
+																marginTop: '15%',
+																width: '50px',
+																height: '50px',
+															}}
+														/>
+													</div>
+												</div>
+											) : (
+												<TaskChartReport data={taskReport} />
+											)}
 										</div>
 									</div>
 								</CardBody>
