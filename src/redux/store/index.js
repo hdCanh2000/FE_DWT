@@ -10,6 +10,7 @@ import { roleSlice } from '../slice/roleSlice';
 import { kpiNormSlice } from '../slice/kpiNormSlice';
 import { keySlice } from '../slice/keySlice';
 import { unitSlice } from '../slice/unitSlice';
+import { requirementSlice } from '../slice/requirementSlice';
 
 const reducer = combineReducers({
 	mission: missionSlice.reducer,
@@ -23,6 +24,7 @@ const reducer = combineReducers({
 	kpiNorm: kpiNormSlice.reducer,
 	key: keySlice.reducer,
 	unit: unitSlice.reducer,
+	requirement: requirementSlice.reducer,
 });
 
 // eslint-disable-next-line import/prefer-default-export

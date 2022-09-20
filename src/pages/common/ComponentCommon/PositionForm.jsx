@@ -47,7 +47,6 @@ const CommonForm = ({
 					};
 				})
 			};
-			console.log(result);
 			handleSubmit(result);
 			resetForm();
 		},
