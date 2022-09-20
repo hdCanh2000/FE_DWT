@@ -98,7 +98,7 @@ const EmployeePage = () => {
 			title: 'Đơn vị',
 			id: 'unit',
 			key: 'unit',
-			type: 'select',
+			type: 'singleSelect',
 			align: 'center',
 			options: units,
 			isShow: true,
@@ -184,7 +184,7 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			departmentId: data?.department?.value,
+			departmentId: parseInt(data.departmentId, 10),
 			parentId: data?.parent?.value,
 			point: data?.point,
 			description: data?.description,
