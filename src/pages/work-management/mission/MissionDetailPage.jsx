@@ -60,6 +60,7 @@ import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import { fetchMissionById } from '../../../redux/slice/missionSlice';
 import { fetchTaskListByMissionId } from '../../../redux/slice/taskSlice';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
+import styles from './circle.module.css';
 
 const chartOptions = {
 	chart: {
@@ -805,7 +806,17 @@ const MissionDetailPage = () => {
 															/>
 														</div>
 													</div>
-												) : null}
+												) : (
+													<div className='row align-items-center' style={{ opacity: 0.5 }}>
+														<div className='col-xl-12 col-md-12'>
+															<center>
+																<div className={styles.circle}/>
+																<br/>
+																<h2>Chưa có công việc cho mục tiêu này</h2>
+															</center>
+														</div>
+													</div>
+												)}
 											</CardBody>
 										</Card>
 									</div>
@@ -923,9 +934,8 @@ const MissionDetailPage = () => {
 							<Tabs defaultActiveKey='ListTask' id='uncontrolled-tab-example'>
 								<Tab
 									eventKey='ListTask'
-									title={`Danh sách công việc (${
-										tasks.filter((item) => item.status !== 3)?.length || 0
-									})`}
+									title={`Danh sách công việc (${tasks.filter((item) => item.status !== 3)?.length || 0
+										})`}
 									className='mb-3'>
 									<Card>
 										<CardHeader>
@@ -966,9 +976,8 @@ const MissionDetailPage = () => {
 								</Tab>
 								<Tab
 									eventKey='ListPendingTask'
-									title={`Công việc chờ xác nhận (${
-										tasks.filter((item) => item.status === 3)?.length || 0
-									})`}
+									title={`Công việc chờ xác nhận (${tasks.filter((item) => item.status === 3)?.length || 0
+										})`}
 									className='mb-3'>
 									<Card stretch>
 										<CardHeader>

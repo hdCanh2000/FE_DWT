@@ -142,6 +142,15 @@ const EmployeePage = () => {
 			isShow: true,
 		},
 		{
+			title: 'Đây có phải là Key ?',
+			id: 'isKey',
+			key: 'isKey',
+			type: 'key',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === true ? 'Là Key' : 'Không phải Key'),
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',
@@ -193,6 +202,7 @@ const EmployeePage = () => {
 			parent: data?.parent,
 			department: data?.department,
 			unit: data?.unit,
+			isKey : data.isKey,
 		};
 		if (data?.id) {
 			try {

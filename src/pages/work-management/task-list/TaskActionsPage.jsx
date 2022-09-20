@@ -395,7 +395,6 @@ const TaskActionsPage = () => {
 			}
 		}
 	};
-
 	return (
 		<PageWrapper title={demoPages.jobsPage.subMenu.mission.text}>
 			<SubHeaderCommon />
