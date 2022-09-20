@@ -96,8 +96,8 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Đơn vị',
-			id: 'unit',
-			key: 'unit',
+			id: 'unitId',
+			key: 'unitId',
 			type: 'singleSelect',
 			align: 'center',
 			options: units,
@@ -200,8 +200,6 @@ const EmployeePage = () => {
 			evaluationDescription: data?.evaluationDescription,
 			unitId: parseInt(data?.unitId, 10),
 			parent: data?.parent,
-			department: data?.department,
-			unit: data?.unit,
 			isKey : data.isKey,
 		};
 		if (data?.id) {
