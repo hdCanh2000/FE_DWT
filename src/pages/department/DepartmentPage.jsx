@@ -4,12 +4,8 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
-// import { arrayToTree } from 'performant-array-to-tree';
-// import Tree from 'react-animated-tree';
-
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-// import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -37,13 +33,7 @@ const DepartmentPage = () => {
 	const [itemEdit, setItemEdit] = React.useState({});
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [openForm, setOpenForm] = React.useState(false);
-<<<<<<< HEAD
 	const department = useSelector((state) => state.department.departments);
-=======
-
-	const departments = useSelector((state) => state.department.departments);
-
->>>>>>> development
 	useEffect(() => {
 		dispatch(fetchDepartmentWithUserList());
 	}, [dispatch]);

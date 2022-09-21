@@ -192,23 +192,15 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-<<<<<<< HEAD
 			departmentId: parseInt(data?.departmentId, 10),
 			parentId: parseInt(data?.parent, 10),
-=======
-			departmentId: parseInt(data.departmentId, 10),
-			parentId: data?.parent?.value,
->>>>>>> development
 			point: data?.point,
 			description: data?.description,
 			evaluationDescription: data?.evaluationDescription,
 			unitId: parseInt(data?.unitId, 10),
 			parent: data?.parent,
-<<<<<<< HEAD
 			department: data?.department,
 			unit: data?.unit,
-=======
->>>>>>> development
 			isKey: data.isKey,
 		};
 		if (data?.id) {
