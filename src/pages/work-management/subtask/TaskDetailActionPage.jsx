@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import moment from 'moment';
+import { isEmpty } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
 import SelectComponent from 'react-select';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
-import { addNewTask, getTaskById, updateTaskByID } from '../mission/services';
+import { addNewSubtask, getSubTaskById, updateSubtask } from '../TaskDetail/services';
 import Toasts from '../../../components/bootstrap/Toasts';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
@@ -18,13 +19,13 @@ import Option from '../../../components/bootstrap/Option';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
-import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormListByParams, fetchKpiSubNormList } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
-import { fetchKeyList } from '../../../redux/slice/keySlice';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
+import { fetchAllTask, fetchTaskById } from '../../../redux/slice/taskSlice';
+import styles from './style.module.css';
 
 const customStyles = {
 	control: (provided) => ({
@@ -35,7 +36,7 @@ const customStyles = {
 	}),
 };
 
-const TaskActionsPage = () => {
+const TaskDetailActionPage = () => {
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const params = useParams();
@@ -43,11 +44,12 @@ const TaskActionsPage = () => {
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
-	const missions = useSelector((state) => state.mission.missions);
+	const tasks = useSelector((state) => state.task.tasks);
+	const task = useSelector((state) => state.task.task);
 
-	const [task, setTask] = useState({});
+	const [subtask, setSubTask] = useState({});
 	const [kpiNormOptions, setKpiNormOptions] = useState([]);
-	const [missionOption, setMissionOption] = useState({});
+	const [taskOption, setTaskOption] = useState({ label: '', value: '' });
 	const [departmentOption, setDepartmentOption] = useState({ label: null, value: null });
 	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
 	const [userOption, setUserOption] = useState({ label: '', value: '' });
@@ -55,17 +57,14 @@ const TaskActionsPage = () => {
 
 	useEffect(() => {
 		if (params?.id) {
-			getTaskById(params.id).then((res) => {
+			getSubTaskById(params.id).then((res) => {
 				const response = res.data;
-				setTask(response?.data);
-				// setKeysState(response.data?.keys || []);
-				setMissionOption(
-					{
-						...response.data.mission,
-						label: response.data.mission?.name,
-						value: response.data.mission?.id,
-					} || {},
-				);
+				setSubTask(response?.data);
+				setTaskOption({
+					...response.data.task,
+					label: response.data.task?.name,
+					value: response.data.task?.id,
+				});
 				setKpiNormOptions(
 					response.data?.kpiNorms?.map((item) => {
 						return {
@@ -107,7 +106,7 @@ const TaskActionsPage = () => {
 				);
 			});
 		} else {
-			setTask({
+			setSubTask({
 				id: null,
 				name: '',
 				description: '',
@@ -122,20 +121,26 @@ const TaskActionsPage = () => {
 			setUserOption({});
 			setDepartmentRelatedOption([]);
 			setUserRelatedOption([]);
-			setMissionOption({});
+			setTaskOption({});
 		}
 	}, [params?.id]);
+
+	useEffect(() => {
+		dispatch(fetchTaskById(params.taskId));
+	}, [dispatch, params.taskId]);
+
+	useEffect(() => {
+		if (!isEmpty(task)) {
+			setTaskOption(task);
+		}
+	}, [task]);
 
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(fetchKeyList());
-	}, [dispatch]);
-
-	useEffect(() => {
-		dispatch(fetchMissionList());
+		dispatch(fetchAllTask());
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -143,13 +148,18 @@ const TaskActionsPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(
-			fetchKpiNormListByParams({
-				departmentId: parseInt(departmentOption.value, 10),
-				parentId: 'null',
-			}),
-		);
-	}, [departmentOption.value, dispatch]);
+		if (!isEmpty(task)) {
+			dispatch(fetchKpiSubNormList({ kpiNormIds: task.kpiNormIds }));
+			setTaskOption(task);
+		} else {
+			dispatch(
+				fetchKpiNormListByParams({
+					departmentId: parseInt(departmentOption.value, 10),
+					parentId: 'null',
+				}),
+			);
+		}
+	}, [departmentOption.value, dispatch, task]);
 
 	// show toast
 	const handleShowToast = (title, content) => {
@@ -165,19 +175,19 @@ const TaskActionsPage = () => {
 
 	const handleChange = (e) => {
 		const { value, name } = e.target;
-		setTask({
-			...task,
+		setSubTask({
+			...subtask,
 			[name]: value,
 		});
 	};
 
-	// thêm field nhiệm vụ phụ
+	// thêm field đầu việc phụ
 	const handleAddFieldKPINorm = () => {
 		const initKeyState = {};
 		setKpiNormOptions((prev) => [...prev, initKeyState]);
 	};
 
-	// hàm onchange chọn nhiệm vụ
+	// hàm onchange chọn đầu việc
 	const handleChangeKpiNormOption = (index, event) => {
 		setKpiNormOptions((prev) => {
 			return prev.map((key, i) => {
@@ -185,20 +195,32 @@ const TaskActionsPage = () => {
 				return {
 					...key,
 					...event,
+				};
+			});
+		});
+	};
+
+	// hàm onchange chọn đầu việc
+	const handleChangeKpiNormInput = (index, event) => {
+		setKpiNormOptions((prev) => {
+			return prev.map((key, i) => {
+				if (i !== index) return key;
+				return {
+					...key,
 					[event?.target?.name]: event?.target?.value,
 				};
 			});
 		});
 	};
 
-	// xoá các nhiệm vụ theo index
+	// xoá các đầu việc theo index
 	const handleRemoveKpiNormField = (e, index) => {
 		setKpiNormOptions((prev) => prev.filter((state) => state !== prev[index]));
 	};
 
 	// clear form
 	const handleClearForm = () => {
-		setTask({
+		setSubTask({
 			id: null,
 			name: '',
 			description: '',
@@ -214,9 +236,8 @@ const TaskActionsPage = () => {
 		setDepartmentRelatedOption([]);
 		setUserOption({});
 		setUserRelatedOption([]);
-		// setKeysState([]);
 		setKpiNormOptions([]);
-		setMissionOption({});
+		setTaskOption({});
 	};
 
 	const calcTotalKpiValue = (arr = []) => {
@@ -230,37 +251,38 @@ const TaskActionsPage = () => {
 	const person = window.localStorage.getItem('name');
 
 	const handleSubmitTaskForm = async () => {
-		const newWorks = JSON.parse(JSON.stringify(task?.logs || []));
-		const newNotes = JSON.parse(JSON.stringify(task?.notes || []));
+		const newWorks = JSON.parse(JSON.stringify(subtask?.logs || []));
+		const newNotes = JSON.parse(JSON.stringify(subtask?.notes || []));
 		const newLogs = [
 			...newWorks,
 			{
 				user: person,
 				type: 2,
 				prevStatus: null,
-				nextStatus: task?.id ? 'Cập nhật' : 'Thêm mới',
-				taskId: task?.id,
-				taskName: task?.name,
-				time: moment().format('DD/MM/YYYY hh:mm'),
+				nextStatus: subtask?.id ? 'Cập nhật' : 'Thêm mới',
+				subtaskId: subtask.id,
+				subtaskName: subtask?.name,
+				time: moment().format('YYYY/MM/DD hh:mm'),
 				createdAt: Date.now(),
 			},
 		];
-		const data = { ...task };
-		data.kpiValue = parseInt(task?.kpiValue, 10) || calcTotalKpiValue(kpiNormOptions);
-		data.priority = parseInt(task?.priority, 10);
-		data.estimateMD = parseInt(task?.estimateMD, 10);
-		data.mission = missionOption?.value
+		const data = { ...subtask };
+		data.kpiValue = parseInt(subtask?.kpiValue, 10) || calcTotalKpiValue(kpiNormOptions);
+		data.priority = parseInt(subtask?.priority, 10);
+		data.estimateMD = parseInt(subtask?.estimateMD, 10);
+		data.task = taskOption?.value
 			? {
-					id: missionOption?.value,
-					name: missionOption?.label,
+					id: taskOption?.value,
+					name: taskOption?.label,
 			  }
 			: null;
-		data.missionId = missionOption?.id || null;
+		data.taskId = taskOption?.id || null;
 		data.kpiNormIds = kpiNormOptions.map((item) => item.id);
 		data.kpiNorms = kpiNormOptions.map((item) => {
 			return {
 				name: item.name,
 				id: item.id,
+				point: parseInt(item.point, 10),
 				quantity: parseInt(item.quantity, 10),
 				total: parseInt(item.quantity * item.point, 10),
 			};
@@ -291,29 +313,31 @@ const TaskActionsPage = () => {
 				};
 			}),
 		];
+		data.steps = subtask.steps ? subtask.steps : [];
 		const dataSubmit = { ...data, logs: newLogs, notes: newNotes };
 		if (data.id) {
 			try {
-				const response = await updateTaskByID(dataSubmit);
+				const response = await updateSubtask(dataSubmit);
 				const result = await response.data;
 				handleShowToast(
-					`Cập nhật nhiệm vụ!`,
-					`Nhiệm vụ ${result.name} được cập nhật thành công!`,
+					`Cập nhật đầu việc!`,
+					`Đầu việc ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				handleShowToast(`Cập nhật nhiệm vụ`, `Cập nhật nhiệm vụ không thành công!`);
+				handleShowToast(`Cập nhật đầu việc`, `Cập nhật đầu việc không thành công!`);
 			}
 		} else {
 			try {
-				const response = await addNewTask(dataSubmit);
+				const response = await addNewSubtask(dataSubmit);
 				const result = await response.data;
 				handleClearForm();
-				handleShowToast(`Thêm nhiệm vụ`, `nhiệm vụ ${result.name} được thêm thành công!`);
+				handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
+				handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);
 			}
 		}
 	};
+
 	return (
 		<PageWrapper title={demoPages.jobsPage.subMenu.mission.text}>
 			<SubHeaderCommon />
@@ -322,50 +346,52 @@ const TaskActionsPage = () => {
 					<Card className='p-4 w-75 m-auto'>
 						<CardHeader className='py-2'>
 							<CardLabel>
-								<CardTitle className='fs-4 ml-0'>Thêm nhiệm vụ</CardTitle>
+								<CardTitle className='fs-4 ml-0'>
+									{params.id ? 'Cập nhật đầu việc' : 'Thêm đầu việc'}
+								</CardTitle>
 							</CardLabel>
 						</CardHeader>
 						<div className='col-12 p-4'>
 							<div className='row g-4'>
-								{/* Tên nhiệm vụ */}
+								{/* Tên đầu việc */}
 								<div className='row g-2'>
 									<div className='col-12'>
-										<FormGroup id='name' label='Tên nhiệm vụ'>
+										<FormGroup id='name' label='Tên đầu việc'>
 											<Input
 												onChange={handleChange}
-												value={task?.name || ''}
+												value={subtask?.name || ''}
 												name='name'
-												ariaLabel='Tên nhiệm vụ'
-												placeholder='Tên nhiệm vụ'
+												ariaLabel='Tên đầu việc'
+												placeholder='Tên đầu việc'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 									</div>
 								</div>
-								{/* Thuộc mục tiêu */}
+								{/* Thuộc nhiệm vụ */}
 								<div className='row g-2'>
 									<div className='col-12'>
-										<FormGroup id='task' label='Thuộc mục tiêu'>
+										<FormGroup id='task' label='Thuộc công việc'>
 											<SelectComponent
-												placeholder='Thuộc mục tiêu'
-												defaultValue={missionOption}
-												value={missionOption}
-												onChange={setMissionOption}
-												options={missions}
+												placeholder='Thuộc công việc'
+												defaultValue={taskOption}
+												value={taskOption}
+												onChange={setTaskOption}
+												options={tasks}
 											/>
 										</FormGroup>
 									</div>
 								</div>
-								{/* Mô tả nhiệm vụ */}
+								{/* Mô tả đầu việc */}
 								<div className='row g-2'>
 									<div className='col-12'>
-										<FormGroup id='description' label='Mô tả nhiệm vụ'>
+										<FormGroup id='description' label='Mô tả đầu việc'>
 											<Textarea
 												name='description'
 												onChange={handleChange}
-												value={task.description || ''}
-												ariaLabel='Mô tả nhiệm vụ'
-												placeholder='Mô tả nhiệm vụ'
+												value={subtask.description || ''}
+												ariaLabel='Mô tả đầu việc'
+												placeholder='Mô tả đầu việc'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
@@ -380,7 +406,7 @@ const TaskActionsPage = () => {
 												name='kpiValue'
 												onChange={handleChange}
 												value={
-													task.kpiValue ||
+													subtask.kpiValue ||
 													calcTotalKpiValue(kpiNormOptions)
 												}
 												ariaLabel='Giá trị KPI'
@@ -395,7 +421,7 @@ const TaskActionsPage = () => {
 												type='number'
 												name='estimateMD'
 												onChange={handleChange}
-												value={task.estimateMD || ''}
+												value={subtask.estimateMD || ''}
 												ariaLabel='Ước tính MD'
 												placeholder='Ước tính MD'
 												className='border border-2 rounded-0 shadow-none'
@@ -406,7 +432,7 @@ const TaskActionsPage = () => {
 										<FormGroup id='review' label='Thưởng/Phạt'>
 											<Input
 												onChange={handleChange}
-												value={task?.review || ''}
+												value={subtask?.review || ''}
 												name='review'
 												ariaLabel='Thưởng/Phạt'
 												placeholder='Thưởng/Phạt'
@@ -425,7 +451,7 @@ const TaskActionsPage = () => {
 												className='border border-2 rounded-0 shadow-none'
 												placeholder='Độ ưu tiên'
 												onChange={handleChange}
-												value={task?.priority}>
+												value={subtask?.priority}>
 												{PRIORITIES.map((priority) => (
 													<Option key={priority} value={priority}>
 														{`Cấp ${priority}`}
@@ -455,7 +481,10 @@ const TaskActionsPage = () => {
 												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
-												onChange={setDepartmentOption}
+												onChange={(selectedOption) => {
+													setDepartmentOption(selectedOption);
+													setKpiNormOptions([]);
+												}}
 												options={departments}
 											/>
 										</FormGroup>
@@ -506,7 +535,7 @@ const TaskActionsPage = () => {
 											<Textarea
 												name='note'
 												onChange={handleChange}
-												value={task.note || ''}
+												value={subtask.note || ''}
 												ariaLabel='Ghi chú'
 												placeholder='Ghi chú'
 												className='border border-2 rounded-0 shadow-none'
@@ -526,7 +555,7 @@ const TaskActionsPage = () => {
 												placeholder='Ngày bắt đầu'
 												onChange={handleChange}
 												value={
-													task.startDate ||
+													subtask.startDate ||
 													moment().add(0, 'days').format('YYYY-MM-DD')
 												}
 												type='date'
@@ -542,7 +571,7 @@ const TaskActionsPage = () => {
 												name='startTime'
 												placeholder='Thời gian bắt đầu'
 												type='time'
-												value={task.startTime || '08:00'}
+												value={subtask.startTime || '08:00'}
 												onChange={handleChange}
 												ariaLabel='Thời gian bắt đầu'
 												className='border border-2 rounded-0 shadow-none'
@@ -562,7 +591,7 @@ const TaskActionsPage = () => {
 												placeholder='Hạn ngày hoàn thành'
 												onChange={handleChange}
 												value={
-													task.deadlineDate ||
+													subtask.deadlineDate ||
 													moment().add(1, 'days').format('YYYY-MM-DD')
 												}
 												type='date'
@@ -578,7 +607,7 @@ const TaskActionsPage = () => {
 												name='deadlineTime'
 												placeholder='Hạn thời gian hoàn thành'
 												type='time'
-												value={task.deadlineTime || '17:30'}
+												value={subtask.deadlineTime || '17:30'}
 												onChange={handleChange}
 												ariaLabel='Hạn thời gian hoàn thành'
 												className='border border-2 rounded-0 shadow-none'
@@ -586,6 +615,7 @@ const TaskActionsPage = () => {
 										</FormGroup>
 									</div>
 								</div>
+								{/* Danh mục định mức KPI */}
 								<div className='row g-2'>
 									<div className='col-12'>
 										<FormGroup>
@@ -613,9 +643,6 @@ const TaskActionsPage = () => {
 																<CustomSelect
 																	placeholder='Chọn nhiệm vụ phụ'
 																	value={item}
-																	disabled={
-																		!departmentOption.value
-																	}
 																	onChange={(e) => {
 																		handleChangeKpiNormOption(
 																			index,
@@ -634,11 +661,12 @@ const TaskActionsPage = () => {
 															label='Số lượng'>
 															<Input
 																onChange={(e) =>
-																	handleChangeKpiNormOption(
+																	handleChangeKpiNormInput(
 																		index,
 																		e,
 																	)
 																}
+																min={0}
 																disabled={!item.value}
 																type='number'
 																value={item?.quantity || ''}
@@ -655,27 +683,13 @@ const TaskActionsPage = () => {
 															className='ml-2'
 															id='total'
 															label='Quy đổi (điểm)'>
-															<Input
-																onChange={(e) =>
-																	handleChangeKpiNormOption(
-																		index,
-																		e,
-																	)
-																}
-																type='number'
-																value={
-																	parseInt(
-																		item.quantity * item.point,
-																		10,
-																	) || item.total
-																}
-																name='total'
-																size='lg'
-																readOnly
-																ariaLabel='Quy đổi'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='Quy đổi (điểm)'
-															/>
+															<div
+																className={`${styles.total} form-control`}>
+																{parseInt(
+																	item.quantity * item.point,
+																	10,
+																) || 0}
+															</div>
 														</FormGroup>
 													</div>
 													<div className='col-1'>
@@ -708,7 +722,7 @@ const TaskActionsPage = () => {
 									color='primary'
 									className='w-50 p-3'
 									type='button'
-									isDisable={!task.name}
+									isDisable={!subtask.name}
 									onClick={handleSubmitTaskForm}>
 									Lưu thông tin
 								</Button>
@@ -721,4 +735,4 @@ const TaskActionsPage = () => {
 	);
 };
 
-export default TaskActionsPage;
+export default TaskDetailActionPage;

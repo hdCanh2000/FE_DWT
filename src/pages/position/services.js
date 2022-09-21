@@ -30,4 +30,11 @@ const updatePosition = (data) => {
 	});
 };
 
-export { getAllPositionWithUser, getPositionById, addPosition, updatePosition };
+const deletePosition = (id) => {
+	return axiosClient({
+		method: 'DELETE',
+		url: `/positions/${id}`,
+	});
+};
+
+export { getAllPositionWithUser, getPositionById, addPosition, updatePosition, deletePosition };
