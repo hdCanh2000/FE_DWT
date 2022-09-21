@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -18,14 +17,12 @@ import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchPositionList } from '../../redux/slice/positionSlice';
-import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
-import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
-import { addPosition, updatePosition } from './services';
-import PositionForm from '../common/ComponentCommon/PositionForm';
+import { addRequirement, updateRequirement, deleteRequirement } from './services';
+import CommonForm from '../common/ComponentCommon/CommonForm';
+import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 
-const PositionPage = () => {
+const RecruitmentRequirementPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 
@@ -36,23 +33,10 @@ const PositionPage = () => {
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
-	const positions = useSelector((state) => state.position.positions);
-	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
-	const departments = useSelector((state) => state.department.departments);
 	const requirements = useSelector((state) => state.requirement.requirements);
 
-	const [nvs] = React.useState(true);
-	useEffect(() => {
-		dispatch(fetchPositionList());
-	}, [dispatch]);
-
-	useEffect(() => {
-		dispatch(fetchPositionLevelList());
-	}, [dispatch]);
-
-	useEffect(() => {
-		dispatch(fetchDepartmentList());
-	}, [dispatch]);
+	const [itemDelete, setItemDelete] = React.useState({});
+	const [isDelete, setIsDelete] = React.useState(false);
 
 	useEffect(() => {
 		dispatch(fetchRequirementList());
@@ -60,8 +44,8 @@ const PositionPage = () => {
 
 	const columns = [
 		{
-			title: 'Tên Vị Trí',
-			placeholder: 'tên vị trí',
+			title: 'Tên yêu cầu tuyển dụng',
+			placeholder: 'tên yêu cầu tuyển dụng',
 			id: 'name',
 			key: 'name',
 			type: 'text',
@@ -69,82 +53,13 @@ const PositionPage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Địa điểm làm việc',
-			placeholder: 'địa điểm làm việc',
-			id: 'address',
-			key: 'address',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-		{
-			title: 'Mã Vị Trí',
-			// placeholder: 'mã vị trí',
-			// id: 'code',
-			key: 'code',
-			// type: 'text',
-			align: 'left',
-			// isShow: true,
-			render: (item) => <span>{item?.positionLevel?.code || 'No data'}</span>,
-		},
-		{
-			title: 'Loại hình công việc',
-			placeholder: 'loại hình công việc',
-			id: 'jobType',
-			key: 'jobType',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-		{
-			title: 'Mô Tả Vị Trí',
-			placeholder: 'mô tả vị trí',
+			title: 'Mô tả yêu cầu tuyển dụng',
+			placeholder: 'mô tả yêu cầu tuyển dụng',
 			id: 'description',
 			key: 'description',
 			type: 'textarea',
 			align: 'left',
 			isShow: true,
-		},
-		{
-			title: 'Cấp Nhân Sự',
-			id: 'positionLevelId',
-			key: 'positionLevelId',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: true,
-			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels && (positionLevels.filter((item) => item?.name !== "Không")),
-		},
-		{
-			title: 'Quản lý cấp trên',
-			id: 'manager',
-			key: 'manager',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: false,
-			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels,
-		},
-		{
-			title: 'Phòng Ban',
-			id: 'departmentId',
-			key: 'departmentId',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: true,
-			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
-			options: departments,
-		},
-		{
-			title: 'Yêu cầu năng lực',
-			id: 'requirements',
-			key: 'requirements',
-			type: 'select',
-			align: 'left',
-			isShow: false,
-			render: (item) => <span>{item?.requirement?.name || 'No data'}</span>,
-			options: requirements,
-			isMulti: true,
 		},
 		{
 			title: 'Hành Động',
@@ -161,19 +76,38 @@ const PositionPage = () => {
 						icon='Edit'
 						onClick={() => handleOpenForm(item)}
 					/>
-					{/* <Button
+					<Button
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
 						onClick={() => handleOpenDelete(item)}
-					/> */}
+					/>
 				</>
 			),
 			isShow: false,
 		},
 	];
+
+	const handleOpenDelete = (item) => {
+		setIsDelete(true);
+		setItemDelete({ ...item });
+	};
+	const handleCloseDelete = () => {
+		setIsDelete(false);
+	};
+
+	const handleDeleteRequirement = async (data) => {
+		try {
+			await deleteRequirement(data);
+			dispatch(fetchRequirementList());
+			handleShowToast(`Xoá yêu cầu năng lực`, `Xoá yêu cầu năng lực thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá yêu cầu năng lực`, `Xoá yêu cầu năng lực thất bại!`);
+		}
+		handleCloseDelete();
+	};
 
 	const handleShowToast = (title, content) => {
 		addToast(
@@ -190,53 +124,51 @@ const PositionPage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data.name,
-			address: data.address,
 			description: data.description,
-			departmentId: parseInt(data.departmentId, 10),
-			positionLevelId: parseInt(data.positionLevelId, 10),
-			manager: parseInt(data.manager, 10),
-			jobType: data.jobType,
-			kpiNormId: data.kpiName,
-<<<<<<< HEAD
-=======
-			requirements: data.requirements
->>>>>>> development
 		};
 		if (data.id) {
 			try {
-				const response = await updatePosition(dataSubmit);
+				const response = await updateRequirement(dataSubmit);
 				const result = await response.data;
-				dispatch(fetchPositionList());
+				dispatch(fetchRequirementList());
 				handleCloseForm();
 				handleShowToast(
-					`Cập nhật vị trí!`,
-					`Vị trí ${result.name} được cập nhật thành công!`,
+					`Cập nhật yêu cầu năng lực!`,
+					`Yêu câu năng lực ${result.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
-				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+				handleShowToast(
+					`Cập nhật yêu cầu năng lực`,
+					`Cập nhật yêu cầu năng lực không thành công!`,
+				);
 			}
 		} else {
 			try {
-				const response = await addPosition(dataSubmit);
+				const response = await addRequirement(dataSubmit);
 				const result = await response.data;
-				dispatch(fetchPositionList());
+				dispatch(fetchRequirementList());
 				handleCloseForm();
-				handleShowToast(`Thêm vị trí`, `Vị trí ${result.name} được thêm thành công!`);
+				handleShowToast(
+					`Thêm yêu cầu năng lực`,
+					`Yêu cầu năng lực ${result.name} được thêm thành công!`,
+				);
 			} catch (error) {
-				handleShowToast(`Thêm vị trí`, `Thêm vị trí không thành công!`);
+				handleShowToast(`Thêm yêu cầu năng lực`, `Thêm yêu cầu năng lực không thành công!`);
 			}
 		}
 	};
 
 	return (
-		<PageWrapper title={demoPages.hrRecords.subMenu.position.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.recruitmentRequirements.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
 						<div className='row mb-4'>
 							<div className='col-12'>
 								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Quản lý vị trí</div>
+									<div className='display-6 fw-bold py-3'>
+										Quản lý yêu cầu tuyển dụng
+									</div>
 								</div>
 							</div>
 						</div>
@@ -246,7 +178,7 @@ const PositionPage = () => {
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách vị trí</CardLabel>
+												<CardLabel>Danh sách yêu cầu tuyển dụng</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions>
@@ -255,7 +187,7 @@ const PositionPage = () => {
 												icon='PersonPlusFill'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
-												Thêm vị trí
+												Thêm yêu cầu năng lực
 											</Button>
 										</CardActions>
 									</CardHeader>
@@ -263,21 +195,31 @@ const PositionPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columns}
-											data={positions}
+											data={requirements}
 										/>
 									</div>
 								</Card>
 							</div>
 						</div>
-						<PositionForm
+						<CommonForm
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
+							label={
+								itemEdit?.id
+									? 'Cập nhật yêu cầu năng lực'
+									: 'Thêm mới yêu cầu năng lực'
+							}
 							fields={columns}
-							nv={nvs}
 							validate={validate}
+						/>
+						<TaskAlertConfirm
+							openModal={isDelete}
+							onCloseModal={handleCloseDelete}
+							onConfirm={() => handleDeleteRequirement(itemDelete?.id)}
+							title='Xoá yêu cầu năng lực'
+							content={`Xác nhận xoá yêu cầu năng lực <strong>${itemDelete?.name}</strong> ?`}
 						/>
 					</>,
 					['admin'],
@@ -287,4 +229,4 @@ const PositionPage = () => {
 	);
 };
 
-export default PositionPage;
+export default RecruitmentRequirementPage;

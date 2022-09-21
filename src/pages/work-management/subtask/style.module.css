@@ -1,0 +1,12 @@
+.total {
+    background-color: transparent;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    display: block;
+    border: 1px solid #dee2e6 !important;
+    border-width: 2px !important;
+    border-radius: 0 !important;
+    min-height: calc(1.5em + 1.25rem + 2px);
+    padding: 0.625rem 1.25rem;
+    font-size: 1.25rem;
+}

@@ -37,7 +37,13 @@ const DepartmentPage = () => {
 	const [itemEdit, setItemEdit] = React.useState({});
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [openForm, setOpenForm] = React.useState(false);
+<<<<<<< HEAD
 	const department = useSelector((state) => state.department.departments);
+=======
+
+	const departments = useSelector((state) => state.department.departments);
+
+>>>>>>> development
 	useEffect(() => {
 		dispatch(fetchDepartmentWithUserList());
 	}, [dispatch]);

@@ -940,7 +940,51 @@
 "@csstools/postcss-unset-value@^1.0.0":
   "version" "1.0.0"
 
+<<<<<<< HEAD
 "@emotion/babel-plugin@^11.10.0", "@emotion/babel-plugin@^11.7.1":
+=======
+"@csstools/postcss-unset-value@^1.0.2":
+  "integrity" "sha512-c8J4roPBILnelAsdLr4XOAR/GsTm0GJi4XpcfvoWk3U6KiTCqiFYc63KhRMQQX35jYMp4Ao8Ij9+IZRgMfJp1g=="
+  "resolved" "https://registry.npmjs.org/@csstools/postcss-unset-value/-/postcss-unset-value-1.0.2.tgz"
+  "version" "1.0.2"
+
+"@csstools/selector-specificity@^2.0.0", "@csstools/selector-specificity@^2.0.2":
+  "integrity" "sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg=="
+  "resolved" "https://registry.npmjs.org/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz"
+  "version" "2.0.2"
+
+"@denq/iron-tree@^1.3.3":
+  "integrity" "sha512-cnem4EfvcwXzt+p4y3dBJTCUH1lAYgWG0JJywola0HlEj8fh+SBKrdNuvej1TC4Z0VUmDOdD5hEoM4tkiHRgXg=="
+  "resolved" "https://registry.npmjs.org/@denq/iron-tree/-/iron-tree-1.3.3.tgz"
+  "version" "1.3.3"
+
+"@devexpress/dx-core@3.0.5":
+  "integrity" "sha512-LIMzInUVtc2u8ajI4Dn0WJOrCrHfq6KE+D5sOoJlR/5TWxQ46C4FT9qrryJwYp1SlYQO2auAybcmPzmM82svsQ=="
+  "resolved" "https://registry.npmjs.org/@devexpress/dx-core/-/dx-core-3.0.5.tgz"
+  "version" "3.0.5"
+
+"@devexpress/dx-grid-core@3.0.5":
+  "integrity" "sha512-WIVsuHAnGcoM6ryWJI9FcP2C7h6g+R4vaSpPyO9lVCHWNV1AiwSaTe6kQ9ja2ILXhjmiLO0EyfG2N0ER5qsdnA=="
+  "resolved" "https://registry.npmjs.org/@devexpress/dx-grid-core/-/dx-grid-core-3.0.5.tgz"
+  "version" "3.0.5"
+
+"@devexpress/dx-react-core@3.0.5":
+  "integrity" "sha512-YvqSZ3bwtP/3T97ahXAt6brvrAZ/BGDjqJGOcvXowFtN/Yz8EIh1x5CiQa35iT0oGJrvByp+M+/QNuryLvvRJw=="
+  "resolved" "https://registry.npmjs.org/@devexpress/dx-react-core/-/dx-react-core-3.0.5.tgz"
+  "version" "3.0.5"
+  dependencies:
+    "@devexpress/dx-core" "3.0.5"
+    "prop-types" "^15.7.2"
+
+"@devexpress/dx-react-grid@^3.0.5":
+  "integrity" "sha512-AwO7WAR4Ke1/DROl+zsd7r5v3Kab15G5Ca5gKCAsFoaZ+gQi/x+IsBj5Ougapq4/g1RfquoYbBrTxnnputHL3Q=="
+  "resolved" "https://registry.npmjs.org/@devexpress/dx-react-grid/-/dx-react-grid-3.0.5.tgz"
+  "version" "3.0.5"
+  dependencies:
+    "@devexpress/dx-grid-core" "3.0.5"
+
+"@emotion/babel-plugin@^11.10.0":
+>>>>>>> development
   "integrity" "sha512-xNQ57njWTFVfPAc3cjfuaPdsgLp5QOSuRsj9MA6ndEhH/AzuZM86qIQzt6rq+aGBwj3n5/TkLmU5lhAfdRmogA=="
   "resolved" "https://registry.npmjs.org/@emotion/babel-plugin/-/babel-plugin-11.10.2.tgz"
   "version" "11.10.2"
@@ -6985,6 +7029,13 @@
   "integrity" "sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg=="
   "resolved" "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.2.4.tgz"
   "version" "1.2.4"
+
+"list-to-tree@^2.2.5":
+  "integrity" "sha512-hfpfHlFcXlz1GmXN6GKWZZZfwZKxn+7GmHNWAoOCE8l3cY4Le5VG1uyHs+tUItlBVIbNlXmnFHpzs6Q9HRtE4A=="
+  "resolved" "https://registry.npmjs.org/list-to-tree/-/list-to-tree-2.2.5.tgz"
+  "version" "2.2.5"
+  dependencies:
+    "@denq/iron-tree" "^1.3.3"
 
 "loader-runner@^4.2.0":
   "integrity" "sha512-3R/1M+yS3j5ou80Me59j7F9IMs4PXs3VqRrm0TU3AbKPxlmpoY1TNscJV/oGJXo8qCatFGTfDbY6W6ipGOYXfg=="

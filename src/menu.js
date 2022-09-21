@@ -121,6 +121,11 @@ export const demoPages = {
 				text: 'Cấu hình cấp nhân sự',
 				path: '/cauhinh-cap-nhan-su',
 			},
+			recruitmentRequirements: {
+				id: 'recruitmentRequirements',
+				text: 'Yêu cầu tuyển dụng',
+				path: '/yeu-cau-tuyen-dung',
+			},
 		},
 	},
 	reportPage: {

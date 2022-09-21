@@ -38,4 +38,19 @@ const fetchAllKpiNorms = (params) => {
 	});
 };
 
-export { getAllKpiNorm, addKpiNorm, updateKpiNorm, deleteKpiNorm, fetchAllKpiNorms };
+const fetchAllSubKpiNorms = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/api/kpiNorms`,
+		data,
+	});
+};
+
+export {
+	getAllKpiNorm,
+	addKpiNorm,
+	updateKpiNorm,
+	deleteKpiNorm,
+	fetchAllKpiNorms,
+	fetchAllSubKpiNorms,
+};
