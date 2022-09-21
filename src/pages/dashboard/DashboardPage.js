@@ -756,14 +756,14 @@ const DashboardPage = () => {
 	};
 	const monthStoreSeries = [
 		{
-			name: 'Thu Nhập Tuần Này',
+			name: 'Thu Nhập Tháng Này',
 			type: 'column',
 			data: [
 				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 25, 30
 			],
 		},
 		{
-			name: 'Thu Nhập Tuần Trước',
+			name: 'Thu Nhập Tháng Trước',
 			type: 'column',
 			data: [
 				20, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 25
@@ -861,17 +861,17 @@ const DashboardPage = () => {
 	};
 	const quarterStoreSeries = [
 		{
-			name: 'Thu Nhập Tuần Này',
+			name: 'Thu Nhập Quý Này',
 			type: 'column',
 			data: [
-				350, 450, 600
+				300, 450, 500
 			],
 		},
 		{
-			name: 'Thu Nhập Tuần Trước',
+			name: 'Thu Nhập Quý Trước',
 			type: 'column',
 			data: [
-				300, 400, 500
+				250, 300, 400
 			],
 		},
 	];
