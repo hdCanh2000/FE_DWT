@@ -48,9 +48,6 @@
 		]
 	},
 	"dependencies": {
-		"@devexpress/dx-react-core": "^3.0.5",
-		"@devexpress/dx-react-grid": "^3.0.5",
-		"@devexpress/dx-react-grid-bootstrap4": "^3.0.5",
 		"@emotion/react": "^11.9.0",
 		"@omtanke/react-use-event-outside": "^1.0.1",
 		"@popperjs/core": "^2.11.5",
@@ -70,7 +67,6 @@
 		"i18next-http-backend": "^1.4.0",
 		"jsx-to-string": "^1.4.0",
 		"jwt-decode": "^3.1.2",
-		"list-to-tree": "^2.2.5",
 		"lodash": "^4.17.21",
 		"moment": "^2.29.3",
 		"node-sass": "^7.0.3",
@@ -80,6 +76,8 @@
 		"prismjs": "^1.28.0",
 		"prop-types": "^15.8.1",
 		"react": "^18.1.0",
+		"react-animated-tree": "^1.0.10",
+		"react-animated-tree-v2": "^1.0.0",
 		"react-apexcharts": "^1.4.0",
 		"react-big-calendar": "^0.40.1",
 		"react-bootstrap": "2.4.0",

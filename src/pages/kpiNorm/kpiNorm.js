@@ -288,6 +288,7 @@ const EmployeePage = () => {
 		setOpenForm(true);
 		setItemEdit(item);
 	};
+	const lable = 'Định mức lao động & KPI';
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
 			<Page container='fluid'>
@@ -295,7 +296,7 @@ const EmployeePage = () => {
 					<div className='row mb-4'>
 						<div className='col-12'>
 							<div className='d-flex justify-content-between align-items-center'>
-								<div className='display-6 fw-bold py-3'>Danh mục định mức KPI</div>
+								<div className='display-6 fw-bold py-3'>{lable}</div>
 							</div>
 						</div>
 					</div>,

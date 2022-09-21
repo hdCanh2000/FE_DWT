@@ -11,7 +11,6 @@ import Checks from '../../components/bootstrap/forms/Checks';
 import Input from '../../components/bootstrap/forms/Input';
 
 const KpiNormDetail = ({ className, show, onClose, item, label, fields, options, ...props }) => {
-	console.log(item,'item');
 	const formik = useFormik({
 		initialValues: { ...item },
 		enableReinitialize: true,

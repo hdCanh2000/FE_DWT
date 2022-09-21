@@ -170,8 +170,8 @@ export const demoPages = {
 			},
 			kpiNorm: {
 				id: 'kpiNorm',
-				text: 'Danh mục định mức KPI',
-				path: '/danh-muc-dinh-muc-kpi',
+				text: 'Định mức lao động & KPI',
+				path: '/dinh-muc-lao-dong-kpi',
 			},
 			overall: {
 				id: 'overall',

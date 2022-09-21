@@ -187,7 +187,7 @@ const PositionPage = () => {
 			departmentId: parseInt(data.departmentId, 10),
 			positionLevelId: parseInt(data.positionLevelId, 10),
 			jobType: data.jobType,
-			kpiNormId: data.kpiName
+			kpiNormId: data.kpiName,
 		};
 		if (data.id) {
 			try {
