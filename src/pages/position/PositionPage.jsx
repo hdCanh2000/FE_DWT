@@ -21,7 +21,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
-import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
+import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addPosition, updatePosition } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
 
@@ -39,7 +39,7 @@ const PositionPage = () => {
 	const positions = useSelector((state) => state.position.positions);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
-	// const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
+	const requirements = useSelector((state) => state.requirement.requirements);
 
 	const [nvs] = React.useState(true);
 	useEffect(() => {
@@ -55,7 +55,7 @@ const PositionPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(fetchKpiNormList());
+		dispatch(fetchRequirementList());
 	}, [dispatch]);
 
 	const columns = [
@@ -113,7 +113,7 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels,
+			options: positionLevels && (positionLevels.filter((item) => item?.name !== "Không")),
 		},
 		{
 			title: 'Quản lý cấp trên',
@@ -134,6 +134,17 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
+		},
+		{
+			title: 'Yêu cầu năng lực',
+			id: 'requirements',
+			key: 'requirements',
+			type: 'select',
+			align: 'left',
+			isShow: false,
+			render: (item) => <span>{item?.requirement?.name || 'No data'}</span>,
+			options: requirements,
+			isMulti: true,
 		},
 		{
 			title: 'Hành Động',
@@ -186,6 +197,7 @@ const PositionPage = () => {
 			manager: parseInt(data.manager, 10),
 			jobType: data.jobType,
 			kpiNormId: data.kpiName,
+			requirements: data.requirements
 		};
 		if (data.id) {
 			try {
