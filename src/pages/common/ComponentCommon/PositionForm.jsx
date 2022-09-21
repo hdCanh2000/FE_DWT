@@ -53,7 +53,6 @@ const CommonForm = ({
 	});
 
 	const dispatch = useDispatch();
-
 	const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 

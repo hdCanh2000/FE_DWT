@@ -1,11 +1,11 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react/self-closing-comp */
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-// import { useToasts } from 'react-toast-notifications';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -14,10 +14,7 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-// import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
-// import CommonForm from '../common/ComponentCommon/CommonForm';
-// import { addDepartment, updateDepartment } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
@@ -25,6 +22,7 @@ import DetailForm from './DepartmentDetail';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
+import DepartmentDetailPage from './DepartmentDetailPage';
 
 const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -35,13 +33,30 @@ const DepartmentPage = () => {
 	const [itemEdit, setItemEdit] = React.useState({});
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [openForm, setOpenForm] = React.useState(false);
-
-	const departments = useSelector((state) => state.department.departments);
-
+	const department = useSelector((state) => state.department.departments);
 	useEffect(() => {
 		dispatch(fetchDepartmentWithUserList());
 	}, [dispatch]);
-
+	const departmentList = department?.map((items) => {
+		return {
+			label: items.name,
+			value: items.id,
+		};
+	});
+	const organizationLevelOptions = [
+		{
+			label: 'Khối',
+			value: 1,
+		},
+		{
+			label: 'Phòng ban',
+			value: 2,
+		},
+		{
+			label: 'Đội',
+			value: 3,
+		},
+	];
 	const columns = [
 		{
 			title: 'Tên phòng ban',
@@ -50,6 +65,26 @@ const DepartmentPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+		},
+		{
+			title: 'Cấp tổ chức',
+			id: 'organizationLevel',
+			key: 'organizationLevel',
+			type: 'select',
+			align: 'center',
+			options: organizationLevelOptions,
+			isShow: true,
+			isMulti: false,
+		},
+		{
+			title: 'Quan hệ cha con',
+			id: 'parentId',
+			key: 'parentId',
+			type: 'select',
+			align: 'center',
+			options: departmentList,
+			isShow: true,
+			isMulti: false,
 		},
 		{
 			title: 'Mô tả',
@@ -144,6 +179,8 @@ const DepartmentPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
+			organizationLevel: data?.organizationLevel?.value,
+			parentId: data?.parentId?.value,
 			id: data?.id,
 			name: data.name,
 			description: data.description,
@@ -162,21 +199,11 @@ const DepartmentPage = () => {
 			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
 		}
 	};
-
 	return (
 		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
-						<div className='row mb-4'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>
-										Danh sách phòng ban
-									</div>
-								</div>
-							</div>
-						</div>
 						<div className='row mb-0'>
 							<div className='col-12'>
 								<Card className='w-100'>
@@ -196,11 +223,10 @@ const DepartmentPage = () => {
 											</Button>
 										</CardActions>
 									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={columns}
-											data={departments}
+									<div className='row'>
+										<DepartmentDetailPage
+											organizationLevelOptions={organizationLevelOptions}
+											departmentList={departmentList}
 										/>
 									</div>
 								</Card>

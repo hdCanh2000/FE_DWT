@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 
@@ -81,13 +81,17 @@ const KeyPage = () => {
 	}, [dispatch]);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-	const datas = useSelector((state) => state.positionLevel.positionLevels);
-	const [data, setData] = React.useState([]);
 	useEffect(() => {
 		setData(datas.filter((item) => item?.id !== 0));
 		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
 	},[datas])
 	const { addToast } = useToasts();
+	const [data, setData] = useState([]);
+	const datas = useSelector((state) => state.positionLevel.positionLevels);
+	useEffect(() => {
+		setData(datas.filter((item) => item?.id !== 0));
+		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
+	},[datas])
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>

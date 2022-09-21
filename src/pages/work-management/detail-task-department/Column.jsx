@@ -149,7 +149,6 @@ const Column = (props) => {
 			newColumn.cards.splice(cardIndexToUpdate, 1, cardToUpdate);
 		}
 		onUpdateColumn(newColumn);
-		// console.log(newColumn);
 	};
 
 	const handleColumnTitleChange = useCallback((e) => {
