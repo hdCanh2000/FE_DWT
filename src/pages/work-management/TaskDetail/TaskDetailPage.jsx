@@ -1,7 +1,7 @@
 // eslint-disable react/no-array-index-key
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -95,6 +95,7 @@ const TaskDetailPage = () => {
 		type: 1,
 		isShowNote: false,
 	});
+
 	const [state, setState] = React.useState({
 		series: [0, 0, 0, 0, 0, 0, 0],
 		options: chartOptions,
@@ -171,9 +172,9 @@ const TaskDetailPage = () => {
 			),
 		},
 		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
+			title: 'Thời gian bắt đầu',
+			id: 'startDate',
+			key: 'startDate',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
@@ -293,13 +294,10 @@ const TaskDetailPage = () => {
 						<Button
 							isOutline={!darkModeStatus}
 							color='success'
-							isDisable={
-								item?.status === 4 || item?.status === 7 || item.status === 3
-							}
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2'
 							icon='Edit'
-							onClick={() => handleOpenModal(item, 'edit')}
+							onClick={() => handleOnClickToEditPage(params.id, item.id)}
 						/>
 						<Button
 							isOutline={!darkModeStatus}
@@ -330,9 +328,9 @@ const TaskDetailPage = () => {
 			),
 		},
 		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
+			title: 'Thời gian bắt đầu',
+			id: 'startDate',
+			key: 'startDate',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
@@ -451,6 +449,7 @@ const TaskDetailPage = () => {
 		setTask(res.data.data);
 		setTaskReport(res.data.report);
 	};
+
 	const fetchSubtasks = async (id) => {
 		const res = await getAllSubtasksByTaskId(id);
 		setSubtasks(res.data);
@@ -461,6 +460,17 @@ const TaskDetailPage = () => {
 		fetchTaskId(params?.id);
 		fetchSubtasks(params?.id);
 	}, [params?.id]);
+
+	const handleOnClickToActionPage = useCallback(
+		(missionId) => navigate(`${demoPages.jobsPage.subMenu.task.path}/${missionId}/them-moi`),
+		[navigate],
+	);
+
+	const handleOnClickToEditPage = useCallback(
+		(taskId, subTaskId) =>
+			navigate(`${demoPages.jobsPage.subMenu.task.path}/${taskId}/cap-nhat/${subTaskId}`),
+		[navigate],
+	);
 
 	// show toast
 	const handleShowToast = (titleToast, content, icon = 'Check2Circle', color = 'success') => {
@@ -484,6 +494,7 @@ const TaskDetailPage = () => {
 		}
 		fetchSubtasks(params?.id);
 	};
+
 	const handleOpenConfirm = (item) => {
 		setDeletes({
 			id: item.id,
@@ -491,6 +502,7 @@ const TaskDetailPage = () => {
 		});
 		set0penConfirm(true);
 	};
+
 	const handleCloseComfirm = () => {
 		setDeletes({});
 		set0penConfirm(false);
@@ -652,17 +664,13 @@ const TaskDetailPage = () => {
 		setOpenListInfoModal(false);
 	};
 
-	// update subtask
-	const handleOpenModal = (item) => {
-		setEditModalStatus(true);
-		setItemEdit({ ...item });
-	};
 	const handleCloseEditForm = () => {
 		setEditModalStatus(false);
 		setItemEdit(null);
 		fetchTaskId(params?.id);
 		fetchSubtasks(params?.id);
 	};
+
 	const handleSubmitSubTaskForm = async (data) => {
 		if (data.id) {
 			try {
@@ -1001,12 +1009,19 @@ const TaskDetailPage = () => {
 															</div>
 														</div>
 													) : (
-														<div className='row align-items-center' style={{ opacity: 0.5 }}>
+														<div
+															className='row align-items-center'
+															style={{ opacity: 0.5 }}>
 															<div className='col-xl-12 col-md-12'>
 																<center>
-																	<div className={styles.circle} />
+																	<div
+																		className={styles.circle}
+																	/>
 																	<br />
-																	<h2>Chưa có công việc cho mục tiêu này</h2>
+																	<h2>
+																		Chưa có công việc cho mục
+																		tiêu này
+																	</h2>
 																</center>
 															</div>
 														</div>
@@ -1143,14 +1158,15 @@ const TaskDetailPage = () => {
 						<Tabs defaultActiveKey='DetailSubtask' id='uncontrolled-tab-example'>
 							<Tab
 								eventKey='DetailSubtask'
-								title={`Danh sách đầu việc (${subtasks?.filter((item) => item.status !== 3).length
-									})`}
+								title={`Danh sách đầu việc (${
+									subtasks?.filter((item) => item.status !== 3).length
+								})`}
 								className='mb-3'>
 								{/* Danh sách đầu việc */}
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
 										<CardTitle>
-											<CardLabel>Danh sách đầu việc </CardLabel>
+											<CardLabel>Danh sách đầu việc</CardLabel>
 										</CardTitle>
 									</CardLabel>
 									{verifyPermissionHOC(
@@ -1159,7 +1175,7 @@ const TaskDetailPage = () => {
 											size='lg'
 											isLight
 											className='w-30 h-100'
-											onClick={() => handleOpenModal(0, 'add')}
+											onClick={() => handleOnClickToActionPage(task.id)}
 											icon='AddCircle'>
 											Thêm đầu việc
 										</Button>,
@@ -1197,8 +1213,9 @@ const TaskDetailPage = () => {
 							</Tab>
 							<Tab
 								eventKey='SubmitSubtask'
-								title={`Đầu việc chờ xác nhận (${subtasks?.filter((item) => item.status === 3).length
-									})`}>
+								title={`Đầu việc chờ xác nhận (${
+									subtasks?.filter((item) => item.status === 3).length
+								})`}>
 								<CardHeader>
 									<CardLabel icon='ContactSupport' iconColor='secondary'>
 										<CardTitle tag='h4' className='h5'>

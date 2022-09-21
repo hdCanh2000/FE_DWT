@@ -2,6 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 
+const customStyles = {
+	control: (provided) => ({
+		...provided,
+	}),
+};
+
 const CustomSelect = ({
 	onChange,
 	options,
@@ -12,23 +18,9 @@ const CustomSelect = ({
 	disabled,
 	...props
 }) => {
-	if (disabled === 'true') {
-		return (
-			<Select
-				isDisabled
-				value={value}
-				defaultValue={value}
-				onChange={(val) => onChange(val)}
-				options={options}
-				isMulti={isMulti}
-				className={className}
-				placeholder={placeholder}
-				{...props}
-			/>
-		);
-	}
 	return (
 		<Select
+			isDisabled={disabled}
 			value={value}
 			defaultValue={value}
 			onChange={(val) => onChange(val)}
@@ -36,6 +28,7 @@ const CustomSelect = ({
 			isMulti={isMulti}
 			className={className}
 			placeholder={placeholder}
+			styles={customStyles}
 			{...props}
 		/>
 	);
@@ -43,7 +36,7 @@ const CustomSelect = ({
 
 CustomSelect.propTypes = {
 	className: PropTypes.string,
-	disabled: PropTypes.string,
+	disabled: PropTypes.bool,
 	onChange: PropTypes.func,
 	// eslint-disable-next-line react/forbid-prop-types
 	options: PropTypes.array,

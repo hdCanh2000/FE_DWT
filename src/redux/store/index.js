@@ -19,7 +19,7 @@ const reducer = combineReducers({
 	department: departmentSlice.reducer,
 	position: positionSlice.reducer,
 	role: roleSlice.reducer,
-	positionLevel:positionLevelSlice.reducer,
+	positionLevel: positionLevelSlice.reducer,
 	toggleForm: toggleFormSlice.reducer,
 	kpiNorm: kpiNormSlice.reducer,
 	key: keySlice.reducer,

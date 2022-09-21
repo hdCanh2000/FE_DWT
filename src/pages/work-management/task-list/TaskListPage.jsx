@@ -8,6 +8,8 @@ import {
 	useNavigate,
 	useSearchParams,
 } from 'react-router-dom';
+import { isEmpty } from 'lodash';
+import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
@@ -452,7 +454,25 @@ const TaskListPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={taskReport} />
+											{isEmpty(taskReport) ? (
+												<div
+													className='col-xl-12 col-xxl-12'
+													style={{ textAlign: 'center' }}>
+													<div style={{ height: '290px' }}>
+														<Spinner
+															animation='border'
+															variant='primary'
+															style={{
+																marginTop: '15%',
+																width: '50px',
+																height: '50px',
+															}}
+														/>
+													</div>
+												</div>
+											) : (
+												<TaskChartReport data={taskReport} />
+											)}
 										</div>
 									</div>
 								</CardBody>
@@ -476,7 +496,25 @@ const TaskListPage = () => {
 								<CardBody className='py-0'>
 									<div className='row'>
 										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={subTaskReportDepartment} />
+											{isEmpty(subTaskReportDepartment) ? (
+												<div
+													className='col-xl-12 col-xxl-12'
+													style={{ textAlign: 'center' }}>
+													<div style={{ height: '290px' }}>
+														<Spinner
+															animation='border'
+															variant='primary'
+															style={{
+																marginTop: '15%',
+																width: '50px',
+																height: '50px',
+															}}
+														/>
+													</div>
+												</div>
+											) : (
+												<TaskChartReport data={subTaskReportDepartment} />
+											)}
 										</div>
 									</div>
 								</CardBody>

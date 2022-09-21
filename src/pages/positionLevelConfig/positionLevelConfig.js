@@ -82,7 +82,7 @@ const KeyPage = () => {
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const datas = useSelector((state) => state.positionLevel.positionLevels);
-	const [data,setData] = React.useState([]);
+	const [data, setData] = React.useState([]);
 	useEffect(() => {
 		setData(datas.filter((item) => item?.id !== 0));
 		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps

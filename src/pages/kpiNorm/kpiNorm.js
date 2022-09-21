@@ -200,7 +200,7 @@ const EmployeePage = () => {
 			evaluationDescription: data?.evaluationDescription,
 			unitId: parseInt(data?.unitId, 10),
 			parent: data?.parent,
-			isKey : data.isKey,
+			isKey: data.isKey,
 		};
 		if (data?.id) {
 			try {

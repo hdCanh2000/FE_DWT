@@ -507,7 +507,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 										</FormGroup>
 										{/* eslint-disable-next-line no-shadow */}
 										{keysState?.map((item, index) => {
-											console.log(item);
 											return (
 												<div
 													// eslint-disable-next-line react/no-array-index-key

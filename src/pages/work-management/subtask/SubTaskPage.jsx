@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../../../components/bootstrap/Alert';
 import Button from '../../../components/bootstrap/Button';
 import Card, {
@@ -38,14 +38,13 @@ import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
 
 const SubTaskPage = () => {
 	const { themeStatus, darkModeStatus } = useDarkMode();
+	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const [subtasks, setSubtasks] = useState([]);
 	const [itemEdit, setItemEdit] = useState({});
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [deletes, setDeletes] = React.useState({});
-
-	// const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
 		title: '',
@@ -64,11 +63,15 @@ const SubTaskPage = () => {
 		fetchDataAllSubTasks();
 	}, []);
 
-	// form modal
-	const handleOpenEditForm = (item) => {
-		setEditModalStatus(true);
-		setItemEdit({ ...item });
-	};
+	const handleOnClickToActionPage = useCallback(
+		() => navigate(`${demoPages.jobsPage.subMenu.task.path}/them-moi`),
+		[navigate],
+	);
+
+	const handleOnClickToEditPage = useCallback(
+		(subtaskId) => navigate(`${demoPages.jobsPage.subMenu.task.path}/cap-nhat/${subtaskId}`),
+		[navigate],
+	);
 
 	const handleCloseEditForm = () => {
 		setEditModalStatus(false);
@@ -218,7 +221,7 @@ const SubTaskPage = () => {
 										color='info'
 										icon='Plus'
 										tag='button'
-										onClick={() => handleOpenEditForm(null)}>
+										onClick={handleOnClickToActionPage}>
 										Thêm đầu việc
 									</Button>
 								</CardActions>
@@ -246,7 +249,7 @@ const SubTaskPage = () => {
 													<td className='cursor-pointer'>
 														<Link
 															className='text-underline'
-															to={`/dau-viec/${item?.id}`}>
+															to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${item?.id}`}>
 															{item?.name}
 														</Link>
 													</td>
@@ -341,12 +344,9 @@ const SubTaskPage = () => {
 															isLight={darkModeStatus}
 															className='text-nowrap mx-2'
 															icon='Edit'
-															isDisable={
-																item.status === 4 ||
-																item.status === 7 ||
-																item.status === 3
+															onClick={() =>
+																handleOnClickToEditPage(item.id)
 															}
-															onClick={() => handleOpenEditForm(item)}
 														/>
 														<Button
 															isOutline={!darkModeStatus}

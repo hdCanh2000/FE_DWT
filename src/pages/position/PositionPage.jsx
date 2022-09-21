@@ -123,7 +123,7 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: false,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels, 
+			options: positionLevels,
 		},
 		{
 			title: 'Phòng Ban',

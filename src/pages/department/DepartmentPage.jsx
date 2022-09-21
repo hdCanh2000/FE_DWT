@@ -32,9 +32,9 @@ const DepartmentPage = () => {
 	const navigate = useNavigate();
 
 	const dispatch = useDispatch();
-	const [itemEdit,setItemEdit] = React.useState({});
-	const [openDetail,setOpenDetail] = React.useState(false);
-	const [openForm,setOpenForm] = React.useState(false);
+	const [itemEdit, setItemEdit] = React.useState({});
+	const [openDetail, setOpenDetail] = React.useState(false);
+	const [openForm, setOpenForm] = React.useState(false);
 
 	const departments = useSelector((state) => state.department.departments);
 
@@ -112,22 +112,22 @@ const DepartmentPage = () => {
 			isShow: false,
 		},
 	];
-	const handleOpenDetail =(item)=>{
+	const handleOpenDetail = (item) => {
 		setItemEdit(item);
 		setOpenDetail(true);
-	}
-	const handleCloseDetail =()=>{
+	};
+	const handleCloseDetail = () => {
 		setItemEdit({});
 		setOpenDetail(false);
-	}
-	const handleOpenForm =(item)=>{
+	};
+	const handleOpenForm = (item) => {
 		setItemEdit(item);
 		setOpenForm(true);
-	}
-	const handleCloseForm =()=>{
+	};
+	const handleCloseForm = () => {
 		setItemEdit({});
 		setOpenForm(false);
-	}
+	};
 	const handleOpenDetails = (item) => {
 		navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`);
 	};
