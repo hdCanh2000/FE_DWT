@@ -35,7 +35,6 @@ const TASK = {
 
 const MANAGEMENT = {
 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
-	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
@@ -43,10 +42,6 @@ const MANAGEMENT = {
 		import('../pages/recruitmentRequirements/RecruitmentRequirementsPage'),
 	),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
-};
-
-const CHART = {
-	ORGANIZATIONAL: lazy(() => import('../pages/chart/organizational/OrganizationalChartPage')),
 };
 
 const POSITION_LEVEL_CONFIG = {
@@ -211,11 +206,6 @@ const presentation = [
 	{
 		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
-		exact: true,
-	},
-	{
-		path: demoPages.companyPage.subMenu.organizational.path,
-		element: <CHART.ORGANIZATIONAL />,
 		exact: true,
 	},
 	// yêu cầu năng luc tuyển dụng
