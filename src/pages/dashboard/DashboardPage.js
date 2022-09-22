@@ -844,16 +844,7 @@ const DashboardPage = () => {
 			offsetX: 40,
 		},
 	};
-<<<<<<< HEAD
 	const yearStoreSeries = [
-=======
-	const quarterStoreSeries = [
-		{
-			name: 'Thu Nhập Quý Này',
-			type: 'column',
-			data: [300, 450, 500],
-		},
->>>>>>> 9b84f9630df44679af288a0d4676764616086599
 		{
 			// name: 'Thu Nhập Quý Năm Nay',
 			type: 'column',
