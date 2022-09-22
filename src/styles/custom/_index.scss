@@ -12,6 +12,9 @@
 .sticky-top-size {
 	top: map.get($header, height) + map.get($subheader, height) + map.get($page, padding-y);
 }
+.treeview > div { 
+	border-left: 1px dashed black !important; 
+  } 
 
 .card,
 .modal-content,
