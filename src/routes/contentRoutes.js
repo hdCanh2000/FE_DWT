@@ -43,7 +43,6 @@ const MANAGEMENT = {
 	),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
-
 const POSITION_LEVEL_CONFIG = {
 	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
 };
@@ -159,13 +158,8 @@ const presentation = [
 	},
 	// trang danh sách phòng ban
 	{
-		path: `${demoPages.companyPage.subMenu.features.path}`,
+		path: `${demoPages.companyPage.path}`,
 		element: <MANAGEMENT.DEPARTMENT />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.companyPage.subMenu.features.path}/:id`,
-		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
 		exact: true,
 	},
 	// Quản lý Vị Trí

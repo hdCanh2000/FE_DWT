@@ -94,7 +94,7 @@ const EmployeePage = () => {
 			isMulti: false,
 		},
 		{
-			title: 'Đơn vị',
+			title: 'Đơn vị tính',
 			id: 'unitId',
 			key: 'unitId',
 			type: 'singleSelect',
@@ -299,7 +299,6 @@ const EmployeePage = () => {
 						</div>
 					</div>
 				</div>
-				, ['admin', 'manager'],
 				{verifyPermissionHOC(
 					<div className='row mb-0'>
 						<div className='col-12'>
@@ -329,7 +328,7 @@ const EmployeePage = () => {
 												<tr>
 													<th>Tên định mức KPI</th>
 													<th className='text-center'>Phòng ban</th>
-													<th className='text-center'>Đơn vị</th>
+													<th className='text-center'>Đơn vị tính</th>
 													<th className='text-center'>
 														Điểm KPI trên 1 đơn vị
 													</th>

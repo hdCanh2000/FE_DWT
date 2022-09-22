@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import Tree from 'react-animated-tree-v2';
 import { arrayToTree } from 'performant-array-to-tree';
-
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -187,7 +186,7 @@ const DepartmentPage = () => {
 						<Tree
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
-							content={`${item.name}`}
+							content={item.name}
 							style={treeStyles}
 							open
 							onItemClick={() => handleClick(item)}>
@@ -199,8 +198,15 @@ const DepartmentPage = () => {
 		});
 	};
 	return (
-		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
+		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
+			<div className='row'>
+					<div className='col-12'>
+						<div className='d-flex justify-content-between align-items-center'>
+							<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
+						</div>
+					</div>
+				</div>
 				{verifyPermissionHOC(
 					<>
 						<div className='row mb-0'>
@@ -209,7 +215,7 @@ const DepartmentPage = () => {
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách phòng ban</CardLabel>
+												<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions>
@@ -218,7 +224,7 @@ const DepartmentPage = () => {
 												icon='PersonPlusFill'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
-												Thêm phòng ban
+												Thêm cơ cấu tổ chức
 											</Button>
 										</CardActions>
 									</CardHeader>
