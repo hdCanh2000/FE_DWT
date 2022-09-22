@@ -50,26 +50,26 @@ export const demoPages = {
 	},
 	companyPage: {
 		id: 'companyPage',
-		text: 'Sơ đồ tổ chức',
-		path: 'company-pages',
+		text: 'Cơ cấu tổ chức',
+		path: '/co-cau-to-chuc',
 		icon: 'CustomCompany',
-		subMenu: {
-			// organizational: {
-			// 	id: 'organizational',
-			// 	text: 'Sơ đồ tổ chức',
-			// 	path: '/so-do-to-chuc',
-			// },
-			features: {
-				id: 'features',
-				text: 'Sơ đồ phòng ban',
-				path: '/so-do-phong-ban',
-			},
-			// areas: {
-			// 	id: 'areas',
-			// 	text: 'Sơ đồ khu vực',
-			// 	path: '/so-do-khu-vuc',
-			// },
-		},
+		// subMenu: {
+		// 	// organizational: {
+		// 	// 	id: 'organizational',
+		// 	// 	text: 'Sơ đồ tổ chức',
+		// 	// 	path: '/so-do-to-chuc',
+		// 	// },
+		// 	features: {
+		// 		id: 'features',
+		// 		text: 'Sơ đồ phòng ban',
+		// 		path: '/so-do-phong-ban',
+		// 	},
+		// 	// areas: {
+		// 	// 	id: 'areas',
+		// 	// 	text: 'Sơ đồ khu vực',
+		// 	// 	path: '/so-do-khu-vuc',
+		// 	// },
+		// },
 	},
 	jobsPage: {
 		// công việc

@@ -89,17 +89,17 @@ const DepartmentDetailPage = ({ organizationLevelOptions, departmentList, initVa
 						<CardHeader>
 							<CardLabel icon='Edit' iconColor='warning'>
 								<CardTitle>
-									{isEdit ? 'Thông tin chi tiết' : 'Chỉnh sửa phòng ban'}
+									{isEdit ? 'Thông tin chi tiết cơ cấu tổ chức' : 'Chỉnh sửa cấu tổ chức'}
 								</CardTitle>
 							</CardLabel>
 						</CardHeader>
 						<CardBody className='pt-0'>
 							<div className='row g-4'>
 								<div className='col-md-6'>
-									<FormGroup id='name' label='Tên phòng ban'>
+									<FormGroup id='name' label='Tên đơn vị'>
 										<Input
 											disabled={isEdit}
-											placeholder='Tên phòng ban'
+											placeholder='Tên đơn vị'
 											onChange={formik.handleChange}
 											onBlur={formik.handleBlur}
 											value={formik.values.name}
@@ -112,11 +112,11 @@ const DepartmentDetailPage = ({ organizationLevelOptions, departmentList, initVa
 									</FormGroup>
 								</div>
 								<div className='col-md-6'>
-									<FormGroup id='slug' label='Mã phòng ban'>
+									<FormGroup id='slug' label='Mã cơ cấu tổ chức'>
 										<Input
 											disabled={isEdit}
 											type='text'
-											placeholder='Mã phòng ban'
+											placeholder='Mã đơn vị'
 											onChange={formik.handleChange}
 											onBlur={formik.handleBlur}
 											value={formik.values.slug}
@@ -128,12 +128,12 @@ const DepartmentDetailPage = ({ organizationLevelOptions, departmentList, initVa
 									</FormGroup>
 								</div>
 								<div className='col-md-12'>
-									<FormGroup id='parentId' label='Quan hệ cha con'>
+									<FormGroup id='parentId' label='Thuộc đơn vị'>
 										<Select
 											list={departmentList}
 											disabled={isEdit}
 											type='text'
-											placeholder='Chọn quan hệ cha con'
+											placeholder='Chọn đơn vị trực thuộc'
 											onChange={formik.handleChange}
 											onBlur={formik.handleBlur}
 											value={formik.values.parentId}
@@ -228,7 +228,7 @@ const DepartmentDetailPage = ({ organizationLevelOptions, departmentList, initVa
 											<Button
 												color='info'
 												size='lg'
-												icon='PersonPlusFill'
+												icon='Build'
 												tag='button'
 												className='w-50 p-3'
 												onClick={() => handleEdit()}>
