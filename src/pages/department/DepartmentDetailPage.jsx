@@ -22,6 +22,7 @@ import {
 	fetchDepartmentWithUserList,
 } from '../../redux/slice/departmentSlice';
 import Select from '../../components/bootstrap/forms/Select';
+import { close, minus, plus } from './icon/icon';
 
 // eslint-disable-next-line react/prop-types
 const DepartmentDetailPage = ({ organizationLevelOptions, departmentList }) => {
@@ -102,14 +103,26 @@ const DepartmentDetailPage = ({ organizationLevelOptions, departmentList }) => {
 		return datas?.map((item) => {
 			return (
 				<div>
-					<Tree
-						key={item.id}
-						content={`${item.name}(${item.items.length})`}
-						style={treeStyles}
-						open
-						onItemClick={() => handleClick(item)}>
-						{renderDepartmentMenu(item?.items)}
-					</Tree>
+					{item?.items?.length === 0 && (
+						<Tree
+							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
+							key={item.id}
+							content={`${item.name}`}
+							style={treeStyles}
+							onItemClick={() => handleClick(item)}
+						/>
+					)}
+					{item?.items?.length !== 0 && (
+						<Tree
+							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
+							key={item.id}
+							content={`${item.name}(${item.items.length})`}
+							style={treeStyles}
+							open
+							onItemClick={() => handleClick(item)}>
+							{renderDepartmentMenu(item.items)}
+						</Tree>
+					)}
 				</div>
 			);
 		});

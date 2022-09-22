@@ -288,12 +288,7 @@ const DashboardPage = () => {
 	};
 	const [activeCompanyTab, setActiveCompanyTab] = useState(COMPANIES_TAB.COMP1);
 
-	const search = [
-		{ name: 'Ngày' },
-		{ name: 'Tuần' },
-		{ name: 'Tháng' },
-		{ name: 'Quý' },
-	];
+	const search = [{ name: 'Ngày' }, { name: 'Tuần' }, { name: 'Tháng' }, { name: 'Quý' }];
 	const SEARCH_TAB = {
 		COMP1: search[0].name,
 		COMP2: search[1].name,
@@ -547,16 +542,12 @@ const DashboardPage = () => {
 		{
 			name: 'Thu Nhập Hôm Nay',
 			type: 'column',
-			data: [
-				0, 0, 0, 1, 2, 0, 0, 0, 1, 4, 3, 2, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
-			],
+			data: [0, 0, 0, 1, 2, 0, 0, 0, 1, 4, 3, 2, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		},
 		{
 			name: 'Thu Nhập Hôm Qua',
 			type: 'column',
-			data: [
-				1, 2, 0, 1, 0, 0, 2, 0, 1, 2, 4, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
-			],
+			data: [1, 2, 0, 1, 0, 0, 2, 0, 1, 2, 4, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 		},
 	];
 
@@ -653,16 +644,12 @@ const DashboardPage = () => {
 		{
 			name: 'Thu Nhập Tuần Này',
 			type: 'column',
-			data: [
-				11, 15, 9, 18, 20, 22, 15
-			],
+			data: [11, 15, 9, 18, 20, 22, 15],
 		},
 		{
 			name: 'Thu Nhập Tuần Trước',
 			type: 'column',
-			data: [
-				10, 12, 14, 20, 22, 25, 9
-			],
+			data: [10, 12, 14, 20, 22, 25, 9],
 		},
 	];
 	const monthOptions = {
@@ -759,14 +746,16 @@ const DashboardPage = () => {
 			name: 'Thu Nhập Tháng Này',
 			type: 'column',
 			data: [
-				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 25, 30
+				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11,
+				15, 9, 18, 20, 22, 15, 25, 30,
 			],
 		},
 		{
 			name: 'Thu Nhập Tháng Trước',
 			type: 'column',
 			data: [
-				20, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 25
+				20, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9,
+				10, 12, 14, 20, 22, 25, 9, 25,
 			],
 		},
 	];
@@ -863,16 +852,12 @@ const DashboardPage = () => {
 		{
 			name: 'Thu Nhập Quý Này',
 			type: 'column',
-			data: [
-				300, 450, 500
-			],
+			data: [300, 450, 500],
 		},
 		{
 			name: 'Thu Nhập Quý Trước',
 			type: 'column',
-			data: [
-				250, 300, 400
-			],
+			data: [250, 300, 400],
 		},
 	];
 	const salesByStoreSeries1 = [
@@ -1185,16 +1170,11 @@ const DashboardPage = () => {
 									<CardActions>
 										<ButtonGroup>
 											{search.map((element) => (
-												<div key={element.name} >
+												<div key={element.name}>
 													<Button
-														isLight={
-															searchTab !== element.name
-														}
-														onClick={() =>
-															setSearchTab(element.name)
-														}
-														color={themeStatus}
-													>
+														isLight={searchTab !== element.name}
+														onClick={() => setSearchTab(element.name)}
+														color={themeStatus}>
 														{element.name}
 													</Button>
 												</div>
@@ -1208,13 +1188,14 @@ const DashboardPage = () => {
 												aria-label='Previous Year'
 												isDisable={year <= 2019}
 												onClick={() => {
-													setYear(year - 1)
-													setSearchTab('')
+													setYear(year - 1);
+													setSearchTab('');
 												}}
 											/>
-											<Button color='primary' isLight
-												onClick={() => setSearchTab('')}
-											>
+											<Button
+												color='primary'
+												isLight
+												onClick={() => setSearchTab('')}>
 												{year}
 											</Button>
 											<Button
@@ -1224,8 +1205,8 @@ const DashboardPage = () => {
 												aria-label='Next Year'
 												isDisable={year >= 2021}
 												onClick={() => {
-													setYear(year + 1)
-													setSearchTab('')
+													setYear(year + 1);
+													setSearchTab('');
 												}}
 											/>
 										</ButtonGroup>
