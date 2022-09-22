@@ -54,11 +54,11 @@ export const demoPages = {
 		path: 'company-pages',
 		icon: 'CustomCompany',
 		subMenu: {
-			organizational: {
-				id: 'organizational',
-				text: 'Sơ đồ tổ chức',
-				path: '/so-do-to-chuc',
-			},
+			// organizational: {
+			// 	id: 'organizational',
+			// 	text: 'Sơ đồ tổ chức',
+			// 	path: '/so-do-to-chuc',
+			// },
 			features: {
 				id: 'features',
 				text: 'Sơ đồ phòng ban',

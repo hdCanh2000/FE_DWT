@@ -292,16 +292,14 @@ const EmployeePage = () => {
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<div className='row mb-4'>
-						<div className='col-12'>
-							<div className='d-flex justify-content-between align-items-center'>
-								<div className='display-6 fw-bold py-3'>{lable}</div>
-							</div>
+				<div className='row'>
+					<div className='col-12'>
+						<div className='d-flex justify-content-between align-items-center'>
+							<div className='display-6 fw-bold py-3'>{lable}</div>
 						</div>
-					</div>,
-					['admin', 'manager'],
-				)}
+					</div>
+				</div>
+				, ['admin', 'manager'],
 				{verifyPermissionHOC(
 					<div className='row mb-0'>
 						<div className='col-12'>
