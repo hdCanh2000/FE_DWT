@@ -344,6 +344,7 @@ const DashboardPage = () => {
 					.format('YYYY'),
 			);
 		}
+		arr.sort();
 		return arr;
 	}
 	const salesByStoreOptions = {
@@ -590,6 +591,28 @@ const DashboardPage = () => {
 					enabled: true,
 				},
 			},
+			{
+				seriesName: 'Thu Nhập Năm Ngoái',
+				opposite: true,
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_SUCCESS_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập Năm Ngoái',
+					style: {
+						color: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+			},
 		],
 		tooltip: {
 			theme: 'dark',
@@ -622,6 +645,24 @@ const DashboardPage = () => {
 				randomize(356),
 				randomize(468),
 				randomize(555),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Trước',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(150),
+				randomize(200),
+				randomize(225),
+				randomize(250),
+				randomize(300),
+				randomize(333),
+				randomize(388),
+				randomize(400),
+				randomize(350),
+				randomize(456),
+				randomize(501),
 			],
 		},
 	];
@@ -761,7 +802,7 @@ const DashboardPage = () => {
 			},
 		},
 		xaxis: {
-			categories: getYear(5),
+			categories: getYear(6),
 		},
 		yaxis: [
 			{
@@ -787,7 +828,7 @@ const DashboardPage = () => {
 					enabled: true,
 				},
 			},
-			
+
 		],
 		tooltip: {
 			theme: 'dark',
@@ -808,7 +849,7 @@ const DashboardPage = () => {
 			// name: 'Thu Nhập Quý Năm Nay',
 			type: 'column',
 			data: [
-				300, 450, 500, 700
+				300, 450, 500, 600, 700, 800
 			],
 		},
 	];
@@ -1066,35 +1107,38 @@ const DashboardPage = () => {
 												</div>
 											))}
 										</ButtonGroup>
-										<ButtonGroup>
-											<Button
-												color='primary'
-												isLight
-												icon='ChevronLeft'
-												aria-label='Previous Year'
-												isDisable={year <= 2019}
-												onClick={() => {
-													setYear(year - 1)
-													setSearchTab('')
-												}}
-											/>
-											<Button color='primary' isLight
-												onClick={() => setSearchTab('')}
-											>
-												{year}
-											</Button>
-											<Button
-												color='primary'
-												isLight
-												icon='ChevronRight'
-												aria-label='Next Year'
-												isDisable={year >= 2021}
-												onClick={() => {
-													setYear(year + 1)
-													setSearchTab('')
-												}}
-											/>
-										</ButtonGroup>
+										{searchTab === "30 Ngày" || searchTab === "Năm" ? (
+											null
+										) : (
+											<ButtonGroup>
+												<Button
+													color='primary'
+													isLight
+													icon='ChevronLeft'
+													aria-label='Previous Year'
+													isDisable={year <= 2019}
+													onClick={() => {
+														setYear(year - 1)
+														setSearchTab('')
+													}}
+												/>
+												<Button color='primary' isLight
+												>
+													{year}
+												</Button>
+												<Button
+													color='primary'
+													isLight
+													icon='ChevronRight'
+													aria-label='Next Year'
+													isDisable={year >= 2021}
+													onClick={() => {
+														setYear(year + 1)
+														setSearchTab('')
+													}}
+												/>
+											</ButtonGroup>
+										)}
 									</CardActions>
 								</CardHeader>
 								<CardBody>
@@ -1125,7 +1169,6 @@ const DashboardPage = () => {
 										<div className='col-xl-9 col-xxl-10'>
 											<Chart
 												series={
-
 													(searchTab === SEARCH_TAB.COMP1 &&
 														dayStoreSeries) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
@@ -1143,9 +1186,6 @@ const DashboardPage = () => {
 													salesByStoreSeries4
 												}
 												options={
-													// (searchTab === SEARCH_TAB.COMP1 &&
-													// 	dayOptions) ||
-													
 													(searchTab === SEARCH_TAB.COMP1 &&
 														dayOptions) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
