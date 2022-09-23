@@ -1,4 +1,6 @@
-import React from 'react';
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
@@ -9,19 +11,28 @@ import Icon from '../../components/icon/Icon';
 import Progress from '../../components/bootstrap/Progress';
 import useDarkMode from '../../hooks/useDarkMode';
 import { demoPages } from '../../menu';
+import getTaskByUser from './services';
 
 const minWidth100 = {
 	minWidth: 100,
 };
-
-const Expand = ({ subtasks, onOpenModal, taskId }) => {
+const Expand = ({ idUser }) => {
 	const { themeStatus } = useDarkMode();
+	const [taskByUser, setTaskByUser] = useState([]);
+	useEffect(() => {
+		const fecth = async () => {
+			const reponse = await getTaskByUser(idUser);
+			const result = await reponse.data;
+			setTaskByUser(result);
+		};
+		fecth();
+	}, [idUser]);
 	return (
 		<table className='table table-modern'>
 			<thead>
 				<tr>
-					<th>Tên đầu việc</th>
-					<th className='text-center'>Nhân viên phụ trách</th>
+					<th>Tên công việc</th>
+					<th className='text-center'>Hình thức</th>
 					<th className='text-center'>Trạng thái</th>
 					<th className='text-center'>Hạn ngày hoàn thành</th>
 					<th className='text-center'>Giá trị KPI</th>
@@ -30,7 +41,7 @@ const Expand = ({ subtasks, onOpenModal, taskId }) => {
 				</tr>
 			</thead>
 			<tbody>
-				{subtasks?.map((subTaskItem) => (
+				{taskByUser?.map((subTaskItem) => (
 					<tr key={subTaskItem.id}>
 						<td>
 							<Link
@@ -39,7 +50,9 @@ const Expand = ({ subtasks, onOpenModal, taskId }) => {
 								{subTaskItem?.name}
 							</Link>
 						</td>
-						<td className='text-center'>{subTaskItem?.users[0]?.name}</td>
+						<td className='text-center'>
+							{subTaskItem?.userId === idUser ? 'Phụ trách chính' : 'Liên quan'}
+						</td>
 						<td className='text-center'>
 							<Button
 								isLink
@@ -55,11 +68,13 @@ const Expand = ({ subtasks, onOpenModal, taskId }) => {
 						<td className='text-center'>{subTaskItem.kpiValue}</td>
 						<td className='text-center' style={minWidth100}>
 							<div className='d-flex align-items-center'>
-								<div className='flex-shrink-0 me-3'>{`${subTaskItem.progress}%`}</div>
+								<div className='flex-shrink-0 me-3'>{`${
+									subTaskItem.progress || 0
+								}%`}</div>
 								<Progress
 									className='flex-grow-1'
 									isAutoColor
-									value={subTaskItem.progress}
+									value={subTaskItem.progress || 0}
 									style={{ height: 10 }}
 								/>
 							</div>
@@ -87,7 +102,8 @@ const Expand = ({ subtasks, onOpenModal, taskId }) => {
 						<Button
 							className='d-flex align-items-center cursor-pointer'
 							style={{ paddingLeft: 0 }}
-							onClick={() => onOpenModal(taskId)}>
+							// onClick={() => onOpenModal(taskId)}
+						>
 							<Icon size='lg' icon='PlusCircle' />
 							<span className='mx-2'>Thêm đầu việc</span>
 						</Button>
@@ -100,17 +116,11 @@ const Expand = ({ subtasks, onOpenModal, taskId }) => {
 
 Expand.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types, react/require-default-props
-	subtasks: PropTypes.array.isRequired,
-	// eslint-disable-next-line react/require-default-props
-	// handleUpdateStatus: PropTypes.func,
-	// eslint-disable-next-line react/require-default-props
-	onOpenModal: PropTypes.func,
-	taskId: PropTypes.number,
+	idUser: PropTypes.array.isRequired,
 };
 Expand.defaultProps = {
 	// eslint-disable-next-line react/default-props-match-prop-types
 	subtasks: null,
-	taskId: null,
 };
 
 export default Expand;

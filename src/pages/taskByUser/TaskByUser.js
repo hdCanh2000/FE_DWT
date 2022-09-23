@@ -20,9 +20,10 @@ import { demoPages } from '../../menu';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import Search from '../common/ComponentCommon/Search';
 import Expand from './Expan';
-// import ExpandRow from '../work-management/task-list/ExpandRow';
+// import getTaskByUser from './services';
 
 const TaskByUser = () => {
+    // const [taskByUser, setTaskByUser] = useState([]);
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
 	const [isExpan, setIsExpan] = useState([]);
@@ -35,8 +36,21 @@ const TaskByUser = () => {
 			setIsExpan(isExpan.filter((item) => item !== idExpan));
 		}
 	};
+        // const fecth = async (idUser) => {
+		// 	const reponse = await getTaskByUser(idUser);
+		// 	const result = await reponse.data;
+        //     setTaskByUser(result);
+		// };
+        // const fetchLength=()=>{
+        //     users?.map((item)=>{
+        //         fecth(item.id);
+        //     })
+        // }
+        // fetchLength();
+        // console.log(taskByUser);
+    
 	return (
-		<PageWrapper title={demoPages.jobsPage.subMenu.taskByUser.path}>
+		<PageWrapper title={demoPages.jobsPage.subMenu.taskByUser.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -112,6 +126,7 @@ const TaskByUser = () => {
 									<tbody>
 										{users?.map((item) => (
 											<React.Fragment key={item.id}>
+                                                {/* {fecth(item.id)} */}
 												<tr>
 													<td>{item?.name}</td>
 													<td>
@@ -131,7 +146,7 @@ const TaskByUser = () => {
 															<span
 																className='mx-2'
 																style={{ color: '#0174EB' }}>
-																{item?.subtasks?.length || 0}
+																{/* {isLength[index] || 0}abc */}
 															</span>
 														</Button>
 													</td>
@@ -139,67 +154,14 @@ const TaskByUser = () => {
 														{item?.department?.label}
 													</td>
 													<td style={{ textAlign: 'center' }}>
-														{item?.status}
+														{item?.status === 1
+															? 'Đang hoạt động'
+															: 'Không hoạt động'}
 													</td>
-													{/* <td>
-														{verifyPermissionHOC(
-															<Dropdown>
-																<DropdownToggle hasIcon={false}>
-																	<Button
-																		isLink
-																		color={formatColorStatus(
-																			item.status,
-																		)}
-																		icon='Circle'
-																		className='text-nowrap'>
-																		{FORMAT_TASK_STATUS(
-																			item.status,
-																		)}
-																	</Button>
-																</DropdownToggle>
-																<DropdownMenu>
-																	{Object.keys(
-																		renderStatusTask(
-																			item.status,
-																		),
-																	).map((key) => (
-																		<DropdownItem
-																			key={key}
-																			onClick={() =>
-																				handleOpenConfirmStatusTask(
-																					item,
-																					STATUS[key]
-																						.value,
-																				)
-																			}>
-																			<div>
-																				<Icon
-																					icon='Circle'
-																					color={
-																						STATUS[key]
-																							.color
-																					}
-																				/>
-																				{STATUS[key].name}
-																			</div>
-																		</DropdownItem>
-																	))}
-																</DropdownMenu>
-															</Dropdown>,
-															['admin', 'manager'],
-															<Button
-																isLink
-																color={formatColorStatus(
-																	item.status,
-																)}
-																icon='Circle'
-																className='text-nowrap'>
-																{FORMAT_TASK_STATUS(item.status)}
-															</Button>,
-														)}
-													</td> */}
 													<td style={{ textAlign: 'center' }}>
-														{item?.roles[0]}
+														{item?.roles[0] === 'manager'
+															? 'Quản lý '
+															: 'Nhân viên'}
 													</td>
 												</tr>
 												<tr>
@@ -210,11 +172,7 @@ const TaskByUser = () => {
 															borderRadius: '0.5rem',
 														}}>
 														{isExpan.includes(item.id) && (
-															<Expand
-																key={item.id}
-																subtasks={item?.subtasks}
-																taskId={item.id}
-															/>
+															<Expand idUser={item.id} />
 														)}
 													</td>
 												</tr>
