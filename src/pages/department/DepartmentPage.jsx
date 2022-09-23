@@ -1,47 +1,61 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react/self-closing-comp */
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { useToasts } from 'react-toast-notifications';
 import { useToasts } from 'react-toast-notifications';
+import Tree from 'react-animated-tree-v2';
+import { arrayToTree } from 'performant-array-to-tree';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
+	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-// import Toasts from '../../components/bootstrap/Toasts';
-import useDarkMode from '../../hooks/useDarkMode';
-// import CommonForm from '../common/ComponentCommon/CommonForm';
-// import { addDepartment, updateDepartment } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
-import DetailForm from './DepartmentDetail';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
+import DepartmentDetailPage from './DepartmentForm';
+import { close, minus, plus } from './icon/icon';
+import Search from '../common/ComponentCommon/Search';
 
 const DepartmentPage = () => {
-	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
-	const navigate = useNavigate();
-
 	const dispatch = useDispatch();
 	const [itemEdit, setItemEdit] = React.useState({});
-	const [openDetail, setOpenDetail] = React.useState(false);
 	const [openForm, setOpenForm] = React.useState(false);
-
-	const departments = useSelector((state) => state.department.departments);
-
+	const department = useSelector((state) => state.department.departments);
+	const [itemEdits, setItemEdits] = useState({});
 	useEffect(() => {
 		dispatch(fetchDepartmentWithUserList());
 	}, [dispatch]);
-
+	const departmentList = department?.map((items) => {
+		return {
+			label: items.name,
+			value: items.id,
+		};
+	});
+	const organizationLevelOptions = [
+		{
+			label: 'Khối',
+			value: 1,
+		},
+		{
+			label: 'Phòng ban',
+			value: 2,
+		},
+		{
+			label: 'Đội nhóm',
+			value: 3,
+		},
+	];
 	const columns = [
 		{
 			title: 'Tên phòng ban',
@@ -50,6 +64,26 @@ const DepartmentPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+		},
+		{
+			title: 'Cấp tổ chức',
+			id: 'organizationLevel',
+			key: 'organizationLevel',
+			type: 'select',
+			align: 'center',
+			options: organizationLevelOptions,
+			isShow: true,
+			isMulti: false,
+		},
+		{
+			title: 'Quan hệ cha con',
+			id: 'parentId',
+			key: 'parentId',
+			type: 'select',
+			align: 'center',
+			options: departmentList,
+			isShow: true,
+			isMulti: false,
 		},
 		{
 			title: 'Mô tả',
@@ -84,42 +118,7 @@ const DepartmentPage = () => {
 			isShow: true,
 			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
 		},
-		{
-			title: 'Hành động',
-			id: 'action',
-			key: 'action',
-			align: 'center',
-			render: (item) => (
-				<>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='RemoveRedEye'
-						onClick={() => handleOpenDetail(item)}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
-						color='primary'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => handleOpenDetails(item)}
-					/>
-				</>
-			),
-			isShow: false,
-		},
 	];
-	const handleOpenDetail = (item) => {
-		setItemEdit(item);
-		setOpenDetail(true);
-	};
-	const handleCloseDetail = () => {
-		setItemEdit({});
-		setOpenDetail(false);
-	};
 	const handleOpenForm = (item) => {
 		setItemEdit(item);
 		setOpenForm(true);
@@ -127,9 +126,6 @@ const DepartmentPage = () => {
 	const handleCloseForm = () => {
 		setItemEdit({});
 		setOpenForm(false);
-	};
-	const handleOpenDetails = (item) => {
-		navigate(`${demoPages.companyPage.subMenu.features.path}/${item.id}`);
 	};
 	const handleShowToast = (title, content) => {
 		addToast(
@@ -144,6 +140,8 @@ const DepartmentPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
+			organizationLevel: data?.organizationLevel?.value,
+			parentId: data?.parentId?.value,
 			id: data?.id,
 			name: data.name,
 			description: data.description,
@@ -162,28 +160,64 @@ const DepartmentPage = () => {
 			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
 		}
 	};
-
+	const treeStyles = {
+		cursor: 'pointer',
+		color: 'black',
+		fill: 'black',
+		width: '100%',
+		fontSize: '15px',
+	};
+	const departments = arrayToTree(department, { childrenField: 'items', dataField: null });
+	const handleClick = (item) => {
+		setItemEdits(item);
+	};
+	const renderDepartmentMenu = (datas) => {
+		return datas?.map((item) => {
+			return (
+				<div>
+					{item?.items?.length === 0 && (
+						<Tree
+							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
+							key={item.id}
+							content={`${item.name}`}
+							style={treeStyles}
+							onItemClick={() => handleClick(item)}
+						/>
+					)}
+					{item?.items?.length !== 0 && (
+						<Tree
+							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
+							key={item.id}
+							content={item.name}
+							style={treeStyles}
+							open
+							onItemClick={() => handleClick(item)}>
+							{renderDepartmentMenu(item.items)}
+						</Tree>
+					)}
+				</div>
+			);
+		});
+	};
 	return (
-		<PageWrapper title={demoPages.companyPage.subMenu.features.text}>
+		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
+				<div className='row'>
+					<div className='col-12'>
+						<div className='d-flex justify-content-between align-items-center'>
+							<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
+						</div>
+					</div>
+				</div>
 				{verifyPermissionHOC(
 					<>
-						<div className='row mb-4'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>
-										Danh sách phòng ban
-									</div>
-								</div>
-							</div>
-						</div>
 						<div className='row mb-0'>
 							<div className='col-12'>
-								<Card className='w-100'>
+								<Card className='w-100 ' style={{ minHeight: '900px' }}>
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách phòng ban</CardLabel>
+												<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions>
@@ -192,21 +226,33 @@ const DepartmentPage = () => {
 												icon='PersonPlusFill'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
-												Thêm phòng ban
+												Thêm cơ cấu tổ chức
 											</Button>
 										</CardActions>
 									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={columns}
-											data={departments}
-										/>
+									<div className='row h-100 w-100'>
+										<div className='col-lg-3 col-md-6'>
+											<Card className='h-100' style={{ minHeight: '900px' }}>
+												<CardBody>
+													<Search />
+													{renderDepartmentMenu(departments)}
+												</CardBody>
+											</Card>
+										</div>
+
+										{itemEdits.name !== undefined && (
+											<DepartmentDetailPage
+												initValues={itemEdits}
+												organizationLevelOptions={organizationLevelOptions}
+												departmentList={departmentList}
+											/>
+										)}
 									</div>
 								</Card>
 							</div>
 						</div>
 						<CommonForm
+							setInitValues={setItemEdits}
 							show={openForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
@@ -215,14 +261,6 @@ const DepartmentPage = () => {
 							fields={columns}
 							validate={validate}
 							disable='true'
-						/>
-						<DetailForm
-							show={openDetail}
-							onClose={handleCloseDetail}
-							item={itemEdit}
-							label='Chi tiết phòng ban'
-							fields={columns}
-							validate={validate}
 						/>
 					</>,
 					['admin', 'manager'],

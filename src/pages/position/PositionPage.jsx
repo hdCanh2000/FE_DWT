@@ -133,7 +133,7 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: true,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels && (positionLevels.filter((item) => item?.name !== "Không")),
+			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
 		},
 		{
 			title: 'Quản lý cấp trên',
@@ -217,7 +217,7 @@ const PositionPage = () => {
 			manager: parseInt(data.manager, 10),
 			jobType: parseInt(data.jobType, 10),
 			kpiNormId: data.kpiName,
-			requirements: data.requirements
+			requirements: data.requirements,
 		};
 		if (data.id) {
 			try {

@@ -9,7 +9,9 @@ const MISSION = {
 	MISSION: lazy(() => import('../pages/work-management/mission/MissionPage')),
 	MISSION_DETAIL: lazy(() => import('../pages/work-management/mission/MissionDetailPage')),
 };
-
+const TASKBYUSER = {
+	TASKBYUSER: lazy(() => import('../pages/taskByUser/TaskByUser')),
+};
 const TASK = {
 	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
 	TASKMANAGEMENT: lazy(() =>
@@ -35,7 +37,6 @@ const TASK = {
 
 const MANAGEMENT = {
 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
-	DEPARTMENT_DETAIL: lazy(() => import('../pages/department/DepartmentDetailPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
 	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
@@ -44,11 +45,6 @@ const MANAGEMENT = {
 	),
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
-
-const CHART = {
-	ORGANIZATIONAL: lazy(() => import('../pages/chart/organizational/OrganizationalChartPage')),
-};
-
 const POSITION_LEVEL_CONFIG = {
 	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
 };
@@ -94,6 +90,11 @@ const presentation = [
 	{
 		path: demoPages.jobsPage.subMenu.mission.path,
 		element: <TASK.TASKLIST />,
+		exact: true,
+	},
+	{
+		path: demoPages.jobsPage.subMenu.taskByUser.path,
+		element: <TASKBYUSER.TASKBYUSER />,
 		exact: true,
 	},
 	// trang chi tiết công việc (nhiệm vụ)
@@ -164,13 +165,8 @@ const presentation = [
 	},
 	// trang danh sách phòng ban
 	{
-		path: `${demoPages.companyPage.subMenu.features.path}`,
+		path: `${demoPages.companyPage.path}`,
 		element: <MANAGEMENT.DEPARTMENT />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.companyPage.subMenu.features.path}/:id`,
-		element: <MANAGEMENT.DEPARTMENT_DETAIL />,
 		exact: true,
 	},
 	// Quản lý Vị Trí
@@ -211,11 +207,6 @@ const presentation = [
 	{
 		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
-		exact: true,
-	},
-	{
-		path: demoPages.companyPage.subMenu.organizational.path,
-		element: <CHART.ORGANIZATIONAL />,
 		exact: true,
 	},
 	// yêu cầu năng luc tuyển dụng

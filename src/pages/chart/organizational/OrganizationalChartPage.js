@@ -114,6 +114,30 @@ const OrganizationalChartPage = () => {
 											position: 'Trưởng phòng Brand',
 										})}
 									/>
+									<TreeNode
+										label={card({
+											name: 'Nguyễn Văn D',
+											position: 'Trưởng phòng Brand',
+										})}
+									/>
+									<TreeNode
+										label={card({
+											name: 'Nguyễn Văn D',
+											position: 'Trưởng phòng Brand',
+										})}
+									/>
+									<TreeNode
+										label={card({
+											name: 'Nguyễn Văn D',
+											position: 'Trưởng phòng Brand',
+										})}
+									/>
+									<TreeNode
+										label={card({
+											name: 'Nguyễn Văn D',
+											position: 'Trưởng phòng Brand',
+										})}
+									/>
 								</TreeNode>
 								<TreeNode
 									label={card({

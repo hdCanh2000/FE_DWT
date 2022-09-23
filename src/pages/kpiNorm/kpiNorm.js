@@ -14,8 +14,6 @@ import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-// import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
@@ -23,6 +21,8 @@ import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import { getAllKeys } from '../key/services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import Search from '../common/ComponentCommon/Search';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -95,7 +95,7 @@ const EmployeePage = () => {
 			isMulti: false,
 		},
 		{
-			title: 'Đơn vị',
+			title: 'Đơn vị tính',
 			id: 'unitId',
 			key: 'unitId',
 			type: 'singleSelect',
@@ -193,13 +193,15 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			departmentId: parseInt(data.departmentId, 10),
-			parentId: data?.parent?.value,
+			departmentId: parseInt(data?.departmentId, 10),
+			parentId: parseInt(data?.parent, 10),
 			point: data?.point,
 			description: data?.description,
 			evaluationDescription: data?.evaluationDescription,
 			unitId: parseInt(data?.unitId, 10),
 			parent: data?.parent,
+			department: data?.department,
+			unit: data?.unit,
 			isKey: data.isKey,
 		};
 		if (data?.id) {
@@ -287,19 +289,17 @@ const EmployeePage = () => {
 		setOpenForm(true);
 		setItemEdit(item);
 	};
+	const lable = 'Định mức lao động & KPI';
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<div className='row mb-4'>
-						<div className='col-12'>
-							<div className='d-flex justify-content-between align-items-center'>
-								<div className='display-6 fw-bold py-3'>Danh mục định mức KPI</div>
-							</div>
+				<div className='row'>
+					<div className='col-12'>
+						<div className='d-flex justify-content-between align-items-center'>
+							<div className='display-6 fw-bold py-3'>{lable}</div>
 						</div>
-					</div>,
-					['admin', 'manager'],
-				)}
+					</div>
+				</div>
 				{verifyPermissionHOC(
 					<div className='row mb-0'>
 						<div className='col-12'>
@@ -322,6 +322,9 @@ const EmployeePage = () => {
 								</CardHeader>
 								<div className='p-4'>
 									<div className='p-4'>
+										<div style={{ maxWidth: '25%' }}>
+											<Search />
+										</div>
 										<table
 											className='table table-modern mb-0'
 											style={{ fontSize: 14 }}>
@@ -329,7 +332,7 @@ const EmployeePage = () => {
 												<tr>
 													<th>Tên định mức KPI</th>
 													<th className='text-center'>Phòng ban</th>
-													<th className='text-center'>Đơn vị</th>
+													<th className='text-center'>Đơn vị tính</th>
 													<th className='text-center'>
 														Điểm KPI trên 1 đơn vị
 													</th>

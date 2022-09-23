@@ -289,10 +289,11 @@ const DashboardPage = () => {
 	const [activeCompanyTab, setActiveCompanyTab] = useState(COMPANIES_TAB.COMP1);
 
 	const search = [
-		{ name: 'Ngày' },
-		{ name: 'Tuần' },
+		// { name: 'Tuần' },
+		{ name: '30 Ngày' },
 		{ name: 'Tháng' },
 		{ name: 'Quý' },
+		{ name: 'Năm' }
 	];
 	const SEARCH_TAB = {
 		COMP1: search[0].name,
@@ -334,22 +335,16 @@ const DashboardPage = () => {
 		}
 		return arr.reverse();
 	}
-	function getHours(day) {
-		const arr = [];
-		for (let i = 0; i < day; i += 1) {
-			arr.push(i);
-		}
-		return arr;
-	}
-	function getMonths(day) {
+	function getYear(day) {
 		const arr = [];
 		for (let i = 0; i < day; i += 1) {
 			arr.push(
 				moment()
-					.add(-1 * i, 'month')
-					.format('ll'),
+					.add(-1 * i, 'year')
+					.format('YYYY'),
 			);
 		}
+		arr.sort();
 		return arr;
 	}
 	const salesByStoreOptions = {
@@ -454,6 +449,7 @@ const DashboardPage = () => {
 			offsetX: 40,
 		},
 	};
+
 	const dayOptions = {
 		chart: {
 			height: 370,
@@ -480,7 +476,7 @@ const DashboardPage = () => {
 			},
 		},
 		xaxis: {
-			categories: getHours(24),
+			categories: getDate(30),
 		},
 		yaxis: [
 			{
@@ -504,28 +500,6 @@ const DashboardPage = () => {
 				},
 				tooltip: {
 					enabled: true,
-				},
-			},
-			{
-				seriesName: 'Thu Nhập Năm Ngoái',
-				opposite: true,
-				axisTicks: {
-					show: true,
-				},
-				axisBorder: {
-					show: true,
-					color: process.env.REACT_APP_SUCCESS_COLOR,
-				},
-				labels: {
-					style: {
-						colors: process.env.REACT_APP_SUCCESS_COLOR,
-					},
-				},
-				title: {
-					text: 'Thu Nhập Năm Ngoái',
-					style: {
-						color: process.env.REACT_APP_SUCCESS_COLOR,
-					},
 				},
 			},
 		],
@@ -545,123 +519,10 @@ const DashboardPage = () => {
 	};
 	const dayStoreSeries = [
 		{
-			name: 'Thu Nhập Hôm Nay',
+			name: 'Thu Nhập Tháng Này',
 			type: 'column',
 			data: [
-				0, 0, 0, 1, 2, 0, 0, 0, 1, 4, 3, 2, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
-			],
-		},
-		{
-			name: 'Thu Nhập Hôm Qua',
-			type: 'column',
-			data: [
-				1, 2, 0, 1, 0, 0, 2, 0, 1, 2, 4, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0
-			],
-		},
-	];
-
-	const weekOptions = {
-		chart: {
-			height: 370,
-			type: 'line',
-			stacked: false,
-			toolbar: { show: false },
-		},
-		colors: [
-			process.env.REACT_APP_INFO_COLOR,
-			process.env.REACT_APP_SUCCESS_COLOR,
-			process.env.REACT_APP_WARNING_COLOR,
-		],
-		dataLabels: {
-			enabled: false,
-		},
-		stroke: {
-			width: [1, 1, 4],
-			curve: 'smooth',
-		},
-		plotOptions: {
-			bar: {
-				borderRadius: 5,
-				columnWidth: '20px',
-			},
-		},
-		xaxis: {
-			categories: getDate(7),
-		},
-		yaxis: [
-			{
-				axisTicks: {
-					show: true,
-				},
-				axisBorder: {
-					show: true,
-					color: process.env.REACT_APP_INFO_COLOR,
-				},
-				labels: {
-					style: {
-						colors: process.env.REACT_APP_INFO_COLOR,
-					},
-				},
-				title: {
-					text: 'Thu Nhập ( Triệu )',
-					style: {
-						color: process.env.REACT_APP_INFO_COLOR,
-					},
-				},
-				tooltip: {
-					enabled: true,
-				},
-			},
-			{
-				seriesName: 'Thu Nhập Năm Ngoái',
-				opposite: true,
-				axisTicks: {
-					show: true,
-				},
-				axisBorder: {
-					show: true,
-					color: process.env.REACT_APP_SUCCESS_COLOR,
-				},
-				labels: {
-					style: {
-						colors: process.env.REACT_APP_SUCCESS_COLOR,
-					},
-				},
-				title: {
-					text: 'Thu Nhập Năm Ngoái',
-					style: {
-						color: process.env.REACT_APP_SUCCESS_COLOR,
-					},
-				},
-			},
-		],
-		tooltip: {
-			theme: 'dark',
-			fixed: {
-				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
-				offsetY: 30,
-				offsetX: 60,
-			},
-		},
-		legend: {
-			horizontalAlign: 'left',
-			offsetX: 40,
-		},
-	};
-	const weekStoreSeries = [
-		{
-			name: 'Thu Nhập Tuần Này',
-			type: 'column',
-			data: [
-				11, 15, 9, 18, 20, 22, 15
-			],
-		},
-		{
-			name: 'Thu Nhập Tuần Trước',
-			type: 'column',
-			data: [
-				10, 12, 14, 20, 22, 25, 9
+				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 25, 30
 			],
 		},
 	];
@@ -691,7 +552,20 @@ const DashboardPage = () => {
 			},
 		},
 		xaxis: {
-			categories: getDate(30),
+			categories: [
+				'Jan',
+				'Feb',
+				'Mar',
+				'Apr',
+				'May',
+				'Jun',
+				'Jul',
+				'Aug',
+				'Sep',
+				'Oct',
+				'Nov',
+				'Dec',
+			],
 		},
 		yaxis: [
 			{
@@ -756,17 +630,39 @@ const DashboardPage = () => {
 	};
 	const monthStoreSeries = [
 		{
-			name: 'Thu Nhập Tháng Này',
+			name: 'Thu Nhập Năm Nay',
 			type: 'column',
 			data: [
-				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 25, 30
+				randomize(140),
+				randomize(200),
+				randomize(250),
+				randomize(275),
+				randomize(295),
+				randomize(314),
+				randomize(388),
+				randomize(406),
+				randomize(410),
+				randomize(356),
+				randomize(468),
+				randomize(555),
 			],
 		},
 		{
-			name: 'Thu Nhập Tháng Trước',
+			name: 'Thu Nhập Năm Trước',
 			type: 'column',
 			data: [
-				20, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 10, 12, 14, 20, 22, 25, 9, 25
+				randomize(100),
+				randomize(150),
+				randomize(200),
+				randomize(225),
+				randomize(250),
+				randomize(300),
+				randomize(333),
+				randomize(388),
+				randomize(400),
+				randomize(350),
+				randomize(456),
+				randomize(501),
 			],
 		},
 	];
@@ -796,7 +692,12 @@ const DashboardPage = () => {
 			},
 		},
 		xaxis: {
-			categories: getMonths(3),
+			categories: [
+				"Quý 1",
+				"Quý 2",
+				"Quý 3",
+				"Quý 4",
+			],
 		},
 		yaxis: [
 			{
@@ -861,20 +762,98 @@ const DashboardPage = () => {
 	};
 	const quarterStoreSeries = [
 		{
-			name: 'Thu Nhập Quý Này',
+			name: 'Thu Nhập Quý Năm Nay',
 			type: 'column',
 			data: [
-				300, 450, 500
+				300, 450, 500, 700
 			],
 		},
 		{
-			name: 'Thu Nhập Quý Trước',
+			name: 'Thu Nhập Quý Năm Trước',
 			type: 'column',
 			data: [
-				250, 300, 400
+				250, 300, 400, 650
 			],
 		},
 	];
+	const yearOptions = {
+		chart: {
+			height: 370,
+			type: 'line',
+			stacked: false,
+			toolbar: { show: false },
+		},
+		colors: [
+			process.env.REACT_APP_INFO_COLOR,
+			process.env.REACT_APP_SUCCESS_COLOR,
+			process.env.REACT_APP_WARNING_COLOR,
+		],
+		dataLabels: {
+			enabled: false,
+		},
+		stroke: {
+			width: [1, 1, 4],
+			curve: 'smooth',
+		},
+		plotOptions: {
+			bar: {
+				borderRadius: 5,
+				columnWidth: '20px',
+			},
+		},
+		xaxis: {
+			categories: getYear(6),
+		},
+		yaxis: [
+			{
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_INFO_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập ( Triệu )',
+					style: {
+						color: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				tooltip: {
+					enabled: true,
+				},
+			},
+
+		],
+		tooltip: {
+			theme: 'dark',
+			fixed: {
+				enabled: true,
+				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				offsetY: 30,
+				offsetX: 60,
+			},
+		},
+		legend: {
+			horizontalAlign: 'left',
+			offsetX: 40,
+		},
+	};
+	const yearStoreSeries = [
+		{
+			// name: 'Thu Nhập Quý Năm Nay',
+			type: 'column',
+			data: [
+				300, 450, 500, 600, 700, 800
+			],
+		},
+	];
+
 	const salesByStoreSeries1 = [
 		{
 			name: 'Thu Nhập Năm Nay',
@@ -912,24 +891,6 @@ const DashboardPage = () => {
 				randomize(488),
 			],
 		},
-		// {
-		// 	name: 'Revenue',
-		// 	type: 'line',
-		// 	data: [
-		// 		randomize(20),
-		// 		randomize(29),
-		// 		randomize(37),
-		// 		randomize(36),
-		// 		randomize(44),
-		// 		randomize(45),
-		// 		randomize(50),
-		// 		randomize(58),
-		// 		randomize(60),
-		// 		randomize(67),
-		// 		randomize(73),
-		// 		randomize(80),
-		// 	],
-		// },
 	];
 	const salesByStoreSeries2 = [
 		{
@@ -968,24 +929,6 @@ const DashboardPage = () => {
 				randomize(444),
 			],
 		},
-		// {
-		// 	name: 'Revenue',
-		// 	type: 'line',
-		// 	data: [
-		// 		randomize(34),
-		// 		randomize(54),
-		// 		randomize(43),
-		// 		randomize(63),
-		// 		randomize(35),
-		// 		randomize(63),
-		// 		randomize(46),
-		// 		randomize(53),
-		// 		randomize(70),
-		// 		randomize(65),
-		// 		randomize(52),
-		// 		randomize(82),
-		// 	],
-		// },
 	];
 	const salesByStoreSeries3 = [
 		{
@@ -1024,24 +967,6 @@ const DashboardPage = () => {
 				randomize(499),
 			],
 		},
-		// {
-		// 	name: 'Revenue',
-		// 	type: 'line',
-		// 	data: [
-		// 		randomize(34),
-		// 		randomize(21),
-		// 		randomize(54),
-		// 		randomize(56),
-		// 		randomize(34),
-		// 		randomize(43),
-		// 		randomize(37),
-		// 		randomize(43),
-		// 		randomize(55),
-		// 		randomize(62),
-		// 		randomize(70),
-		// 		randomize(68),
-		// 	],
-		// },
 	];
 	const salesByStoreSeries4 = [
 		{
@@ -1080,24 +1005,6 @@ const DashboardPage = () => {
 				randomize(478),
 			],
 		},
-		// {
-		// 	name: 'Revenue',
-		// 	type: 'line',
-		// 	data: [
-		// 		randomize(30),
-		// 		randomize(43),
-		// 		randomize(51),
-		// 		randomize(19),
-		// 		randomize(32),
-		// 		randomize(25),
-		// 		randomize(39),
-		// 		randomize(42),
-		// 		randomize(50),
-		// 		randomize(60),
-		// 		randomize(55),
-		// 		randomize(80),
-		// 	],
-		// },
 	];
 
 	// all department
@@ -1185,50 +1092,48 @@ const DashboardPage = () => {
 									<CardActions>
 										<ButtonGroup>
 											{search.map((element) => (
-												<div key={element.name} >
+												<div key={element.name}>
 													<Button
-														isLight={
-															searchTab !== element.name
-														}
-														onClick={() =>
-															setSearchTab(element.name)
-														}
-														color={themeStatus}
-													>
+														isLight={searchTab !== element.name}
+														onClick={() => setSearchTab(element.name)}
+														color={themeStatus}>
 														{element.name}
 													</Button>
 												</div>
 											))}
 										</ButtonGroup>
-										<ButtonGroup>
-											<Button
-												color='primary'
-												isLight
-												icon='ChevronLeft'
-												aria-label='Previous Year'
-												isDisable={year <= 2019}
-												onClick={() => {
-													setYear(year - 1)
-													setSearchTab('')
-												}}
-											/>
-											<Button color='primary' isLight
-												onClick={() => setSearchTab('')}
-											>
-												{year}
-											</Button>
-											<Button
-												color='primary'
-												isLight
-												icon='ChevronRight'
-												aria-label='Next Year'
-												isDisable={year >= 2021}
-												onClick={() => {
-													setYear(year + 1)
-													setSearchTab('')
-												}}
-											/>
-										</ButtonGroup>
+										{searchTab === "30 Ngày" || searchTab === "Năm" ? (
+											null
+										) : (
+											<ButtonGroup>
+												<Button
+													color='primary'
+													isLight
+													icon='ChevronLeft'
+													aria-label='Previous Year'
+													isDisable={year <= 2019}
+													onClick={() => {
+														setYear(year - 1)
+														setSearchTab('')
+													}}
+												/>
+												<Button color='primary' isLight
+												>
+													{year}
+												</Button>
+												<Button
+													color='primary'
+													isLight
+													icon='ChevronRight'
+													aria-label='Next Year'
+													isDisable={year >= 2021}
+													onClick={() => {
+														setYear(year + 1)
+														setSearchTab('')
+													}}
+												/>
+											</ButtonGroup>
+										)}
 									</CardActions>
 								</CardHeader>
 								<CardBody>
@@ -1250,12 +1155,6 @@ const DashboardPage = () => {
 															className='w-100 py-4'
 															shadow='sm'
 															hoverShadow='none'>
-															{/* <img
-															src={company.img}
-															alt={company.name}
-															width='auto'
-															height={24}
-														/> */}
 															{company.name}
 														</Button>
 													</div>
@@ -1268,11 +1167,11 @@ const DashboardPage = () => {
 													(searchTab === SEARCH_TAB.COMP1 &&
 														dayStoreSeries) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
-														weekStoreSeries) ||
-													(searchTab === SEARCH_TAB.COMP3 &&
 														monthStoreSeries) ||
-													(searchTab === SEARCH_TAB.COMP4 &&
+													(searchTab === SEARCH_TAB.COMP3 &&
 														quarterStoreSeries) ||
+													(searchTab === SEARCH_TAB.COMP4 &&
+														yearStoreSeries) ||
 													(activeCompanyTab === COMPANIES_TAB.COMP1 &&
 														salesByStoreSeries1) ||
 													(activeCompanyTab === COMPANIES_TAB.COMP2 &&
@@ -1285,11 +1184,11 @@ const DashboardPage = () => {
 													(searchTab === SEARCH_TAB.COMP1 &&
 														dayOptions) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
-														weekOptions) ||
-													(searchTab === SEARCH_TAB.COMP3 &&
 														monthOptions) ||
-													(searchTab === SEARCH_TAB.COMP4 &&
+													(searchTab === SEARCH_TAB.COMP3 &&
 														quarterOptions) ||
+													(searchTab === SEARCH_TAB.COMP4 &&
+														yearOptions) ||
 													salesByStoreOptions
 												}
 												type={salesByStoreOptions.chart.type}

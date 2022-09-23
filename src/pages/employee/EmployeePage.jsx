@@ -277,7 +277,7 @@ const EmployeePage = () => {
 					<div className='row mb-4'>
 						<div className='col-12'>
 							<div className='d-flex justify-content-between align-items-center'>
-								<div className='display-6 fw-bold py-3'>Danh sách nhân viên</div>
+								<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
 							</div>
 						</div>
 					</div>,
@@ -290,7 +290,7 @@ const EmployeePage = () => {
 								<CardHeader>
 									<CardLabel icon='AccountCircle' iconColor='primary'>
 										<CardTitle>
-											<CardLabel>Danh sách nhân viên</CardLabel>
+											<CardLabel>Danh sách nhân sự</CardLabel>
 										</CardTitle>
 									</CardLabel>
 									<CardActions>
@@ -299,7 +299,7 @@ const EmployeePage = () => {
 											icon='PersonPlusFill'
 											tag='button'
 											onClick={() => handleOpenForm(null)}>
-											Thêm nhân viên
+											Thêm nhân sự
 										</Button>
 									</CardActions>
 								</CardHeader>
