@@ -353,3 +353,22 @@ export const formatColorPriority = (priority) => {
 	}
 	return result;
 };
+
+export const formatJobType = (type) => {
+	let result = '';
+	switch (type) {
+		case 1:
+			result = 'Chính thức';
+			break;
+		case 2:
+			result = 'Thực tập';
+			break;
+		case 3:
+			result = 'Thử việc';
+			break;
+		default:
+			result = 'Chính thức';
+			break;
+	}
+	return result;
+};
