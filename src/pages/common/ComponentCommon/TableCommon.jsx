@@ -1,9 +1,17 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
+import PaginationButtons, {
+	dataPagination,
+	PER_COUNT,
+}  from '../../../components/PaginationButtons';
 import Search from './Search';
 
-const TableCommon = ({ data, columns, className, ...props }) => {
+
+const TableCommon = ({data, columns, className, ...props }) => {
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(data, currentPage, perPage);
 	return (
 		<div>
 			<div style={{ maxWidth: '25%' }}>
@@ -21,10 +29,10 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 										className={classNames(
 											column.className,
 											`text-${
-												// eslint-disable-next-line no-nested-ternary
-												column.align === 'right'
-													? 'right'
-													: column.align === 'center'
+											// eslint-disable-next-line no-nested-ternary
+											column.align === 'right'
+												? 'right'
+												: column.align === 'center'
 													? 'center'
 													: 'left'
 											}`,
@@ -34,8 +42,8 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 											column.align === 'right'
 												? 'right'
 												: column.align === 'center'
-												? 'center'
-												: 'left'
+													? 'center'
+													: 'left'
 										}>
 										{column.title}
 									</th>
@@ -51,10 +59,10 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 									className={classNames(
 										column.className,
 										`text-${
-											// eslint-disable-next-line no-nested-ternary
-											column.align === 'right'
-												? 'right'
-												: column.align === 'center'
+										// eslint-disable-next-line no-nested-ternary
+										column.align === 'right'
+											? 'right'
+											: column.align === 'center'
 												? 'center'
 												: 'left'
 										}`,
@@ -64,8 +72,8 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 										column.align === 'right'
 											? 'right'
 											: column.align === 'center'
-											? 'center'
-											: 'left'
+												? 'center'
+												: 'left'
 									}>
 									{column.title}
 								</th>
@@ -74,7 +82,7 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 					</tr>
 				</thead>
 				<tbody>
-					{data?.map((row) => {
+					{items?.map((row) => {
 						return (
 							<tr key={row.id}>
 								{columns?.map((column) => {
@@ -89,17 +97,17 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 														column.align === 'right'
 															? 'right'
 															: column.align === 'center'
-															? 'center'
-															: 'left'
+																? 'center'
+																: 'left'
 													}
 													className={`text-${
 														// eslint-disable-next-line no-nested-ternary
 														column.align === 'right'
 															? 'right'
 															: column.align === 'center'
-															? 'center'
-															: 'left'
-													}`}
+																? 'center'
+																: 'left'
+														}`}
 													style={{ fontSize: 14 }}>
 													{column.render(row, value)}
 												</td>
@@ -118,17 +126,17 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 													column.align === 'right'
 														? 'right'
 														: column.align === 'center'
-														? 'center'
-														: 'left'
+															? 'center'
+															: 'left'
 												}
 												className={`text-${
 													// eslint-disable-next-line no-nested-ternary
 													column.align === 'right'
 														? 'right'
 														: column.align === 'center'
-														? 'center'
-														: 'left'
-												}`}
+															? 'center'
+															: 'left'
+													}`}
 												style={{ fontSize: 14 }}>
 												{column.render(row, value)}
 											</td>
@@ -136,18 +144,15 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 									}
 									return (
 										<td
-											style={{
-												fontSize: 14,
-												minWidth: `${column.minWidth}px`,
-											}}
+											style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
 											key={column.key}
 											className={classNames(
 												column.className,
 												`text-${
-													// eslint-disable-next-line no-nested-ternary
-													column.align === 'right'
-														? 'right'
-														: column.align === 'center'
+												// eslint-disable-next-line no-nested-ternary
+												column.align === 'right'
+													? 'right'
+													: column.align === 'center'
 														? 'center'
 														: 'left'
 												}`,
@@ -157,8 +162,8 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 												column.align === 'right'
 													? 'right'
 													: column.align === 'center'
-													? 'center'
-													: 'left'
+														? 'center'
+														: 'left'
 											}>
 											{column.format ? column.format(value) : value}
 										</td>
@@ -169,6 +174,16 @@ const TableCommon = ({ data, columns, className, ...props }) => {
 					})}
 				</tbody>
 			</table>
+			<hr />
+			<footer>
+				<PaginationButtons
+					data={data}
+					setCurrentPage={setCurrentPage}
+					currentPage={currentPage}
+					perPage={perPage}
+					setPerPage={setPerPage}
+				/>
+			</footer>
 		</div>
 	);
 };
@@ -179,6 +194,7 @@ TableCommon.propTypes = {
 	data: PropTypes.array,
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
+	// eslint-disable-next-line react/forbid-prop-types
 };
 TableCommon.defaultProps = {
 	className: null,
