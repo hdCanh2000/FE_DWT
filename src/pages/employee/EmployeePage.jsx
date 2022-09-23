@@ -23,6 +23,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { addEmployee, updateEmployee } from './services';
+// import Search from '../common/ComponentCommon/Search';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -258,7 +259,7 @@ const EmployeePage = () => {
 					<div className='row mb-4'>
 						<div className='col-12'>
 							<div className='d-flex justify-content-between align-items-center'>
-								<div className='display-6 fw-bold py-3'>Danh sách nhân viên</div>
+								<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
 							</div>
 						</div>
 					</div>,
@@ -271,7 +272,7 @@ const EmployeePage = () => {
 								<CardHeader>
 									<CardLabel icon='AccountCircle' iconColor='primary'>
 										<CardTitle>
-											<CardLabel>Danh sách nhân viên</CardLabel>
+											<CardLabel>Danh sách nhân sự</CardLabel>
 										</CardTitle>
 									</CardLabel>
 									<CardActions>
@@ -280,11 +281,12 @@ const EmployeePage = () => {
 											icon='PersonPlusFill'
 											tag='button'
 											onClick={() => handleOpenForm(null)}>
-											Thêm nhân viên
+											Thêm nhân sự
 										</Button>
 									</CardActions>
 								</CardHeader>
 								<div className='p-4'>
+									
 									<TableCommon
 										className='table table-modern mb-0'
 										columns={columns}

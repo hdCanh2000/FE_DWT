@@ -5,6 +5,7 @@ import PaginationButtons, {
 	dataPagination,
 	PER_COUNT,
 }  from '../../../components/PaginationButtons';
+import Search from './Search';
 
 
 const TableCommon = ({data, columns, className, ...props }) => {
@@ -12,7 +13,10 @@ const TableCommon = ({data, columns, className, ...props }) => {
 	const [perPage, setPerPage] = useState(PER_COUNT['10']);
 	const items = dataPagination(data, currentPage, perPage);
 	return (
-		<>
+		<div>
+			<div style={{ maxWidth: '25%' }}>
+				<Search />
+			</div>
 			<table className={classNames(className)} {...props}>
 				<thead>
 					<tr>
@@ -180,9 +184,8 @@ const TableCommon = ({data, columns, className, ...props }) => {
 					setPerPage={setPerPage}
 				/>
 			</footer>
-		</>
+		</div>
 	);
-
 };
 
 TableCommon.propTypes = {
