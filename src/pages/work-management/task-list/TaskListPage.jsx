@@ -54,6 +54,7 @@ import { addNewSubtask } from '../TaskDetail/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import TaskChartReport from '../../dashboard/admin/TaskChartReport';
 import { getReportSubTaskDepartment, getReportTask } from '../../dashboard/services';
+import Search from '../../common/ComponentCommon/Search';
 
 const Item = ({
 	id,
@@ -579,6 +580,9 @@ const TaskListPage = () => {
 									)}
 								</CardHeader>
 								<div className='p-4'>
+									<div style={{ maxWidth: '25%' }}>
+										<Search />
+									</div>
 									<table
 										className='table table-modern mb-0'
 										style={{ fontSize: 14 }}>

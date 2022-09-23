@@ -35,6 +35,7 @@ import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import Toasts from '../../../components/bootstrap/Toasts';
 import { deleteSubtaskById, getAllSubTasks } from './services';
 import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
+import Search from '../../common/ComponentCommon/Search';
 
 const SubTaskPage = () => {
 	const { themeStatus, darkModeStatus } = useDarkMode();
@@ -227,12 +228,15 @@ const SubTaskPage = () => {
 								</CardActions>
 							</CardHeader>
 							<div className='p-4'>
+								<div style={{ maxWidth: '25%' }}>
+									<Search />
+								</div>
 								<table className='table table-modern mb-0' style={{ fontSize: 14 }}>
 									<thead>
 										<tr>
 											<th className='text-center'>STT</th>
-											<th>Tên đầu việc</th>
-											<th>Nhân viên phụ trách</th>
+											<th className='text-center'>Tên đầu việc</th>
+											<th className='text-center'>Nhân viên phụ trách</th>
 											<th className='text-center'>Hạn hoàn thành</th>
 											<th className='text-center'>Điểm KPI</th>
 											<th className='text-center'>Độ ưu tiên</th>

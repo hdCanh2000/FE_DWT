@@ -23,7 +23,6 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { addEmployee, updateEmployee } from './services';
-// import Search from '../common/ComponentCommon/Search';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -36,6 +35,7 @@ const EmployeePage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const users = useSelector((state) => state.employee.employees);
+	console.log(users);
 	const departments = useSelector((state) => state.department.departments);
 
 	useEffect(() => {
@@ -286,7 +286,6 @@ const EmployeePage = () => {
 									</CardActions>
 								</CardHeader>
 								<div className='p-4'>
-									
 									<TableCommon
 										className='table table-modern mb-0'
 										columns={columns}

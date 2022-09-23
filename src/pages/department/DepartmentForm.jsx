@@ -232,7 +232,7 @@ const DepartmentDetailPage = ({ organizationLevelOptions, departmentList, initVa
 												tag='button'
 												className='w-50 p-3'
 												onClick={() => handleEdit()}>
-												Sửa phòng ban
+												Sửa cơ cấu tổ chức
 											</Button>
 										)}
 									</div>
