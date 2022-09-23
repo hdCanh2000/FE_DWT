@@ -24,6 +24,8 @@ import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addPosition, updatePosition } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
+import { formatJobType } from '../../utils/constants';
+import PositionDetail from './PositionDetail';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -32,14 +34,14 @@ const PositionPage = () => {
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-
 	const positions = useSelector((state) => state.position.positions);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
 	const requirements = useSelector((state) => state.requirement.requirements);
+	const [openDetail, setOpenDetail] = React.useState(false);
+	const [dataDetail, setDataDetail] = React.useState({});
 
 	const [nvs] = React.useState(true);
 	useEffect(() => {
@@ -88,15 +90,6 @@ const PositionPage = () => {
 			render: (item) => <span>{item?.positionLevel?.code || 'No data'}</span>,
 		},
 		{
-			title: 'Loại hình công việc',
-			placeholder: 'loại hình công việc',
-			id: 'jobType',
-			key: 'jobType',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-		{
 			title: 'Mô Tả Vị Trí',
 			placeholder: 'mô tả vị trí',
 			id: 'description',
@@ -104,6 +97,33 @@ const PositionPage = () => {
 			type: 'textarea',
 			align: 'left',
 			isShow: true,
+		},
+		{
+			title: 'Loại hình công việc',
+			placeholder: 'loại hình công việc',
+			id: 'jobType',
+			key: 'jobType',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: true,
+			format: (value) => (formatJobType(value)),
+			options: [
+				{
+					id: 1,
+					text: 'Chính thức',
+					value: 1,
+				},
+				{
+					id: 2,
+					text: 'Thực tập',
+					value: 2,
+				},
+				{
+					id: 3,
+					text: 'Thử việc',
+					value: 3,
+				}
+			],
 		},
 		{
 			title: 'Cấp Nhân Sự',
@@ -161,14 +181,14 @@ const PositionPage = () => {
 						icon='Edit'
 						onClick={() => handleOpenForm(item)}
 					/>
-					{/* <Button
+					<Button
 						isOutline={!darkModeStatus}
-						color='danger'
+						color='primary'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
-					/> */}
+						icon='RemoveRedEye'
+						onClick={() => handleOpenDetail(item)}
+					/>
 				</>
 			),
 			isShow: false,
@@ -195,7 +215,7 @@ const PositionPage = () => {
 			departmentId: parseInt(data.departmentId, 10),
 			positionLevelId: parseInt(data.positionLevelId, 10),
 			manager: parseInt(data.manager, 10),
-			jobType: data.jobType,
+			jobType: parseInt(data.jobType, 10),
 			kpiNormId: data.kpiName,
 			requirements: data.requirements
 		};
@@ -224,7 +244,14 @@ const PositionPage = () => {
 			}
 		}
 	};
-
+	const handleOpenDetail = (item) => {
+		setOpenDetail(true);
+		setDataDetail({...item});
+	};
+	const handleCloseDetail = () => {
+		setOpenDetail(false);
+		setDataDetail({});
+	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.position.text}>
 			<Page container='fluid'>
@@ -275,6 +302,14 @@ const PositionPage = () => {
 							fields={columns}
 							nv={nvs}
 							validate={validate}
+						/>
+						<PositionDetail
+							show={openDetail}
+							onClose={handleCloseDetail}
+							item={dataDetail}
+							label={`Chi tiết vị trí: ${dataDetail?.name}`}
+							fields={columns}
+							// nv
 						/>
 					</>,
 					['admin'],

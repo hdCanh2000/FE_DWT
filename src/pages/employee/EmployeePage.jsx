@@ -23,6 +23,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { addEmployee, updateEmployee } from './services';
+import DetailForm from '../common/ComponentCommon/DetailForm';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -36,6 +37,8 @@ const EmployeePage = () => {
 
 	const users = useSelector((state) => state.employee.employees);
 	const departments = useSelector((state) => state.department.departments);
+	const [openDetail, setOpenDetail] = React.useState(false);
+	const [dataDetail, setDataDetail] = React.useState({});
 
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
@@ -177,6 +180,14 @@ const EmployeePage = () => {
 						icon='Edit'
 						onClick={() => handleOpenForm(item)}
 					/>
+					<Button
+						isOutline={!darkModeStatus}
+						color='primary'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='RemoveRedEye'
+						onClick={() => handleOpenDetail(item)}
+					/>
 					{/* <Button
 						isOutline={!darkModeStatus}
 						color='primary'
@@ -251,6 +262,14 @@ const EmployeePage = () => {
 			}
 		}
 	};
+	const handleOpenDetail = (item) => {
+		setOpenDetail(true);
+		setDataDetail({ ...item });
+	};
+	const handleCloseDetail = () => {
+		setOpenDetail(false);
+		setDataDetail({});
+	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
@@ -305,6 +324,13 @@ const EmployeePage = () => {
 					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
 					fields={columns}
 					validate={validate}
+				/>
+				<DetailForm
+					show={openDetail}
+					onClose={handleCloseDetail}
+					item={dataDetail}
+					label={`Chi tiết nhân viên: ${dataDetail?.name}`}
+					fields={columns}
 				/>
 			</Page>
 		</PageWrapper>

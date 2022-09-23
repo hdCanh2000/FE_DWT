@@ -21,8 +21,8 @@ import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
-import KpiNormDetail from './kpiNormDetail';
 import { getAllKeys } from '../key/services';
+import DetailForm from '../common/ComponentCommon/DetailForm';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -371,22 +371,22 @@ const EmployeePage = () => {
 																/>
 																<Button
 																	isOutline={!darkModeStatus}
-																	color='danger'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-1'
-																	icon='Trash'
-																	onClick={() =>
-																		handleOpenDelete(item)
-																	}
-																/>
-																<Button
-																	isOutline={!darkModeStatus}
 																	color='primary'
 																	isLight={darkModeStatus}
 																	className='text-nowrap mx-1'
 																	icon='RemoveRedEye'
 																	onClick={() =>
 																		handleOpenDetail(item)
+																	}
+																/>
+																<Button
+																	isOutline={!darkModeStatus}
+																	color='danger'
+																	isLight={darkModeStatus}
+																	className='text-nowrap mx-1'
+																	icon='Trash'
+																	onClick={() =>
+																		handleOpenDelete(item)
 																	}
 																/>
 															</td>
@@ -411,11 +411,11 @@ const EmployeePage = () => {
 					fields={columns}
 					validate={validate}
 				/>
-				<KpiNormDetail
+				<DetailForm
 					show={openDetail}
 					onClose={handleCloseDetail}
 					item={dataDetail}
-					label={`Chi tiết định mức KPI ${dataDetail.name}`}
+					label={`Chi tiết định mức KPI: ${dataDetail?.name}`}
 					fields={columns}
 				/>
 				<TaskAlertConfirm

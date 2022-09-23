@@ -3,18 +3,20 @@ import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import { Button, Modal } from 'react-bootstrap';
-import Textarea from '../../components/bootstrap/forms/Textarea';
-import FormGroup from '../../components/bootstrap/forms/FormGroup';
-import Select from '../../components/bootstrap/forms/Select';
-import CustomSelect from '../../components/form/CustomSelect';
-import Checks from '../../components/bootstrap/forms/Checks';
-import Input from '../../components/bootstrap/forms/Input';
+import FormGroup from '../../../components/bootstrap/forms/FormGroup';
+import Input from '../../../components/bootstrap/forms/Input';
+import Textarea from '../../../components/bootstrap/forms/Textarea';
+import Checks from '../../../components/bootstrap/forms/Checks';
+import CustomSelect from '../../../components/form/CustomSelect';
+import Select from '../../../components/bootstrap/forms/Select';
 
-const KpiNormDetail = ({ className, show, onClose, item, label, fields, options, ...props }) => {
+
+const PositionDetail = ({ className, show, onClose, item, label, fields, options, ...props }) => {
 	const formik = useFormik({
 		initialValues: { ...item },
 		enableReinitialize: true,
 	});
+
 	return (
 		<Modal
 			className={classNames(className, 'p-4')}
@@ -64,9 +66,10 @@ const KpiNormDetail = ({ className, show, onClose, item, label, fields, options,
 													id={field.id}
 													label={field.title}>
 													<CustomSelect
-														disabled='true'
+														disabled
 														value={formik.values[field.id]}
 														options={field.options}
+														isMulti={!!field.isMulti}
 													/>
 												</FormGroup>
 											</React.Fragment>
@@ -86,7 +89,7 @@ const KpiNormDetail = ({ className, show, onClose, item, label, fields, options,
 													<Textarea
 														readOnly
 														rows={5}
-														placeholder={`Nhập ${field.title}`}
+														placeholder={`Không có dữ liệu ${field.title}`}
 														list={options}
 														size='lg'
 														name={field.id}
@@ -94,6 +97,38 @@ const KpiNormDetail = ({ className, show, onClose, item, label, fields, options,
 														value={formik.values[field.id]}
 													/>
 												</FormGroup>
+											</React.Fragment>
+										);
+									}
+									if (field.type === 'key') {
+										return (
+											<React.Fragment key={field.id}>
+												<FormGroup
+													key={field.id}
+													className='col-12'
+													id={field.id}
+													label={field.title}>
+													<Checks
+														disabled
+														id={field.id}
+														type='switch'
+														size='lg'
+														label={
+															Number(formik.values[field.id]) === 1
+																? 'Là Key'
+																: 'Không phải Key'
+														}
+														onChange={formik.handleChange}
+														checked={formik.values[field.id]}
+													/>
+												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
 											</React.Fragment>
 										);
 									}
@@ -106,6 +141,7 @@ const KpiNormDetail = ({ className, show, onClose, item, label, fields, options,
 													id={field.id}
 													label={field.title}>
 													<Checks
+														disabled
 														readOnly
 														id={field.id}
 														type='switch'
@@ -154,7 +190,7 @@ const KpiNormDetail = ({ className, show, onClose, item, label, fields, options,
 	);
 };
 
-KpiNormDetail.propTypes = {
+PositionDetail.propTypes = {
 	className: PropTypes.string,
 	show: PropTypes.bool,
 	// eslint-disable-next-line react/forbid-prop-types
@@ -171,7 +207,7 @@ KpiNormDetail.propTypes = {
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
 };
-KpiNormDetail.defaultProps = {
+PositionDetail.defaultProps = {
 	className: null,
 	show: false,
 	columns: [],
@@ -184,4 +220,4 @@ KpiNormDetail.defaultProps = {
 	label: '',
 };
 
-export default KpiNormDetail;
+export default PositionDetail;
