@@ -78,6 +78,11 @@ export const demoPages = {
 		path: 'jobs-page',
 		icon: 'CustomBriefCase',
 		subMenu: {
+			taskByUser: {
+				id: 'taskByUser',
+				text: 'Công việc của nhân viên',
+				path: '/cong-viec-cua-nhan-vien',
+			},
 			target: {
 				id: 'target',
 				text: 'Mục tiêu',

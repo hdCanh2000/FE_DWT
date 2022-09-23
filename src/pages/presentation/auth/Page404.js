@@ -14,12 +14,12 @@ const Page404 = () => {
 						<div
 							className='text-primary fw-bold'
 							style={{ fontSize: 'calc(3rem + 3vw)' }}>
-							404
+							Page not found
 						</div>
 						<div
 							className='text-dark fw-bold'
 							style={{ fontSize: 'calc(1.5rem + 1.5vw)' }}>
-							Page not found
+							Đang phát triển
 						</div>
 					</div>
 					<div className='col-12 d-flex align-items-baseline justify-content-center'>

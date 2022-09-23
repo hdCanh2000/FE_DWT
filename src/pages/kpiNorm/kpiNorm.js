@@ -22,6 +22,7 @@ import validate from './validate';
 import KpiNormDetail from './kpiNormDetail';
 import { getAllKeys } from '../key/services';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import Search from '../common/ComponentCommon/Search';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -321,6 +322,9 @@ const EmployeePage = () => {
 								</CardHeader>
 								<div className='p-4'>
 									<div className='p-4'>
+										<div style={{ maxWidth: '25%' }}>
+											<Search />
+										</div>
 										<table
 											className='table table-modern mb-0'
 											style={{ fontSize: 14 }}>

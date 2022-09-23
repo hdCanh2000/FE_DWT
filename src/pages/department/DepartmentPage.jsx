@@ -52,7 +52,7 @@ const DepartmentPage = () => {
 			value: 2,
 		},
 		{
-			label: 'Đội',
+			label: 'Đội nhóm',
 			value: 3,
 		},
 	];
@@ -161,6 +161,7 @@ const DepartmentPage = () => {
 		}
 	};
 	const treeStyles = {
+		cursor: 'pointer',
 		color: 'black',
 		fill: 'black',
 		width: '100%',
@@ -198,7 +199,6 @@ const DepartmentPage = () => {
 			);
 		});
 	};
-	console.log(itemEdits.name, 'itemEdits');
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
