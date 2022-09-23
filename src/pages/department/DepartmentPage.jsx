@@ -24,6 +24,7 @@ import { addDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
 import DepartmentDetailPage from './DepartmentForm';
 import { close, minus, plus } from './icon/icon';
+import Search from '../common/ComponentCommon/Search';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
@@ -197,10 +198,11 @@ const DepartmentPage = () => {
 			);
 		});
 	};
+	console.log(itemEdits.name, 'itemEdits');
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
-			<div className='row'>
+				<div className='row'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
 							<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
@@ -211,7 +213,7 @@ const DepartmentPage = () => {
 					<>
 						<div className='row mb-0'>
 							<div className='col-12'>
-								<Card className='w-100'>
+								<Card className='w-100 ' style={{ minHeight: '900px' }}>
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
 											<CardTitle>
@@ -230,17 +232,21 @@ const DepartmentPage = () => {
 									</CardHeader>
 									<div className='row h-100 w-100'>
 										<div className='col-lg-3 col-md-6'>
-											<Card className='h-100'>
+											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
+													<Search />
 													{renderDepartmentMenu(departments)}
 												</CardBody>
 											</Card>
 										</div>
-										<DepartmentDetailPage
-											initValues={itemEdits}
-											organizationLevelOptions={organizationLevelOptions}
-											departmentList={departmentList}
-										/>
+
+										{itemEdits.name !== undefined && (
+											<DepartmentDetailPage
+												initValues={itemEdits}
+												organizationLevelOptions={organizationLevelOptions}
+												departmentList={departmentList}
+											/>
+										)}
 									</div>
 								</Card>
 							</div>
