@@ -159,9 +159,10 @@ const TaskByUser = () => {
 															: 'Không hoạt động'}
 													</td>
 													<td style={{ textAlign: 'center' }}>
-														{item?.roles[0] === 'manager'
+														{/* {item?.roles[0] === 'manager'
 															? 'Quản lý '
-															: 'Nhân viên'}
+															: 'Nhân viên'} */}
+														{item?.roles}
 													</td>
 												</tr>
 												<tr>
