@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
+import styled from 'styled-components';
 import { Button, Modal } from 'react-bootstrap';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
@@ -9,13 +11,62 @@ import Select from '../../components/bootstrap/forms/Select';
 import CustomSelect from '../../components/form/CustomSelect';
 import Checks from '../../components/bootstrap/forms/Checks';
 import Input from '../../components/bootstrap/forms/Input';
+import Option from '../../components/bootstrap/Option';
+import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 
+const ErrorText = styled.span`
+	font-size: 14px;
+	color: #e22828;
+	margin-top: 5px;
+`;
 
 const PositionDetail = ({ className, show, onClose, item, label, fields, options, nv, ...props }) => {
 	const formik = useFormik({
 		initialValues: { ...item },
 		enableReinitialize: true,
 	});
+
+	const dispatch = useDispatch();
+	const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
+	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
+
+	useEffect(() => {
+		dispatch(fetchKpiNormList());
+	}, [dispatch]);
+
+	// xoá các key theo index
+	// const handleRemoveKeyField = (e, index) => {
+	// 	setKpiNormId((prev) => prev.filter((state) => state !== prev[index]));
+	// };
+
+	const handleChangeKeysState = (index, event) => {
+		event.preventDefault();
+		event.persist();
+		setKpiNormId((prev) => {
+			return prev?.map((key, i) => {
+				if (i !== index) return key;
+				return {
+					...key,
+					[event.target.name]: event.target.value,
+					error: {
+						...key.error,
+						[event.target.name]:
+							event.target.value.length > 0
+								? null
+								: `Vui lòng nhập đầy đủ thông tin!`,
+					},
+				};
+			});
+		});
+	};
+
+	// const handleAddFieldKey = () => {
+	// 	const initState = {};
+	// 	if (kpiNormId?.length <= 11) {
+	// 		setKpiNormId((prev) => [...prev, initState]);
+	// 	}
+	// };
+
 
 	return (
 		<Modal
@@ -146,27 +197,17 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 								})}
 								<div>
 									{nv && (
-										<React.Fragment key={item.id}>
-											{/* <FormGroup>
-												<Button
-													disabled
-													variant='success'>
+										<>
+											<hr />
+											<FormGroup 
+											style={{fontWeight: 500, 
+													color: '#6c757d',}}>
 													Danh sách nhiệm vụ
-												</Button>
 											</FormGroup>
-											<Select
-													disabled
-													// ariaLabel={item.name || ''}
-													// name={item?.kpiNormId.kpiName}
-													size='lg'
-													className='border border-2 rounded-0 shadow-none'
-													value={item?.kpiNormId.kpiName}
-													// defaultValue={formik.values[item.id]}
-												/> */}
-											{/* {item?.kpiNormId.filter((element) => {
+											{kpiNormId?.map((element, index) => {
 												return (
 													<div
-														key={element?.name}
+														key={element.name}
 														className='mt-4 d-flex align-items-center justify-content-between'>
 														<div
 															style={{
@@ -174,25 +215,42 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 																marginRight: 10,
 															}}>
 															<FormGroup
-																disabled
 																className='mr-2'
-																id={element?.id}
+																id='kpiName'
 																label='Tên nhiệm vụ'>
 																<Select
 																	disabled
-																	ariaLabel={element.title || ''}
-																	name={element?.kpiName}
+																	name='kpiName'
 																	required
 																	size='lg'
 																	className='border border-2 rounded-0 shadow-none'
+																	placeholder='Chọn nhiệm vụ'
 																	value={element?.kpiName}
-																/>
+																	onChange={(e) =>
+																		handleChangeKeysState(
+																			index,
+																			e,
+																		)
+																	}>
+																	{kpiNorms.map((key) => (
+																		<Option
+																			key={`${key.name}`}
+																			value={`${key.name}`}>
+																			{`${key?.name}`}
+																		</Option>
+																	))}
+																</Select>
 															</FormGroup>
+															{element.error?.kpiName && (
+																<ErrorText>
+																	{element.error?.kpiName}
+																</ErrorText>
+															)}
 														</div>
 													</div>
 												);
-											})} */}
-										</React.Fragment>
+											})}
+										</>
 									)}
 								</div>
 							</div>

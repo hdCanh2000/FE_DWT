@@ -309,7 +309,7 @@ const PositionPage = () => {
 							item={dataDetail}
 							label={`Chi tiết vị trí: ${dataDetail?.name}`}
 							fields={columns}
-							// nv
+							nv
 						/>
 					</>,
 					['admin'],
