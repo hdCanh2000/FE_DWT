@@ -25,6 +25,7 @@ import Search from '../common/ComponentCommon/Search';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -38,6 +39,9 @@ const EmployeePage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [openDetail, setOpenDetail] = useState(false);
 	const [dataDetail, setDataDetail] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(kpiNorm, currentPage, perPage);
 
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
@@ -325,7 +329,7 @@ const EmployeePage = () => {
 												</tr>
 											</thead>
 											<tbody>
-												{kpiNorm?.map((item) => (
+												{items?.map((item) => (
 													<React.Fragment key={item.id}>
 														<tr>
 															<td>{item?.name}</td>
@@ -423,6 +427,16 @@ const EmployeePage = () => {
 												))}
 											</tbody>
 										</table>
+										<hr />
+										<footer>
+											<PaginationButtons
+												data={kpiNorm}
+												setCurrentPage={setCurrentPage}
+												currentPage={currentPage}
+												perPage={perPage}
+												setPerPage={setPerPage}
+											/>
+										</footer>
 									</div>
 								</div>
 							</Card>

@@ -120,7 +120,7 @@ const presentation = [
 	// trang cập nhật công việc (nhiệm vụ)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/:id`,
-		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+		element: <TASK.ADD_OR_UPDATE_TASK />,
 		exact: true,
 	},
 	// trang thêm mới đầu việc (nhiệm vụ con) với nhiệm vụ

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Icon from '../../components/icon/Icon';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -14,6 +15,9 @@ const TaskByUser = () => {
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
 	const [isExpan, setIsExpan] = useState([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(users, currentPage, perPage);
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
@@ -51,14 +55,16 @@ const TaskByUser = () => {
 									<thead>
 										<tr>
 											<th>Họ và tên</th>
-											<th style={{ textAlign: 'center' }}>Số đầu việc</th>
+											<th style={{ textAlign: 'center' }}>
+												Danh sách đầu việc
+											</th>
 											<th style={{ textAlign: 'center' }}>Phòng ban</th>
 											<th style={{ textAlign: 'center' }}>Trạng thái</th>
 											<th style={{ textAlign: 'center' }}>Chức vụ</th>
 										</tr>
 									</thead>
 									<tbody>
-										{users?.map((item) => (
+										{items?.map((item) => (
 											<React.Fragment key={item.id}>
 												{/* {fecth(item.id)} */}
 												<tr>
@@ -76,11 +82,6 @@ const TaskByUser = () => {
 																		: 'CaretDownFill'
 																}`}
 															/>
-															<span
-																className='mx-2'
-																style={{ color: '#0174EB' }}>
-																0
-															</span>
 														</Button>
 													</td>
 													<td style={{ textAlign: 'center' }}>
@@ -113,6 +114,16 @@ const TaskByUser = () => {
 										))}
 									</tbody>
 								</table>
+								<hr />
+								<footer>
+									<PaginationButtons
+										data={users}
+										setCurrentPage={setCurrentPage}
+										currentPage={currentPage}
+										perPage={perPage}
+										setPerPage={setPerPage}
+									/>
+								</footer>
 							</div>
 							{/* {!tasks?.length && (
                                 <Alert color='warning' isLight icon='Report' className='mt-3'>
