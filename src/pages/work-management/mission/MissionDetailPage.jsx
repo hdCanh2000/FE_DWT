@@ -675,12 +675,12 @@ const MissionDetailPage = () => {
 												</div>
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col col-sm-5 text-start'>
-														<div className='fw-bold fs-4 mb-10'>
+														{/* <div className='fw-bold fs-4 mb-10'>
 															{mission?.data?.kpiValue}
 														</div>
 														<div className='text-muted'>
 															KPI được giao
-														</div>
+														</div> */}
 														<div className='fw-bold fs-4 mb-10 mt-4'>
 															{mission?.report?.currentKPI}
 														</div>

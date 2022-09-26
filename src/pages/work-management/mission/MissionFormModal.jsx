@@ -6,12 +6,7 @@ import { Button, Modal } from 'react-bootstrap';
 import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import Card, {
-	CardBody,
-	CardHeader,
-	CardLabel,
-	CardTitle,
-} from '../../../components/bootstrap/Card';
+import Card, { CardBody } from '../../../components/bootstrap/Card';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
@@ -20,6 +15,7 @@ import Option from '../../../components/bootstrap/Option';
 import Select from '../../../components/bootstrap/forms/Select';
 import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
 import { getMissionById, getAllKeys } from './services';
+import { fetchUnitList } from '../../../redux/slice/unitSlice';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -30,25 +26,26 @@ const ErrorText = styled.span`
 const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
+	const units = useSelector((state) => state.unit.units);
 
 	const [mission, setMission] = useState({});
 	const [keysState, setKeysState] = useState([]);
+	const [unitOption, setUnitOption] = useState({ label: '', value: '' });
 	const [departmentOption, setDepartmentOption] = useState({ label: '', value: '' });
 	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
 	const [keyOption, setKeyOption] = useState([]);
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
-		kpiValue: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
 	});
 	const [logsMision, setLogsMission] = React.useState([]);
 
 	const nameRef = useRef(null);
-	const kpiValueRef = useRef(null);
 	const departmentRef = useRef(null);
 
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
+		dispatch(fetchUnitList());
 	}, [dispatch]);
 
 	const onValidate = (value, name) => {
@@ -66,8 +63,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	const validateForm = () => {
 		validateFieldForm('name', mission?.name);
-		validateFieldForm('kpiValue', mission?.kpiValue);
-		validateFieldForm('kpiValue', parseInt(mission?.kpiValue, 10) > 0);
 		validateFieldForm('departmentOption', departmentOption?.value);
 	};
 
@@ -82,10 +77,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 
 	useEffect(() => {
 		handleClearErrorMsgAfterChange('name');
-		handleClearErrorMsgAfterChange('kpiValue');
 		handleClearErrorMsgAfterChange('departmentOption');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mission?.name, mission?.kpiValue, departmentOption?.value]);
+	}, [mission?.name, departmentOption?.value]);
 
 	useEffect(() => {
 		if (item?.id) {
@@ -97,6 +91,12 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					id: res.data?.data?.departments?.[0].id,
 					label: res.data?.data?.departments?.[0].name,
 					value: res.data?.data?.departments?.[0].id,
+				});
+				setUnitOption({
+					...res.data?.data?.unit,
+					id: res.data?.data?.unit?.id,
+					label: res.data?.data?.unit?.name,
+					value: res.data?.data?.unit?.id,
 				});
 				setDepartmentRelatedOption(
 					res.data?.data?.departments?.slice(1)?.map((department) => {
@@ -117,8 +117,11 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				startTime: '',
 				endTime: '',
 				status: 1,
+				manday: '',
+				quantity: '',
 			});
 			setKeysState([]);
+			setUnitOption({});
 			setDepartmentOption({});
 			setDepartmentRelatedOption([]);
 		}
@@ -237,8 +240,11 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			startTime: '',
 			endTime: '',
 			status: 0,
+			quantity: '',
+			manday: '',
 		});
 		setKeysState([]);
+		setUnitOption({});
 		setDepartmentOption({});
 		setDepartmentRelatedOption([]);
 		setErrors({});
@@ -269,7 +275,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				};
 			});
 			data.status = 1;
-			data.kpiValue = parseInt(data.kpiValue, 10);
+			data.quantity = parseInt(data?.quantity, 10) || '';
+			data.manday = parseInt(data?.manday, 10) || '';
+			data.kpiValue = parseInt(data?.kpiValue, 10) || '';
 			data.departmentId = departmentOption.id;
 			data.departments = [
 				{
@@ -283,13 +291,14 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					};
 				}),
 			];
+			data.unitId = unitOption.id;
+			data.unit = {
+				id: unitOption.id,
+				name: unitOption.label,
+			};
 			validateForm();
 			if (!mission?.name) {
 				nameRef.current.focus();
-				return;
-			}
-			if (parseInt(mission?.kpiValue, 10) <= 0 || !mission?.kpiValue) {
-				kpiValueRef.current.focus();
 				return;
 			}
 			if (!prevIsValid()) {
@@ -320,7 +329,9 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				};
 			});
 			data.status = 1;
-			data.kpiValue = parseInt(data.kpiValue, 10);
+			data.quantity = parseInt(data?.quantity, 10) || '';
+			data.manday = parseInt(data?.manday, 10) || '';
+			data.kpiValue = parseInt(data?.kpiValue, 10) || '';
 			data.departmentId = departmentOption.id;
 			data.departments = [
 				{
@@ -334,13 +345,14 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					};
 				}),
 			];
+			data.unitId = unitOption.id;
+			data.unit = {
+				id: unitOption.id,
+				name: unitOption.label,
+			};
 			validateForm();
 			if (!mission?.name) {
 				nameRef.current.focus();
-				return;
-			}
-			if (parseInt(mission?.kpiValue, 10) <= 0 || !mission?.kpiValue) {
-				kpiValueRef.current.focus();
 				return;
 			}
 			if (!prevIsValid()) {
@@ -353,12 +365,15 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			name: '',
 			description: '',
 			kpiValue: '',
+			quantity: '',
+			manday: '',
 			startTime: '',
 			endTime: '',
 			status: 0,
 		});
 		setKeysState([]);
 		setDepartmentOption({});
+		setUnitOption({});
 		setDepartmentRelatedOption([]);
 	};
 	const compare = ['>', '=', '<', '<=', '>='];
@@ -372,11 +387,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 					<div className='col-md-12'>
 						<form>
 							<Card shadow='sm'>
-								<CardHeader>
-									<CardLabel icon='Info' iconColor='success'>
-										<CardTitle>Thông tin mục tiêu</CardTitle>
-									</CardLabel>
-								</CardHeader>
 								<CardBody>
 									<div className='row g-4'>
 										<FormGroup
@@ -389,53 +399,63 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 												value={mission.name || ''}
 												name='name'
 												ref={nameRef}
-												required
 												placeholder='Tên mục tiêu'
-												size='lg'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 										{errors?.name?.errorMsg && (
 											<ErrorText>Vui lòng nhập tên mục tiêu</ErrorText>
 										)}
-										<FormGroup
-											color='red'
-											className='col-12'
-											id='description'
-											label='Mô tả mục tiêu'>
-											<Textarea
-												name='description'
+										{/* Số lương - Đơn vị tính - Manday */}
+										<FormGroup className='col-2' id='quantity' label='Số lượng'>
+											<Input
+												type='number'
+												name='quantity'
 												onChange={handleChange}
-												value={mission.description || ''}
-												required
-												size='lg'
-												placeholder='Mô tả mục tiêu'
+												value={mission.quantity || ''}
+												placeholder='Số lượng'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
+										<FormGroup className='col-3' id='unit' label='Đơn vị tính'>
+											<SelectComponent
+												placeholder='Đơn vị tính'
+												defaultValue={unitOption}
+												value={unitOption}
+												onChange={setUnitOption}
+												options={units}
+											/>
+										</FormGroup>
 										<FormGroup
-											color='red'
-											className='col-12'
+											className='col-4'
+											id='manday'
+											label='Số ngày công cần thiết'>
+											<Input
+												type='number'
+												name='manday'
+												onChange={handleChange}
+												value={mission.manday || ''}
+												placeholder='Số ngày công cần thiết'
+												className='border border-2 rounded-0 shadow-none'
+											/>
+										</FormGroup>
+										{/* Giá trị KPI */}
+										<FormGroup
+											className='col-3'
 											id='kpiValue'
 											label='Giá trị KPI'>
 											<Input
-												ref={kpiValueRef}
 												type='number'
 												name='kpiValue'
 												onChange={handleChange}
 												value={mission.kpiValue || ''}
-												required
-												size='lg'
 												placeholder='Giá trị KPI'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
-										{errors?.kpiValue?.errorMsg && (
-											<ErrorText>Vui lòng nhập giá trị KPI hợp lệ</ErrorText>
-										)}
 										<FormGroup
 											color='red'
-											className='col-12'
+											className='col-4'
 											id='department'
 											label='Phòng ban phụ trách'>
 											<SelectComponent
@@ -451,7 +471,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 											<ErrorText>Vui lòng chọn phòng ban phụ trách</ErrorText>
 										)}
 										<FormGroup
-											className='col-12'
+											className='col-8'
 											id='departmentReplatedOption'
 											label='Phòng ban liên quan'>
 											<SelectComponent
@@ -479,7 +499,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													onChange={handleChange}
 													value={mission.startTime || ''}
 													type='date'
-													size='lg'
 													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
@@ -495,11 +514,22 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													onChange={handleChange}
 													value={mission.endTime || ''}
 													type='date'
-													size='lg'
 													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
+										<FormGroup
+											className='col-12'
+											id='description'
+											label='Mô tả mục tiêu'>
+											<Textarea
+												name='description'
+												onChange={handleChange}
+												value={mission.description || ''}
+												placeholder='Mô tả mục tiêu'
+												className='border border-2 rounded-0 shadow-none'
+											/>
+										</FormGroup>
 										<FormGroup>
 											<Button variant='success' onClick={handleAddFieldKey}>
 												Thêm tiêu chí đánh giá
@@ -512,15 +542,13 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 													// eslint-disable-next-line react/no-array-index-key
 													key={index}
 													className='mt-4 d-flex align-items-center justify-content-between'>
-													<div style={{ width: '40%', marginRight: 5 }}>
+													<div style={{ width: '50%', marginRight: 5 }}>
 														<FormGroup
 															className='mr-2'
 															id='name'
 															label={`Chỉ số key ${index + 1}`}>
 															<Select
 																name='keyName'
-																required
-																size='lg'
 																ariaLabel={`Chỉ số key ${
 																	index + 1
 																}`}
@@ -556,8 +584,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																}
 																value={item?.keyType}
 																name='keyType'
-																size='lg'
-																required
 																ariaLabel='So sánh'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='> = <'>
@@ -587,8 +613,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																}
 																value={item?.keyValue || ''}
 																name='keyValue'
-																size='lg'
-																required
 																ariaLabel='Giá trị'
 																className='border border-2 rounded-0 shadow-none'
 																placeholder='VD: 100 , 1000 , ..'
@@ -608,7 +632,6 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 																background: 'transparent',
 																border: 0,
 															}}
-															size='lg'
 															className='mt-4 h-100'
 															onClick={(e) =>
 																handleRemoveKeyField(e, index)
