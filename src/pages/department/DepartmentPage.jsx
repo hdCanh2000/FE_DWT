@@ -181,6 +181,7 @@ const DepartmentPage = () => {
 				<div>
 					{item?.items?.length === 0 && (
 						<Tree
+						canHide
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={`${item.name}`}
@@ -203,6 +204,7 @@ const DepartmentPage = () => {
 			);
 		});
 	};
+	console.log(department);
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
@@ -235,7 +237,7 @@ const DepartmentPage = () => {
 										</CardActions>
 									</CardHeader>
 									<div className='row h-100 w-100'>
-										<div className='col-lg-3 col-md-6'>
+										<div className='col-lg-4 col-md-6'>
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />

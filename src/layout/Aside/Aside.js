@@ -9,7 +9,7 @@ const Aside = () => {
 	return (
 		<div className='position-fixed aside-head top-0 left-0' style={{ maxWidth: 260 }}>
 			<Link to='/'>
-				<img src={Logo} alt='logo' />
+				<img src={Logo} alt='logo' style={{width: '80%', marginLeft: '10%'}} />
 			</Link>
 			<Card className='mt-4' style={{ height: '100vh' }}>
 				<Navigation menu={demoPages} id='aside-demo-pages' />

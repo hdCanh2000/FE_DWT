@@ -8,12 +8,12 @@ const TableWorkTrack = () => {
 		setData([
 			...data,
 			{
-				name: '',
-				amount: '',
-				unit: '',
-				descriptions: '',
-				dateLine: '',
-				plant: '',
+				name: 'null',
+				amount: 'null',
+				unit: 'nul',
+				descriptions: 'null',
+				dateLine: 'null',
+				plant: 'null',
 			},
 		]);
 	};
@@ -36,12 +36,24 @@ const TableWorkTrack = () => {
 						{data?.map((item, index) => (
 							<tr>
 								<td>{index + 1}</td>
-								<td contentEditable='true'>{item.name}</td>
-								<td contentEditable='true'>{item.amount}</td>
-								<td contentEditable='true'>{item.unit}</td>
-								<td contentEditable='true'>{item.descriptions}</td>
-								<td contentEditable='true'>{item.dateLine}</td>
-								<td contentEditable='true'>{item.plant}</td>
+								<td contentEditable='true' className='text-center'>
+									{item.name}
+								</td>
+								<td contentEditable='true' className='text-center'>
+									{item.amount}
+								</td>
+								<td contentEditable='true' className='text-center'>
+									{item.unit}
+								</td>
+								<td contentEditable='true' className='text-center'>
+									{item.descriptions}
+								</td>
+								<td contentEditable='true' className='text-center'>
+									{item.dateLine}
+								</td>
+								<td contentEditable='true' className='text-center'>
+									{item.plant}
+								</td>
 							</tr>
 						))}
 						<tr>
