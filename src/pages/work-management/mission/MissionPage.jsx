@@ -141,12 +141,12 @@ const MissionPage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const [departmentSelect] = useState(1);
-	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const missions = useSelector((state) => state.mission?.missions);
 	const missionReport = useSelector((state) => state.mission?.missionReport);
 	const latestTasks = useSelector((state) => state.task?.taskLates);
 	const taskReport = useSelector((state) => state.task?.taskReport);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
+	const toggleFormConfirm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	const navigateToDetailPage = useCallback(
@@ -224,27 +224,27 @@ const MissionPage = () => {
 			),
 			align: 'center',
 		},
-		{
-			title: 'Giá trị KPI',
-			id: 'kpiValue',
-			key: 'kpiValue',
-			type: 'number',
-			align: 'center',
-		},
-		{
-			title: 'KPI thực tế',
-			id: 'currentKPI',
-			key: 'currentKPI',
-			type: 'number',
-			align: 'center',
-		},
-		{
-			title: 'KPI đã hoàn thành',
-			id: 'completeKPI',
-			key: 'completeKPI',
-			type: 'number',
-			align: 'center',
-		},
+		// {
+		// 	title: 'Giá trị KPI',
+		// 	id: 'kpiValue',
+		// 	key: 'kpiValue',
+		// 	type: 'number',
+		// 	align: 'center',
+		// },
+		// {
+		// 	title: 'KPI thực tế',
+		// 	id: 'currentKPI',
+		// 	key: 'currentKPI',
+		// 	type: 'number',
+		// 	align: 'center',
+		// },
+		// {
+		// 	title: 'KPI đã hoàn thành',
+		// 	id: 'completeKPI',
+		// 	key: 'completeKPI',
+		// 	type: 'number',
+		// 	align: 'center',
+		// },
 		{
 			title: '',
 			id: 'action',
@@ -267,7 +267,7 @@ const MissionPage = () => {
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2'
 							icon='Close'
-							onClick={() => handleOpenConfirmModal(item)}>
+							onClick={() => handleOpenFormDelete(item)}>
 							Đóng
 						</Button>
 					</div>,
@@ -276,42 +276,17 @@ const MissionPage = () => {
 		},
 	];
 
-	// confirm modal
-	const handleOpenConfirmModal = () => {
-		setOpenConfirmModal(true);
-	};
-
-	const handleCloseConfirmModal = () => {
-		setOpenConfirmModal(false);
-	};
-
 	const handleCloseItem = async (data) => {
-		if (data.status === 1) {
-			try {
-				const newData = data;
-				newData.status = 0;
-				await updateMissionById(data);
-				dispatch(fetchMissionList());
-				dispatch(fetchMissionReport());
-				handleCloseConfirmModal();
-				handleShowToast(`Đóng mục tiêu`, `Đóng mục tiêu thành công!`);
-			} catch (error) {
-				handleCloseConfirmModal();
-				handleShowToast(`Đóng mục tiêu`, `Đóng mục tiêu không thành công!`);
-			}
-		} else {
-			try {
-				const newData = data;
-				newData.status = 1;
-				await updateMissionById(data);
-				dispatch(fetchMissionList());
-				dispatch(fetchMissionReport());
-				handleCloseConfirmModal();
-				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu thành công!`);
-			} catch (error) {
-				handleCloseConfirmModal();
-				handleShowToast(`Mở mục tiêu`, `Mở mục tiêu không thành công!`);
-			}
+		try {
+			const newData = { ...data };
+			newData.status = -1;
+			const response = await updateMissionById(newData);
+			dispatch(fetchMissionList());
+			dispatch(fetchMissionReport());
+			handleCloseForm();
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${response?.data?.name} thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
 		}
 	};
 
@@ -491,42 +466,13 @@ const MissionPage = () => {
 											<CardTitle tag='h4' className='h4'>
 												{item?.name}
 											</CardTitle>
-											<CardSubTitle style={{ fontSize: 14 }} className='mt-2'>
-												{/* <div className='d-flex'>
-													<div className='me-2'>
-														Số CV:
-														<span className='text-danger fw-bold ps-2'>
-															{item?.totalTask || 0}
-														</span>
-													</div>
-													<div className='me-2'>
-														Giá trị KPI:
-														<span className='text-danger fw-bold ps-2'>
-															{item?.kpiValue || 0}
-														</span>
-													</div>
-													<div>
-														KPI thực tế:
-														<span className='text-danger fw-bold ps-2'>
-															{item.currentKPI}
-														</span>
-													</div>
-												</div> */}
-												<div className='d-flex '>
-													<div>
-														Trạng thái:
-														<span
-															className={
-																item.status === 1
-																	? 'text-success fw-bold ps-2'
-																	: 'text-danger fw-bold ps-2'
-															}>
-															{item.status === 1
-																? 'Đang thực hiện'
-																: 'Đã đóng'}
-														</span>
-													</div>
-												</div>
+											<CardSubTitle
+												className={
+													item.status === 1
+														? 'mt-2 fs-14 text-success fw-bold ps-2'
+														: 'mt-2 fs-14 text-danger fw-bold ps-2'
+												}>
+												{item.status === 1 ? 'Đang thực hiện' : 'Đã đóng'}
 											</CardSubTitle>
 										</CardLabel>
 										{verifyPermissionHOC(
@@ -710,8 +656,8 @@ const MissionPage = () => {
 					})}
 				</div>
 				<MissionAlertConfirm
-					openModal={openConfirmModal}
-					onCloseModal={handleCloseConfirmModal}
+					openModal={toggleFormConfirm}
+					onCloseModal={handleCloseForm}
 					onConfirm={() => handleCloseItem(itemEdit)}
 					title={itemEdit?.status === 1 ? 'Đóng mục tiêu' : 'Mở mục tiêu'}
 					content={
