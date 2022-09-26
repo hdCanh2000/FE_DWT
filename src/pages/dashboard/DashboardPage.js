@@ -7,6 +7,7 @@ import { dashboardMenu, demoPages } from '../../menu';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Page from '../../layout/Page/Page';
 import Button, { ButtonGroup } from '../../components/bootstrap/Button';
+// import Select from '../../components/bootstrap/forms/Select';
 import Card, {
 	CardActions,
 	CardBody,
@@ -275,6 +276,7 @@ const DashboardPage = () => {
 
 	const [year, setYear] = useState(Number(moment().format('YYYY')));
 	const companies = [
+		{ name: 'Tổng Công Ty'},
 		{ name: 'Kênh OTC' },
 		{ name: 'Kênh ETC' },
 		{ name: 'Kênh MT' },
@@ -285,9 +287,10 @@ const DashboardPage = () => {
 		COMP2: companies[1].name,
 		COMP3: companies[2].name,
 		COMP4: companies[3].name,
+		COMP5: companies[4].name,
 	};
 	const [activeCompanyTab, setActiveCompanyTab] = useState(COMPANIES_TAB.COMP1);
-
+	console.log(activeCompanyTab);
 	const search = [
 		// { name: 'Tuần' },
 		{ name: '30 Ngày' },
@@ -1078,8 +1081,8 @@ const DashboardPage = () => {
 			<Page container='fluid overflow-hidden'>
 				<div className='row'>
 					{verifyPermissionHOC(
-						<div className='col-xxl-12'>
-							<Card className='h-100'>
+						<div className='col-xxl-6'>
+							<Card className='mb-0'>
 								<CardHeader>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
@@ -1090,6 +1093,47 @@ const DashboardPage = () => {
 										</CardSubTitle>
 									</CardLabel>
 									<CardActions>
+									<div className='col-xl-4 col-xxl-3'>
+											<div className='row g-3'>
+												{companies.map((company) => (
+													<div
+														key={company.name}
+														className='col-xl-12 col-lg-6 col-sm-12'>
+														{ company.name !== "Tổng Công Ty" ? (
+															<Button
+															isLight={
+																activeCompanyTab !== company.name
+															}
+															onClick={() =>
+																setActiveCompanyTab(company.name)
+															}
+															color={themeStatus}
+															style={{marginLeft: '30px'}}
+															className='w-100 py-4'
+															shadow='sm'
+															hoverShadow='none'>
+															{company.name}
+														</Button>
+														) : (
+															<Button
+															isLight={
+																activeCompanyTab !== company.name
+															}
+															onClick={() =>
+																setActiveCompanyTab(company.name)
+															}
+															color={themeStatus}
+															className='w-100 py-4'
+															shadow='sm'
+															hoverShadow='none'>
+															{company.name}
+														</Button>
+														)}
+														
+													</div>
+												))}
+											</div>
+										</div>
 										<ButtonGroup>
 											{search.map((element) => (
 												<div key={element.name}>
@@ -1138,30 +1182,7 @@ const DashboardPage = () => {
 								</CardHeader>
 								<CardBody>
 									<div className='row'>
-										<div className='col-xl-3 col-xxl-2'>
-											<div className='row g-3'>
-												{companies.map((company) => (
-													<div
-														key={company.name}
-														className='col-xl-12 col-lg-6 col-sm-12'>
-														<Button
-															isLight={
-																activeCompanyTab !== company.name
-															}
-															onClick={() =>
-																setActiveCompanyTab(company.name)
-															}
-															color={themeStatus}
-															className='w-100 py-4'
-															shadow='sm'
-															hoverShadow='none'>
-															{company.name}
-														</Button>
-													</div>
-												))}
-											</div>
-										</div>
-										<div className='col-xl-9 col-xxl-10'>
+										<div className='col-xl-12 col-xxl-12'>
 											<Chart
 												series={
 													(searchTab === SEARCH_TAB.COMP1 &&
@@ -1172,11 +1193,11 @@ const DashboardPage = () => {
 														quarterStoreSeries) ||
 													(searchTab === SEARCH_TAB.COMP4 &&
 														yearStoreSeries) ||
-													(activeCompanyTab === COMPANIES_TAB.COMP1 &&
-														salesByStoreSeries1) ||
 													(activeCompanyTab === COMPANIES_TAB.COMP2 &&
-														salesByStoreSeries2) ||
+														salesByStoreSeries1) ||
 													(activeCompanyTab === COMPANIES_TAB.COMP3 &&
+														salesByStoreSeries2) ||
+													(activeCompanyTab === COMPANIES_TAB.COMP4 &&
 														salesByStoreSeries3) ||
 													salesByStoreSeries4
 												}
