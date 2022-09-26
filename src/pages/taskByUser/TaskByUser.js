@@ -1,29 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import Alert from '../../components/bootstrap/Alert';
 import Button from '../../components/bootstrap/Button';
-import Card, {
-	CardActions,
-	CardHeader,
-	CardLabel,
-	CardTitle,
-} from '../../components/bootstrap/Card';
+import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Icon from '../../components/icon/Icon';
-// import Dropdown, {
-// 	DropdownItem,
-// 	DropdownMenu,
-// 	DropdownToggle,
-// } from '../../components/bootstrap/Dropdown';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import Search from '../common/ComponentCommon/Search';
 import Expand from './Expan';
-// import getTaskByUser from './services';
 
 const TaskByUser = () => {
-    // const [taskByUser, setTaskByUser] = useState([]);
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
 	const [isExpan, setIsExpan] = useState([]);
@@ -36,19 +23,6 @@ const TaskByUser = () => {
 			setIsExpan(isExpan.filter((item) => item !== idExpan));
 		}
 	};
-        // const fecth = async (idUser) => {
-		// 	const reponse = await getTaskByUser(idUser);
-		// 	const result = await reponse.data;
-        //     setTaskByUser(result);
-		// };
-        // const fetchLength=()=>{
-        //     users?.map((item)=>{
-        //         fecth(item.id);
-        //     })
-        // }
-        // fetchLength();
-        // console.log(taskByUser);
-    
 	return (
 		<PageWrapper title={demoPages.jobsPage.subMenu.taskByUser.text}>
 			<Page container='fluid'>
@@ -68,46 +42,6 @@ const TaskByUser = () => {
 										<CardLabel>Danh sách công việc của nhân viên</CardLabel>
 									</CardTitle>
 								</CardLabel>
-								<CardActions className='d-flex align-items-center'>
-									<Button
-										color='info'
-										icon='Plus'
-										tag='button'
-										// onClick={() => handleOpenEditForm(null)}>
-										// onClick={handleOnClickToActionPage}
-									>
-										Thêm nhiệm vụ
-									</Button>
-									{/* {verifyPermissionHOC(
-                                            <Dropdown>
-                                                <DropdownToggle hasIcon={false}>
-                                                    <Button
-                                                        color='primary'
-                                                        icon='Circle'
-                                                        className='text-nowrap'>
-                                                        {
-                                                            dataDepartments.filter(
-                                                                (item) => item.id === departmentSelect,
-                                                            )[0]?.name
-                                                        }
-                                                    </Button>
-                                                </DropdownToggle>
-                                                <DropdownMenu>
-                                                    {dataDepartments?.map((item) => (
-                                                        <DropdownItem
-                                                            key={item?.id}
-                                                            // onClick={() =>
-                                                            // 	setDepartmentSelect(item.id)
-                                                            // }
-                                                        >
-                                                            <div>{item?.name}</div>
-                                                        </DropdownItem>
-                                                    ))}
-                                                </DropdownMenu>
-                                            </Dropdown>,
-                                            ['admin'],
-                                        )} */}
-								</CardActions>
 							</CardHeader>
 							<div className='p-4'>
 								<div style={{ maxWidth: '25%' }}>
@@ -126,7 +60,7 @@ const TaskByUser = () => {
 									<tbody>
 										{users?.map((item) => (
 											<React.Fragment key={item.id}>
-                                                {/* {fecth(item.id)} */}
+												{/* {fecth(item.id)} */}
 												<tr>
 													<td>{item?.name}</td>
 													<td>
@@ -136,17 +70,16 @@ const TaskByUser = () => {
 															<Icon
 																color='info'
 																size='sm'
-																// icon={`${
-																//     expandState[item.id]
-																//         ? 'CaretUpFill'
-																//         : 'CaretDownFill'
-																// }`}
-																icon='CaretDownFill'
+																icon={`${
+																	isExpan.includes(item.id)
+																		? 'CaretUpFill'
+																		: 'CaretDownFill'
+																}`}
 															/>
 															<span
 																className='mx-2'
 																style={{ color: '#0174EB' }}>
-																{/* {isLength[index] || 0}abc */}
+																	0
 															</span>
 														</Button>
 													</td>
@@ -159,10 +92,9 @@ const TaskByUser = () => {
 															: 'Không hoạt động'}
 													</td>
 													<td style={{ textAlign: 'center' }}>
-														{/* {item?.roles[0] === 'manager'
+														{item?.roles[0] === 'manager'
 															? 'Quản lý '
-															: 'Nhân viên'} */}
-														{item?.roles}
+															: 'Nhân viên'}
 													</td>
 												</tr>
 												<tr>
