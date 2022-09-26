@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
 import SelectComponent from 'react-select';
@@ -39,6 +39,7 @@ const customStyles = {
 const TaskActionsPage = () => {
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const params = useParams();
 
 	const departments = useSelector((state) => state.department.departments);
@@ -215,10 +216,10 @@ const TaskActionsPage = () => {
 			description: '',
 			priority: '',
 			kpiValue: '',
-			startDate: '',
-			startTime: '',
-			deadlineDate: '',
-			deadlineTime: '',
+			startDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			startTime: '08:00',
+			deadlineDate: moment().add(1, 'days').format('YYYY-MM-DD'),
+			deadlineTime: '17:00',
 			status: 0,
 			quantity: '',
 			manday: '',
@@ -312,6 +313,7 @@ const TaskActionsPage = () => {
 					`Cập nhật nhiệm vụ!`,
 					`Nhiệm vụ ${result.name} được cập nhật thành công!`,
 				);
+				navigate(-1);
 			} catch (error) {
 				handleShowToast(`Cập nhật nhiệm vụ`, `Cập nhật nhiệm vụ không thành công!`);
 			}
@@ -320,6 +322,7 @@ const TaskActionsPage = () => {
 				const response = await addNewTask(dataSubmit);
 				const result = await response.data;
 				handleClearForm();
+				navigate(-1);
 				handleShowToast(`Thêm nhiệm vụ`, `nhiệm vụ ${result.name} được thêm thành công!`);
 			} catch (error) {
 				handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
