@@ -105,7 +105,7 @@ const Expand = ({ idUser }) => {
 							// onClick={() => onOpenModal(taskId)}
 						>
 							<Icon size='lg' icon='PlusCircle' />
-							<span className='mx-2'>Thêm đầu việc</span>
+							<span className='mx-2'>Thêm công việc của nhân viên</span>
 						</Button>
 					</td>
 				</tr>

@@ -12,6 +12,9 @@ const MISSION = {
 const TASKBYUSER = {
 	TASKBYUSER: lazy(() => import('../pages/taskByUser/TaskByUser')),
 };
+const DAILYWORKTRACKING = {
+	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/dailyWorkTracking')),
+};
 const TASK = {
 	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
 	TASKMANAGEMENT: lazy(() =>
@@ -95,6 +98,11 @@ const presentation = [
 	{
 		path: demoPages.jobsPage.subMenu.taskByUser.path,
 		element: <TASKBYUSER.TASKBYUSER />,
+		exact: true,
+	},
+	{
+		path: demoPages.jobsPage.subMenu.dailyWorkTracking.path,
+		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
 		exact: true,
 	},
 	// trang chi tiết công việc (nhiệm vụ)

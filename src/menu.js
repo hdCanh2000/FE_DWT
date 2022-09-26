@@ -83,6 +83,11 @@ export const demoPages = {
 				text: 'Công việc của nhân viên',
 				path: '/cong-viec-cua-nhan-vien',
 			},
+			dailyWorkTracking: {
+				id: 'dailyWorkTracking',
+				text: 'Công việc hằng ngày',
+				path: '/cong-viec-hang-ngay',
+			},
 			target: {
 				id: 'target',
 				text: 'Mục tiêu',
