@@ -41,11 +41,11 @@ const dailyWorkTracking = () => {
 								</div>
 							</div>
 							<div className='row p-4'>
-								<div className='col-6'>
+								<div className='col-7'>
 									<TableWorkTrack />
 								</div>
-								<div className='col-6'>
-                                <TableWorkTrack />
+								<div className='col-5'>
+									<TableWorkTrack />
 								</div>
 							</div>
 						</Card>
