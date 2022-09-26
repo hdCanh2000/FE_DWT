@@ -1,5 +1,6 @@
 import React, { lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
+import Card from '../../components/bootstrap/Card';
 import Login from '../../pages/presentation/auth/Login';
 import contents from '../../routes/contentRoutes';
 
@@ -13,18 +14,23 @@ const ProtectedRoute = ({ element }) => {
 
 const ContentRoutes = () => {
 	return (
-		<Routes>
-			{contents.map((page) => (
-				<Route
-					key={page.path}
-					path={page.path}
-					exact={page.exact}
-					element={<ProtectedRoute element={page.element} />}
-				/>
-			))}
-			<Route path='/dang-nhap' element={<Login />} />
-			<Route path='*' element={<PAGE_404 />} />
-		</Routes>
+		<div>
+			<Routes>
+				{contents.map((page) => (
+					<Route
+						key={page.path}
+						path={page.path}
+						exact={page.exact}
+						element={<ProtectedRoute element={page.element} />}
+					/>
+				))}
+				<Route path='/dang-nhap' element={<Login />} />
+				<Route path='*' element={<PAGE_404 />} />
+			</Routes>
+			<Card style={{textAlign : 'center' , width: '98%'}} className='p-3'>
+				Copyright © 2020 tbht. All rights reserved. - Designed by Thái IT
+			</Card>
+		</div>
 	);
 };
 
