@@ -477,30 +477,6 @@ const MissionPage = () => {
 						</div>,
 						['admin'],
 					)}
-					{/* {verifyPermissionHOC(
-						<div className='col-xxl-12'>
-							<Card className='mb-8'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê công việc thuộc mục tiêu
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={taskReport} />
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['manager'],
-					)} */}
 				</div>
 				{parseInt(searchParams.get('view'), 10) === 1 || !searchParams.get('view') ? (
 					<div className='row'>
@@ -516,7 +492,7 @@ const MissionPage = () => {
 												{item?.name}
 											</CardTitle>
 											<CardSubTitle style={{ fontSize: 14 }} className='mt-2'>
-												<div className='d-flex'>
+												{/* <div className='d-flex'>
 													<div className='me-2'>
 														Số CV:
 														<span className='text-danger fw-bold ps-2'>
@@ -535,7 +511,7 @@ const MissionPage = () => {
 															{item.currentKPI}
 														</span>
 													</div>
-												</div>
+												</div> */}
 												<div className='d-flex '>
 													<div>
 														Trạng thái:
@@ -546,8 +522,8 @@ const MissionPage = () => {
 																	: 'text-danger fw-bold ps-2'
 															}>
 															{item.status === 1
-																? 'ACTIVE'
-																: 'IN ACTIVE'}
+																? 'Đang thực hiện'
+																: 'Đã đóng'}
 														</span>
 													</div>
 												</div>
