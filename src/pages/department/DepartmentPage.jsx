@@ -181,7 +181,6 @@ const DepartmentPage = () => {
 				<div>
 					{item?.items?.length === 0 && (
 						<Tree
-						canHide
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={`${item.name}`}
