@@ -182,16 +182,6 @@ const DepartmentPage = () => {
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={`${item.name}`}
-
-    
-          
-            
-    
-
-          
-    
-    
-  
 							style={treeStyles}
 							onItemClick={() => handleClick(item)}
 						/>
@@ -211,7 +201,6 @@ const DepartmentPage = () => {
 			);
 		});
 	};
-	console.log(department);
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
