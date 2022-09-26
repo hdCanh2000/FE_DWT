@@ -604,7 +604,7 @@ const TaskActionsPage = () => {
 													// eslint-disable-next-line react/no-array-index-key
 													key={index}
 													className='row mt-4 d-flex align-items-center justify-content-between'>
-													<div className='col-5'>
+													<div className='col-12'>
 														<div className='w-100'>
 															<FormGroup
 																className='mr-2'
@@ -626,57 +626,6 @@ const TaskActionsPage = () => {
 																/>
 															</FormGroup>
 														</div>
-													</div>
-													<div className='col-3'>
-														<FormGroup
-															className='ml-2'
-															id='quantity'
-															label='Số lượng'>
-															<Input
-																onChange={(e) =>
-																	handleChangeKpiNormOption(
-																		index,
-																		e,
-																	)
-																}
-																disabled={!item.value}
-																type='number'
-																value={item?.quantity || ''}
-																name='quantity'
-																size='lg'
-																ariaLabel='Số lượng'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='Số lượng'
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-3'>
-														<FormGroup
-															className='ml-2'
-															id='total'
-															label='Quy đổi (điểm)'>
-															<Input
-																onChange={(e) =>
-																	handleChangeKpiNormOption(
-																		index,
-																		e,
-																	)
-																}
-																type='number'
-																value={
-																	parseInt(
-																		item.quantity * item.point,
-																		10,
-																	) || item.total
-																}
-																name='total'
-																size='lg'
-																readOnly
-																ariaLabel='Quy đổi'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='Quy đổi (điểm)'
-															/>
-														</FormGroup>
 													</div>
 													<div className='col-1'>
 														<div className='w-100'>
