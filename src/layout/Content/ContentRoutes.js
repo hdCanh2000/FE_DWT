@@ -1,6 +1,5 @@
 import React, { lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
-import Card from '../../components/bootstrap/Card';
 import Login from '../../pages/presentation/auth/Login';
 import contents from '../../routes/contentRoutes';
 
@@ -27,9 +26,6 @@ const ContentRoutes = () => {
 				<Route path='/dang-nhap' element={<Login />} />
 				<Route path='*' element={<PAGE_404 />} />
 			</Routes>
-			<Card style={{ textAlign: 'center', width: '100%' }} className='p-3'>
-				Copyright © 2020 tbht. All rights reserved. - Designed by Thái IT
-			</Card>
 		</div>
 	);
 };

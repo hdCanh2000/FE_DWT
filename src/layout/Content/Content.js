@@ -42,7 +42,6 @@ const Content = () => {
 			<Suspense fallback={_loading}>
 				<ContentRoutes />
 			</Suspense>
-			
 		</main>
 	);
 };
