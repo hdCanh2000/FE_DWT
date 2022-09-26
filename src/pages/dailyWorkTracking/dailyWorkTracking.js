@@ -41,7 +41,7 @@ const dailyWorkTracking = () => {
 									<TableWorkTrack />
 								</div>
 								<div className='col-5'>
-									abc
+									{/* abc */}
 								</div>
 							</div>
 						</Card>

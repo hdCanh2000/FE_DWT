@@ -141,7 +141,6 @@ const DepartmentPage = () => {
 			},
 		);
 	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			organizationLevel: data?.organizationLevel?.value,
@@ -153,7 +152,6 @@ const DepartmentPage = () => {
 			address: data.address,
 			status: Number(data.status),
 		};
-
 		try {
 			const response = await addDepartment(dataSubmit);
 			const result = await response.data;
@@ -184,6 +182,16 @@ const DepartmentPage = () => {
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={`${item.name}`}
+
+    
+          
+            
+    
+
+          
+    
+    
+  
 							style={treeStyles}
 							onItemClick={() => handleClick(item)}
 						/>
@@ -244,7 +252,6 @@ const DepartmentPage = () => {
 												</CardBody>
 											</Card>
 										</div>
-
 										{itemEdits.name !== undefined && (
 											<DepartmentDetailPage
 												initValues={itemEdits}
@@ -274,5 +281,4 @@ const DepartmentPage = () => {
 		</PageWrapper>
 	);
 };
-
 export default DepartmentPage;

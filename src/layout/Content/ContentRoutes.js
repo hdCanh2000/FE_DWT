@@ -14,7 +14,7 @@ const ProtectedRoute = ({ element }) => {
 
 const ContentRoutes = () => {
 	return (
-		<div>
+		<div style={{ width: '100%' }}>
 			<Routes>
 				{contents.map((page) => (
 					<Route
@@ -27,7 +27,7 @@ const ContentRoutes = () => {
 				<Route path='/dang-nhap' element={<Login />} />
 				<Route path='*' element={<PAGE_404 />} />
 			</Routes>
-			<Card style={{textAlign : 'center' , width: '98%'}} className='p-3'>
+			<Card style={{ textAlign: 'center', width: '100%' }} className='p-3'>
 				Copyright © 2020 tbht. All rights reserved. - Designed by Thái IT
 			</Card>
 		</div>
