@@ -79,7 +79,7 @@ const TaskByUser = () => {
 															<span
 																className='mx-2'
 																style={{ color: '#0174EB' }}>
-																	0
+																0
 															</span>
 														</Button>
 													</td>
