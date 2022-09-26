@@ -24,13 +24,13 @@ import Card, {
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
-import { addNewTask, deleteTaskById, getAllDepartments, updateTaskByID } from '../mission/services';
+import { addNewTask, getAllDepartments, updateTaskByID } from '../mission/services';
 import { getAllTasksByDepartment } from './services';
 import useDarkMode from '../../../hooks/useDarkMode';
 import {
 	formatColorPriority,
 	// formatColorStatus,
-	FORMAT_TASK_STATUS,
+	// FORMAT_TASK_STATUS,
 	// renderStatusTask,
 	// STATUS,
 } from '../../../utils/constants';
@@ -49,7 +49,7 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
-import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
+// import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 // import { addNewSubtask } from '../TaskDetail/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import TaskChartReport from '../../dashboard/admin/TaskChartReport';
@@ -163,13 +163,13 @@ const TaskListPage = () => {
 
 	const [departmentSelect, setDepartmentSelect] = useState(1);
 
-	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
-	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
-		title: '',
-		subTitle: '',
-		status: null,
-		isShowNote: false,
-	});
+	// const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
+	// const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+	// 	title: '',
+	// 	subTitle: '',
+	// 	status: null,
+	// 	isShowNote: false,
+	// });
 
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
@@ -239,6 +239,11 @@ const TaskListPage = () => {
 		});
 	};
 
+	const handleOpenConfirmModal = (item) => {
+		setOpenConfirmModal(true);
+		setItemEdit(item);
+	};
+
 	const handleCloseConfirmModal = () => {
 		setOpenConfirmModal(false);
 		setItemEdit(null);
@@ -267,11 +272,12 @@ const TaskListPage = () => {
 		);
 	};
 
-	const handleCloseItem = async (taskId) => {
+	const handleCloseItem = async (data) => {
 		try {
-			await deleteTaskById(taskId);
-			const newState = [...tasks];
-			setTasks(newState.filter((item) => item.id !== taskId));
+			const res = await updateTaskByID({ ...data, status: -1 });
+			const result = await res.data;
+			const newTasks = [...tasks];
+			setTasks(newTasks.filter((item) => item.id !== result.id));
 			handleCloseConfirmModal();
 			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ thành công!`);
 		} catch (error) {
@@ -316,29 +322,29 @@ const TaskListPage = () => {
 		}
 	};
 
-	const handleUpdateStatus = async (status, data) => {
-		try {
-			const newData = { ...data };
-			newData.status = status;
-			const response = await updateTaskByID(newData);
-			const result = await response.data;
-			const newTasks = [...tasks];
-			setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-			handleClearValueForm();
-			handleCloseEditForm();
-			handleCloseConfirmStatusTask();
-			handleShowToast(
-				`Cập nhật trạng thái nhiệm vụ!`,
-				`nhiệm vụ ${result.name} được cập nhật trạng thái thành công!`,
-			);
-		} catch (error) {
-			setTasks(tasks);
-			handleShowToast(
-				`Cập nhật trạng thái nhiệm vụ`,
-				`Cập nhật trạng thái nhiệm vụ không thành công!`,
-			);
-		}
-	};
+	// const handleUpdateStatus = async (status, data) => {
+	// 	try {
+	// 		const newData = { ...data };
+	// 		newData.status = status;
+	// 		const response = await updateTaskByID(newData);
+	// 		const result = await response.data;
+	// 		const newTasks = [...tasks];
+	// 		setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
+	// 		handleClearValueForm();
+	// 		handleCloseEditForm();
+	// 		handleCloseConfirmStatusTask();
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái nhiệm vụ!`,
+	// 			`nhiệm vụ ${result.name} được cập nhật trạng thái thành công!`,
+	// 		);
+	// 	} catch (error) {
+	// 		setTasks(tasks);
+	// 		handleShowToast(
+	// 			`Cập nhật trạng thái nhiệm vụ`,
+	// 			`Cập nhật trạng thái nhiệm vụ không thành công!`,
+	// 		);
+	// 	}
+	// };
 
 	const handleClickSwitchView = (view) => {
 		navigate({
@@ -352,21 +358,21 @@ const TaskListPage = () => {
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
 
-	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
-		setOpenConfirmModalStatus(true);
-		setItemEdit({ ...item });
-		setInfoConfirmModalStatus({
-			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} nhiệm vụ`.toUpperCase(),
-			subTitle: item?.name,
-			status: nextStatus,
-			isShowNote,
-		});
-	};
+	// const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
+	// 	setOpenConfirmModalStatus(true);
+	// 	setItemEdit({ ...item });
+	// 	setInfoConfirmModalStatus({
+	// 		title: `Xác nhận xoá nhiệm vụ`.toUpperCase(),
+	// 		subTitle: item?.name,
+	// 		status: nextStatus,
+	// 		isShowNote,
+	// 	});
+	// };
 
-	const handleCloseConfirmStatusTask = () => {
-		setOpenConfirmModalStatus(false);
-		setItemEdit(null);
-	};
+	// const handleCloseConfirmStatusTask = () => {
+	// 	setOpenConfirmModalStatus(false);
+	// 	setItemEdit(null);
+	// };
 
 	return (
 		<PageWrapper title={demoPages.jobsPage.subMenu.mission.text}>
@@ -626,11 +632,10 @@ const TaskListPage = () => {
 																		color='danger'
 																		isLight={darkModeStatus}
 																		className='text-nowrap mx-2'
-																		icon='EditOff'
+																		icon='Close'
 																		onClick={() =>
-																			handleOpenConfirmStatusTask(
+																			handleOpenConfirmModal(
 																				item,
-																				7,
 																			)
 																		}
 																	/>
@@ -703,9 +708,9 @@ const TaskListPage = () => {
 				<MissionAlertConfirm
 					openModal={openConfirmModal}
 					onCloseModal={handleCloseConfirmModal}
-					onConfirm={() => handleCloseItem(itemEdit?.id)}
-					title='Đóng nhiệm vụ'
-					content={`Xác nhận đóng nhiệm vụ <strong>${itemEdit?.name}</strong> ?`}
+					onConfirm={() => handleCloseItem(itemEdit)}
+					title='Xoá nhiệm vụ'
+					content={`Xác nhận xoá nhiệm vụ <strong>${itemEdit?.name}</strong> ?`}
 				/>
 				<TaskFormModal
 					show={editModalStatus}
@@ -714,7 +719,7 @@ const TaskListPage = () => {
 					item={itemEdit}
 					isShowMission={!itemEdit?.id}
 				/>
-				<ModalConfirmCommon
+				{/* <ModalConfirmCommon
 					show={openConfirmModalStatus}
 					onClose={handleCloseConfirmStatusTask}
 					onSubmit={handleUpdateStatus}
@@ -723,7 +728,7 @@ const TaskListPage = () => {
 					title={infoConfirmModalStatus.title}
 					subTitle={infoConfirmModalStatus.subTitle}
 					status={infoConfirmModalStatus.status}
-				/>
+				/> */}
 			</Page>
 		</PageWrapper>
 	);
