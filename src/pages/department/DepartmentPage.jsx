@@ -48,6 +48,10 @@ const DepartmentPage = () => {
 			value: 1,
 		},
 		{
+			label: 'Công ty',
+			value: 4,
+		},
+		{
 			label: 'Phòng ban',
 			value: 2,
 		},
@@ -199,6 +203,7 @@ const DepartmentPage = () => {
 			);
 		});
 	};
+	console.log(department);
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
@@ -231,7 +236,7 @@ const DepartmentPage = () => {
 										</CardActions>
 									</CardHeader>
 									<div className='row h-100 w-100'>
-										<div className='col-lg-3 col-md-6'>
+										<div className='col-lg-4 col-md-6'>
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />
