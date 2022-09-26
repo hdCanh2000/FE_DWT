@@ -3,6 +3,7 @@ import Card from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
+import TableWorkTrack from './tableWorkTracking';
 
 const dailyWorkTracking = () => {
 	return (
@@ -39,44 +40,12 @@ const dailyWorkTracking = () => {
 									</table>
 								</div>
 							</div>
-							<div className='row h-100 w-100'>
-								<div className='col-6 '>
-									<table
-										className='table table-modern mb-0'
-										style={{ fontSize: 14 }}>
-										<thead>
-											<tr>
-												<th>Tên định mức KPI</th>
-												<th className='text-center'>Phòng ban</th>
-												<th className='text-center'>Đơn vị tính</th>
-												<th className='text-center'>
-													Điểm KPI trên 1 đơn vị
-												</th>
-												<th className='text-center'>Hành động</th>
-											</tr>
-										</thead>
-										{/* <tbody>
-											</tbody> */}
-									</table>
+							<div className='row p-4'>
+								<div className='col-6'>
+									<TableWorkTrack />
 								</div>
 								<div className='col-6'>
-									<table
-										className='table table-modern mb-0'
-										style={{ fontSize: 14 }}>
-										<thead>
-											<tr>
-												<th>Tên định mức KPI</th>
-												<th className='text-center'>Phòng ban</th>
-												<th className='text-center'>Đơn vị tính</th>
-												<th className='text-center'>
-													Điểm KPI trên 1 đơn vị
-												</th>
-												<th className='text-center'>Hành động</th>
-											</tr>
-										</thead>
-										{/* <tbody>
-											</tbody> */}
-									</table>
+                                <TableWorkTrack />
 								</div>
 							</div>
 						</Card>
