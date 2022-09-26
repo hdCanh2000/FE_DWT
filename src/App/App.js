@@ -102,7 +102,7 @@ const App = () => {
 							{!checkCurentPath('/dang-nhap') && (
 								<div className='main__sidebar'>
 									<Routes>
-										<Route path='*' element={<Aside />} />
+										<Route path='*' element={<Aside />} />		
 									</Routes>
 								</div>
 							)}
