@@ -29,32 +29,36 @@ import { getAllTasksByDepartment } from './services';
 import useDarkMode from '../../../hooks/useDarkMode';
 import {
 	formatColorPriority,
-	formatColorStatus,
+	// formatColorStatus,
 	FORMAT_TASK_STATUS,
-	renderStatusTask,
-	STATUS,
+	// renderStatusTask,
+	// STATUS,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
-import Icon from '../../../components/icon/Icon';
+// import Icon from '../../../components/icon/Icon';
 import Alert from '../../../components/bootstrap/Alert';
 import Toasts from '../../../components/bootstrap/Toasts';
 import TaskFormModal from '../mission/TaskFormModal';
 import MissionAlertConfirm from '../mission/MissionAlertConfirm';
 import Progress from '../../../components/bootstrap/Progress';
-import ExpandRow from './ExpandRow';
+// import ExpandRow from './ExpandRow';
 import Badge from '../../../components/bootstrap/Badge';
-import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
+// import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
 	DropdownToggle,
 } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
-import { addNewSubtask } from '../TaskDetail/services';
+// import { addNewSubtask } from '../TaskDetail/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import TaskChartReport from '../../dashboard/admin/TaskChartReport';
 import { getReportSubTaskDepartment, getReportTask } from '../../dashboard/services';
 import Search from '../../common/ComponentCommon/Search';
+import PaginationButtons, {
+	dataPagination,
+	PER_COUNT,
+} from '../../../components/PaginationButtons';
 
 const Item = ({
 	id,
@@ -153,11 +157,9 @@ const TaskListPage = () => {
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [expandedRows, setExpandedRows] = useState([]);
-	const [expandState, setExpandState] = useState({});
-	// handle expand subtask
-	const [editModalStatusExpand, setEditModalStatusExpand] = useState(false);
-	const [taskExpandId, setTaskExpandId] = useState('');
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(tasks, currentPage, perPage);
 
 	const [departmentSelect, setDepartmentSelect] = useState(1);
 
@@ -223,32 +225,6 @@ const TaskListPage = () => {
 		[navigate],
 	);
 
-	// Handle
-	const handleOpenModalExpand = (taskId) => {
-		setEditModalStatusExpand(true);
-		setTaskExpandId(taskId);
-	};
-
-	const handleCloseModalExpand = () => {
-		setEditModalStatusExpand(false);
-	};
-
-	const handleEpandRow = (event, userId) => {
-		const currentExpandedRows = expandedRows;
-		const isRowExpanded = currentExpandedRows.includes(userId);
-
-		const obj = {};
-		// eslint-disable-next-line no-unused-expressions
-		isRowExpanded ? (obj[userId] = false) : (obj[userId] = true);
-		setExpandState(obj);
-
-		const newExpandedRows = isRowExpanded
-			? currentExpandedRows.filter((id) => id !== userId)
-			: currentExpandedRows.concat(userId);
-
-		setExpandedRows(newExpandedRows);
-	};
-
 	const handleClearValueForm = () => {
 		setItemEdit({
 			id: null,
@@ -262,12 +238,6 @@ const TaskListPage = () => {
 			status: 0,
 		});
 	};
-
-	// confirm modal
-	// const handleOpenConfirmModal = (item) => {
-	// 	setOpenConfirmModal(true);
-	// 	setItemEdit({ ...item });
-	// };
 
 	const handleCloseConfirmModal = () => {
 		setOpenConfirmModal(false);
@@ -396,20 +366,6 @@ const TaskListPage = () => {
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
 		setItemEdit(null);
-	};
-
-	const handleSubmitSubTaskForm = async (data) => {
-		const dataSubmit = { ...data, taskId: taskExpandId };
-		try {
-			const response = await addNewSubtask(dataSubmit);
-			const result = await response.data;
-			handleCloseEditForm();
-			fetchDataAllTasks();
-			handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
-		} catch (error) {
-			fetchDataAllTasks();
-			handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);
-		}
 	};
 
 	return (
@@ -590,20 +546,16 @@ const TaskListPage = () => {
 											<tr>
 												<th className='text-center'>STT</th>
 												<th>Tên nhiệm vụ</th>
-												<th className='text-center'>Số đầu việc</th>
-												<th>Phòng ban</th>
-												{/* <th className='text-center'>Nhân viên</th> */}
+												<th>Phòng ban phụ trách</th>
+												<th>Nhân viên phụ trách</th>
 												<th className='text-center'>Hạn hoàn thành</th>
-												<th className='text-center'>Giá trị KPI</th>
-												{/* <th className='text-center'>KPI thực tế</th> */}
 												<th className='text-center'>Độ ưu tiên</th>
-												<th className='text-center'>Trạng thái</th>
 												<th className='text-center'>Tiến độ</th>
 												<td />
 											</tr>
 										</thead>
 										<tbody>
-											{tasks?.map((item, index) => (
+											{items?.map((item, index) => (
 												<React.Fragment key={item.id}>
 													<tr>
 														<td>{index + 1}</td>
@@ -614,124 +566,33 @@ const TaskListPage = () => {
 																{item?.name}
 															</Link>
 														</td>
-														<td align='center'>
-															<Button
-																className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
-																onClick={(event) =>
-																	handleEpandRow(event, item.id)
-																}>
-																<Icon
-																	color='info'
-																	size='sm'
-																	icon={`${
-																		expandState[item.id]
-																			? 'CaretUpFill'
-																			: 'CaretDownFill'
-																	}`}
-																/>
-																<span
-																	className='mx-2'
-																	style={{ color: '#0174EB' }}>
-																	{item?.subtasks?.length || 0}
-																</span>
-															</Button>
-														</td>
 														<td>{item?.departments[0]?.name}</td>
-														{/* <td className='text-center'>
-															{item?.users[0]?.name}
-														</td> */}
+														<td>{item?.users[0]?.name}</td>
 														<td align='center'>
 															{moment(`${item.deadlineDate}`).format(
 																'DD-MM-YYYY',
 															)}
 														</td>
-														<td align='center'>{item?.kpiValue}</td>
-														{/* <td align='center'>{item?.currentKPI}</td> */}
-														<td>
-															<div className='d-flex align-items-center'>
-																<span
-																	style={{
-																		paddingRight: '1rem',
-																		paddingLeft: '1rem',
-																	}}
-																	className={classNames(
-																		'badge',
-																		'border border-2',
-																		[`border-${themeStatus}`],
-																		'bg-success',
-																		'pt-2 pb-2 me-2',
-																		`bg-${formatColorPriority(
-																			item.priority,
-																		)}`,
-																	)}>
-																	<span className=''>{`Cấp ${item.priority}`}</span>
-																</span>
-															</div>
+														<td className='text-center'>
+															<span
+																style={{
+																	paddingRight: '1rem',
+																	paddingLeft: '1rem',
+																}}
+																className={classNames(
+																	'badge',
+																	'border border-2',
+																	[`border-${themeStatus}`],
+																	'bg-success',
+																	'pt-2 pb-2 me-2',
+																	`bg-${formatColorPriority(
+																		item.priority,
+																	)}`,
+																)}>
+																<span className=''>{`Cấp ${item.priority}`}</span>
+															</span>
 														</td>
-														<td>
-															{verifyPermissionHOC(
-																<Dropdown>
-																	<DropdownToggle hasIcon={false}>
-																		<Button
-																			isLink
-																			color={formatColorStatus(
-																				item.status,
-																			)}
-																			icon='Circle'
-																			className='text-nowrap'>
-																			{FORMAT_TASK_STATUS(
-																				item.status,
-																			)}
-																		</Button>
-																	</DropdownToggle>
-																	<DropdownMenu>
-																		{Object.keys(
-																			renderStatusTask(
-																				item.status,
-																			),
-																		).map((key) => (
-																			<DropdownItem
-																				key={key}
-																				onClick={() =>
-																					handleOpenConfirmStatusTask(
-																						item,
-																						STATUS[key]
-																							.value,
-																					)
-																				}>
-																				<div>
-																					<Icon
-																						icon='Circle'
-																						color={
-																							STATUS[
-																								key
-																							].color
-																						}
-																					/>
-																					{
-																						STATUS[key]
-																							.name
-																					}
-																				</div>
-																			</DropdownItem>
-																		))}
-																	</DropdownMenu>
-																</Dropdown>,
-																['admin', 'manager'],
-																<Button
-																	isLink
-																	color={formatColorStatus(
-																		item.status,
-																	)}
-																	icon='Circle'
-																	className='text-nowrap'>
-																	{FORMAT_TASK_STATUS(
-																		item.status,
-																	)}
-																</Button>,
-															)}
-														</td>
-														<td>
+														<td className='text-center'>
 															<div className='d-flex align-items-center flex-column'>
 																<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
 																<Progress
@@ -745,7 +606,7 @@ const TaskListPage = () => {
 																/>
 															</div>
 														</td>
-														<td>
+														<td className='text-center'>
 															{verifyPermissionHOC(
 																<div className='d-flex align-items-center'>
 																	<Button
@@ -761,9 +622,6 @@ const TaskListPage = () => {
 																		}
 																	/>
 																	<Button
-																		isDisable={
-																			item.status === 7
-																		}
 																		isOutline={!darkModeStatus}
 																		color='danger'
 																		isLight={darkModeStatus}
@@ -781,41 +639,20 @@ const TaskListPage = () => {
 															)}
 														</td>
 													</tr>
-													<tr>
-														<td
-															colSpan='12'
-															style={{
-																padding: '5px 0 5px 50px',
-																borderRadius: '0.5rem',
-															}}>
-															{expandedRows.includes(item?.id) && (
-																<>
-																	<ExpandRow
-																		key={item.id}
-																		subtasks={item?.subtasks}
-																		taskId={item.id}
-																		onOpenModal={
-																			handleOpenModalExpand
-																		}
-																	/>
-																	<TaskDetailForm
-																		show={editModalStatusExpand}
-																		item={itemEdit}
-																		onClose={
-																			handleCloseModalExpand
-																		}
-																		onSubmit={
-																			handleSubmitSubTaskForm
-																		}
-																	/>
-																</>
-															)}
-														</td>
-													</tr>
 												</React.Fragment>
 											))}
 										</tbody>
 									</table>
+									<hr />
+									<footer>
+										<PaginationButtons
+											data={tasks}
+											setCurrentPage={setCurrentPage}
+											currentPage={currentPage}
+											perPage={perPage}
+											setPerPage={setPerPage}
+										/>
+									</footer>
 								</div>
 								{!tasks?.length && (
 									<Alert color='warning' isLight icon='Report' className='mt-3'>
