@@ -1,73 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
-import styled from 'styled-components';
 import { Button, Modal } from 'react-bootstrap';
-import Textarea from '../../components/bootstrap/forms/Textarea';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
-import Select from '../../components/bootstrap/forms/Select';
-import CustomSelect from '../../components/form/CustomSelect';
-import Checks from '../../components/bootstrap/forms/Checks';
 import Input from '../../components/bootstrap/forms/Input';
-import Option from '../../components/bootstrap/Option';
-import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
+import Textarea from '../../components/bootstrap/forms/Textarea';
+import Checks from '../../components/bootstrap/forms/Checks';
+import CustomSelect from '../../components/form/CustomSelect';
+import Select from '../../components/bootstrap/forms/Select';
 
-const ErrorText = styled.span`
-	font-size: 14px;
-	color: #e22828;
-	margin-top: 5px;
-`;
-
-const PositionDetail = ({ className, show, onClose, item, label, fields, options, nv, ...props }) => {
+const CommonForm = ({
+	className,
+	show,
+	onClose,
+	item,
+	handleSubmit,
+	label,
+	fields,
+	options,
+	validate,
+	disable,
+	...props
+}) => {
 	const formik = useFormik({
 		initialValues: { ...item },
+		validationSchema: validate,
 		enableReinitialize: true,
+		onSubmit: (values, { resetForm }) => {
+			handleSubmit(values);
+			resetForm();
+		},
 	});
-
-	const dispatch = useDispatch();
-	const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
-	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
-
-	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
-
-	// xoá các key theo index
-	// const handleRemoveKeyField = (e, index) => {
-	// 	setKpiNormId((prev) => prev.filter((state) => state !== prev[index]));
-	// };
-
-	const handleChangeKeysState = (index, event) => {
-		event.preventDefault();
-		event.persist();
-		setKpiNormId((prev) => {
-			return prev?.map((key, i) => {
-				if (i !== index) return key;
-				return {
-					...key,
-					[event.target.name]: event.target.value,
-					error: {
-						...key.error,
-						[event.target.name]:
-							event.target.value.length > 0
-								? null
-								: `Vui lòng nhập đầy đủ thông tin!`,
-					},
-				};
-			});
-		});
-	};
-
-	// const handleAddFieldKey = () => {
-	// 	const initState = {};
-	// 	if (kpiNormId?.length <= 11) {
-	// 		setKpiNormId((prev) => [...prev, initState]);
-	// 	}
-	// };
-
-
 	return (
 		<Modal
 			className={classNames(className, 'p-4')}
@@ -76,7 +40,6 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 			size='lg'
 			scrollable
 			centered
-			nv={nv}
 			{...props}>
 			<Modal.Header closeButton className='p-4'>
 				<Modal.Title>{label}</Modal.Title>
@@ -96,16 +59,26 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 													id={field.id}
 													label={field.title}>
 													<Select
-														disabled
 														ariaLabel={field.title || ''}
+														placeholder={`Chọn ${field.title}`}
 														list={field.options}
 														name={field.id}
 														size='lg'
 														className='border border-2 rounded-0 shadow-none'
+														onChange={formik.handleChange}
+														onBlur={formik.handleBlur}
 														value={formik.values[field.id]}
 														defaultValue={formik.values[field.id]}
+														isValid={formik.isValid}
 													/>
 												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
 											</React.Fragment>
 										);
 									}
@@ -118,12 +91,22 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 													id={field.id}
 													label={field.title}>
 													<CustomSelect
-														disabled
+														placeholder={`Chọn ${field.title}`}
 														value={formik.values[field.id]}
-														options={field.options}
+														onChange={(value) => {
+															formik.setFieldValue(field.id, value);
+														}}
 														isMulti={!!field.isMulti}
+														options={field.options}
 													/>
 												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
 											</React.Fragment>
 										);
 									}
@@ -139,16 +122,57 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 													id={field.id}
 													label={field.title}>
 													<Textarea
-														readOnly
 														rows={5}
+														ariaLabel={field.title}
 														placeholder={`Nhập ${field.title}`}
 														list={options}
 														size='lg'
 														name={field.id}
 														className='border border-2 rounded-0 shadow-none'
+														onChange={formik.handleChange}
+														onBlur={formik.handleBlur}
 														value={formik.values[field.id]}
+														isValid={formik.isValid}
 													/>
 												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
+											</React.Fragment>
+										);
+									}
+									if (field.type === 'key') {
+										return (
+											<React.Fragment key={field.id}>
+												<FormGroup
+													key={field.id}
+													className='col-12'
+													id={field.id}
+													label={field.title}>
+													<Checks
+														id={field.id}
+														type='switch'
+														size='lg'
+														label={
+															Number(formik.values[field.id]) === 1
+																? 'Là Key'
+																: 'Không phải Key'
+														}
+														onChange={formik.handleChange}
+														checked={formik.values[field.id]}
+													/>
+												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
 											</React.Fragment>
 										);
 									}
@@ -161,7 +185,6 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 													id={field.id}
 													label={field.title}>
 													<Checks
-														readOnly
 														id={field.id}
 														type='switch'
 														size='lg'
@@ -174,6 +197,13 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 														checked={formik.values[field.id]}
 													/>
 												</FormGroup>
+												<div className='text-danger mt-1'>
+													{formik.errors[field.id] && (
+														<span className='error'>
+															{formik.errors[field.id]}
+														</span>
+													)}
+												</div>
 											</React.Fragment>
 										);
 									}
@@ -184,75 +214,28 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 												id={field.id}
 												label={field.title}>
 												<Input
-													disabled
 													type={field.type || 'text'}
 													name={field.id}
+													onChange={formik.handleChange}
 													value={formik.values[field.id] || ''}
 													size='lg'
+													placeholder={`Nhập ${field.title}`}
 													className='border border-2 rounded-0 shadow-none'
+													onBlur={formik.handleBlur}
+													isValid={formik.isValid}
+													isTouched={formik.touched[field.id]}
 												/>
 											</FormGroup>
+											<div className='text-danger mt-1'>
+												{formik.errors[field.id] && (
+													<span className='error'>
+														{formik.errors[field.id]}
+													</span>
+												)}
+											</div>
 										</React.Fragment>
 									);
 								})}
-								<div>
-									{nv && (
-										<>
-											<hr />
-											<FormGroup 
-											style={{fontWeight: 500, 
-													color: '#6c757d',}}>
-													Danh sách nhiệm vụ
-											</FormGroup>
-											{kpiNormId?.map((element, index) => {
-												return (
-													<div
-														key={element.name}
-														className='mt-4 d-flex align-items-center justify-content-between'>
-														<div
-															style={{
-																width: '100%',
-																marginRight: 10,
-															}}>
-															<FormGroup
-																className='mr-2'
-																id='kpiName'
-																label='Tên nhiệm vụ'>
-																<Select
-																	disabled
-																	name='kpiName'
-																	required
-																	size='lg'
-																	className='border border-2 rounded-0 shadow-none'
-																	placeholder='Chọn nhiệm vụ'
-																	value={element?.kpiName}
-																	onChange={(e) =>
-																		handleChangeKeysState(
-																			index,
-																			e,
-																		)
-																	}>
-																	{kpiNorms.map((key) => (
-																		<Option
-																			key={`${key.name}`}
-																			value={`${key.name}`}>
-																			{`${key?.name}`}
-																		</Option>
-																	))}
-																</Select>
-															</FormGroup>
-															{element.error?.kpiName && (
-																<ErrorText>
-																	{element.error?.kpiName}
-																</ErrorText>
-															)}
-														</div>
-													</div>
-												);
-											})}
-										</>
-									)}
-								</div>
 							</div>
 						</div>
 					</div>
@@ -262,13 +245,17 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 				<Button size='lg' variant='secondary' onClick={onClose}>
 					Đóng
 				</Button>
+				<Button size='lg' variant='primary' type='submit' onClick={formik.handleSubmit}>
+					Xác nhận
+				</Button>
 			</Modal.Footer>
 		</Modal>
 	);
 };
 
-PositionDetail.propTypes = {
+CommonForm.propTypes = {
 	className: PropTypes.string,
+	disable: PropTypes.string,
 	show: PropTypes.bool,
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
@@ -283,10 +270,10 @@ PositionDetail.propTypes = {
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
-	nv: PropTypes.bool,
 };
-PositionDetail.defaultProps = {
+CommonForm.defaultProps = {
 	className: null,
+	disable: null,
 	show: false,
 	columns: [],
 	options: [],
@@ -296,7 +283,6 @@ PositionDetail.defaultProps = {
 	onClose: null,
 	handleSubmit: null,
 	label: '',
-	nv: false,
 };
 
-export default PositionDetail;
+export default CommonForm;

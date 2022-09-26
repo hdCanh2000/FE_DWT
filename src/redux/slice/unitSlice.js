@@ -11,7 +11,7 @@ export const fetchUnitList = createAsyncThunk('unit/fetchList', async () => {
 	const response = await getAllUnits();
 	return response.data?.map((unit) => {
 		return {
-			id: unit?.id,
+			...unit,
 			value: unit?.id,
 			label: unit?.name,
 		};

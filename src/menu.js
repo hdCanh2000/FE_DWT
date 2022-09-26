@@ -83,6 +83,11 @@ export const demoPages = {
 				text: 'Công việc của nhân viên',
 				path: '/cong-viec-cua-nhan-vien',
 			},
+			dailyWorkTracking: {
+				id: 'dailyWorkTracking',
+				text: 'Công việc hằng ngày',
+				path: '/cong-viec-hang-ngay',
+			},
 			target: {
 				id: 'target',
 				text: 'Mục tiêu',
@@ -165,8 +170,8 @@ export const demoPages = {
 		subMenu: {
 			kpi: {
 				id: 'kpi',
-				text: 'Cấu hình KPI',
-				path: '/cau-hinh-kpi',
+				text: 'Cấu hình Key',
+				path: '/cau-hinh-key',
 			},
 			unit: {
 				id: 'unit',
@@ -175,8 +180,8 @@ export const demoPages = {
 			},
 			authorization: {
 				id: 'authorization',
-				text: 'Cấu hình phân quyền',
-				path: '/cau-hinh-phan-quyen',
+				text: 'Cấu hình vai trò',
+				path: '/cau-hinh-vai-tro',
 			},
 			kpiNorm: {
 				id: 'kpiNorm',

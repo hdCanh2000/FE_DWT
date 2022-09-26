@@ -19,10 +19,13 @@ import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
-import { getAllKeys } from '../key/services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import Search from '../common/ComponentCommon/Search';
+import { fetchPositionList } from '../../redux/slice/positionSlice';
+import { fetchUnitList } from '../../redux/slice/unitSlice';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -30,25 +33,27 @@ const EmployeePage = () => {
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const departments = useSelector((state) => state.department.departments);
+	const positions = useSelector((state) => state.position.positions);
+	const units = useSelector((state) => state.unit.units);
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [openDetail, setOpenDetail] = useState(false);
 	const [dataDetail, setDataDetail] = useState(false);
-	const [openForm, setOpenForm] = React.useState(false);
-	const [itemEdit, setItemEdit] = React.useState({});
-	const [units, setUnit] = React.useState([]);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(kpiNorm, currentPage, perPage);
+
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	useEffect(() => {
-		const fecthKey = async () => {
-			const reponse = await getAllKeys();
-			const result = reponse.data.map((item) => {
-				return {
-					label: item.name,
-					value: item.id,
-				};
-			});
-			setUnit(result);
-		};
-		fecthKey();
-	}, []);
+		dispatch(fetchUnitList());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchPositionList());
+	}, [dispatch]);
+
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
@@ -56,24 +61,10 @@ const EmployeePage = () => {
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-	const kpiNorms = kpiNorm.map((item) => {
-		if (item.id === itemEdit?.id) {
-			return {
-				id: '',
-				label: 'Không',
-				text: '',
-				value: '',
-			};
-		}
-		return {
-			id: item.id,
-			label: item.name,
-			text: item.name,
-			value: item.id,
-		};
-	});
+
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
+
 	const columns = [
 		{
 			title: 'Tên định mức Kpi',
@@ -85,45 +76,57 @@ const EmployeePage = () => {
 		},
 		{
 			title: 'Phòng ban',
-			id: 'departmentId',
-			key: 'departmentId',
-			type: 'singleSelect',
+			id: 'department',
+			key: 'department',
+			type: 'select',
 			align: 'center',
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
 			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Vị trí chuyên môn',
+			id: 'position',
+			key: 'position',
+			type: 'select',
+			align: 'center',
+			isShow: true,
+			render: (item) => <span>{item?.position?.name || 'No data'}</span>,
+			options: positions,
+			isMulti: false,
+			col: 6,
 		},
 		{
 			title: 'Đơn vị tính',
-			id: 'unitId',
-			key: 'unitId',
-			type: 'singleSelect',
+			id: 'unit',
+			key: 'unit',
+			type: 'select',
 			align: 'center',
 			options: units,
 			isShow: true,
-			render: (item) => <span>{showUnit(item?.unitId) || ''}</span>,
+			render: (item) => <span>{item?.unit?.name || ''}</span>,
 			isMulti: false,
+			col: 4,
 		},
 		{
-			title: 'Điểm KPI trên 1 đơn vị',
-			id: 'point',
-			key: 'point',
+			title: 'Số lượng',
+			id: 'quantity',
+			key: 'quantity',
 			type: 'number',
 			align: 'center',
 			isShow: true,
+			col: 3,
 		},
 		{
-			title: 'Nhiệm vụ cha',
-			id: 'parent',
-			key: 'parent',
-			type: 'singleSelect',
+			title: 'Số ngày công cần thiết',
+			id: 'manday',
+			key: 'manday',
+			type: 'number',
 			align: 'center',
-			render: (item) => (
-				<span>{item?.parent?.label === '' ? 'không' : item?.parent?.label}</span>
-			),
-			options: kpiNorms,
-			isShow: false,
+			isShow: true,
+			col: 5,
 		},
 		{
 			title: 'Mô tả',
@@ -134,21 +137,12 @@ const EmployeePage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Cách đánh giá đo lường',
-			id: 'evaluationDescription',
-			key: 'evaluationDescription',
+			title: 'Nguồn nhân lực',
+			id: 'hr',
+			key: 'hr',
 			type: 'textarea',
 			align: 'center',
 			isShow: true,
-		},
-		{
-			title: 'Đây có phải là Key ?',
-			id: 'isKey',
-			key: 'isKey',
-			type: 'key',
-			align: 'center',
-			isShow: true,
-			format: (value) => (value === true ? 'Là Key' : 'Không phải Key'),
 		},
 		{
 			title: 'Hành động',
@@ -178,6 +172,7 @@ const EmployeePage = () => {
 			isShow: false,
 		},
 	];
+
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -193,16 +188,26 @@ const EmployeePage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			departmentId: parseInt(data?.departmentId, 10),
-			parentId: parseInt(data?.parent, 10),
 			point: data?.point,
 			description: data?.description,
-			evaluationDescription: data?.evaluationDescription,
-			unitId: parseInt(data?.unitId, 10),
-			parent: data?.parent,
-			department: data?.department,
-			unit: data?.unit,
-			isKey: data.isKey,
+			hr: data?.hr,
+			departmentId: parseInt(data?.department?.id, 10),
+			department: {
+				id: data?.department?.id,
+				name: data?.department?.name,
+			},
+			positionId: parseInt(data?.position?.id, 10),
+			position: {
+				id: data?.position?.id,
+				name: data?.position?.name,
+			},
+			unitId: parseInt(data?.unit?.id, 10),
+			unit: {
+				id: data?.unit?.id,
+				name: data?.unit?.name,
+			},
+			manday: data?.manday,
+			quantity: data?.quantity,
 		};
 		if (data?.id) {
 			try {
@@ -234,31 +239,33 @@ const EmployeePage = () => {
 			}
 		}
 	};
+
 	const handleOpenDelete = (item) => {
 		setIsDelete(true);
 		setItemDelete({ ...item });
 	};
+
 	const handleCloseDelete = () => {
 		setIsDelete(false);
 	};
+
 	const handleOpenDetail = (item) => {
 		setOpenDetail(true);
 		setDataDetail({
 			...item,
 			department: {
-				label: showDepartment(item?.departmentId),
+				...item.department,
+				label: item?.department?.name,
 				value: item?.departmentId,
-			},
-			parent: {
-				label: showParent(item?.parentId),
-				value: item?.parent,
 			},
 		});
 	};
+
 	const handleCloseDetail = () => {
 		setOpenDetail(false);
 		setDataDetail({});
 	};
+
 	const handleDeleteKpiNorm = async (item) => {
 		try {
 			await deleteKpiNorm(item);
@@ -269,27 +276,9 @@ const EmployeePage = () => {
 		}
 		handleCloseDelete();
 	};
-	const showDepartment = (idDepartment) => {
-		const newDepartment = departments.filter((item) => item?.id === idDepartment);
-		return newDepartment[0]?.label;
-	};
-	const showParent = (idParent) => {
-		const newParent = kpiNorm.filter((item) => item?.id === idParent);
-		return newParent[0]?.name;
-	};
-	const showUnit = (idUnit) => {
-		const newUnit = units.filter((item) => item?.value === idUnit);
-		return newUnit[0]?.label;
-	};
-	const handleCloseForm = () => {
-		setOpenForm(false);
-		setItemEdit({});
-	};
-	const handleOpenForm = (item) => {
-		setOpenForm(true);
-		setItemEdit(item);
-	};
+
 	const lable = 'Định mức lao động & KPI';
+
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
 			<Page container='fluid'>
@@ -331,37 +320,27 @@ const EmployeePage = () => {
 											<thead>
 												<tr>
 													<th>Tên định mức KPI</th>
-													<th className='text-center'>Phòng ban</th>
-													<th className='text-center'>Đơn vị tính</th>
-													<th className='text-center'>
-														Điểm KPI trên 1 đơn vị
-													</th>
+													<th>Phòng ban</th>
+													<th className='text-center'>Số lượng</th>
+													<th>Đơn vị tính</th>
+													<th>Mô tả</th>
+													<th>Vị trí chuyên môn</th>
 													<th className='text-center'>Hành động</th>
 												</tr>
 											</thead>
 											<tbody>
-												{kpiNorm?.map((item) => (
+												{items?.map((item) => (
 													<React.Fragment key={item.id}>
 														<tr>
-															<td className='cursor-pointer'>
-																{item?.name}
+															<td>{item?.name}</td>
+															<td>{item?.department?.name}</td>
+															<td className='text-center'>
+																{item?.quantity}
 															</td>
-															<td
-																className='cursor-pointer'
-																align='center'>
-																{showDepartment(item?.departmentId)}
-															</td>
-															<td
-																className='cursor-pointer'
-																align='center'>
-																{showUnit(item?.unitId)}
-															</td>
-															<td
-																className='cursor-pointer'
-																align='center'>
-																{item?.point}
-															</td>
-															<td align='center'>
+															<td>{item?.unit?.name}</td>
+															<td>{item?.description}</td>
+															<td>{item?.position?.name}</td>
+															<td className='text-center'>
 																<Button
 																	isOutline={!darkModeStatus}
 																	color='success'
@@ -369,7 +348,32 @@ const EmployeePage = () => {
 																	className='text-nowrap mx-1'
 																	icon='Edit'
 																	onClick={() =>
-																		handleOpenForm(item)
+																		handleOpenForm({
+																			...item,
+																			department: {
+																				...item.department,
+																				value: item
+																					.department
+																					?.value,
+																				label: item
+																					.department
+																					?.name,
+																			},
+																			position: {
+																				...item.position,
+																				value: item.position
+																					?.value,
+																				label: item.position
+																					?.name,
+																			},
+																			unit: {
+																				...item.unit,
+																				value: item.unit
+																					?.value,
+																				label: item.unit
+																					?.name,
+																			},
+																		})
 																	}
 																/>
 																<Button
@@ -379,7 +383,32 @@ const EmployeePage = () => {
 																	className='text-nowrap mx-1'
 																	icon='RemoveRedEye'
 																	onClick={() =>
-																		handleOpenDetail(item)
+																		handleOpenDetail({
+																			...item,
+																			department: {
+																				...item.department,
+																				value: item
+																					.department
+																					?.value,
+																				label: item
+																					.department
+																					?.name,
+																			},
+																			position: {
+																				...item.position,
+																				value: item.position
+																					?.value,
+																				label: item.position
+																					?.name,
+																			},
+																			unit: {
+																				...item.unit,
+																				value: item.unit
+																					?.value,
+																				label: item.unit
+																					?.name,
+																			},
+																		})
 																	}
 																/>
 																<Button
@@ -398,6 +427,16 @@ const EmployeePage = () => {
 												))}
 											</tbody>
 										</table>
+										<hr />
+										<footer>
+											<PaginationButtons
+												data={kpiNorm}
+												setCurrentPage={setCurrentPage}
+												currentPage={currentPage}
+												perPage={perPage}
+												setPerPage={setPerPage}
+											/>
+										</footer>
 									</div>
 								</div>
 							</Card>
@@ -406,7 +445,7 @@ const EmployeePage = () => {
 					['admin', 'manager'],
 				)}
 				<CommonForm
-					show={openForm}
+					show={toggleForm}
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
@@ -418,7 +457,7 @@ const EmployeePage = () => {
 					show={openDetail}
 					onClose={handleCloseDetail}
 					item={dataDetail}
-					label={`Chi tiết định mức KPI: ${dataDetail?.name}`}
+					label={`${dataDetail?.name}`}
 					fields={columns}
 				/>
 				<TaskAlertConfirm

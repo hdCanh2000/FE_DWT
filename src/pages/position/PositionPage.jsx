@@ -106,7 +106,7 @@ const PositionPage = () => {
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
-			format: (value) => (formatJobType(value)),
+			format: (value) => formatJobType(value),
 			options: [
 				{
 					id: 1,
@@ -122,7 +122,7 @@ const PositionPage = () => {
 					id: 3,
 					text: 'Thử việc',
 					value: 3,
-				}
+				},
 			],
 		},
 		{
@@ -246,7 +246,7 @@ const PositionPage = () => {
 	};
 	const handleOpenDetail = (item) => {
 		setOpenDetail(true);
-		setDataDetail({...item});
+		setDataDetail({ ...item });
 	};
 	const handleCloseDetail = () => {
 		setOpenDetail(false);
@@ -309,7 +309,7 @@ const PositionPage = () => {
 							item={dataDetail}
 							label={`Chi tiết vị trí: ${dataDetail?.name}`}
 							fields={columns}
-							// nv
+							nv
 						/>
 					</>,
 					['admin'],

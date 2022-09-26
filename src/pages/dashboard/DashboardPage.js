@@ -39,6 +39,8 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../components/bootstrap/Dropdown';
+import CommonSalePerformance from '../common/CRMDashboard/CommonSalePerformance copy';
+import CommonApprovedAppointmentChart from '../common/SubHeaders/CommonApprovedAppointmentChart';
 
 const DashboardPage = () => {
 	const { darkModeStatus, themeStatus } = useDarkMode();
@@ -296,7 +298,7 @@ const DashboardPage = () => {
 		{ name: '30 Ngày' },
 		{ name: 'Tháng' },
 		{ name: 'Quý' },
-		{ name: 'Năm' }
+		{ name: 'Năm' },
 	];
 	const SEARCH_TAB = {
 		COMP1: search[0].name,
@@ -525,7 +527,8 @@ const DashboardPage = () => {
 			name: 'Thu Nhập Tháng Này',
 			type: 'column',
 			data: [
-				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 25, 30
+				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11,
+				15, 9, 18, 20, 22, 15, 25, 30,
 			],
 		},
 	];
@@ -695,12 +698,7 @@ const DashboardPage = () => {
 			},
 		},
 		xaxis: {
-			categories: [
-				"Quý 1",
-				"Quý 2",
-				"Quý 3",
-				"Quý 4",
-			],
+			categories: ['Quý 1', 'Quý 2', 'Quý 3', 'Quý 4'],
 		},
 		yaxis: [
 			{
@@ -767,16 +765,12 @@ const DashboardPage = () => {
 		{
 			name: 'Thu Nhập Quý Năm Nay',
 			type: 'column',
-			data: [
-				300, 450, 500, 700
-			],
+			data: [300, 450, 500, 700],
 		},
 		{
 			name: 'Thu Nhập Quý Năm Trước',
 			type: 'column',
-			data: [
-				250, 300, 400, 650
-			],
+			data: [250, 300, 400, 650],
 		},
 	];
 	const yearOptions = {
@@ -831,7 +825,6 @@ const DashboardPage = () => {
 					enabled: true,
 				},
 			},
-
 		],
 		tooltip: {
 			theme: 'dark',
@@ -851,9 +844,7 @@ const DashboardPage = () => {
 		{
 			// name: 'Thu Nhập Quý Năm Nay',
 			type: 'column',
-			data: [
-				300, 450, 500, 600, 700, 800
-			],
+			data: [300, 450, 500, 600, 700, 800],
 		},
 	];
 
@@ -1146,9 +1137,7 @@ const DashboardPage = () => {
 												</div>
 											))}
 										</ButtonGroup>
-										{searchTab === "30 Ngày" || searchTab === "Năm" ? (
-											null
-										) : (
+										{searchTab === '30 Ngày' || searchTab === 'Năm' ? null : (
 											<ButtonGroup>
 												<Button
 													color='primary'
@@ -1157,12 +1146,11 @@ const DashboardPage = () => {
 													aria-label='Previous Year'
 													isDisable={year <= 2019}
 													onClick={() => {
-														setYear(year - 1)
-														setSearchTab('')
+														setYear(year - 1);
+														setSearchTab('');
 													}}
 												/>
-												<Button color='primary' isLight
-												>
+												<Button color='primary' isLight>
 													{year}
 												</Button>
 												<Button
@@ -1172,8 +1160,8 @@ const DashboardPage = () => {
 													aria-label='Next Year'
 													isDisable={year >= 2021}
 													onClick={() => {
-														setYear(year + 1)
-														setSearchTab('')
+														setYear(year + 1);
+														setSearchTab('');
 													}}
 												/>
 											</ButtonGroup>
@@ -1374,45 +1362,12 @@ const DashboardPage = () => {
 					)}
 				</div>
 				<div className='row mt-0'>
-					{verifyPermissionHOC(
-						<div className='col-xxl-6'>
-							<Card className='mb-0 mt-4'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê đầu việc cá nhân
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											{subTaskReport === null ? (
-												<div style={{ height: '262px' }}>
-													<Spinner
-														animation='border'
-														variant='primary'
-														style={{
-															marginLeft: '42%',
-															marginTop: '15%',
-															width: '50px',
-															height: '50px',
-														}}
-													/>
-												</div>
-											) : (
-												<TaskChartReport data={subTaskReport} />
-											)}
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['manager', 'admin'],
-					)}
+					<div className='col-xxl-6' style={{ marginTop: '1%' }}>
+						<CommonSalePerformance />
+					</div>
+					<div className='col-xxl-6' style={{ marginTop: '1%' }}>
+						<CommonApprovedAppointmentChart />
+					</div>
 					{verifyPermissionHOC(
 						<div className='col-xxl-12'>
 							<Card className='mb-0'>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
 import SelectComponent from 'react-select';
@@ -20,11 +20,12 @@ import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
+import { fetchUnitList } from '../../../redux/slice/unitSlice';
 
 const customStyles = {
 	control: (provided) => ({
@@ -38,16 +39,19 @@ const customStyles = {
 const TaskActionsPage = () => {
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const params = useParams();
 
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 	const missions = useSelector((state) => state.mission.missions);
+	const units = useSelector((state) => state.unit.units);
 
 	const [task, setTask] = useState({});
 	const [kpiNormOptions, setKpiNormOptions] = useState([]);
 	const [missionOption, setMissionOption] = useState({});
+	const [unitOption, setUnitOption] = useState({});
 	const [departmentOption, setDepartmentOption] = useState({ label: null, value: null });
 	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
 	const [userOption, setUserOption] = useState({ label: '', value: '' });
@@ -58,12 +62,18 @@ const TaskActionsPage = () => {
 			getTaskById(params.id).then((res) => {
 				const response = res.data;
 				setTask(response?.data);
-				// setKeysState(response.data?.keys || []);
 				setMissionOption(
 					{
 						...response.data.mission,
 						label: response.data.mission?.name,
 						value: response.data.mission?.id,
+					} || {},
+				);
+				setUnitOption(
+					{
+						...response.data.unit,
+						label: response.data.unit?.name,
+						value: response.data.unit?.id,
 					} || {},
 				);
 				setKpiNormOptions(
@@ -117,9 +127,12 @@ const TaskActionsPage = () => {
 				deadlineDate: moment().add(1, 'days').format('YYYY-MM-DD'),
 				deadlineTime: '17:00',
 				status: 0,
+				quantity: '',
+				manday: '',
 			});
 			setDepartmentOption({});
 			setUserOption({});
+			setUnitOption({});
 			setDepartmentRelatedOption([]);
 			setUserRelatedOption([]);
 			setMissionOption({});
@@ -143,13 +156,12 @@ const TaskActionsPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(
-			fetchKpiNormListByParams({
-				departmentId: parseInt(departmentOption.value, 10),
-				parentId: 'null',
-			}),
-		);
-	}, [departmentOption.value, dispatch]);
+		dispatch(fetchKpiNormList());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchUnitList());
+	}, [dispatch]);
 
 	// show toast
 	const handleShowToast = (title, content) => {
@@ -204,27 +216,22 @@ const TaskActionsPage = () => {
 			description: '',
 			priority: '',
 			kpiValue: '',
-			startDate: '',
-			startTime: '',
-			deadlineDate: '',
-			deadlineTime: '',
+			startDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			startTime: '08:00',
+			deadlineDate: moment().add(1, 'days').format('YYYY-MM-DD'),
+			deadlineTime: '17:00',
 			status: 0,
+			quantity: '',
+			manday: '',
+			review: '',
 		});
 		setDepartmentOption({});
 		setDepartmentRelatedOption([]);
+		setUnitOption({});
 		setUserOption({});
 		setUserRelatedOption([]);
-		// setKeysState([]);
 		setKpiNormOptions([]);
 		setMissionOption({});
-	};
-
-	const calcTotalKpiValue = (arr = []) => {
-		let result = 0;
-		arr.forEach((item) => {
-			result += parseInt(item.quantity, 10) * parseInt(item.point, 10);
-		});
-		return result || '';
 	};
 
 	const person = window.localStorage.getItem('name');
@@ -246,9 +253,10 @@ const TaskActionsPage = () => {
 			},
 		];
 		const data = { ...task };
-		data.kpiValue = parseInt(task?.kpiValue, 10) || calcTotalKpiValue(kpiNormOptions);
+		data.kpiValue = parseInt(task?.kpiValue, 10);
 		data.priority = parseInt(task?.priority, 10);
-		data.estimateMD = parseInt(task?.estimateMD, 10);
+		data.manday = parseInt(task?.manday, 10);
+		data.quantity = parseInt(task?.quantity, 10);
 		data.mission = missionOption?.value
 			? {
 					id: missionOption?.value,
@@ -261,8 +269,8 @@ const TaskActionsPage = () => {
 			return {
 				name: item.name,
 				id: item.id,
+				manday: parseInt(item.manday, 10),
 				quantity: parseInt(item.quantity, 10),
-				total: parseInt(item.quantity * item.point, 10),
 			};
 		});
 		data.departmentId = departmentOption.id || null;
@@ -291,6 +299,11 @@ const TaskActionsPage = () => {
 				};
 			}),
 		];
+		data.unitId = unitOption.id;
+		data.unit = {
+			id: unitOption.id,
+			name: unitOption.label,
+		};
 		const dataSubmit = { ...data, logs: newLogs, notes: newNotes };
 		if (data.id) {
 			try {
@@ -300,6 +313,7 @@ const TaskActionsPage = () => {
 					`Cập nhật nhiệm vụ!`,
 					`Nhiệm vụ ${result.name} được cập nhật thành công!`,
 				);
+				navigate(-1);
 			} catch (error) {
 				handleShowToast(`Cập nhật nhiệm vụ`, `Cập nhật nhiệm vụ không thành công!`);
 			}
@@ -308,6 +322,7 @@ const TaskActionsPage = () => {
 				const response = await addNewTask(dataSubmit);
 				const result = await response.data;
 				handleClearForm();
+				navigate(-1);
 				handleShowToast(`Thêm nhiệm vụ`, `nhiệm vụ ${result.name} được thêm thành công!`);
 			} catch (error) {
 				handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
@@ -371,21 +386,30 @@ const TaskActionsPage = () => {
 										</FormGroup>
 									</div>
 								</div>
-								{/* Giá trị KPI - Ước tính MD - Độ ưu tiên */}
+								{/* Đơn vị tính, số lượng */}
 								<div className='row g-2'>
 									<div className='col-4'>
-										<FormGroup id='kpiValue' label='Giá trị KPI'>
+										<FormGroup id='' label='Số lượng'>
 											<Input
 												type='number'
-												name='kpiValue'
+												name='quantity'
 												onChange={handleChange}
-												value={
-													task.kpiValue ||
-													calcTotalKpiValue(kpiNormOptions)
-												}
-												ariaLabel='Giá trị KPI'
-												placeholder='Giá trị KPI'
+												value={task?.quantity || ''}
+												ariaLabel='Số lượng'
+												placeholder='Số lượng'
 												className='border border-2 rounded-0 shadow-none'
+											/>
+										</FormGroup>
+									</div>
+									<div className='col-4'>
+										<FormGroup id='unit' label='Đơn vị tính'>
+											<SelectComponent
+												style={customStyles}
+												placeholder='Chọn đơn vị tính'
+												defaultValue={unitOption}
+												value={unitOption}
+												onChange={setUnitOption}
+												options={units}
 											/>
 										</FormGroup>
 									</div>
@@ -393,29 +417,17 @@ const TaskActionsPage = () => {
 										<FormGroup id='Ước tính MD' label='Ước tính MD'>
 											<Input
 												type='number'
-												name='estimateMD'
+												name='manday'
 												onChange={handleChange}
-												value={task.estimateMD || ''}
+												value={task.manday || ''}
 												ariaLabel='Ước tính MD'
 												placeholder='Ước tính MD'
 												className='border border-2 rounded-0 shadow-none'
 											/>
 										</FormGroup>
 									</div>
-									<div className='col-4'>
-										<FormGroup id='review' label='Thưởng/Phạt'>
-											<Input
-												onChange={handleChange}
-												value={task?.review || ''}
-												name='review'
-												ariaLabel='Thưởng/Phạt'
-												placeholder='Thưởng/Phạt'
-												className='border border-2 rounded-0 shadow-none'
-											/>
-										</FormGroup>
-									</div>
 								</div>
-								{/* Người phụ trách - Phòng ban phụ trách - Thưởng/Phạt */}
+								{/* Giá trị KPI - Ước tính MD - Độ ưu tiên */}
 								<div className='row g-2'>
 									<div className='col-4'>
 										<FormGroup id='priority' label='Độ ưu tiên'>
@@ -435,6 +447,34 @@ const TaskActionsPage = () => {
 										</FormGroup>
 									</div>
 									<div className='col-4'>
+										<FormGroup id='kpiValue' label='Giá trị KPI'>
+											<Input
+												type='number'
+												name='kpiValue'
+												onChange={handleChange}
+												value={task?.kpiValue || ''}
+												ariaLabel='Giá trị KPI'
+												placeholder='Giá trị KPI'
+												className='border border-2 rounded-0 shadow-none'
+											/>
+										</FormGroup>
+									</div>
+									<div className='col-4'>
+										<FormGroup id='review' label='Thưởng/Phạt'>
+											<Input
+												onChange={handleChange}
+												value={task?.review || ''}
+												name='review'
+												ariaLabel='Thưởng/Phạt'
+												placeholder='Thưởng/Phạt'
+												className='border border-2 rounded-0 shadow-none'
+											/>
+										</FormGroup>
+									</div>
+								</div>
+								{/* Người phụ trách - Phòng ban phụ trách - Thưởng/Phạt */}
+								<div className='row g-2'>
+									<div className='col-6'>
 										<FormGroup id='userOption' label='Nguời phụ trách'>
 											<SelectComponent
 												style={customStyles}
@@ -446,7 +486,7 @@ const TaskActionsPage = () => {
 											/>
 										</FormGroup>
 									</div>
-									<div className='col-4'>
+									<div className='col-6'>
 										<FormGroup
 											id='departmentOption'
 											label='Phòng ban phụ trách'>
@@ -455,7 +495,10 @@ const TaskActionsPage = () => {
 												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
-												onChange={setDepartmentOption}
+												onChange={(selectedOption) => {
+													setDepartmentOption(selectedOption);
+													setKpiNormOptions([]);
+												}}
 												options={departments}
 											/>
 										</FormGroup>
@@ -604,7 +647,7 @@ const TaskActionsPage = () => {
 													// eslint-disable-next-line react/no-array-index-key
 													key={index}
 													className='row mt-4 d-flex align-items-center justify-content-between'>
-													<div className='col-5'>
+													<div className='col-11'>
 														<div className='w-100'>
 															<FormGroup
 																className='mr-2'
@@ -626,57 +669,6 @@ const TaskActionsPage = () => {
 																/>
 															</FormGroup>
 														</div>
-													</div>
-													<div className='col-3'>
-														<FormGroup
-															className='ml-2'
-															id='quantity'
-															label='Số lượng'>
-															<Input
-																onChange={(e) =>
-																	handleChangeKpiNormOption(
-																		index,
-																		e,
-																	)
-																}
-																disabled={!item.value}
-																type='number'
-																value={item?.quantity || ''}
-																name='quantity'
-																size='lg'
-																ariaLabel='Số lượng'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='Số lượng'
-															/>
-														</FormGroup>
-													</div>
-													<div className='col-3'>
-														<FormGroup
-															className='ml-2'
-															id='total'
-															label='Quy đổi (điểm)'>
-															<Input
-																onChange={(e) =>
-																	handleChangeKpiNormOption(
-																		index,
-																		e,
-																	)
-																}
-																type='number'
-																value={
-																	parseInt(
-																		item.quantity * item.point,
-																		10,
-																	) || item.total
-																}
-																name='total'
-																size='lg'
-																readOnly
-																ariaLabel='Quy đổi'
-																className='border border-2 rounded-0 shadow-none'
-																placeholder='Quy đổi (điểm)'
-															/>
-														</FormGroup>
 													</div>
 													<div className='col-1'>
 														<div className='w-100'>

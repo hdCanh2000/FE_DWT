@@ -48,6 +48,10 @@ const DepartmentPage = () => {
 			value: 1,
 		},
 		{
+			label: 'Công ty',
+			value: 4,
+		},
+		{
 			label: 'Phòng ban',
 			value: 2,
 		},
@@ -137,7 +141,6 @@ const DepartmentPage = () => {
 			},
 		);
 	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			organizationLevel: data?.organizationLevel?.value,
@@ -149,7 +152,6 @@ const DepartmentPage = () => {
 			address: data.address,
 			status: Number(data.status),
 		};
-
 		try {
 			const response = await addDepartment(dataSubmit);
 			const result = await response.data;
@@ -231,7 +233,7 @@ const DepartmentPage = () => {
 										</CardActions>
 									</CardHeader>
 									<div className='row h-100 w-100'>
-										<div className='col-lg-3 col-md-6'>
+										<div className='col-lg-4 col-md-6'>
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />
@@ -239,7 +241,6 @@ const DepartmentPage = () => {
 												</CardBody>
 											</Card>
 										</div>
-
 										{itemEdits.name !== undefined && (
 											<DepartmentDetailPage
 												initValues={itemEdits}
@@ -269,5 +270,4 @@ const DepartmentPage = () => {
 		</PageWrapper>
 	);
 };
-
 export default DepartmentPage;

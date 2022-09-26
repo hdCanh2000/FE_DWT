@@ -4,11 +4,10 @@ import PropTypes from 'prop-types';
 import PaginationButtons, {
 	dataPagination,
 	PER_COUNT,
-}  from '../../../components/PaginationButtons';
+} from '../../../components/PaginationButtons';
 import Search from './Search';
 
-
-const TableCommon = ({data, columns, className, ...props }) => {
+const TableCommon = ({ data, columns, className, ...props }) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [perPage, setPerPage] = useState(PER_COUNT['10']);
 	const items = dataPagination(data, currentPage, perPage);
@@ -29,10 +28,10 @@ const TableCommon = ({data, columns, className, ...props }) => {
 										className={classNames(
 											column.className,
 											`text-${
-											// eslint-disable-next-line no-nested-ternary
-											column.align === 'right'
-												? 'right'
-												: column.align === 'center'
+												// eslint-disable-next-line no-nested-ternary
+												column.align === 'right'
+													? 'right'
+													: column.align === 'center'
 													? 'center'
 													: 'left'
 											}`,
@@ -42,8 +41,8 @@ const TableCommon = ({data, columns, className, ...props }) => {
 											column.align === 'right'
 												? 'right'
 												: column.align === 'center'
-													? 'center'
-													: 'left'
+												? 'center'
+												: 'left'
 										}>
 										{column.title}
 									</th>
@@ -59,10 +58,10 @@ const TableCommon = ({data, columns, className, ...props }) => {
 									className={classNames(
 										column.className,
 										`text-${
-										// eslint-disable-next-line no-nested-ternary
-										column.align === 'right'
-											? 'right'
-											: column.align === 'center'
+											// eslint-disable-next-line no-nested-ternary
+											column.align === 'right'
+												? 'right'
+												: column.align === 'center'
 												? 'center'
 												: 'left'
 										}`,
@@ -72,8 +71,8 @@ const TableCommon = ({data, columns, className, ...props }) => {
 										column.align === 'right'
 											? 'right'
 											: column.align === 'center'
-												? 'center'
-												: 'left'
+											? 'center'
+											: 'left'
 									}>
 									{column.title}
 								</th>
@@ -97,17 +96,17 @@ const TableCommon = ({data, columns, className, ...props }) => {
 														column.align === 'right'
 															? 'right'
 															: column.align === 'center'
-																? 'center'
-																: 'left'
+															? 'center'
+															: 'left'
 													}
 													className={`text-${
 														// eslint-disable-next-line no-nested-ternary
 														column.align === 'right'
 															? 'right'
 															: column.align === 'center'
-																? 'center'
-																: 'left'
-														}`}
+															? 'center'
+															: 'left'
+													}`}
 													style={{ fontSize: 14 }}>
 													{column.render(row, value)}
 												</td>
@@ -126,17 +125,17 @@ const TableCommon = ({data, columns, className, ...props }) => {
 													column.align === 'right'
 														? 'right'
 														: column.align === 'center'
-															? 'center'
-															: 'left'
+														? 'center'
+														: 'left'
 												}
 												className={`text-${
 													// eslint-disable-next-line no-nested-ternary
 													column.align === 'right'
 														? 'right'
 														: column.align === 'center'
-															? 'center'
-															: 'left'
-													}`}
+														? 'center'
+														: 'left'
+												}`}
 												style={{ fontSize: 14 }}>
 												{column.render(row, value)}
 											</td>
@@ -144,15 +143,18 @@ const TableCommon = ({data, columns, className, ...props }) => {
 									}
 									return (
 										<td
-											style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
+											style={{
+												fontSize: 14,
+												minWidth: `${column.minWidth}px`,
+											}}
 											key={column.key}
 											className={classNames(
 												column.className,
 												`text-${
-												// eslint-disable-next-line no-nested-ternary
-												column.align === 'right'
-													? 'right'
-													: column.align === 'center'
+													// eslint-disable-next-line no-nested-ternary
+													column.align === 'right'
+														? 'right'
+														: column.align === 'center'
 														? 'center'
 														: 'left'
 												}`,
@@ -162,8 +164,8 @@ const TableCommon = ({data, columns, className, ...props }) => {
 												column.align === 'right'
 													? 'right'
 													: column.align === 'center'
-														? 'center'
-														: 'left'
+													? 'center'
+													: 'left'
 											}>
 											{column.format ? column.format(value) : value}
 										</td>

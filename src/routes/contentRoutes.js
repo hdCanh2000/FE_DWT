@@ -12,6 +12,9 @@ const MISSION = {
 const TASKBYUSER = {
 	TASKBYUSER: lazy(() => import('../pages/taskByUser/TaskByUser')),
 };
+const DAILYWORKTRACKING = {
+	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/dailyWorkTracking')),
+};
 const TASK = {
 	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
 	TASKMANAGEMENT: lazy(() =>
@@ -97,6 +100,11 @@ const presentation = [
 		element: <TASKBYUSER.TASKBYUSER />,
 		exact: true,
 	},
+	{
+		path: demoPages.jobsPage.subMenu.dailyWorkTracking.path,
+		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
+		exact: true,
+	},
 	// trang chi tiết công việc (nhiệm vụ)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/:id`,
@@ -112,7 +120,7 @@ const presentation = [
 	// trang cập nhật công việc (nhiệm vụ)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/:id`,
-		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+		element: <TASK.ADD_OR_UPDATE_TASK />,
 		exact: true,
 	},
 	// trang thêm mới đầu việc (nhiệm vụ con) với nhiệm vụ

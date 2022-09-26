@@ -196,13 +196,13 @@ const MissionDetailPage = () => {
 			),
 			align: 'center',
 		},
-		{
-			title: 'Giá trị KPI',
-			id: 'kpiValue',
-			key: 'kpiValue',
-			type: 'number',
-			align: 'center',
-		},
+		// {
+		// 	title: 'Giá trị KPI',
+		// 	id: 'kpiValue',
+		// 	key: 'kpiValue',
+		// 	type: 'number',
+		// 	align: 'center',
+		// },
 		// {
 		// 	title: 'KPI thực tế',
 		// 	id: 'currentKpi',
@@ -217,23 +217,21 @@ const MissionDetailPage = () => {
 			key: 'priority',
 			type: 'text',
 			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<span
-						style={{
-							paddingRight: '1rem',
-							paddingLeft: '1rem',
-						}}
-						className={classNames(
-							'badge',
-							'border border-2',
-							[`border-${themeStatus}`],
-							'bg-success',
-							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`,
-						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
-					</span>
-				</div>
+				<span
+					style={{
+						paddingRight: '1rem',
+						paddingLeft: '1rem',
+					}}
+					className={classNames(
+						'badge',
+						'border border-2',
+						[`border-${themeStatus}`],
+						'bg-success',
+						'pt-2 pb-2 me-2',
+						`bg-${formatColorPriority(item.priority)}`,
+					)}>
+					<span className=''>{`Cấp ${item.priority}`}</span>
+				</span>
 			),
 			align: 'center',
 		},
@@ -242,6 +240,7 @@ const MissionDetailPage = () => {
 			id: 'status',
 			key: 'status',
 			type: 'number',
+			align: 'center',
 			render: (item) => (
 				<Dropdown>
 					<DropdownToggle hasIcon={false}>
@@ -274,6 +273,7 @@ const MissionDetailPage = () => {
 			title: '',
 			id: 'action',
 			key: 'action',
+			align: 'center',
 			render: (item) => (
 				<>
 					<Button
@@ -675,12 +675,12 @@ const MissionDetailPage = () => {
 												</div>
 												<div className='row d-flex align-items-end pb-3'>
 													<div className='col col-sm-5 text-start'>
-														<div className='fw-bold fs-4 mb-10'>
+														{/* <div className='fw-bold fs-4 mb-10'>
 															{mission?.data?.kpiValue}
 														</div>
 														<div className='text-muted'>
 															KPI được giao
-														</div>
+														</div> */}
 														<div className='fw-bold fs-4 mb-10 mt-4'>
 															{mission?.report?.currentKPI}
 														</div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
@@ -40,6 +40,7 @@ const TaskDetailActionPage = () => {
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const params = useParams();
+	const navigate = useNavigate();
 
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
@@ -323,6 +324,7 @@ const TaskDetailActionPage = () => {
 					`Cập nhật đầu việc!`,
 					`Đầu việc ${result.name} được cập nhật thành công!`,
 				);
+				navigate(-1);
 			} catch (error) {
 				handleShowToast(`Cập nhật đầu việc`, `Cập nhật đầu việc không thành công!`);
 			}
@@ -331,6 +333,7 @@ const TaskDetailActionPage = () => {
 				const response = await addNewSubtask(dataSubmit);
 				const result = await response.data;
 				handleClearForm();
+				navigate(-1);
 				handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
 			} catch (error) {
 				handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);
