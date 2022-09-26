@@ -24,28 +24,24 @@ const dailyWorkTracking = () => {
 									<table
 										className='table table-modern mb-0'
 										style={{ fontSize: 14 }}>
-										<thead>
+										<thead color='#F5F5F5'>
 											<tr>
 												<th>Tên định mức KPI</th>
-												<th className='text-center'>Phòng ban</th>
-												<th className='text-center'>Đơn vị tính</th>
-												<th className='text-center'>
-													Điểm KPI trên 1 đơn vị
-												</th>
-												<th className='text-center'>Hành động</th>
+												<th>Phòng ban</th>
+												<th>Đơn vị tính</th>
+												<th>Điểm KPI trên 1 đơn vị</th>
+												<th>Hành động</th>
 											</tr>
 										</thead>
-										{/* <tbody>
-											</tbody> */}
 									</table>
 								</div>
 							</div>
 							<div className='row p-4'>
-								<div className='col-6'>
+								<div className='col-7'>
 									<TableWorkTrack />
 								</div>
-								<div className='col-6'>
-                                <TableWorkTrack />
+								<div className='col-5'>
+									abc
 								</div>
 							</div>
 						</Card>

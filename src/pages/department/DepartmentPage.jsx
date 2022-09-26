@@ -48,6 +48,10 @@ const DepartmentPage = () => {
 			value: 1,
 		},
 		{
+			label: 'Công ty',
+			value: 4,
+		},
+		{
 			label: 'Phòng ban',
 			value: 2,
 		},
