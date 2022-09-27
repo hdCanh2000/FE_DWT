@@ -20,7 +20,7 @@ import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
@@ -156,8 +156,12 @@ const TaskActionsPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
+		dispatch(
+			fetchKpiNormListByParams({
+				departmentId: departmentOption?.value,
+			}),
+		);
+	}, [dispatch, departmentOption?.value]);
 
 	useEffect(() => {
 		dispatch(fetchUnitList());
@@ -334,7 +338,7 @@ const TaskActionsPage = () => {
 			<SubHeaderCommon />
 			<Page container='fluid'>
 				<div className='row mx-4 px-4 my-4'>
-					<Card className='p-4 w-75 m-auto'>
+					<Card className='p-4 w-100 m-auto'>
 						<CardHeader className='py-2'>
 							<CardLabel>
 								<CardTitle className='fs-4 ml-0'>Thêm nhiệm vụ</CardTitle>
@@ -568,10 +572,7 @@ const TaskActionsPage = () => {
 												name='startDate'
 												placeholder='Ngày bắt đầu'
 												onChange={handleChange}
-												value={
-													task.startDate ||
-													moment().add(0, 'days').format('YYYY-MM-DD')
-												}
+												value={task.startDate}
 												type='date'
 												ariaLabel='Ngày bắt đầu'
 												className='border border-2 rounded-0 shadow-none'

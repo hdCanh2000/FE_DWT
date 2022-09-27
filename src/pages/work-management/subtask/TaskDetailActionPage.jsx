@@ -20,7 +20,7 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormListByParams, fetchKpiSubNormList } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
@@ -149,18 +149,13 @@ const TaskDetailActionPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (!isEmpty(task)) {
-			dispatch(fetchKpiSubNormList({ kpiNormIds: task.kpiNormIds }));
-			setTaskOption(task);
-		} else {
-			dispatch(
-				fetchKpiNormListByParams({
-					departmentId: parseInt(departmentOption.value, 10),
-					parentId: 'null',
-				}),
-			);
-		}
-	}, [departmentOption.value, dispatch, task]);
+		dispatch(
+			fetchKpiNormListByParams({
+				departmentId: parseInt(departmentOption.value, 10),
+				parentId: 'null',
+			}),
+		);
+	}, [departmentOption.value, dispatch]);
 
 	// show toast
 	const handleShowToast = (title, content) => {
