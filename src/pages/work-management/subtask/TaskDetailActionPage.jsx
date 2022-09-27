@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { isEmpty } from 'lodash';
 import { useToasts } from 'react-toast-notifications';
@@ -20,7 +20,7 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormListByParams, fetchKpiSubNormList } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
@@ -40,6 +40,7 @@ const TaskDetailActionPage = () => {
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const params = useParams();
+	const navigate = useNavigate();
 
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
@@ -148,18 +149,13 @@ const TaskDetailActionPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (!isEmpty(task)) {
-			dispatch(fetchKpiSubNormList({ kpiNormIds: task.kpiNormIds }));
-			setTaskOption(task);
-		} else {
-			dispatch(
-				fetchKpiNormListByParams({
-					departmentId: parseInt(departmentOption.value, 10),
-					parentId: 'null',
-				}),
-			);
-		}
-	}, [departmentOption.value, dispatch, task]);
+		dispatch(
+			fetchKpiNormListByParams({
+				departmentId: parseInt(departmentOption.value, 10),
+				parentId: 'null',
+			}),
+		);
+	}, [departmentOption.value, dispatch]);
 
 	// show toast
 	const handleShowToast = (title, content) => {
@@ -323,6 +319,7 @@ const TaskDetailActionPage = () => {
 					`Cập nhật đầu việc!`,
 					`Đầu việc ${result.name} được cập nhật thành công!`,
 				);
+				navigate(-1);
 			} catch (error) {
 				handleShowToast(`Cập nhật đầu việc`, `Cập nhật đầu việc không thành công!`);
 			}
@@ -331,6 +328,7 @@ const TaskDetailActionPage = () => {
 				const response = await addNewSubtask(dataSubmit);
 				const result = await response.data;
 				handleClearForm();
+				navigate(-1);
 				handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
 			} catch (error) {
 				handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
 import SelectComponent from 'react-select';
@@ -20,7 +20,7 @@ import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
@@ -39,6 +39,7 @@ const customStyles = {
 const TaskActionsPage = () => {
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const params = useParams();
 
 	const departments = useSelector((state) => state.department.departments);
@@ -155,8 +156,12 @@ const TaskActionsPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
+		dispatch(
+			fetchKpiNormListByParams({
+				departmentId: departmentOption?.value,
+			}),
+		);
+	}, [dispatch, departmentOption?.value]);
 
 	useEffect(() => {
 		dispatch(fetchUnitList());
@@ -215,10 +220,10 @@ const TaskActionsPage = () => {
 			description: '',
 			priority: '',
 			kpiValue: '',
-			startDate: '',
-			startTime: '',
-			deadlineDate: '',
-			deadlineTime: '',
+			startDate: moment().add(0, 'days').format('YYYY-MM-DD'),
+			startTime: '08:00',
+			deadlineDate: moment().add(1, 'days').format('YYYY-MM-DD'),
+			deadlineTime: '17:00',
 			status: 0,
 			quantity: '',
 			manday: '',
@@ -312,6 +317,7 @@ const TaskActionsPage = () => {
 					`Cập nhật nhiệm vụ!`,
 					`Nhiệm vụ ${result.name} được cập nhật thành công!`,
 				);
+				navigate(-1);
 			} catch (error) {
 				handleShowToast(`Cập nhật nhiệm vụ`, `Cập nhật nhiệm vụ không thành công!`);
 			}
@@ -320,6 +326,7 @@ const TaskActionsPage = () => {
 				const response = await addNewTask(dataSubmit);
 				const result = await response.data;
 				handleClearForm();
+				navigate(-1);
 				handleShowToast(`Thêm nhiệm vụ`, `nhiệm vụ ${result.name} được thêm thành công!`);
 			} catch (error) {
 				handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
@@ -331,7 +338,7 @@ const TaskActionsPage = () => {
 			<SubHeaderCommon />
 			<Page container='fluid'>
 				<div className='row mx-4 px-4 my-4'>
-					<Card className='p-4 w-75 m-auto'>
+					<Card className='p-4 w-100 m-auto'>
 						<CardHeader className='py-2'>
 							<CardLabel>
 								<CardTitle className='fs-4 ml-0'>Thêm nhiệm vụ</CardTitle>
@@ -565,10 +572,7 @@ const TaskActionsPage = () => {
 												name='startDate'
 												placeholder='Ngày bắt đầu'
 												onChange={handleChange}
-												value={
-													task.startDate ||
-													moment().add(0, 'days').format('YYYY-MM-DD')
-												}
+												value={task.startDate}
 												type='date'
 												ariaLabel='Ngày bắt đầu'
 												className='border border-2 rounded-0 shadow-none'

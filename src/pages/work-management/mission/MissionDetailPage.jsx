@@ -20,31 +20,17 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Alert from '../../../components/bootstrap/Alert';
 import Toasts from '../../../components/bootstrap/Toasts';
-import Icon from '../../../components/icon/Icon';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { demoPages } from '../../../menu';
-import {
-	addNewTask,
-	deleteMissionById,
-	deleteTaskById,
-	updateMissionById,
-	updateTaskByID,
-} from './services';
+import { addNewTask, updateMissionById, updateTaskByID } from './services';
 import Button from '../../../components/bootstrap/Button';
 import MissionAlertConfirm from './MissionAlertConfirm';
 import TaskAlertConfirm from './TaskAlertConfirm';
 import TaskFormModal from './TaskFormModal';
-import Dropdown, {
-	DropdownItem,
-	DropdownMenu,
-	DropdownToggle,
-} from '../../../components/bootstrap/Dropdown';
 import {
 	FORMAT_TASK_STATUS,
 	formatColorStatus,
 	formatColorPriority,
-	STATUS,
-	renderStatusTask,
 } from '../../../utils/constants';
 import Progress from '../../../components/bootstrap/Progress';
 import Chart from '../../../components/extras/Chart';
@@ -131,7 +117,7 @@ const MissionDetailPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	// const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	// const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [editModalMissionStatus, setEditModalMissionStatus] = useState(false);
@@ -197,83 +183,68 @@ const MissionDetailPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Giá trị KPI',
-			id: 'kpiValue',
-			key: 'kpiValue',
-			type: 'number',
-			align: 'center',
-		},
-		// {
-		// 	title: 'KPI thực tế',
-		// 	id: 'currentKpi',
-		// 	key: 'currentKpi',
-		// 	type: 'number',
-		// 	render: (item) => <span>{item?.currentKPI}</span>,
-		// 	align: 'center',
-		// },
-		{
 			title: 'Độ ưu tiên',
 			id: 'priority',
 			key: 'priority',
 			type: 'text',
 			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<span
-						style={{
-							paddingRight: '1rem',
-							paddingLeft: '1rem',
-						}}
-						className={classNames(
-							'badge',
-							'border border-2',
-							[`border-${themeStatus}`],
-							'bg-success',
-							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`,
-						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
-					</span>
-				</div>
+				<span
+					style={{
+						paddingRight: '1rem',
+						paddingLeft: '1rem',
+					}}
+					className={classNames(
+						'badge',
+						'border border-2',
+						[`border-${themeStatus}`],
+						'bg-success',
+						'pt-2 pb-2 me-2',
+						`bg-${formatColorPriority(item.priority)}`,
+					)}>
+					<span className=''>{`Cấp ${item.priority}`}</span>
+				</span>
 			),
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
-			render: (item) => (
-				<Dropdown>
-					<DropdownToggle hasIcon={false}>
-						<Button
-							isLink
-							color={formatColorStatus(item.status)}
-							icon='Circle'
-							className='text-nowrap'>
-							{FORMAT_TASK_STATUS(item.status)}
-						</Button>
-					</DropdownToggle>
-					<DropdownMenu>
-						{Object.keys(renderStatusTask(item.status)).map((key) => (
-							<DropdownItem
-								key={uuidv4()}
-								onClick={() =>
-									handleOpenConfirmStatusTask(item, STATUS[key].value)
-								}>
-								<div>
-									<Icon icon='Circle' color={STATUS[key].color} />
-									{STATUS[key].name}
-								</div>
-							</DropdownItem>
-						))}
-					</DropdownMenu>
-				</Dropdown>
-			),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'number',
+		// 	align: 'center',
+		// 	render: (item) => (
+		// 		<Dropdown>
+		// 			<DropdownToggle hasIcon={false}>
+		// 				<Button
+		// 					isLink
+		// 					color={formatColorStatus(item.status)}
+		// 					icon='Circle'
+		// 					className='text-nowrap'>
+		// 					{FORMAT_TASK_STATUS(item.status)}
+		// 				</Button>
+		// 			</DropdownToggle>
+		// 			<DropdownMenu>
+		// 				{Object.keys(renderStatusTask(item.status)).map((key) => (
+		// 					<DropdownItem
+		// 						key={uuidv4()}
+		// 						onClick={() =>
+		// 							handleOpenConfirmStatusTask(item, STATUS[key].value)
+		// 						}>
+		// 						<div>
+		// 							<Icon icon='Circle' color={STATUS[key].color} />
+		// 							{STATUS[key].name}
+		// 						</div>
+		// 					</DropdownItem>
+		// 				))}
+		// 			</DropdownMenu>
+		// 		</Dropdown>
+		// 	),
+		// },
 		{
 			title: '',
 			id: 'action',
 			key: 'action',
+			align: 'center',
 			render: (item) => (
 				<>
 					<Button
@@ -285,13 +256,12 @@ const MissionDetailPage = () => {
 						onClick={() => handleOnClickToEditPage(item.id)}
 					/>
 					<Button
-						isDisable={item.status === 7}
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='EditOff'
-						onClick={() => handleOpenConfirmStatusTask(item, 7)}
+						icon='Close'
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
@@ -479,20 +449,26 @@ const MissionDetailPage = () => {
 		);
 	};
 
-	const handleDeleteItem = async (taskId) => {
+	const handleDeleteItem = async (data) => {
 		try {
-			await deleteTaskById(taskId);
-			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ thành công!`);
+			const res = await updateTaskByID({ ...data, status: -1 });
+			const result = await res.data;
+			handleCloseForm();
+			dispatch(fetchMissionById(id));
+			dispatch(fetchTaskListByMissionId(id));
+			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ ${result.name} thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá nhiệm vụ`, `Xoá nhiệm vụ không thành công!`);
 		}
 	};
 
-	const handleDeleteMission = async (missionId) => {
+	const handleDeleteMission = async (data) => {
 		try {
-			await deleteMissionById(missionId);
+			const newData = { ...data };
+			newData.status = -1;
+			const response = await updateMissionById(newData);
 			navigate('/muc-tieu');
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${response?.data?.name} thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
 		}
@@ -1023,7 +999,7 @@ const MissionDetailPage = () => {
 				<TaskAlertConfirm
 					openModal={toggleFormDelete}
 					onCloseModal={handleCloseForm}
-					onConfirm={() => handleDeleteItem(itemEdit?.id)}
+					onConfirm={() => handleDeleteItem(itemEdit)}
 					title='Xoá nhiệm vụ'
 					content={`Xác nhận xoá nhiệm vụ <strong>${itemEdit?.name}</strong> ?`}
 				/>
@@ -1036,7 +1012,7 @@ const MissionDetailPage = () => {
 				<MissionAlertConfirm
 					openModal={openConfirmMissionModal}
 					onCloseModal={handleCloseConfirmMissionModal}
-					onConfirm={() => handleDeleteMission(missionEdit?.id)}
+					onConfirm={() => handleDeleteMission(missionEdit)}
 					title='Xoá mục tiêu'
 					content={`Xác nhận xoá mục tiêu <strong>${missionEdit?.name}</strong> ?`}
 				/>
