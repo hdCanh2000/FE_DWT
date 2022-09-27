@@ -254,7 +254,7 @@ const EmployeePage = () => {
 				handleCloseForm();
 				handleShowToast(
 					`Thêm nhân viên`,
-					`Nhân viên ${result?.user?.name} được thêm thành công!`,
+					`Nhân viên ${result?.name} được thêm thành công!`,
 				);
 			} catch (error) {
 				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
