@@ -89,7 +89,9 @@ const DepartmentDetailPage = ({ organizationLevelOptions, departmentList, initVa
 						<CardHeader>
 							<CardLabel icon='Edit' iconColor='warning'>
 								<CardTitle>
-									{isEdit ? 'Thông tin chi tiết cơ cấu tổ chức' : 'Chỉnh sửa cấu tổ chức'}
+									{isEdit
+										? 'Thông tin chi tiết cơ cấu tổ chức'
+										: 'Chỉnh sửa cấu tổ chức'}
 								</CardTitle>
 							</CardLabel>
 						</CardHeader>

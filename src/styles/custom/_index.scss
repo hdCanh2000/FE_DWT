@@ -12,9 +12,9 @@
 .sticky-top-size {
 	top: map.get($header, height) + map.get($subheader, height) + map.get($page, padding-y);
 }
-.treeview > div { 
-	border-left: 1px dashed black !important; 
-  } 
+.treeview > div {
+	border-left: 1px dashed black !important;
+}
 
 .card,
 .modal-content,
@@ -73,6 +73,12 @@
 	padding-bottom: 7px;
 }
 
-.form-control:disabled, .form-control[readonly] {
+.form-control:disabled,
+.form-control[readonly] {
 	background: hsl(0, 0%, 95%) !important;
+}
+
+[contenteditable] {
+	outline: 0px solid transparent;
+	border: 1px solid #c8c7c7 !important;
 }

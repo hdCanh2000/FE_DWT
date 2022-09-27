@@ -20,7 +20,17 @@ const ErrorText = styled.span`
 	margin-top: 5px;
 `;
 
-const PositionDetail = ({ className, show, onClose, item, label, fields, options, nv, ...props }) => {
+const PositionDetail = ({
+	className,
+	show,
+	onClose,
+	item,
+	label,
+	fields,
+	options,
+	nv,
+	...props
+}) => {
 	const formik = useFormik({
 		initialValues: { ...item },
 		enableReinitialize: true,
@@ -66,7 +76,6 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 	// 		setKpiNormId((prev) => [...prev, initState]);
 	// 	}
 	// };
-
 
 	return (
 		<Modal
@@ -199,10 +208,9 @@ const PositionDetail = ({ className, show, onClose, item, label, fields, options
 									{nv && (
 										<>
 											<hr />
-											<FormGroup 
-											style={{fontWeight: 500, 
-													color: '#6c757d',}}>
-													Danh sách nhiệm vụ
+											<FormGroup
+												style={{ fontWeight: 500, color: '#6c757d' }}>
+												Danh sách nhiệm vụ
 											</FormGroup>
 											{kpiNormId?.map((element, index) => {
 												return (

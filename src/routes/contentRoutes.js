@@ -13,7 +13,7 @@ const TASKBYUSER = {
 	TASKBYUSER: lazy(() => import('../pages/taskByUser/TaskByUser')),
 };
 const DAILYWORKTRACKING = {
-	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/dailyWorkTracking')),
+	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTracking')),
 };
 const TASK = {
 	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
