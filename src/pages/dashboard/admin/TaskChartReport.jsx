@@ -1,6 +1,9 @@
 import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import Chart from '../../../components/extras/Chart';
+import styles from './circle.module.css';
+
+const calcTotal = data => data ?  Object.values(data).reduce((accumulator, item) => accumulator + item) : 0 
 
 const TaskChartReport = ({ data }) => {
 	const chartOptions = {
@@ -50,23 +53,35 @@ const TaskChartReport = ({ data }) => {
 			position: 'bottom',
 		},
 	};
-
 	const [state] = useState({
 		series: Object.values(data === null ? {} : data),
 		options: chartOptions,
 	});
-
 	return (
 		<div>
 			<div className='row align-items-start py-4'>
-				<div className='col-xl-8 col-md-12'>
-					<Chart
-						series={state.series}
-						options={state.options}
-						type={state.options.chart.type}
-						height={state.options.chart.height}
-					/>
-				</div>
+				{calcTotal(data) !== 0 ? (
+					<div className='col-xl-8 col-md-12'>
+						<Chart
+							series={state.series}
+							options={state.options}
+							type={state.options.chart.type}
+							height={state.options.chart.height}
+						/>
+					</div>
+				) : (
+					<div className='col-xl-8 col-md-12'>
+						<center>
+							<div
+								className={styles.circle}
+							/>
+							<br />
+							<h5>
+								Hiện chưa có việc được giao
+							</h5>
+						</center>
+					</div>
+				)}
 				<div className='col-xl-4 col-md-12'>
 					<div className='row'>
 						<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
