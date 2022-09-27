@@ -1405,7 +1405,7 @@ const DashboardPage = () => {
 								</Card>
 							</div>
 						</div>
-						<div className='row mt-4'>
+						<div className='row mt-0'>
 							<div className='col-xxl-12 col-xl-12 h-100'>
 								<Card className='h-100'>
 									<CardHeader>
