@@ -350,6 +350,105 @@ const DashboardPage = () => {
 		arr.sort();
 		return arr;
 	}
+	const guestChart = {
+		series: [
+			{
+				name: 'Nữ',
+				data: [
+					-0.8, -1.05, -1.06, -1.18, -1.4, -2.2, -2.85, -3.7, -3.96, -4.22, -4.3, -4.4,
+					-4.1, -4, -4.1, -3.4, -3.1, -2.8,
+				],
+			},
+			{
+				name: 'Nam',
+				data: [
+					0.4, 0.65, 0.76, 0.88, 1.5, 2.1, 2.9, 3.8, 3.9, 4.2, 4, 4.3, 4.1, 4.2, 4.5, 3.9,
+					3.5, 3,
+				],
+			},
+		],
+		options: {
+			chart: {
+				type: 'bar',
+				height: 370,
+				stacked: true,
+			},
+			colors: [process.env.REACT_APP_DANGER_COLOR, process.env.REACT_APP_INFO_COLOR],
+			plotOptions: {
+				bar: {
+					horizontal: true,
+					barHeight: '80%',
+				},
+			},
+			dataLabels: {
+				enabled: false,
+			},
+			stroke: {
+				width: 1,
+				colors: ['#fff'],
+			},
+			grid: {
+				xaxis: {
+					lines: {
+						show: false,
+					},
+				},
+			},
+			yaxis: {
+				min: -5,
+				max: 5,
+				title: {
+					text: 'Age',
+				},
+			},
+			tooltip: {
+				shared: false,
+				x: {
+					formatter(val) {
+						return val;
+					},
+				},
+				y: {
+					formatter(val) {
+						return `${Math.abs(val)}%`;
+					},
+				},
+			},
+			title: {
+				text: 'Báo cáo người dùng sản phẩm năm 2022',
+			},
+			xaxis: {
+				categories: [
+					'85+',
+					'80-84',
+					'75-79',
+					'70-74',
+					'65-69',
+					'60-64',
+					'55-59',
+					'50-54',
+					'45-49',
+					'40-44',
+					'35-39',
+					'30-34',
+					'25-29',
+					'20-24',
+					'15-19',
+					'10-14',
+					'5-9',
+					'0-4',
+				],
+				title: {
+					text: 'Percent',
+				},
+				labels: {
+					formatter(val) {
+						return `${Math.abs(Math.round(val))}%`;
+					},
+				},
+			},
+		},
+	}
 	const salesByStoreOptions = {
 		chart: {
 			height: 370,
@@ -1132,8 +1231,8 @@ const DashboardPage = () => {
 												</DropdownItem>
 											</DropdownMenu>
 										</Dropdown>
-										<ButtonGroup 
-										style={{marginLeft: '-12px'}}
+										<ButtonGroup
+											style={{ marginLeft: '-12px' }}
 										>
 											{search.map((element) => (
 												<div key={element.name}>
@@ -1219,8 +1318,26 @@ const DashboardPage = () => {
 						</div>,
 						['admin'],
 					)}
+					<div className='col-xxl-6'>
+						{verifyPermissionHOC(
+							<Card stretch>
+								<CardHeader>
+									<CardLabel icon='StackedBarChart'>
+										<CardTitle>
+											Thống kê người dùng
+										</CardTitle>
+										<CardSubTitle>Báo cáo</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody>
+									<Chart series={guestChart.series} options={guestChart.options} type='bar' height={370} />
+								</CardBody>
+							</Card>,
+							['admin'],
+						)}
+					</div>,
 				</div>
-				<div className='row mt-4'>
+				<div className='row' style={{marginTop: '-20px'}}>
 					{verifyPermissionHOC(
 						<div className='col-xxl-6'>
 							<Card className='mb-0'>
