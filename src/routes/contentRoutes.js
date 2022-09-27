@@ -213,13 +213,13 @@ const presentation = [
 	},
 	// trang quản lí cấp nhân sư
 	{
-		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
+		path: demoPages.cauHinh.subMenu.positionLevelConfig.path,
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
 		exact: true,
 	},
 	// yêu cầu năng luc tuyển dụng
 	{
-		path: demoPages.hrRecords.subMenu.recruitmentRequirements.path,
+		path: demoPages.cauHinh.subMenu.recruitmentRequirements.path,
 		element: <MANAGEMENT.RECRUITMENT_REQUIREMENT />,
 	},
 	{

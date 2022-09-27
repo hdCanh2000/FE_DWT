@@ -126,16 +126,7 @@ export const demoPages = {
 				text: 'Vị trí công việc',
 				path: '/vi-tri-cong-viec',
 			},
-			positionLevelConfig: {
-				id: 'positionLevelConfig',
-				text: 'Cấu hình cấp nhân sự',
-				path: '/cauhinh-cap-nhan-su',
-			},
-			recruitmentRequirements: {
-				id: 'recruitmentRequirements',
-				text: 'Yêu cầu tuyển dụng',
-				path: '/yeu-cau-tuyen-dung',
-			},
+			
 		},
 	},
 	reportPage: {
@@ -188,6 +179,16 @@ export const demoPages = {
 				text: 'Định mức lao động & KPI',
 				path: '/dinh-muc-lao-dong-kpi',
 			},
+			positionLevelConfig: {
+				id: 'positionLevelConfig',
+				text: 'Cấu hình cấp nhân sự',
+				path: '/cauhinh-cap-nhan-su',
+			},
+			recruitmentRequirements: {
+				id: 'recruitmentRequirements',
+				text: 'Yêu cầu tuyển dụng',
+				path: '/yeu-cau-tuyen-dung',
+			},
 			overall: {
 				id: 'overall',
 				text: 'Cấu hình chung',
@@ -218,6 +219,7 @@ export const demoPages = {
 				text: 'Cấu hình bảng số liệu',
 				path: '/cau-hinh-bang-so-lieu',
 			},
+			
 		},
 	},
 };
