@@ -22,9 +22,9 @@ import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
-import DepartmentDetailPage from './DepartmentForm';
 import { close, minus, plus } from './icon/icon';
 import Search from '../common/ComponentCommon/Search';
+import DepartmentDetail from './DepartmentDetail';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
@@ -242,12 +242,13 @@ const DepartmentPage = () => {
 											</Card>
 										</div>
 										{itemEdits.name !== undefined && (
-											<DepartmentDetailPage
+											<DepartmentDetail
 												initValues={itemEdits}
 												organizationLevelOptions={organizationLevelOptions}
 												departmentList={departmentList}
 											/>
 										)}
+										
 									</div>
 								</Card>
 							</div>
