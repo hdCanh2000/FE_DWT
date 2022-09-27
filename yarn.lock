@@ -1036,17 +1036,17 @@
     "core-js-pure" "^3.20.2"
     "regenerator-runtime" "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.14.5", "@babel/runtime@^7.15.4", "@babel/runtime@^7.16.3", "@babel/runtime@^7.17.2", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.3.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
-  "integrity" "sha512-eR8Lo9hnDS7tqkO7NsV+mKvCmv5boaXFSZ70DnfhcgiEne8hv9oCEd36Klw74EtizEqLsy4YnW8UWwpBVolHZA=="
-  "resolved" "https://registry.npmjs.org/@babel/runtime/-/runtime-7.19.0.tgz"
-  "version" "7.19.0"
-  dependencies:
-    "regenerator-runtime" "^0.13.4"
-
-"@babel/runtime@7.14.0":
+"@babel/runtime@^7.0.0", "@babel/runtime@7.14.0":
   "integrity" "sha512-JELkvo/DlpNdJ7dlyw/eY7E0suy5i5GQH+Vlxaq1nsNJ+H7f4Vtv3jMeCEgRhZZQFXTjldYfQgv2qmM6M1v5wA=="
   "resolved" "https://registry.npmjs.org/@babel/runtime/-/runtime-7.14.0.tgz"
   "version" "7.14.0"
+  dependencies:
+    "regenerator-runtime" "^0.13.4"
+
+"@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.0", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.14.5", "@babel/runtime@^7.15.4", "@babel/runtime@^7.16.3", "@babel/runtime@^7.17.2", "@babel/runtime@^7.18.3", "@babel/runtime@^7.18.9", "@babel/runtime@^7.3.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.2", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+  "integrity" "sha512-eR8Lo9hnDS7tqkO7NsV+mKvCmv5boaXFSZ70DnfhcgiEne8hv9oCEd36Klw74EtizEqLsy4YnW8UWwpBVolHZA=="
+  "resolved" "https://registry.npmjs.org/@babel/runtime/-/runtime-7.19.0.tgz"
+  "version" "7.19.0"
   dependencies:
     "regenerator-runtime" "^0.13.4"
 
@@ -9668,14 +9668,6 @@
     "@babel/runtime" "7.14.0"
     "react-spring" "^5.3.7"
 
-"react-animated-tree@^1.0.10":
-  "integrity" "sha512-IWfjHAvxt8hCpr8q9gIG9Xb+7COIR/dTIgO8jxdtVIs2jyTI8ZGkG/YKSoW+1WOCLo/UegGjmDtUdhyaMDfpzw=="
-  "resolved" "https://registry.npmjs.org/react-animated-tree/-/react-animated-tree-1.0.10.tgz"
-  "version" "1.0.10"
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-    "react-spring" "^7.1.0"
-
 "react-apexcharts@^1.4.0":
   "integrity" "sha512-DrcMV4aAMrUG+n6412yzyATWEyCDWlpPBBhVbpzBC4PDeuYU6iF84SmExbck+jx5MUm4U5PM3/T307Mc3kzc9Q=="
   "resolved" "https://registry.npmjs.org/react-apexcharts/-/react-apexcharts-1.4.0.tgz"
@@ -10078,13 +10070,6 @@
   "integrity" "sha512-ZDCBm4OaYuuSER3k7EELn9AKGs98HI23qMRL93zUUw6AlyBmqoU+eAfouGRx47gVkZkH+hArJXBHf4UGYpH9Og=="
   "resolved" "https://registry.npmjs.org/react-spring/-/react-spring-5.9.2.tgz"
   "version" "5.9.2"
-  dependencies:
-    "@babel/runtime" "^7.0.0"
-
-"react-spring@^7.1.0":
-  "integrity" "sha512-VHoN34MTZFkvamy7Vlmcx2HR5WVSuaQQjFNlVRNyWNi+rcjYT8OcsggzeDltFycseBh8cZveYTc/iPCEe6O0Sw=="
-  "resolved" "https://registry.npmjs.org/react-spring/-/react-spring-7.2.11.tgz"
-  "version" "7.2.11"
   dependencies:
     "@babel/runtime" "^7.0.0"
 
