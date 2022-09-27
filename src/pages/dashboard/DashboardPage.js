@@ -7,7 +7,6 @@ import { dashboardMenu, demoPages } from '../../menu';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Page from '../../layout/Page/Page';
 import Button, { ButtonGroup } from '../../components/bootstrap/Button';
-// import Select from '../../components/bootstrap/forms/Select';
 import Card, {
 	CardActions,
 	CardBody,
@@ -278,21 +277,20 @@ const DashboardPage = () => {
 
 	const [year, setYear] = useState(Number(moment().format('YYYY')));
 	const companies = [
-		{ name: 'Tổng Công Ty'},
-		{ name: 'Kênh OTC' },
-		{ name: 'Kênh ETC' },
-		{ name: 'Kênh MT' },
-		{ name: 'Kênh Online' },
+		'Tổng Công Ty',
+		'Kênh OTC',
+		'Kênh ETC',
+		'Kênh MT',
+		'Kênh Online',
 	];
 	const COMPANIES_TAB = {
-		COMP1: companies[0].name,
-		COMP2: companies[1].name,
-		COMP3: companies[2].name,
-		COMP4: companies[3].name,
-		COMP5: companies[4].name,
+		COMP1: companies[0],
+		COMP2: companies[1],
+		COMP3: companies[2],
+		COMP4: companies[3],
+		COMP5: companies[4],
 	};
 	const [activeCompanyTab, setActiveCompanyTab] = useState(COMPANIES_TAB.COMP1);
-	console.log(activeCompanyTab);
 	const search = [
 		// { name: 'Tuần' },
 		{ name: '30 Ngày' },
@@ -1084,48 +1082,59 @@ const DashboardPage = () => {
 										</CardSubTitle>
 									</CardLabel>
 									<CardActions>
-									<div className='col-xl-4 col-xxl-3'>
-											<div className='row g-3'>
-												{companies.map((company) => (
-													<div
-														key={company.name}
-														className='col-xl-12 col-lg-6 col-sm-12'>
-														{ company.name !== "Tổng Công Ty" ? (
-															<Button
-															isLight={
-																activeCompanyTab !== company.name
-															}
-															onClick={() =>
-																setActiveCompanyTab(company.name)
-															}
-															color={themeStatus}
-															style={{marginLeft: '30px'}}
-															className='w-100 py-4'
-															shadow='sm'
-															hoverShadow='none'>
-															{company.name}
-														</Button>
-														) : (
-															<Button
-															isLight={
-																activeCompanyTab !== company.name
-															}
-															onClick={() =>
-																setActiveCompanyTab(company.name)
-															}
-															color={themeStatus}
-															className='w-100 py-4'
-															shadow='sm'
-															hoverShadow='none'>
-															{company.name}
-														</Button>
-														)}
-														
-													</div>
-												))}
-											</div>
-										</div>
-										<ButtonGroup>
+										<Dropdown isButtonGroup>
+											<Button color='success' isLight icon='WaterfallChart'>
+												{activeCompanyTab}
+											</Button>
+											<DropdownToggle>
+												<Button color='success' isLight isVisuallyHidden />
+											</DropdownToggle>
+											<DropdownMenu isAlignmentEnd>
+												<DropdownItem>
+													<Button
+														onClick={() =>
+															setActiveCompanyTab(COMPANIES_TAB.COMP1)
+														}>
+														Tổng công ty
+													</Button>
+												</DropdownItem>
+												<DropdownItem>
+													<Button
+														onClick={() =>
+															setActiveCompanyTab(COMPANIES_TAB.COMP2)
+														}>
+														Kênh OTC
+													</Button>
+												</DropdownItem>
+												<DropdownItem>
+													<Button
+														onClick={() =>
+															setActiveCompanyTab(COMPANIES_TAB.COMP3)
+														}>
+														Kênh ETC
+													</Button>
+												</DropdownItem>
+												<DropdownItem>
+													<Button
+														onClick={() =>
+															setActiveCompanyTab(COMPANIES_TAB.COMP4)
+														}>
+														Kênh MT
+													</Button>
+												</DropdownItem>
+												<DropdownItem>
+													<Button
+														onClick={() =>
+															setActiveCompanyTab(COMPANIES_TAB.COMP5)
+														}>
+														Kênh Online
+													</Button>
+												</DropdownItem>
+											</DropdownMenu>
+										</Dropdown>
+										<ButtonGroup 
+										style={{marginLeft: '-12px'}}
+										>
 											{search.map((element) => (
 												<div key={element.name}>
 													<Button
