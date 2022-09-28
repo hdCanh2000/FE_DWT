@@ -486,7 +486,7 @@ const TaskListPage = () => {
 						['manager', 'admin'],
 					)}
 				</div>
-				<div className='row my-4'>
+				<div className='row'>
 					<div className='col-md-12'>
 						{parseInt(searchParams.get('view'), 10) === 1 ||
 						!searchParams.get('view') ? (

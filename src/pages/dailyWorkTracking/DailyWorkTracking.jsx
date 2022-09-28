@@ -3,7 +3,7 @@ import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import TableCalendar from './TableCalendar';
-import TableWorkTrack from './TableWorkTracking';
+import TableWorkTrack from './tableWorkTracking';
 
 const DailyWorkTracking = () => {
 	const [rowsState, setRowsState] = useState([]);
