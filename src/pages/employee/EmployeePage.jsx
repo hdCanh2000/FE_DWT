@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -21,11 +22,11 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
-import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { addEmployee, updateEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
+import { getAllDepartmentWithUser } from '../department/services';
 
-const EmployeePage = () => {
+const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
@@ -36,13 +37,17 @@ const EmployeePage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const users = useSelector((state) => state.employee.employees);
-	const departments = useSelector((state) => state.department.departments);
+	const [departments, setDepartments] = React.useState([]);
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
-
 	useEffect(() => {
-		dispatch(fetchDepartmentList());
-	}, [dispatch]);
+		const fecth = async () => {
+			const response = await getAllDepartmentWithUser();
+			const result = await response.data;
+			setDepartments([...result]);
+		};
+		fecth();
+	}, []);
 
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
@@ -272,17 +277,19 @@ const EmployeePage = () => {
 	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
-			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<div className='row mb-4'>
-						<div className='col-12'>
-							<div className='d-flex justify-content-between align-items-center'>
-								<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
+			<Page container='fluid' style={{ padding: '0' }}>
+				{header === false &&
+					verifyPermissionHOC(
+						<div className='row mb-4'>
+							<div className='col-12'>
+								<div className='d-flex justify-content-between align-items-center'>
+									<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
+								</div>
 							</div>
-						</div>
-					</div>,
-					['admin', 'manager'],
-				)}
+						</div>,
+						['admin', 'manager'],
+					)}
+
 				{verifyPermissionHOC(
 					<div className='row mb-0'>
 						<div className='col-12'>
@@ -335,6 +342,12 @@ const EmployeePage = () => {
 			</Page>
 		</PageWrapper>
 	);
+};
+EmployeePage.propTypes = {
+	header: PropTypes.bool,
+};
+EmployeePage.defaultProps = {
+	header: false,
 };
 
 export default EmployeePage;

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
 	getAllDepartmentWithUser,
-	getDepartmentByIdWithUser,
+	// getDepartmentByIdWithUser,
 } from '../../pages/department/services';
 import { getAllDepartments } from '../../pages/work-management/mission/services';
 
@@ -33,13 +33,13 @@ export const fetchDepartmentWithUserList = createAsyncThunk(
 	},
 );
 
-export const fetchDepartmentById = createAsyncThunk(
-	'department/fetchDepartmentById',
-	async (id) => {
-		const response = await getDepartmentByIdWithUser(id);
-		return response.data;
-	},
-);
+// export const fetchDepartmentById = createAsyncThunk(
+// 	'department/fetchDepartmentById',
+// 	async (id) => {
+// 		const response = await getDepartmentByIdWithUser(id);
+// 		return response.data;
+// 	},
+// );
 
 // eslint-disable-next-line import/prefer-default-export
 export const departmentSlice = createSlice({
@@ -72,16 +72,16 @@ export const departmentSlice = createSlice({
 			state.error = action.error;
 		},
 		// fetch by id with user
-		[fetchDepartmentById.pending]: (state) => {
-			state.loading = true;
-		},
-		[fetchDepartmentById.fulfilled]: (state, action) => {
-			state.loading = false;
-			state.department = { ...action.payload };
-		},
-		[fetchDepartmentById.rejected]: (state, action) => {
-			state.loading = false;
-			state.error = action.error;
-		},
+		// [fetchDepartmentById.pending]: (state) => {
+		// 	state.loading = true;
+		// },
+		// [fetchDepartmentById.fulfilled]: (state, action) => {
+		// 	state.loading = false;
+		// 	state.department = { ...action.payload };
+		// },
+		// [fetchDepartmentById.rejected]: (state, action) => {
+		// 	state.loading = false;
+		// 	state.error = action.error;
+		// },
 	},
 });

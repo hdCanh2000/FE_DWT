@@ -1,11 +1,18 @@
-import React, { useEffect, useState, memo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react/prop-types */
+import React, { useState, memo, useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
-import { useParams } from 'react-router-dom';
 import { Formik, useFormik } from 'formik';
 import { Tab, Tabs } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import Button from '../../components/bootstrap/Button';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import Card, {
+	CardActions,
+	CardBody,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../components/bootstrap/Card';
 import Input from '../../components/bootstrap/forms/Input';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
@@ -14,33 +21,35 @@ import { updateDepartment } from './services';
 import UserDetailPage from './UserDetailPage';
 import validate from './validate';
 import Checks from '../../components/bootstrap/forms/Checks';
-import {
-	fetchDepartmentById,
-	fetchDepartmentWithUserList,
-} from '../../redux/slice/departmentSlice';
 import Select from '../../components/bootstrap/forms/Select';
+import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
+import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
+import './style.scss';
 
+// eslint-disable-next-line eslint-comments/no-duplicate-disable
 // eslint-disable-next-line react/prop-types
 const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues }) => {
-	const params = useParams();
+	const [initData, setInitData] = useState({});
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
-	const department = useSelector((state) => state.department.departments);
 	const [isEdit, setIsEdit] = useState(true);
+	const [openDelete, setOpenDelete] = useState(false);
 	useEffect(() => {
-		dispatch(fetchDepartmentById(params.id));
+		setInitData({ ...initValues });
+	}, [initValues]);
+	useEffect(() => {
 		formik.initialValues = {
-			id: department.id,
-			slug: department?.slug,
-			description: department?.description,
-			name: department?.name,
-			address: department?.address,
-			status: department?.status,
+			id: initValues.id,
+			slug: initValues?.slug,
+			description: initValues?.description,
+			name: initValues?.name,
+			address: initValues?.address,
+			status: initValues?.status,
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch, params.id]);
+	}, [initValues]);
 	const formik = useFormik({
-		initialValues: initValues,
+		initialValues: initData,
 		enableReinitialize: true,
 		validationSchema: validate,
 		onSubmit: (values) => {
@@ -73,20 +82,44 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 		};
 		try {
 			await updateDepartment(dataSubmit);
+			setInitData({ ...dataSubmit });
 			dispatch(fetchDepartmentWithUserList());
 		} catch (error) {
 			handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+		}
+	};
+
+	const handleDelete = async (data) => {
+		const dataSubmit = {
+			organizationLevel: parseInt(data?.organizationLevel, 10),
+			parentId: parseInt(data?.parentId, 10),
+			id: data?.id,
+			name: data.name,
+			description: data.description,
+			slug: data.slug,
+			address: data.address,
+			status: Number(data.status),
+			isDelete: 1,
+		};
+		try {
+			await updateDepartment(dataSubmit);
+			setInitData({ ...dataSubmit });
+			dispatch(fetchDepartmentWithUserList());
+		} catch (error) {
+			handleShowToast(`Xóa phòng ban`, `Xóa phòng ban không thành công!`);
 		}
 	};
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const handleEdit = () => {
 		setIsEdit(false);
 	};
-
+	const handleOpenDelete = () => {
+		setOpenDelete(!openDelete);
+	};
 	return (
 		<div className='col-lg-8 col-md-6'>
 			<Formik initialValues={initValues} enableReinitialize>
-				<Card className='h-100'>
+				<Card className='h-98'>
 					<Card className='h-100 mb-0'>
 						<Tabs defaultActiveKey='departmentDetail' id='uncontrolled-tab-example'>
 							<Tab
@@ -101,6 +134,29 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 												: 'Chỉnh sửa cấu tổ chức'}
 										</CardTitle>
 									</CardLabel>
+									<CardActions>
+										{isEdit && (
+											<div>
+												<Button
+													color='info'
+													size='lg'
+													icon='Build'
+													tag='button'
+													// className='w-30 p-3'
+													onClick={() => handleEdit()}
+												/>
+												<Button
+													color='danger'
+													size='lg'
+													icon='Trash'
+													tag='button'
+													// className='w-5 p-3'
+													style={{ marginLeft: '3px' }}
+													onClick={() => handleOpenDelete()}
+												/>
+											</div>
+										)}
+									</CardActions>
 								</CardHeader>
 								<CardBody className='pt-0'>
 									<div className='row g-4'>
@@ -224,7 +280,7 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 										</div>
 										<div className='col-12'>
 											<div className='w-100 mt-4 text-center'>
-												{!isEdit ? (
+												{!isEdit && (
 													<Button
 														color='primary'
 														size='lg'
@@ -233,27 +289,26 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 														onClick={formik.handleSubmit}>
 														Lưu thông tin
 													</Button>
-												) : (
-													<Button
-														color='info'
-														size='lg'
-														icon='Build'
-														tag='button'
-														className='w-50 p-3'
-														onClick={() => handleEdit()}>
-														Sửa cơ cấu tổ chức
-													</Button>
 												)}
 											</div>
 										</div>
 									</div>
+									<ComfirmSubtask
+										openModal={openDelete}
+										onCloseModal={handleOpenDelete}
+										onConfirm={() => handleDelete(initValues)}
+										title='Xoá cơ cấu tổ chức'
+										// eslint-disable-next-line eslint-comments/no-duplicate-disable
+										// eslint-disable-next-line react/prop-types
+										content={`Xác nhận xoá cơ cấu tổ chức <strong>${initValues?.name}</strong> ?`}
+									/>
 								</CardBody>
 							</Tab>
 							<Tab
 								eventKey='userDepartment'
 								title='Danh sách nhân viên'
 								className='mb-3'>
-								<UserDetailPage dataUser={initValues}/>
+								<UserDetailPage dataUser={initValues} />
 							</Tab>
 						</Tabs>
 					</Card>

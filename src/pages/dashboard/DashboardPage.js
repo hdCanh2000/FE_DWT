@@ -276,13 +276,7 @@ const DashboardPage = () => {
 	];
 
 	const [year, setYear] = useState(Number(moment().format('YYYY')));
-	const companies = [
-		'Tổng Công Ty',
-		'Kênh OTC',
-		'Kênh ETC',
-		'Kênh MT',
-		'Kênh Online',
-	];
+	const companies = ['Tổng Công Ty', 'Kênh OTC', 'Kênh ETC', 'Kênh MT', 'Kênh Online'];
 	const COMPANIES_TAB = {
 		COMP1: companies[0],
 		COMP2: companies[1],
@@ -448,7 +442,7 @@ const DashboardPage = () => {
 				},
 			},
 		},
-	}
+	};
 	const salesByStoreOptions = {
 		chart: {
 			height: 335.5,
@@ -1180,11 +1174,13 @@ const DashboardPage = () => {
 											Báo cáo
 										</CardSubTitle>
 									</CardLabel>
-
 								</CardHeader>
 								<CardActions
-									style={{ textAlign: 'right', marginRight: '19.5px', marginLeft: '19.5px' }}
-								>
+									style={{
+										textAlign: 'right',
+										marginRight: '19.5px',
+										marginLeft: '19.5px',
+									}}>
 									<Dropdown isButtonGroup>
 										<DropdownToggle>
 											<Button color='success' isLight>
@@ -1234,9 +1230,7 @@ const DashboardPage = () => {
 											</DropdownItem>
 										</DropdownMenu>
 									</Dropdown>
-									<ButtonGroup
-									style={{marginRight:'0'}}
-									>
+									<ButtonGroup style={{ marginRight: '0' }}>
 										{search.map((element) => (
 											<div key={element.name}>
 												<Button
@@ -1288,8 +1282,7 @@ const DashboardPage = () => {
 														onClick={() => {
 															setYear(2021);
 															setSearchTab('');
-														}}
-													>
+														}}>
 														2021
 													</Button>
 												</DropdownItem>
@@ -1356,14 +1349,17 @@ const DashboardPage = () => {
 							<Card stretch>
 								<CardHeader>
 									<CardLabel icon='StackedBarChart'>
-										<CardTitle>
-											Thống kê người dùng
-										</CardTitle>
+										<CardTitle>Thống kê người dùng</CardTitle>
 										<CardSubTitle>Báo cáo</CardSubTitle>
 									</CardLabel>
 								</CardHeader>
 								<CardBody>
-									<Chart series={guestChart.series} options={guestChart.options} type='bar' height={370} />
+									<Chart
+										series={guestChart.series}
+										options={guestChart.options}
+										type='bar'
+										height={370}
+									/>
 								</CardBody>
 							</Card>,
 							['admin'],
@@ -1396,9 +1392,7 @@ const DashboardPage = () => {
 								</CardHeader>
 								<CardBody className='py-0'>
 									<div className='row'>
-										<div
-											className='col-md-12'
-											style={{ textAlign: 'center' }}>
+										<div className='col-md-12' style={{ textAlign: 'center' }}>
 											{missionReport === null ? (
 												<div style={{ height: '262px' }}>
 													<Spinner
@@ -1618,7 +1612,7 @@ const DashboardPage = () => {
 					['user'],
 				)}
 			</Page>
-		</PageWrapper >
+		</PageWrapper>
 	);
 };
 
