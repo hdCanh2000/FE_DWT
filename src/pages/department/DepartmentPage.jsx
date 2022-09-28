@@ -25,6 +25,7 @@ import Toasts from '../../components/bootstrap/Toasts';
 import { close, minus, plus } from './icon/icon';
 import Search from '../common/ComponentCommon/Search';
 import DepartmentDetail from './DepartmentDetail';
+import EmployeePage from '../employee/EmployeePage';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
@@ -241,14 +242,17 @@ const DepartmentPage = () => {
 												</CardBody>
 											</Card>
 										</div>
-										{itemEdits.name !== undefined && (
+										{itemEdits.name !== undefined ? (
 											<DepartmentDetail
 												initValues={itemEdits}
 												organizationLevelOptions={organizationLevelOptions}
 												departmentList={departmentList}
 											/>
+										) : (
+											<div className='col-lg-8 col-md-6'>
+												<EmployeePage header />
+											</div>
 										)}
-										
 									</div>
 								</Card>
 							</div>
