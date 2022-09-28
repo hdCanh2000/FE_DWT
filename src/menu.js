@@ -204,11 +204,11 @@ export const demoPages = {
 				text: 'Cấu hình mục tiêu',
 				path: '/cau-hinh-muc-tieu',
 			},
-			role: {
-				id: 'role',
-				text: 'Cầu hình vai trò',
-				path: '/cau-hinh-vai-tro',
-			},
+			// role: {
+			// 	id: 'role',
+			// 	text: 'Cầu hình vai trò',
+			// 	path: '/cau-hinh-vai-tro',
+			// },
 			report: {
 				id: 'report',
 				text: 'Cấu hình báo cáo',
