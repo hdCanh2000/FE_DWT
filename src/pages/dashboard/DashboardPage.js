@@ -38,8 +38,9 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../components/bootstrap/Dropdown';
-import CommonSalePerformance from '../common/CRMDashboard/CommonSalePerformance copy';
+import CommonSalePerformance from '../common/CRMDashboard/CommonSalePerformance';
 import CommonApprovedAppointmentChart from '../common/SubHeaders/CommonApprovedAppointmentChart';
+import OrderBarChart from '../common/SubHeaders/OrderBarChat';
 
 const DashboardPage = () => {
 	const { darkModeStatus, themeStatus } = useDarkMode();
@@ -523,7 +524,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -591,7 +592,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -703,7 +704,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -830,7 +831,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -909,7 +910,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -1626,6 +1627,14 @@ const DashboardPage = () => {
 						</div>
 					</>,
 					['user'],
+				)}
+				{verifyPermissionHOC(
+					<div className='row'>
+						<div className='col-md-6'>
+							<OrderBarChart />
+						</div>
+					</div>,
+					['admin'],
 				)}
 			</Page>
 		</PageWrapper>

@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import Chart from '../../../components/extras/Chart';
 import styles from './circle.module.css';
 
-const calcTotal = data => data ? Object.values(data).reduce((accumulator, item) => accumulator + item) : 0
+const calcTotal = (data) =>
+	data ? Object.values(data).reduce((accumulator, item) => accumulator + item) : 0;
 
 const MissionChartReport = ({ data }) => {
 	const chartOptions = {
@@ -73,13 +74,9 @@ const MissionChartReport = ({ data }) => {
 			) : (
 				<div className='col-xl-7 col-md-12'>
 					<center>
-						<div
-							className={styles.circle}
-						/>
+						<div className={styles.circle} />
 						<br />
-						<h5>
-							Hiện chưa có mục tiêu
-						</h5>
+						<h5>Hiện chưa có mục tiêu</h5>
 					</center>
 				</div>
 			)}
