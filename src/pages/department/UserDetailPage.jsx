@@ -1,23 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
-import { useParams } from 'react-router-dom';
-import { useFormik } from 'formik';
 import Button from '../../components/bootstrap/Button';
 import { CardActions, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Toasts from '../../components/bootstrap/Toasts';
-import { getDepartmentByIdWithUser, updateDepartment } from './services';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import validate from './validate';
 import { addEmployee, updateEmployee } from '../employee/services';
 import Popovers from '../../components/bootstrap/Popovers';
 
 // eslint-disable-next-line prettier/prettier, react/prop-types
 const DepartmentDetailPage = ({dataUser}) => {
-	const params = useParams();
 	const { addToast } = useToasts();
-
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -142,47 +136,6 @@ const DepartmentDetailPage = ({dataUser}) => {
 	];
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [department, setDepartment] = useState({});
-	const formik = useFormik({
-		initialValues: {
-			id: department.id,
-			slug: department?.slug || '',
-			description: department?.description || '',
-			name: department?.name || '',
-			address: department?.address || '',
-			status: department?.status,
-		},
-		enableReinitialize: true,
-		validate,
-		onSubmit: (values, { resetForm }) => {
-			handleSubmitForm(values);
-			resetForm();
-		},
-	});
-
-	async function getInfoDepartmentById() {
-		try {
-			const response = await getDepartmentByIdWithUser(params.id);
-			const data = await response.data;
-			setDepartment(data);
-			formik.initialValues = {
-				id: department.id,
-				slug: department?.slug,
-				description: department?.description,
-				name: department?.name,
-				address: department?.address,
-				status: department?.status,
-			};
-		} catch (error) {
-			setDepartment({});
-		}
-	}
-
-	useEffect(() => {
-		getInfoDepartmentById();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [params.id]);
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -193,35 +146,12 @@ const DepartmentDetailPage = ({dataUser}) => {
 			},
 		);
 	};
-
-	const handleSubmitForm = async (data) => {
-		const dataSubmit = {
-			id: data?.id,
-			name: data.name,
-			description: data.description,
-			slug: data.slug,
-			address: data.address,
-			status: Number(data.status),
-		};
-		try {
-			const response = await updateDepartment(dataSubmit);
-			const result = await response.data;
-			setDepartment(result);
-			handleShowToast(
-				`Cập nhật phòng ban!`,
-				`Phòng ban ${result.name} được cập nhật thành công!`,
-			);
-		} catch (error) {
-			setDepartment(department);
-			handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
-		}
-	};
-
 	const handleSubmitEmployeeForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data.name,
-			departmentId: params.id,
+			departmentId: data.departmentId,
+			department: data.department,
 			code: data.code,
 			email: data.email,
 			password: '123456',
@@ -238,7 +168,6 @@ const DepartmentDetailPage = ({dataUser}) => {
 				const response = await updateEmployee(dataSubmit);
 				const result = await response.data;
 				hanleCloseForm();
-				getInfoDepartmentById();
 				handleShowToast(
 					`Cập nhật nhân viên!`,
 					`Nhân viên ${result?.name} được cập nhật thành công!`,
@@ -251,7 +180,6 @@ const DepartmentDetailPage = ({dataUser}) => {
 				const response = await addEmployee(dataSubmit);
 				const result = await response.data;
 				hanleCloseForm();
-				getInfoDepartmentById();
 				handleShowToast(
 					`Thêm nhân viên`,
 					`Nhân viên ${result?.user?.name} được thêm thành công!`,

@@ -37,7 +37,7 @@ const TableWorkTrack = () => {
 							<tr>
 								<td>{index + 1}</td>
 								<td contentEditable='true' className='text-center'>
-									{item.name}
+									<div>{item.name}</div>
 								</td>
 								<td contentEditable='true' className='text-center'>
 									{item.amount}

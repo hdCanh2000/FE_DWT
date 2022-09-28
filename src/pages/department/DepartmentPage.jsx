@@ -248,7 +248,6 @@ const DepartmentPage = () => {
 												departmentList={departmentList}
 											/>
 										)}
-										
 									</div>
 								</Card>
 							</div>
