@@ -92,7 +92,7 @@ const CommonApprovedAppointmentChart = () => {
 	return (
 		<Card style={{ height: '94%' }} isCompact>
 			<CardHeader className='bg-transparent'>
-				<CardLabel>
+				<CardLabel icon='ReceiptLong'>
 					<CardTitle>Doanh số theo thời gian</CardTitle>
 					<CardSubTitle>
 						<span className='text-danger fw-bold'>

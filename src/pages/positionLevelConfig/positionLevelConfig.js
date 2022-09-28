@@ -143,7 +143,7 @@ const KeyPage = () => {
 		handleCloseDelete();
 	};
 	return (
-		<PageWrapper title={demoPages.hrRecords.subMenu.positionLevelConfig.text}>
+		<PageWrapper title={demoPages.cauHinh.subMenu.positionLevelConfig.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>

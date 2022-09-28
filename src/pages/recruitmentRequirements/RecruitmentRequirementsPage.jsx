@@ -159,7 +159,7 @@ const RecruitmentRequirementPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.hrRecords.subMenu.recruitmentRequirements.text}>
+		<PageWrapper title={demoPages.cauHinh.subMenu.recruitmentRequirements.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
