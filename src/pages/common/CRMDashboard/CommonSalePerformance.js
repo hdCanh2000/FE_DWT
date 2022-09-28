@@ -13,7 +13,7 @@ import Chart from '../../../components/extras/Chart';
 const CommonSalePerformance = () => {
 	const chartOptions = {
 		chart: {
-			height: 400,
+			height: 200,
 			type: 'area',
 			toolbar: {
 				show: false,
@@ -145,7 +145,7 @@ const CommonSalePerformance = () => {
 	return (
 		<Card stretch>
 			<CardHeader>
-				<CardLabel>
+				<CardLabel icon='ReceiptLong'>
 					<CardTitle>Sale Performance</CardTitle>
 				</CardLabel>
 				<CardActions>
