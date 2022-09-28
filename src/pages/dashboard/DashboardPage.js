@@ -20,7 +20,7 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import Progress from '../../components/bootstrap/Progress';
 import { getAllDepartments } from '../work-management/mission/services';
-import { FORMAT_TASK_STATUS, formatColorStatus, formatColorPriority } from '../../utils/constants';
+import { formatColorPriority } from '../../utils/constants';
 import Alert from '../../components/bootstrap/Alert';
 import {
 	getAllSubTasksByUser,
@@ -47,7 +47,7 @@ const DashboardPage = () => {
 	const navigate = useNavigate();
 	const handleOnClickToMissionListPage = useCallback(
 		() => navigate(`../${demoPages.jobsPage.subMenu.target.path}`),
-		[navigate]
+		[navigate],
 	);
 	// departments
 	const [dataDepartments, setDataDepartments] = useState([]);
@@ -81,12 +81,18 @@ const DashboardPage = () => {
 			),
 		},
 		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
+			title: 'Phòng ban phụ trách',
+			id: 'name',
+			key: 'name',
 			type: 'text',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
+			render: (item) => <span>{item?.departments[0]?.name}</span>,
+		},
+		{
+			title: 'Nhân viên phụ trách',
+			id: 'name',
+			key: 'name',
+			type: 'text',
+			render: (item) => <span>{item?.users[0]?.name}</span>,
 		},
 		{
 			title: 'Hạn hoàn thành',
@@ -111,7 +117,8 @@ const DashboardPage = () => {
 						style={{
 							height: 10,
 							width: '100%',
-						}} />
+						}}
+					/>
 				</div>
 			),
 			align: 'center',
@@ -122,14 +129,7 @@ const DashboardPage = () => {
 			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
-		},
-		{
-			title: 'KPI thực tế',
-			id: 'currentKpi',
-			key: 'currentKpi',
-			type: 'number',
-			render: (item) => <span>{item.currentKPI}</span>,
-			align: 'center',
+			format: (item) => item || 0,
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -137,41 +137,39 @@ const DashboardPage = () => {
 			key: 'priority',
 			type: 'text',
 			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<span
-						style={{
-							paddingRight: '1rem',
-							paddingLeft: '1rem',
-						}}
-						className={classNames(
-							'badge',
-							'border border-2',
-							[`border-${themeStatus}`],
-							'bg-success',
-							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`
-						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
-					</span>
-				</div>
+				<span
+					style={{
+						paddingRight: '1rem',
+						paddingLeft: '1rem',
+					}}
+					className={classNames(
+						'badge',
+						'border border-2',
+						[`border-${themeStatus}`],
+						'bg-success',
+						'pt-2 pb-2 me-2',
+						`bg-${formatColorPriority(item.priority)}`,
+					)}>
+					<span className=''>{`Cấp ${item.priority || 1}`}</span>
+				</span>
 			),
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
-			render: (item) => (
-				<Button
-					isLink
-					color={formatColorStatus(item.status)}
-					icon='Circle'
-					className='text-nowrap'>
-					{FORMAT_TASK_STATUS(item.status)}
-				</Button>
-			),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'number',
+		// 	render: (item) => (
+		// 		<Button
+		// 			isLink
+		// 			color={formatColorStatus(item.status)}
+		// 			icon='Circle'
+		// 			className='text-nowrap'>
+		// 			{FORMAT_TASK_STATUS(item.status)}
+		// 		</Button>
+		// 	),
+		// },
 	];
 
 	const columnSubTasks = [
@@ -189,14 +187,6 @@ const DashboardPage = () => {
 			),
 		},
 		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
-			type: 'text',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
-		},
-		{
 			title: 'Hạn hoàn thành',
 			id: 'deadlineDate',
 			key: 'deadlineDate',
@@ -219,7 +209,8 @@ const DashboardPage = () => {
 						style={{
 							height: 10,
 							width: '100%',
-						}} />
+						}}
+					/>
 				</div>
 			),
 			align: 'center',
@@ -230,6 +221,7 @@ const DashboardPage = () => {
 			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
+			format: (item) => item || 0,
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -237,41 +229,39 @@ const DashboardPage = () => {
 			key: 'priority',
 			type: 'text',
 			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<span
-						style={{
-							paddingRight: '1rem',
-							paddingLeft: '1rem',
-						}}
-						className={classNames(
-							'badge',
-							'border border-2',
-							[`border-${themeStatus}`],
-							'bg-success',
-							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`
-						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
-					</span>
-				</div>
+				<span
+					style={{
+						paddingRight: '1rem',
+						paddingLeft: '1rem',
+					}}
+					className={classNames(
+						'badge',
+						'border border-2',
+						[`border-${themeStatus}`],
+						'bg-success',
+						'pt-2 pb-2 me-2',
+						`bg-${formatColorPriority(item.priority)}`,
+					)}>
+					<span className=''>{`Cấp ${item.priority || 1}`}</span>
+				</span>
 			),
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
-			render: (item) => (
-				<Button
-					isLink
-					color={formatColorStatus(item.status)}
-					icon='Circle'
-					className='text-nowrap'>
-					{FORMAT_TASK_STATUS(item.status)}
-				</Button>
-			),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'number',
+		// 	render: (item) => (
+		// 		<Button
+		// 			isLink
+		// 			color={formatColorStatus(item.status)}
+		// 			icon='Circle'
+		// 			className='text-nowrap'>
+		// 			{FORMAT_TASK_STATUS(item.status)}
+		// 		</Button>
+		// 	),
+		// },
 	];
 
 	const [year, setYear] = useState(Number(moment().format('YYYY')));
@@ -326,7 +316,7 @@ const DashboardPage = () => {
 			arr.push(
 				moment()
 					.add(-1 * i, 'day')
-					.format('ll')
+					.format('ll'),
 			);
 		}
 		return arr.reverse();
@@ -337,7 +327,7 @@ const DashboardPage = () => {
 			arr.push(
 				moment()
 					.add(-1 * i, 'year')
-					.format('YYYY')
+					.format('YYYY'),
 			);
 		}
 		arr.sort();
@@ -1103,7 +1093,7 @@ const DashboardPage = () => {
 						id: 1,
 						name: 'Tất cả',
 					})
-					.reverse()
+					.reverse(),
 			);
 		};
 		fetchData();
@@ -1189,39 +1179,47 @@ const DashboardPage = () => {
 										<DropdownMenu isAlignmentEnd>
 											<DropdownItem>
 												<Button
-													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP1)}>
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP1)
+													}>
 													Tổng công ty
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP2)}>
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP2)
+													}>
 													Kênh OTC
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP3)}>
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP3)
+													}>
 													Kênh ETC
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP4)}>
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP4)
+													}>
 													Kênh MT
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP5)}>
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP5)
+													}>
 													Kênh Online
 												</Button>
 											</DropdownItem>
 										</DropdownMenu>
 									</Dropdown>
-									<ButtonGroup
-										style={{ marginRight: '0' }}
-									>
+									<ButtonGroup style={{ marginRight: '0' }}>
 										{search.map((element) => (
 											<div key={element.name}>
 												<Button
@@ -1297,8 +1295,9 @@ const DashboardPage = () => {
 									<div className='row'>
 										<div className='col-md-12'>
 											<Chart
-												series={(searchTab === SEARCH_TAB.COMP1 &&
-													dayStoreSeries) ||
+												series={
+													(searchTab === SEARCH_TAB.COMP1 &&
+														dayStoreSeries) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
 														monthStoreSeries) ||
 													(searchTab === SEARCH_TAB.COMP3 &&
@@ -1311,33 +1310,35 @@ const DashboardPage = () => {
 														salesByStoreSeries2) ||
 													(activeCompanyTab === COMPANIES_TAB.COMP4 &&
 														salesByStoreSeries3) ||
-													salesByStoreSeries4}
-												options={(searchTab === SEARCH_TAB.COMP1 &&
-													dayOptions) ||
+													salesByStoreSeries4
+												}
+												options={
+													(searchTab === SEARCH_TAB.COMP1 &&
+														dayOptions) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
 														monthOptions) ||
 													(searchTab === SEARCH_TAB.COMP3 &&
 														quarterOptions) ||
 													(searchTab === SEARCH_TAB.COMP4 &&
 														yearOptions) ||
-													salesByStoreOptions}
+													salesByStoreOptions
+												}
 												type={salesByStoreOptions.chart.type}
-												height={salesByStoreOptions.chart.height} />
+												height={salesByStoreOptions.chart.height}
+											/>
 										</div>
 									</div>
 								</CardBody>
 							</Card>
 						</div>,
-						['admin']
+						['admin'],
 					)}
 					<div className='col-md-6'>
 						{verifyPermissionHOC(
 							<Card stretch>
 								<CardHeader>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle>
-											Thống kê người dùng
-										</CardTitle>
+									<CardLabel icon='StackedBarChart'>
+										<CardTitle>Thống kê người dùng</CardTitle>
 										<CardSubTitle>Báo cáo</CardSubTitle>
 									</CardLabel>
 								</CardHeader>
@@ -1350,7 +1351,7 @@ const DashboardPage = () => {
 									/>
 								</CardBody>
 							</Card>,
-							['admin']
+							['admin'],
 						)}
 					</div>
 				</div>
@@ -1374,7 +1375,8 @@ const DashboardPage = () => {
 											hoverShadow='default'
 											rounded={1}
 											color={darkModeStatus ? 'dark' : null}
-											onClick={handleOnClickToMissionListPage} />
+											onClick={handleOnClickToMissionListPage}
+										/>
 									</CardActions>
 								</CardHeader>
 								<CardBody className='py-0'>
@@ -1389,7 +1391,8 @@ const DashboardPage = () => {
 															marginTop: '15%',
 															width: '50px',
 															height: '50px',
-														}} />
+														}}
+													/>
 												</div>
 											) : (
 												<MissionChartReport data={missionReport} />
@@ -1399,7 +1402,7 @@ const DashboardPage = () => {
 								</CardBody>
 							</Card>
 						</div>,
-						['admin']
+						['admin'],
 					)}
 					{verifyPermissionHOC(
 						<div className='col-md-6'>
@@ -1421,23 +1424,28 @@ const DashboardPage = () => {
 														color='primary'
 														icon='Circle'
 														className='text-nowrap'>
-														{dataDepartments.filter(
-															(item) => item.id === departmentSelect
-														)[0]?.name}
+														{
+															dataDepartments.filter(
+																(item) =>
+																	item.id === departmentSelect,
+															)[0]?.name
+														}
 													</Button>
 												</DropdownToggle>
 												<DropdownMenu>
 													{dataDepartments?.map((item) => (
 														<DropdownItem
 															key={item?.id}
-															onClick={() => setDepartmentSelect(item.id)}>
+															onClick={() =>
+																setDepartmentSelect(item.id)
+															}>
 															<div>{item?.name}</div>
 														</DropdownItem>
 													))}
 												</DropdownMenu>
 											</Dropdown>
 										</CardActions>,
-										['admin']
+										['admin'],
 									)}
 								</CardHeader>
 								<CardBody className='py-0'>
@@ -1453,7 +1461,8 @@ const DashboardPage = () => {
 															marginLeft: '42%',
 															width: '50px',
 															height: '50px',
-														}} />
+														}}
+													/>
 												</div>
 											) : (
 												<TaskChartReport data={taskReport} />
@@ -1463,7 +1472,7 @@ const DashboardPage = () => {
 								</CardBody>
 							</Card>
 						</div>,
-						['admin', 'manager']
+						['admin', 'manager'],
 					)}
 					{verifyPermissionHOC(
 						<div className='col-md-6'>
@@ -1491,39 +1500,67 @@ const DashboardPage = () => {
 								</CardBody>
 							</Card>
 						</div>,
-						['manager']
+						['manager'],
 					)}
 				</div>
-				<div className='row'>
-					<div className='col-md-6' style={{ marginTop: '1.6%' }}>
-						<CommonSalePerformance />
-					</div>
-					<div className='col-md-6' style={{ marginTop: '1.6%' }}>
-						<CommonApprovedAppointmentChart />
-					</div>
+				<div className='row mt-0'>
 					{verifyPermissionHOC(
-						<div className='col-md-12'>
-							<Card className='mb-0'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê đầu việc cá nhân
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-md-12'>
-											<TaskChartReport data={subTaskReport} />
+						<>
+							<div className='col-md-6' style={{ marginTop: '1%' }}>
+								<CommonSalePerformance />
+							</div>
+							<div className='col-md-6' style={{ marginTop: '1%' }}>
+								<CommonApprovedAppointmentChart />
+							</div>
+						</>,
+						['admin', 'manager'],
+					)}
+					{verifyPermissionHOC(
+						<>
+							<div className='col-md-6'>
+								<Card className='mb-0'>
+									<CardHeader className='py-0'>
+										<CardLabel icon='ReceiptLong'>
+											<CardTitle tag='h4' className='h5'>
+												Thống kê nhiệm vụ cá nhân
+											</CardTitle>
+											<CardSubTitle tag='h5' className='h6'>
+												Báo cáo
+											</CardSubTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody className='py-0'>
+										<div className='row'>
+											<div className='col-md-12'>
+												<TaskChartReport data={taskReport} />
+											</div>
 										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['user']
+									</CardBody>
+								</Card>
+							</div>
+							<div className='col-md-6'>
+								<Card className='mb-0'>
+									<CardHeader className='py-0'>
+										<CardLabel icon='ReceiptLong'>
+											<CardTitle tag='h4' className='h5'>
+												Thống kê đầu việc cá nhân
+											</CardTitle>
+											<CardSubTitle tag='h5' className='h6'>
+												Báo cáo
+											</CardSubTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody className='py-0'>
+										<div className='row'>
+											<div className='col-md-12'>
+												<TaskChartReport data={subTaskReport} />
+											</div>
+										</div>
+									</CardBody>
+								</Card>
+							</div>
+						</>,
+						['user'],
 					)}
 				</div>
 				{verifyPermissionHOC(
@@ -1544,7 +1581,8 @@ const DashboardPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columnTasks}
-											data={tasks} />
+											data={tasks}
+										/>
 									</div>
 									{!tasks?.length && (
 										<Alert
@@ -1572,7 +1610,8 @@ const DashboardPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columnSubTasks}
-											data={subtasks} />
+											data={subtasks}
+										/>
 									</div>
 									{!tasks?.length && (
 										<Alert
@@ -1587,7 +1626,7 @@ const DashboardPage = () => {
 							</div>
 						</div>
 					</>,
-					['user']
+					['user'],
 				)}
 				{verifyPermissionHOC(
 					<div className='row'>
@@ -1595,11 +1634,11 @@ const DashboardPage = () => {
 							<OrderBarChart />
 						</div>
 					</div>,
-					['admin']
+					['admin'],
 				)}
 			</Page>
 		</PageWrapper>
 	);
-}
+};
 
 export default DashboardPage;

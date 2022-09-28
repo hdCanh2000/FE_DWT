@@ -45,6 +45,7 @@ import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import { fetchMissionList, fetchMissionReport } from '../../../redux/slice/missionSlice';
 import { fetchTaskListLates, fetchTaskReport } from '../../../redux/slice/taskSlice';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
+import NotPermission from '../../presentation/auth/NotPermission';
 
 const Item = ({
 	id,
@@ -342,336 +343,373 @@ const MissionPage = () => {
 	return (
 		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
-				{missions?.length > 0 && (
-					<div className='row'>
-						<div className='col-12'>
-							<div className='d-flex justify-content-between align-items-center'>
-								<div className='display-6 fw-bold py-3'>Danh sách mục tiêu</div>
-								<div>
-									<Button
-										size='lg'
-										className='rounded-0'
-										color='info'
-										icon='CardList'
-										onClick={() => handleClickSwitchView(1)}
-									/>
-									<Button
-										size='lg'
-										className='rounded-0'
-										color='primary'
-										icon='Table'
-										onClick={() => handleClickSwitchView(2)}
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
-				)}
-				<div className='row'>
+				<div>
 					{verifyPermissionHOC(
-						<div className='col-xxl-6'>
-							<Card className='mb-4'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê mục tiêu
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											{isEmpty(missionReport) ? (
-												<div
-													className='col-xl-12 col-xxl-12'
-													style={{ textAlign: 'center' }}>
-													<div style={{ height: '290px' }}>
-														<Spinner
-															animation='border'
-															variant='primary'
-															style={{
-																marginTop: '15%',
-																width: '50px',
-																height: '50px',
-															}}
-														/>
-													</div>
-												</div>
-											) : (
-												<MissionChartReport data={missionReport} />
-											)}
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['admin'],
-					)}
-					{verifyPermissionHOC(
-						<div className='col-xxl-6'>
-							<Card className='mb-8'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê công việc thuộc mục tiêu
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											{isEmpty(taskReport) ? (
-												<div
-													className='col-xl-12 col-xxl-12'
-													style={{ textAlign: 'center' }}>
-													<div style={{ height: '290px' }}>
-														<Spinner
-															animation='border'
-															variant='primary'
-															style={{
-																marginTop: '15%',
-																width: '50px',
-																height: '50px',
-															}}
-														/>
-													</div>
-												</div>
-											) : (
-												<TaskChartReport data={taskReport} />
-											)}
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['admin'],
-					)}
-				</div>
-				{parseInt(searchParams.get('view'), 10) === 1 || !searchParams.get('view') ? (
-					<div className='row'>
-						{missions?.map((item) => (
-							<div className='col-md-6 col-xl-4 col-sm-12' key={item?.id}>
-								<Card stretch className='cursor-pointer'>
-									<CardHeader className='bg-transparent py-0'>
-										<CardLabel
-											icon='StarOutline'
-											className='pt-4 pb-2 w-100 align-items-start'
-											onClick={() => navigateToDetailPage(item?.id)}>
-											<CardTitle tag='h4' className='h4'>
-												{item?.name}
-											</CardTitle>
-											<CardSubTitle
-												className={
-													item.status === 1
-														? 'mt-2 fs-14 text-success fw-bold ps-2'
-														: 'mt-2 fs-14 text-danger fw-bold ps-2'
-												}>
-												{item.status === 1 ? 'Đang thực hiện' : 'Đã đóng'}
-											</CardSubTitle>
-										</CardLabel>
-										{verifyPermissionHOC(
-											<CardActions>
-												<Dropdown>
-													<DropdownToggle hasIcon={false}>
-														<Button
-															color='dark'
-															isLink
-															hoverShadow='default'
-															icon='MoreHoriz'
-															aria-label='More Actions'
-														/>
-													</DropdownToggle>
-													<DropdownMenu isAlignmentEnd>
-														<DropdownItem>
-															<Button
-																disabled={item.status === 0}
-																icon='Edit'
-																tag='button'
-																onClick={() =>
-																	handleOpenFormEdit(item)
-																}>
-																Sửa mục tiêu
-															</Button>
-														</DropdownItem>
-														<DropdownItem>
-															<Button
-																icon={
-																	item.status === 0
-																		? 'Check'
-																		: 'Close'
-																}
-																tag='button'
-																onClick={() =>
-																	handleOpenFormDelete(item)
-																}>
-																{item.status === 0
-																	? 'Mở mục tiêu'
-																	: 'Đóng mục tiêu'}
-															</Button>
-														</DropdownItem>
-													</DropdownMenu>
-												</Dropdown>
-											</CardActions>,
-											['admin'],
-										)}
-									</CardHeader>
-									<CardBody
-										className='pt-2 pb-4'
-										onClick={() => navigateToDetailPage(item?.id)}>
-										<div className='row'>
-											<div className='col-md-12'>
-												<div className='d-flex align-items-center jusify-content-start'>
-													<small
-														style={{ fontSize: 14 }}
-														className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-														{moment(`${item?.startTime}`).format(
-															'DD-MM-YYYY',
-														)}
-													</small>
-													<span style={{ fontSize: 14 }} className='px-2'>
-														-
-													</span>
-													<small
-														style={{ fontSize: 14 }}
-														className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
-														{moment(`${item?.endTime}`).format(
-															'DD-MM-YYYY',
-														)}
-													</small>
-												</div>
+						<>
+							{missions?.length > 0 && (
+								<div className='row'>
+									<div className='col-12'>
+										<div className='d-flex justify-content-between align-items-center'>
+											<div className='display-6 fw-bold py-3'>
+												Danh sách mục tiêu
 											</div>
-										</div>
-										<div className='row'>
-											{item?.departments.slice(0, 6)?.map((k, index) => (
-												// eslint-disable-next-line react/no-array-index-key
-												<div key={index} className='col-auto mt-2'>
-													<Badge
-														isLight
-														color='primary'
-														className='px-3 py-3'
-														style={{ fontSize: 14 }}>
-														{k?.name}
-													</Badge>
-												</div>
-											))}
-										</div>
-										<div className='row mt-4'>
-											<div className='col-md-12'>
-												{item.progress}
-												%
-												<Progress
-													isAutoColor
-													value={item.progress}
-													height={10}
+											<div>
+												<Button
+													size='lg'
+													className='rounded-0'
+													color='info'
+													icon='CardList'
+													onClick={() => handleClickSwitchView(1)}
+												/>
+												<Button
+													size='lg'
+													className='rounded-0'
+													color='primary'
+													icon='Table'
+													onClick={() => handleClickSwitchView(2)}
 												/>
 											</div>
 										</div>
-									</CardBody>
-								</Card>
+									</div>
+								</div>
+							)}
+							<div className='row'>
+								{verifyPermissionHOC(
+									<div className='col-xxl-6'>
+										<Card className='mb-4'>
+											<CardHeader className='py-0'>
+												<CardLabel icon='ReceiptLong'>
+													<CardTitle tag='h4' className='h5'>
+														Thống kê mục tiêu
+													</CardTitle>
+													<CardSubTitle tag='h5' className='h6'>
+														Báo cáo
+													</CardSubTitle>
+												</CardLabel>
+											</CardHeader>
+											<CardBody className='py-0'>
+												<div className='row'>
+													<div className='col-xl-12 col-xxl-12'>
+														{isEmpty(missionReport) ? (
+															<div
+																className='col-xl-12 col-xxl-12'
+																style={{ textAlign: 'center' }}>
+																<div style={{ height: '290px' }}>
+																	<Spinner
+																		animation='border'
+																		variant='primary'
+																		style={{
+																			marginTop: '15%',
+																			width: '50px',
+																			height: '50px',
+																		}}
+																	/>
+																</div>
+															</div>
+														) : (
+															<MissionChartReport
+																data={missionReport}
+															/>
+														)}
+													</div>
+												</div>
+											</CardBody>
+										</Card>
+									</div>,
+									['admin'],
+								)}
+								{verifyPermissionHOC(
+									<div className='col-xxl-6'>
+										<Card className='mb-8'>
+											<CardHeader className='py-0'>
+												<CardLabel icon='ReceiptLong'>
+													<CardTitle tag='h4' className='h5'>
+														Thống kê công việc thuộc mục tiêu
+													</CardTitle>
+													<CardSubTitle tag='h5' className='h6'>
+														Báo cáo
+													</CardSubTitle>
+												</CardLabel>
+											</CardHeader>
+											<CardBody className='py-0'>
+												<div className='row'>
+													<div className='col-xl-12 col-xxl-12'>
+														{isEmpty(taskReport) ? (
+															<div
+																className='col-xl-12 col-xxl-12'
+																style={{ textAlign: 'center' }}>
+																<div style={{ height: '290px' }}>
+																	<Spinner
+																		animation='border'
+																		variant='primary'
+																		style={{
+																			marginTop: '15%',
+																			width: '50px',
+																			height: '50px',
+																		}}
+																	/>
+																</div>
+															</div>
+														) : (
+															<TaskChartReport data={taskReport} />
+														)}
+													</div>
+												</div>
+											</CardBody>
+										</Card>
+									</div>,
+									['admin'],
+								)}
 							</div>
-						))}
-						{verifyPermissionHOC(
-							<div className='col-md-12 col-xl-4 col-sm-12'>
-								<Card stretch>
-									<CardBody className='d-flex align-items-center justify-content-center'>
-										<Button
-											color='info'
-											size='lg'
-											isLight
-											className='w-100 h-100'
-											icon='AddCircle'
-											onClick={() => handleOpenFormEdit(null)}>
-											Thêm mục tiêu
-										</Button>
-									</CardBody>
-								</Card>
-							</div>,
-							['admin'],
-						)}
-					</div>
-				) : (
-					<div className='row'>
-						<div className='col-12'>
-							<Card>
-								<CardHeader>
-									<CardLabel icon='Task' iconColor='danger'>
-										<CardTitle>
-											<CardLabel>Danh sách mục tiêu</CardLabel>
-										</CardTitle>
-									</CardLabel>
+							{parseInt(searchParams.get('view'), 10) === 1 ||
+							!searchParams.get('view') ? (
+								<div className='row'>
+									{missions?.map((item) => (
+										<div className='col-md-6 col-xl-4 col-sm-12' key={item?.id}>
+											<Card stretch className='cursor-pointer'>
+												<CardHeader className='bg-transparent py-0'>
+													<CardLabel
+														icon='StarOutline'
+														className='pt-4 pb-2 w-100 align-items-start'
+														onClick={() =>
+															navigateToDetailPage(item?.id)
+														}>
+														<CardTitle tag='h4' className='h4'>
+															{item?.name}
+														</CardTitle>
+														<CardSubTitle
+															className={
+																item.status === 1
+																	? 'mt-2 fs-14 text-success fw-bold ps-2'
+																	: 'mt-2 fs-14 text-danger fw-bold ps-2'
+															}>
+															{item.status === 1
+																? 'Đang thực hiện'
+																: 'Đã đóng'}
+														</CardSubTitle>
+													</CardLabel>
+													{verifyPermissionHOC(
+														<CardActions>
+															<Dropdown>
+																<DropdownToggle hasIcon={false}>
+																	<Button
+																		color='dark'
+																		isLink
+																		hoverShadow='default'
+																		icon='MoreHoriz'
+																		aria-label='More Actions'
+																	/>
+																</DropdownToggle>
+																<DropdownMenu isAlignmentEnd>
+																	<DropdownItem>
+																		<Button
+																			disabled={
+																				item.status === 0
+																			}
+																			icon='Edit'
+																			tag='button'
+																			onClick={() =>
+																				handleOpenFormEdit(
+																					item,
+																				)
+																			}>
+																			Sửa mục tiêu
+																		</Button>
+																	</DropdownItem>
+																	<DropdownItem>
+																		<Button
+																			icon={
+																				item.status === 0
+																					? 'Check'
+																					: 'Close'
+																			}
+																			tag='button'
+																			onClick={() =>
+																				handleOpenFormDelete(
+																					item,
+																				)
+																			}>
+																			{item.status === 0
+																				? 'Mở mục tiêu'
+																				: 'Đóng mục tiêu'}
+																		</Button>
+																	</DropdownItem>
+																</DropdownMenu>
+															</Dropdown>
+														</CardActions>,
+														['admin'],
+													)}
+												</CardHeader>
+												<CardBody
+													className='pt-2 pb-4'
+													onClick={() => navigateToDetailPage(item?.id)}>
+													<div className='row'>
+														<div className='col-md-12'>
+															<div className='d-flex align-items-center jusify-content-start'>
+																<small
+																	style={{ fontSize: 14 }}
+																	className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+																	{moment(
+																		`${item?.startTime}`,
+																	).format('DD-MM-YYYY')}
+																</small>
+																<span
+																	style={{ fontSize: 14 }}
+																	className='px-2'>
+																	-
+																</span>
+																<small
+																	style={{ fontSize: 14 }}
+																	className='border border-success border-2 text-success fw-bold px-2 py-1 rounded-1'>
+																	{moment(
+																		`${item?.endTime}`,
+																	).format('DD-MM-YYYY')}
+																</small>
+															</div>
+														</div>
+													</div>
+													<div className='row'>
+														{item?.departments
+															.slice(0, 6)
+															?.map((k, index) => (
+																<div
+																	// eslint-disable-next-line react/no-array-index-key
+																	key={index}
+																	className='col-auto mt-2'>
+																	<Badge
+																		isLight
+																		color='primary'
+																		className='px-3 py-3'
+																		style={{ fontSize: 14 }}>
+																		{k?.name}
+																	</Badge>
+																</div>
+															))}
+													</div>
+													<div className='row mt-4'>
+														<div className='col-md-12'>
+															{item.progress}
+															%
+															<Progress
+																isAutoColor
+																value={item.progress}
+																height={10}
+															/>
+														</div>
+													</div>
+												</CardBody>
+											</Card>
+										</div>
+									))}
 									{verifyPermissionHOC(
-										<CardActions>
-											<Button
-												color='info'
-												icon='Plus'
-												tag='button'
-												onClick={() => handleOpenFormEdit(null)}>
-												Thêm mục tiêu
-											</Button>
-										</CardActions>,
+										<div className='col-md-12 col-xl-4 col-sm-12'>
+											<Card stretch>
+												<CardBody className='d-flex align-items-center justify-content-center'>
+													<Button
+														color='info'
+														size='lg'
+														isLight
+														className='w-100 h-100'
+														icon='AddCircle'
+														onClick={() => handleOpenFormEdit(null)}>
+														Thêm mục tiêu
+													</Button>
+												</CardBody>
+											</Card>
+										</div>,
 										['admin'],
 									)}
-								</CardHeader>
-								<div className='p-4'>
-									<TableCommon
-										className='table table-modern mb-0'
-										columns={columns}
-										data={missions}
-									/>
 								</div>
-								{!missions?.length && (
-									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										Không có mục tiêu!
-									</Alert>
-								)}
-							</Card>
-						</div>
-					</div>
-				)}
-				<div className='row mt-4'>
-					<div className='col-12'>
-						<div className='display-6 fw-bold py-3'>Công việc mới cập nhật</div>
-					</div>
-					{latestTasks?.map((item) => {
-						return (
-							<Item
-								key={item?.id}
-								keys={item?.keys}
-								departmentsRelated={item?.departments}
-								usersRelated={item?.users}
-								id={item?.id}
-								name={item?.name}
-								teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
-								dueDate={`${item?.deadlineDate}`}
-								percent={item.progress || 0}
-								data-tour='project-item'
+							) : (
+								<div className='row'>
+									<div className='col-12'>
+										<Card>
+											<CardHeader>
+												<CardLabel icon='Task' iconColor='danger'>
+													<CardTitle>
+														<CardLabel>Danh sách mục tiêu</CardLabel>
+													</CardTitle>
+												</CardLabel>
+												{verifyPermissionHOC(
+													<CardActions>
+														<Button
+															color='info'
+															icon='Plus'
+															tag='button'
+															onClick={() =>
+																handleOpenFormEdit(null)
+															}>
+															Thêm mục tiêu
+														</Button>
+													</CardActions>,
+													['admin'],
+												)}
+											</CardHeader>
+											<div className='p-4'>
+												<TableCommon
+													className='table table-modern mb-0'
+													columns={columns}
+													data={missions}
+												/>
+											</div>
+											{!missions?.length && (
+												<Alert
+													color='warning'
+													isLight
+													icon='Report'
+													className='mt-3'>
+													Không có mục tiêu!
+												</Alert>
+											)}
+										</Card>
+									</div>
+								</div>
+							)}
+							<div className='row mt-4'>
+								<div className='col-12'>
+									<div className='display-6 fw-bold py-3'>
+										Công việc mới cập nhật
+									</div>
+								</div>
+								{latestTasks?.map((item) => {
+									return (
+										<Item
+											key={item?.id}
+											keys={item?.keys}
+											departmentsRelated={item?.departments}
+											usersRelated={item?.users}
+											id={item?.id}
+											name={item?.name}
+											teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
+											dueDate={`${item?.deadlineDate}`}
+											percent={item.progress || 0}
+											data-tour='project-item'
+										/>
+									);
+								})}
+							</div>
+							<MissionAlertConfirm
+								openModal={toggleFormConfirm}
+								onCloseModal={handleCloseForm}
+								onConfirm={() => handleCloseItem(itemEdit)}
+								title={itemEdit?.status === 1 ? 'Đóng mục tiêu' : 'Mở mục tiêu'}
+								content={
+									itemEdit?.status === 1
+										? `Xác nhận đóng mục tiêu <strong>${itemEdit?.name}</strong> ?`
+										: `Xác nhận mở mục tiêu <strong>${itemEdit?.name}</strong> ?`
+								}
 							/>
-						);
-					})}
+							<MissionFormModal
+								show={toggleFormEdit}
+								onClose={handleCloseForm}
+								onSubmit={handleSubmitMissionForm}
+								item={itemEdit}
+							/>
+						</>,
+						['admin', 'manager'],
+						<NotPermission />,
+					)}
 				</div>
-				<MissionAlertConfirm
-					openModal={toggleFormConfirm}
-					onCloseModal={handleCloseForm}
-					onConfirm={() => handleCloseItem(itemEdit)}
-					title={itemEdit?.status === 1 ? 'Đóng mục tiêu' : 'Mở mục tiêu'}
-					content={
-						itemEdit?.status === 1
-							? `Xác nhận đóng mục tiêu <strong>${itemEdit?.name}</strong> ?`
-							: `Xác nhận mở mục tiêu <strong>${itemEdit?.name}</strong> ?`
-					}
-				/>
-				<MissionFormModal
-					show={toggleFormEdit}
-					onClose={handleCloseForm}
-					onSubmit={handleSubmitMissionForm}
-					item={itemEdit}
-				/>
 			</Page>
 		</PageWrapper>
 	);

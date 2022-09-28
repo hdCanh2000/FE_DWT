@@ -126,7 +126,6 @@ export const demoPages = {
 				text: 'Vị trí công việc',
 				path: '/vi-tri-cong-viec',
 			},
-			
 		},
 	},
 	reportPage: {
@@ -219,7 +218,6 @@ export const demoPages = {
 				text: 'Cấu hình bảng số liệu',
 				path: '/cau-hinh-bang-so-lieu',
 			},
-			
 		},
 	},
 };

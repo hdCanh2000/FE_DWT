@@ -8,11 +8,11 @@ import moment from 'moment';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { useToasts } from 'react-toast-notifications';
-import Dropdown, {
-	DropdownToggle,
-	DropdownMenu,
-	DropdownItem,
-} from '../../../components/bootstrap/Dropdown';
+// import Dropdown, {
+// 	DropdownToggle,
+// 	DropdownMenu,
+// 	DropdownItem,
+// } from '../../../components/bootstrap/Dropdown';
 import {
 	updateSubtask,
 	updateStatusPendingTask,
@@ -24,23 +24,23 @@ import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Card, {
-	CardActions,
+	// CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
-	CardSubTitle,
+	// CardSubTitle,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import {
 	FORMAT_TASK_STATUS,
-	formatColorStatus,
+	// formatColorStatus,
 	formatColorPriority,
-	renderStatusTask,
-	STATUS,
-	renderStatus,
+	// renderStatusTask,
+	// STATUS,
+	// renderStatus,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
-import Icon from '../../../components/icon/Icon';
+// import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
 import TaskDetailForm from './TaskDetailForm/TaskDetailForm';
 import ComfirmSubtask from './TaskDetailForm/ComfirmSubtask';
@@ -214,6 +214,7 @@ const TaskDetailPage = () => {
 			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
+			format: (item) => item || 0,
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -235,55 +236,55 @@ const TaskDetailPage = () => {
 							'pt-2 pb-2 me-2',
 							`bg-${formatColorPriority(item.priority)}`,
 						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
+						<span className=''>{`Cấp ${item.priority ? item.priority : 1}`}</span>
 					</span>
 				</div>
 			),
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'text',
-			align: 'center',
-			render: (item) =>
-				verifyPermissionHOC(
-					<Dropdown>
-						<DropdownToggle hasIcon={false}>
-							<Button
-								isLink
-								color={formatColorStatus(item.status)}
-								icon='Circle'
-								className='text-nowrap'>
-								{FORMAT_TASK_STATUS(item.status)}
-							</Button>
-						</DropdownToggle>
-						<DropdownMenu>
-							{Object.keys(renderStatusTask(item.status)).map((key) => (
-								<DropdownItem
-									key={key}
-									onClick={() =>
-										handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
-									}>
-									<div>
-										<Icon icon='Circle' color={STATUS[key].color} />
-										{STATUS[key].name}
-									</div>
-								</DropdownItem>
-							))}
-						</DropdownMenu>
-					</Dropdown>,
-					['admin', 'manager'],
-					<Button
-						isLink
-						color={formatColorStatus(item.status)}
-						icon='Circle'
-						className='text-nowrap'>
-						{FORMAT_TASK_STATUS(item.status)}
-					</Button>,
-				),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'text',
+		// 	align: 'center',
+		// 	render: (item) =>
+		// 		verifyPermissionHOC(
+		// 			<Dropdown>
+		// 				<DropdownToggle hasIcon={false}>
+		// 					<Button
+		// 						isLink
+		// 						color={formatColorStatus(item.status)}
+		// 						icon='Circle'
+		// 						className='text-nowrap'>
+		// 						{FORMAT_TASK_STATUS(item.status)}
+		// 					</Button>
+		// 				</DropdownToggle>
+		// 				<DropdownMenu>
+		// 					{Object.keys(renderStatusTask(item.status)).map((key) => (
+		// 						<DropdownItem
+		// 							key={key}
+		// 							onClick={() =>
+		// 								handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
+		// 							}>
+		// 							<div>
+		// 								<Icon icon='Circle' color={STATUS[key].color} />
+		// 								{STATUS[key].name}
+		// 							</div>
+		// 						</DropdownItem>
+		// 					))}
+		// 				</DropdownMenu>
+		// 			</Dropdown>,
+		// 			['admin', 'manager'],
+		// 			<Button
+		// 				isLink
+		// 				color={formatColorStatus(item.status)}
+		// 				icon='Circle'
+		// 				className='text-nowrap'>
+		// 				{FORMAT_TASK_STATUS(item.status)}
+		// 			</Button>,
+		// 		),
+		// },
 		{
 			title: '',
 			id: 'action',
@@ -308,7 +309,7 @@ const TaskDetailPage = () => {
 							onClick={() => handleOpenConfirm(item)}
 						/>
 					</div>,
-					['admin', 'manager'],
+					['admin', 'manager', 'user'],
 				),
 		},
 	];
@@ -370,6 +371,7 @@ const TaskDetailPage = () => {
 			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
+			format: (item) => item || 0,
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -391,28 +393,28 @@ const TaskDetailPage = () => {
 							'pt-2 pb-2 me-2',
 							`bg-${formatColorPriority(item.priority)}`,
 						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
+						<span className=''>{`Cấp ${item.priority ? item.priority : 1}`}</span>
 					</span>
 				</div>
 			),
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
-			align: 'center',
-			render: (item) => (
-				<Button
-					isLink
-					color={formatColorStatus(item.status)}
-					icon='Circle'
-					className='text-nowrap'>
-					{FORMAT_TASK_STATUS(item.status)}
-				</Button>
-			),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'number',
+		// 	align: 'center',
+		// 	render: (item) => (
+		// 		<Button
+		// 			isLink
+		// 			color={formatColorStatus(item.status)}
+		// 			icon='Circle'
+		// 			className='text-nowrap'>
+		// 			{FORMAT_TASK_STATUS(item.status)}
+		// 		</Button>
+		// 	),
+		// },
 		{
 			title: '',
 			id: 'action',
@@ -656,9 +658,9 @@ const TaskDetailPage = () => {
 	};
 
 	// Modal hiển thị thông tin note
-	const handleOpenListInfoModal = () => {
-		setOpenListInfoModal(true);
-	};
+	// const handleOpenListInfoModal = () => {
+	// 	setOpenListInfoModal(true);
+	// };
 
 	const handleCloseListInfoModal = () => {
 		setOpenListInfoModal(false);
@@ -754,7 +756,7 @@ const TaskDetailPage = () => {
 											Tổng kết
 										</CardTitle>
 									</CardLabel>
-									{verifyPermissionHOC(
+									{/* {verifyPermissionHOC(
 										<CardActions className='d-flex'>
 											<Dropdown>
 												<DropdownToggle hasIcon={false}>
@@ -798,7 +800,7 @@ const TaskDetailPage = () => {
 											/>
 										</CardActions>,
 										['admin', 'manager'],
-									)}
+									)} */}
 								</CardHeader>
 								<CardBody className='py-2'>
 									<div className='row g-4'>
@@ -811,13 +813,13 @@ const TaskDetailPage = () => {
 														<CardTitle tag='h4' className='h5'>
 															Tiến độ thực hiện
 														</CardTitle>
-														<CardSubTitle
+														{/* <CardSubTitle
 															tag='h4'
 															className={`h5 text-${formatColorStatus(
 																task?.status,
 															)}`}>
 															{FORMAT_TASK_STATUS(task.status)}
-														</CardSubTitle>
+														</CardSubTitle> */}
 													</CardLabel>
 												</CardHeader>
 												<CardBody className='py-2'>
@@ -1179,7 +1181,7 @@ const TaskDetailPage = () => {
 											icon='AddCircle'>
 											Thêm đầu việc
 										</Button>,
-										['admin', 'manager'],
+										['admin', 'manager', 'user'],
 									)}
 								</CardHeader>
 								<div className='p-4'>

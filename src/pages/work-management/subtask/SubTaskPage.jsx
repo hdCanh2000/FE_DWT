@@ -11,23 +11,23 @@ import Card, {
 	CardLabel,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-import Dropdown, {
-	DropdownItem,
-	DropdownMenu,
-	DropdownToggle,
-} from '../../../components/bootstrap/Dropdown';
+// import Dropdown, {
+// 	DropdownItem,
+// 	DropdownMenu,
+// 	DropdownToggle,
+// } from '../../../components/bootstrap/Dropdown';
 import Progress from '../../../components/bootstrap/Progress';
-import Icon from '../../../components/icon/Icon';
+// import Icon from '../../../components/icon/Icon';
 import useDarkMode from '../../../hooks/useDarkMode';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
 import {
 	formatColorPriority,
-	formatColorStatus,
-	FORMAT_TASK_STATUS,
-	renderStatus,
-	STATUS,
+	// formatColorStatus,
+	// FORMAT_TASK_STATUS,
+	// renderStatus,
+	// STATUS,
 } from '../../../utils/constants';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import { addNewSubtask, updateSubtask } from '../TaskDetail/services';
@@ -47,12 +47,12 @@ const SubTaskPage = () => {
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [deletes, setDeletes] = React.useState({});
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
-	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
-		title: '',
-		subTitle: '',
-		status: null,
-		isShowNote: false,
-	});
+	// const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+	// 	title: '',
+	// 	subTitle: '',
+	// 	status: null,
+	// 	isShowNote: false,
+	// });
 
 	async function fetchDataAllSubTasks() {
 		const response = await getAllSubTasks();
@@ -120,16 +120,16 @@ const SubTaskPage = () => {
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
 
-	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
-		setOpenConfirmModalStatus(true);
-		setItemEdit({ ...item });
-		setInfoConfirmModalStatus({
-			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
-			subTitle: item?.name,
-			status: nextStatus,
-			isShowNote,
-		});
-	};
+	// const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
+	// 	setOpenConfirmModalStatus(true);
+	// 	setItemEdit({ ...item });
+	// 	setInfoConfirmModalStatus({
+	// 		title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+	// 		subTitle: item?.name,
+	// 		status: nextStatus,
+	// 		isShowNote,
+	// 	});
+	// };
 
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
@@ -234,13 +234,13 @@ const SubTaskPage = () => {
 								<table className='table table-modern mb-0' style={{ fontSize: 14 }}>
 									<thead>
 										<tr>
-											<th className='text-center'>STT</th>
-											<th className='text-center'>Tên đầu việc</th>
-											<th className='text-center'>Nhân viên phụ trách</th>
+											<th>STT</th>
+											<th>Tên đầu việc</th>
+											<th>Nhân viên phụ trách</th>
 											<th className='text-center'>Hạn hoàn thành</th>
 											<th className='text-center'>Điểm KPI</th>
 											<th className='text-center'>Độ ưu tiên</th>
-											<th className='text-center'>Trạng thái</th>
+											{/* <th className='text-center'>Trạng thái</th> */}
 											<th className='text-center'>Tiến độ</th>
 											<td />
 										</tr>
@@ -264,28 +264,26 @@ const SubTaskPage = () => {
 														)}
 													</td>
 													<td align='center'>{item?.kpiValue}</td>
-													<td>
-														<div className='d-flex align-items-center'>
-															<span
-																style={{
-																	paddingRight: '1rem',
-																	paddingLeft: '1rem',
-																}}
-																className={classNames(
-																	'badge',
-																	'border border-2',
-																	[`border-${themeStatus}`],
-																	'bg-success',
-																	'pt-2 pb-2 me-2',
-																	`bg-${formatColorPriority(
-																		item.priority,
-																	)}`,
-																)}>
-																<span className=''>{`Cấp ${item.priority}`}</span>
-															</span>
-														</div>
-													</td>
 													<td className='text-center'>
+														<span
+															style={{
+																paddingRight: '1rem',
+																paddingLeft: '1rem',
+															}}
+															className={classNames(
+																'badge',
+																'border border-2',
+																[`border-${themeStatus}`],
+																'bg-success',
+																'pt-2 pb-2 me-2',
+																`bg-${formatColorPriority(
+																	item.priority,
+																)}`,
+															)}>
+															<span className=''>{`Cấp ${item.priority}`}</span>
+														</span>
+													</td>
+													{/* <td className='text-center'>
 														<Dropdown>
 															<DropdownToggle hasIcon={false}>
 																<Button
@@ -326,7 +324,7 @@ const SubTaskPage = () => {
 																))}
 															</DropdownMenu>
 														</Dropdown>
-													</td>
+													</td> */}
 													<td className='text-center'>
 														<div className='d-flex align-items-center justify-content-center flex-column'>
 															<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
@@ -387,10 +385,10 @@ const SubTaskPage = () => {
 					onClose={handleCloseConfirmStatusTask}
 					onSubmit={handleUpdateStatus}
 					item={itemEdit}
-					isShowNote={infoConfirmModalStatus.isShowNote}
-					title={infoConfirmModalStatus.title}
-					subTitle={infoConfirmModalStatus.subTitle}
-					status={infoConfirmModalStatus.status}
+					// isShowNote={infoConfirmModalStatus.isShowNote}
+					// title={infoConfirmModalStatus.title}
+					// subTitle={infoConfirmModalStatus.subTitle}
+					// status={infoConfirmModalStatus.status}
 				/>
 				<ComfirmSubtask
 					openModal={openConfirm}
