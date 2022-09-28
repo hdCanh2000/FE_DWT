@@ -23,6 +23,7 @@ import Page from '../../layout/Page/Page';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const KeyPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -202,7 +203,8 @@ const KeyPage = () => {
 							content={`Xác nhận xoá cấp nhân sự <strong>${itemDelete?.name}</strong> ?`}
 						/>
 					</>,
-					['admin', 'manager'],
+					['admin'],
+					<NotPermission />,
 				)}
 			</Page>
 		</PageWrapper>

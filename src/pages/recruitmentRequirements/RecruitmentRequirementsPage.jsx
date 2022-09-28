@@ -21,6 +21,7 @@ import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addRequirement, updateRequirement, deleteRequirement } from './services';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const RecruitmentRequirementPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -223,6 +224,7 @@ const RecruitmentRequirementPage = () => {
 						/>
 					</>,
 					['admin'],
+					<NotPermission />,
 				)}
 			</Page>
 		</PageWrapper>

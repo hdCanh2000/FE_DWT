@@ -26,6 +26,7 @@ import { addPosition, updatePosition } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
 import { formatJobType } from '../../utils/constants';
 import PositionDetail from './PositionDetail';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -313,6 +314,7 @@ const PositionPage = () => {
 						/>
 					</>,
 					['admin'],
+					<NotPermission />,
 				)}
 			</Page>
 		</PageWrapper>

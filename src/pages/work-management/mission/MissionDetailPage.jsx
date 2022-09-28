@@ -201,7 +201,7 @@ const MissionDetailPage = () => {
 						'pt-2 pb-2 me-2',
 						`bg-${formatColorPriority(item.priority)}`,
 					)}>
-					<span className=''>{`Cấp ${item.priority}`}</span>
+					<span className=''>{`Cấp ${item.priority ? item.priority : 1}`}</span>
 				</span>
 			),
 			align: 'center',
@@ -345,7 +345,7 @@ const MissionDetailPage = () => {
 							'pt-2 pb-2 me-2',
 							`bg-${formatColorPriority(item.priority)}`,
 						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
+						<span className=''>{`Cấp ${item.priority ? item.priority : 1}`}</span>
 					</span>
 				</div>
 			),

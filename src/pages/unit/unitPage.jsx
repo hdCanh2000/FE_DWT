@@ -19,6 +19,7 @@ import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/Comfirm
 import { getAllUnits, addUnit, updateUnit, deleteUnit } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -233,7 +234,8 @@ const UnitPage = () => {
 							validate={validate}
 						/>
 					</>,
-					['admin', 'manager'],
+					['admin'],
+					<NotPermission />,
 				)}
 				<ComfirmSubtask
 					openModal={openConfirm}
