@@ -38,15 +38,16 @@ import Dropdown, {
 	DropdownMenu,
 	DropdownToggle,
 } from '../../components/bootstrap/Dropdown';
-import CommonSalePerformance from '../common/CRMDashboard/CommonSalePerformance copy';
+import CommonSalePerformance from '../common/CRMDashboard/CommonSalePerformance';
 import CommonApprovedAppointmentChart from '../common/SubHeaders/CommonApprovedAppointmentChart';
+import OrderBarChart from '../common/SubHeaders/OrderBarChat';
 
 const DashboardPage = () => {
 	const { darkModeStatus, themeStatus } = useDarkMode();
 	const navigate = useNavigate();
 	const handleOnClickToMissionListPage = useCallback(
 		() => navigate(`../${demoPages.jobsPage.subMenu.target.path}`),
-		[navigate],
+		[navigate]
 	);
 	// departments
 	const [dataDepartments, setDataDepartments] = useState([]);
@@ -110,8 +111,7 @@ const DashboardPage = () => {
 						style={{
 							height: 10,
 							width: '100%',
-						}}
-					/>
+						}} />
 				</div>
 			),
 			align: 'center',
@@ -149,7 +149,7 @@ const DashboardPage = () => {
 							[`border-${themeStatus}`],
 							'bg-success',
 							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`,
+							`bg-${formatColorPriority(item.priority)}`
 						)}>
 						<span className=''>{`Cấp ${item.priority}`}</span>
 					</span>
@@ -219,8 +219,7 @@ const DashboardPage = () => {
 						style={{
 							height: 10,
 							width: '100%',
-						}}
-					/>
+						}} />
 				</div>
 			),
 			align: 'center',
@@ -250,7 +249,7 @@ const DashboardPage = () => {
 							[`border-${themeStatus}`],
 							'bg-success',
 							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`,
+							`bg-${formatColorPriority(item.priority)}`
 						)}>
 						<span className=''>{`Cấp ${item.priority}`}</span>
 					</span>
@@ -333,7 +332,7 @@ const DashboardPage = () => {
 			arr.push(
 				moment()
 					.add(-1 * i, 'day')
-					.format('ll'),
+					.format('ll')
 			);
 		}
 		return arr.reverse();
@@ -344,7 +343,7 @@ const DashboardPage = () => {
 			arr.push(
 				moment()
 					.add(-1 * i, 'year')
-					.format('YYYY'),
+					.format('YYYY')
 			);
 		}
 		arr.sort();
@@ -448,7 +447,7 @@ const DashboardPage = () => {
 				},
 			},
 		},
-	}
+	};
 	const salesByStoreOptions = {
 		chart: {
 			height: 335.5,
@@ -541,7 +540,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -609,7 +608,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -721,7 +720,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -848,7 +847,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -927,7 +926,7 @@ const DashboardPage = () => {
 			theme: 'dark',
 			fixed: {
 				enabled: true,
-				position: 'topLeft', // topRight, topLeft, bottomRight, bottomLeft
+				position: 'topLeft',
 				offsetY: 30,
 				offsetX: 60,
 			},
@@ -1110,7 +1109,7 @@ const DashboardPage = () => {
 						id: 1,
 						name: 'Tất cả',
 					})
-					.reverse(),
+					.reverse()
 			);
 		};
 		fetchData();
@@ -1194,48 +1193,38 @@ const DashboardPage = () => {
 										<DropdownMenu isAlignmentEnd>
 											<DropdownItem>
 												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP1)
-													}>
+													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP1)}>
 													Tổng công ty
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP2)
-													}>
+													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP2)}>
 													Kênh OTC
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP3)
-													}>
+													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP3)}>
 													Kênh ETC
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP4)
-													}>
+													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP4)}>
 													Kênh MT
 												</Button>
 											</DropdownItem>
 											<DropdownItem>
 												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP5)
-													}>
+													onClick={() => setActiveCompanyTab(COMPANIES_TAB.COMP5)}>
 													Kênh Online
 												</Button>
 											</DropdownItem>
 										</DropdownMenu>
 									</Dropdown>
 									<ButtonGroup
-									style={{marginRight:'0'}}
+										style={{ marginRight: '0' }}
 									>
 										{search.map((element) => (
 											<div key={element.name}>
@@ -1313,9 +1302,8 @@ const DashboardPage = () => {
 									<div className='row'>
 										<div className='col-md-12'>
 											<Chart
-												series={
-													(searchTab === SEARCH_TAB.COMP1 &&
-														dayStoreSeries) ||
+												series={(searchTab === SEARCH_TAB.COMP1 &&
+													dayStoreSeries) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
 														monthStoreSeries) ||
 													(searchTab === SEARCH_TAB.COMP3 &&
@@ -1328,34 +1316,30 @@ const DashboardPage = () => {
 														salesByStoreSeries2) ||
 													(activeCompanyTab === COMPANIES_TAB.COMP4 &&
 														salesByStoreSeries3) ||
-													salesByStoreSeries4
-												}
-												options={
-													(searchTab === SEARCH_TAB.COMP1 &&
-														dayOptions) ||
+													salesByStoreSeries4}
+												options={(searchTab === SEARCH_TAB.COMP1 &&
+													dayOptions) ||
 													(searchTab === SEARCH_TAB.COMP2 &&
 														monthOptions) ||
 													(searchTab === SEARCH_TAB.COMP3 &&
 														quarterOptions) ||
 													(searchTab === SEARCH_TAB.COMP4 &&
 														yearOptions) ||
-													salesByStoreOptions
-												}
+													salesByStoreOptions}
 												type={salesByStoreOptions.chart.type}
-												height={salesByStoreOptions.chart.height}
-											/>
+												height={salesByStoreOptions.chart.height} />
 										</div>
 									</div>
 								</CardBody>
 							</Card>
 						</div>,
-						['admin'],
+						['admin']
 					)}
 					<div className='col-md-6'>
 						{verifyPermissionHOC(
 							<Card stretch>
 								<CardHeader>
-									<CardLabel icon='StackedBarChart'>
+									<CardLabel icon='ReceiptLong'>
 										<CardTitle>
 											Thống kê người dùng
 										</CardTitle>
@@ -1366,7 +1350,7 @@ const DashboardPage = () => {
 									<Chart series={guestChart.series} options={guestChart.options} type='bar' height={370} />
 								</CardBody>
 							</Card>,
-							['admin'],
+							['admin']
 						)}
 					</div>
 				</div>
@@ -1390,8 +1374,7 @@ const DashboardPage = () => {
 											hoverShadow='default'
 											rounded={1}
 											color={darkModeStatus ? 'dark' : null}
-											onClick={handleOnClickToMissionListPage}
-										/>
+											onClick={handleOnClickToMissionListPage} />
 									</CardActions>
 								</CardHeader>
 								<CardBody className='py-0'>
@@ -1408,8 +1391,7 @@ const DashboardPage = () => {
 															marginTop: '15%',
 															width: '50px',
 															height: '50px',
-														}}
-													/>
+														}} />
 												</div>
 											) : (
 												<MissionChartReport data={missionReport} />
@@ -1419,7 +1401,7 @@ const DashboardPage = () => {
 								</CardBody>
 							</Card>
 						</div>,
-						['admin'],
+						['admin']
 					)}
 					{verifyPermissionHOC(
 						<div className='col-md-6'>
@@ -1441,28 +1423,23 @@ const DashboardPage = () => {
 														color='primary'
 														icon='Circle'
 														className='text-nowrap'>
-														{
-															dataDepartments.filter(
-																(item) =>
-																	item.id === departmentSelect,
-															)[0]?.name
-														}
+														{dataDepartments.filter(
+															(item) => item.id === departmentSelect
+														)[0]?.name}
 													</Button>
 												</DropdownToggle>
 												<DropdownMenu>
 													{dataDepartments?.map((item) => (
 														<DropdownItem
 															key={item?.id}
-															onClick={() =>
-																setDepartmentSelect(item.id)
-															}>
+															onClick={() => setDepartmentSelect(item.id)}>
 															<div>{item?.name}</div>
 														</DropdownItem>
 													))}
 												</DropdownMenu>
 											</Dropdown>
 										</CardActions>,
-										['admin'],
+										['admin']
 									)}
 								</CardHeader>
 								<CardBody className='py-0'>
@@ -1478,8 +1455,7 @@ const DashboardPage = () => {
 															marginLeft: '42%',
 															width: '50px',
 															height: '50px',
-														}}
-													/>
+														}} />
 												</div>
 											) : (
 												<TaskChartReport data={taskReport} />
@@ -1489,7 +1465,7 @@ const DashboardPage = () => {
 								</CardBody>
 							</Card>
 						</div>,
-						['admin', 'manager'],
+						['admin', 'manager']
 					)}
 					{verifyPermissionHOC(
 						<div className='col-md-6'>
@@ -1517,14 +1493,14 @@ const DashboardPage = () => {
 								</CardBody>
 							</Card>
 						</div>,
-						['manager'],
+						['manager']
 					)}
 				</div>
-				<div className='row mt-0'>
-					<div className='col-md-6' style={{ marginTop: '1%' }}>
+				<div className='row'>
+					<div className='col-md-6' style={{ marginTop: '1.6%' }}>
 						<CommonSalePerformance />
 					</div>
-					<div className='col-md-6' style={{ marginTop: '1%' }}>
+					<div className='col-md-6' style={{ marginTop: '1.6%' }}>
 						<CommonApprovedAppointmentChart />
 					</div>
 					{verifyPermissionHOC(
@@ -1549,7 +1525,7 @@ const DashboardPage = () => {
 								</CardBody>
 							</Card>
 						</div>,
-						['user'],
+						['user']
 					)}
 				</div>
 				{verifyPermissionHOC(
@@ -1570,8 +1546,7 @@ const DashboardPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columnTasks}
-											data={tasks}
-										/>
+											data={tasks} />
 									</div>
 									{!tasks?.length && (
 										<Alert
@@ -1599,8 +1574,7 @@ const DashboardPage = () => {
 										<TableCommon
 											className='table table-modern mb-0'
 											columns={columnSubTasks}
-											data={subtasks}
-										/>
+											data={subtasks} />
 									</div>
 									{!tasks?.length && (
 										<Alert
@@ -1615,11 +1589,19 @@ const DashboardPage = () => {
 							</div>
 						</div>
 					</>,
-					['user'],
+					['user']
+				)}
+				{verifyPermissionHOC(
+					<div className='row'>
+						<div className='col-md-6'>
+							<OrderBarChart />
+						</div>
+					</div>,
+					['admin']
 				)}
 			</Page>
-		</PageWrapper >
+		</PageWrapper>
 	);
-};
+}
 
 export default DashboardPage;
