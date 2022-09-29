@@ -208,6 +208,7 @@ const EmployeePage = () => {
 			},
 			manday: data?.manday,
 			quantity: data?.quantity,
+			type: 1,
 		};
 		if (data?.id) {
 			try {

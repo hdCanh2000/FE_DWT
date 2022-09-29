@@ -35,6 +35,7 @@ const Login = () => {
 			localStorage.setItem('token', result.accessToken);
 			localStorage.setItem('email', result.email);
 			localStorage.setItem('name', result.name);
+			localStorage.setItem('userId', result.id);
 			localStorage.setItem('roles', JSON.stringify(result.roles));
 			// navigate('/');
 			window.location.href = '/';

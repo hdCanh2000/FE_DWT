@@ -14,6 +14,7 @@ const TASKBYUSER = {
 };
 const DAILYWORKTRACKING = {
 	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTracking')),
+	DAILYWORKTRACKINGME: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTrackMe')),
 };
 const TASK = {
 	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
@@ -98,6 +99,11 @@ const presentation = [
 	{
 		path: demoPages.jobsPage.subMenu.taskByUser.path,
 		element: <TASKBYUSER.TASKBYUSER />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.jobsPage.subMenu.dailyWorkTracking.path}`,
+		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGME />,
 		exact: true,
 	},
 	{
