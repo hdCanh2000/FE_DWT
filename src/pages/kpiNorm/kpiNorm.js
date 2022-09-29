@@ -26,6 +26,7 @@ import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -283,167 +284,174 @@ const EmployeePage = () => {
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
 			<Page container='fluid'>
-				<div className='row'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>{lable}</div>
-						</div>
-					</div>
-				</div>
 				{verifyPermissionHOC(
-					<div className='row mb-0'>
-						<div className='col-12'>
-							<Card className='w-100'>
-								<CardHeader>
-									<CardLabel icon='AccountCircle' iconColor='primary'>
-										<CardTitle>
-											<CardLabel>Danh sách định mức KPI</CardLabel>
-										</CardTitle>
-									</CardLabel>
-									<CardActions>
-										<Button
-											color='info'
-											icon='PersonPlusFill'
-											tag='button'
-											onClick={() => handleOpenForm(null)}>
-											Thêm định mức KPI
-										</Button>
-									</CardActions>
-								</CardHeader>
-								<div className='p-4'>
-									<div className='p-4'>
-										<div style={{ maxWidth: '25%' }}>
-											<Search />
-										</div>
-										<table
-											className='table table-modern mb-0'
-											style={{ fontSize: 14 }}>
-											<thead>
-												<tr>
-													<th>Tên định mức KPI</th>
-													<th>Phòng ban</th>
-													<th className='text-center'>Số lượng</th>
-													<th>Đơn vị tính</th>
-													<th>Mô tả</th>
-													<th>Vị trí chuyên môn</th>
-													<th className='text-center'>Hành động</th>
-												</tr>
-											</thead>
-											<tbody>
-												{items?.map((item) => (
-													<React.Fragment key={item.id}>
-														<tr>
-															<td>{item?.name}</td>
-															<td>{item?.department?.name}</td>
-															<td className='text-center'>
-																{item?.quantity}
-															</td>
-															<td>{item?.unit?.name}</td>
-															<td>{item?.description}</td>
-															<td>{item?.position?.name}</td>
-															<td className='text-center'>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='success'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-1'
-																	icon='Edit'
-																	onClick={() =>
-																		handleOpenForm({
-																			...item,
-																			department: {
-																				...item.department,
-																				value: item
-																					.department
-																					?.value,
-																				label: item
-																					.department
-																					?.name,
-																			},
-																			position: {
-																				...item.position,
-																				value: item.position
-																					?.value,
-																				label: item.position
-																					?.name,
-																			},
-																			unit: {
-																				...item.unit,
-																				value: item.unit
-																					?.value,
-																				label: item.unit
-																					?.name,
-																			},
-																		})
-																	}
-																/>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='primary'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-1'
-																	icon='RemoveRedEye'
-																	onClick={() =>
-																		handleOpenDetail({
-																			...item,
-																			department: {
-																				...item.department,
-																				value: item
-																					.department
-																					?.value,
-																				label: item
-																					.department
-																					?.name,
-																			},
-																			position: {
-																				...item.position,
-																				value: item.position
-																					?.value,
-																				label: item.position
-																					?.name,
-																			},
-																			unit: {
-																				...item.unit,
-																				value: item.unit
-																					?.value,
-																				label: item.unit
-																					?.name,
-																			},
-																		})
-																	}
-																/>
-																<Button
-																	isOutline={!darkModeStatus}
-																	color='danger'
-																	isLight={darkModeStatus}
-																	className='text-nowrap mx-1'
-																	icon='Trash'
-																	onClick={() =>
-																		handleOpenDelete(item)
-																	}
-																/>
-															</td>
-														</tr>
-													</React.Fragment>
-												))}
-											</tbody>
-										</table>
-										<hr />
-										<footer>
-											<PaginationButtons
-												data={kpiNorm}
-												setCurrentPage={setCurrentPage}
-												currentPage={currentPage}
-												perPage={perPage}
-												setPerPage={setPerPage}
-											/>
-										</footer>
-									</div>
+					<>
+						<div className='row'>
+							<div className='col-12'>
+								<div className='d-flex justify-content-between align-items-center'>
+									<div className='display-6 fw-bold py-3'>{lable}</div>
 								</div>
-							</Card>
+							</div>
 						</div>
-					</div>,
-					['admin', 'manager'],
+						<div className='row mb-0'>
+							<div className='col-12'>
+								<Card className='w-100'>
+									<CardHeader>
+										<CardLabel icon='AccountCircle' iconColor='primary'>
+											<CardTitle>
+												<CardLabel>Danh sách định mức KPI</CardLabel>
+											</CardTitle>
+										</CardLabel>
+										<CardActions>
+											<Button
+												color='info'
+												icon='PersonPlusFill'
+												tag='button'
+												onClick={() => handleOpenForm(null)}>
+												Thêm định mức KPI
+											</Button>
+										</CardActions>
+									</CardHeader>
+									<div className='p-4'>
+										<div className='p-4'>
+											<div style={{ maxWidth: '25%' }}>
+												<Search />
+											</div>
+											<table
+												className='table table-modern mb-0'
+												style={{ fontSize: 14 }}>
+												<thead>
+													<tr>
+														<th>Tên định mức KPI</th>
+														<th>Phòng ban</th>
+														<th className='text-center'>Số lượng</th>
+														<th>Đơn vị tính</th>
+														<th>Mô tả</th>
+														<th>Vị trí chuyên môn</th>
+														<th className='text-center'>Hành động</th>
+													</tr>
+												</thead>
+												<tbody>
+													{items?.map((item) => (
+														<React.Fragment key={item.id}>
+															<tr>
+																<td>{item?.name}</td>
+																<td>{item?.department?.name}</td>
+																<td className='text-center'>
+																	{item?.quantity}
+																</td>
+																<td>{item?.unit?.name}</td>
+																<td>{item?.description}</td>
+																<td>{item?.position?.name}</td>
+																<td className='text-center'>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='success'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-1'
+																		icon='Edit'
+																		onClick={() =>
+																			handleOpenForm({
+																				...item,
+																				department: {
+																					...item.department,
+																					value: item
+																						.department
+																						?.value,
+																					label: item
+																						.department
+																						?.name,
+																				},
+																				position: {
+																					...item.position,
+																					value: item
+																						.position
+																						?.value,
+																					label: item
+																						.position
+																						?.name,
+																				},
+																				unit: {
+																					...item.unit,
+																					value: item.unit
+																						?.value,
+																					label: item.unit
+																						?.name,
+																				},
+																			})
+																		}
+																	/>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='primary'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-1'
+																		icon='RemoveRedEye'
+																		onClick={() =>
+																			handleOpenDetail({
+																				...item,
+																				department: {
+																					...item.department,
+																					value: item
+																						.department
+																						?.value,
+																					label: item
+																						.department
+																						?.name,
+																				},
+																				position: {
+																					...item.position,
+																					value: item
+																						.position
+																						?.value,
+																					label: item
+																						.position
+																						?.name,
+																				},
+																				unit: {
+																					...item.unit,
+																					value: item.unit
+																						?.value,
+																					label: item.unit
+																						?.name,
+																				},
+																			})
+																		}
+																	/>
+																	<Button
+																		isOutline={!darkModeStatus}
+																		color='danger'
+																		isLight={darkModeStatus}
+																		className='text-nowrap mx-1'
+																		icon='Trash'
+																		onClick={() =>
+																			handleOpenDelete(item)
+																		}
+																	/>
+																</td>
+															</tr>
+														</React.Fragment>
+													))}
+												</tbody>
+											</table>
+											<hr />
+											<footer>
+												<PaginationButtons
+													data={kpiNorm}
+													setCurrentPage={setCurrentPage}
+													currentPage={currentPage}
+													perPage={perPage}
+													setPerPage={setPerPage}
+												/>
+											</footer>
+										</div>
+									</div>
+								</Card>
+							</div>
+						</div>
+					</>,
+					['admin'],
+					<NotPermission />,
 				)}
 				<CommonForm
 					show={toggleForm}

@@ -25,7 +25,8 @@ import Toasts from '../../components/bootstrap/Toasts';
 import { close, minus, plus } from './icon/icon';
 import Search from '../common/ComponentCommon/Search';
 import DepartmentDetail from './DepartmentDetail';
-import EmployeePage from '../employee/EmployeePage';
+import Employee from './Employee';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
@@ -206,15 +207,15 @@ const DepartmentPage = () => {
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
-				<div className='row'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
-						</div>
-					</div>
-				</div>
 				{verifyPermissionHOC(
 					<>
+						<div className='row'>
+							<div className='col-12'>
+								<div className='d-flex justify-content-between align-items-center'>
+									<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
+								</div>
+							</div>
+						</div>
 						<div className='row mb-0'>
 							<div className='col-12'>
 								<Card className='w-100 ' style={{ minHeight: '900px' }}>
@@ -289,28 +290,27 @@ const DepartmentPage = () => {
 												departmentList={departmentList}
 											/>
 										) : (
-											<div className='col-lg-8 col-md-6'>
-												<EmployeePage header />
-											</div>
+											<Employee header />
 										)}
 									</div>
 								</Card>
 							</div>
 						</div>
-						<CommonForm
-							setInitValues={setItemEdits}
-							show={openForm}
-							onClose={handleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label='Thêm mới phòng ban'
-							fields={columns}
-							validate={validate}
-							disable='true'
-						/>
 					</>,
-					['admin', 'manager'],
+					['admin'],
+					<NotPermission />,
 				)}
+				<CommonForm
+					setInitValues={setItemEdits}
+					show={openForm}
+					onClose={handleCloseForm}
+					handleSubmit={handleSubmitForm}
+					item={itemEdit}
+					label='Thêm mới phòng ban'
+					fields={columns}
+					validate={validate}
+					disable='true'
+				/>
 			</Page>
 		</PageWrapper>
 	);
