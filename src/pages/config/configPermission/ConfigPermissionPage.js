@@ -26,6 +26,7 @@ import {
 } from '../../../redux/slice/roleSlice';
 import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
 import ConfigPermissionForm from './ConfigPermissionForm';
+import NotPermission from '../../presentation/auth/NotPermission';
 
 const permissions = [
 	{
@@ -253,6 +254,7 @@ const ConfigPermissionPage = () => {
 						</div>
 					</>,
 					['admin'],
+					<NotPermission />,
 				)}
 				<CommonForm
 					show={toggleForm}

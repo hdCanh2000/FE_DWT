@@ -2,12 +2,16 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React from 'react';
+import React, { useEffect } from 'react';
+import SelectComponent from 'react-select';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-// import ContentEditable from 'react-contenteditable';
+import ContentEditable from 'react-contenteditable';
 import Button from '../../components/bootstrap/Button';
 import Card from '../../components/bootstrap/Card';
 import Icon from '../../components/icon/Icon';
+import Input from '../../components/bootstrap/forms/Input';
+import { fetchUnitList } from '../../redux/slice/unitSlice';
 
 const minWith150 = {
 	minWidth: 150,
@@ -25,24 +29,42 @@ const border = {
 const styleHead = {
 	border: '1px solid #c8c7c7',
 	width: '100%',
-	height: '50px',
-	lineHeight: '50px',
+	height: '75px',
+	padding: '15px',
 	borderBottom: 0,
 };
 
 // eslint-disable-next-line no-unused-vars
-const TableWorkTrack = ({
+const TableWorkTracking = ({
 	rowsState,
 	handleAddRow,
-	// handleChangeRowState,
+	handleChangeRowState,
 	handleRemoveRowField,
+	handleSubmit,
 }) => {
 	const columns = ['STT', 'Nhiệm vụ', 'Số lượng', 'ĐVT', 'Ghi chú', 'Thời hạn', 'KH dự kiến'];
+	const dispatch = useDispatch();
+	const units = useSelector((state) => state.unit.units);
+
+	useEffect(() => {
+		dispatch(fetchUnitList());
+	}, [dispatch]);
 
 	return (
 		<Card className='w-100 h-100'>
-			<div style={styleHead}>
-				<p className='m-0 d-block text-center fs-4 fw-bold'>Hạng mục</p>
+			<div style={styleHead} className='d-flex justify-content-between align-items-center'>
+				<p className='m-0 d-block fs-4 fw-bold'>Hạng mục</p>
+				<div className=''>
+					<Button
+						color='primary'
+						size='lg'
+						isLight
+						className='mt-0 border'
+						icon='Check'
+						onClick={handleSubmit}>
+						Lưu lại
+					</Button>
+				</div>
 			</div>
 			<table className='table table-modern mb-0'>
 				<thead>
@@ -67,35 +89,73 @@ const TableWorkTrack = ({
 					</tr>
 				</thead>
 				<tbody>
-					{rowsState?.map((item, index) => (
-						// eslint-disable-next-line react/no-array-index-key
-						<tr key={index}>
-							<td className='text-center' style={styleIndex}>
-								{index + 1}
-							</td>
-							<td
-								onClick={(e) => handleRemoveRowField(e, index)}
-								className='text-center cursor-pointer'
-								style={styleIndex}>
-								<Icon icon='Delete' size='lg' />
-							</td>
-							<td style={minWith150} contentEditable>
-								<div>{item.name}</div>
-							</td>
-							<td contentEditable>{item.amount}</td>
-							<td contentEditable>{item.unit}</td>
-							<td contentEditable>{item.descriptions}</td>
-							<td contentEditable>{item.dateLine}</td>
-							<td contentEditable>{item.plant}</td>
-						</tr>
-					))}
+					{rowsState?.map((item, index) => {
+						return (
+							// eslint-disable-next-line react/no-array-index-key
+							<tr key={index}>
+								<td className='text-center' style={styleIndex}>
+									{index + 1}
+								</td>
+								<td
+									onClick={(e) => handleRemoveRowField(e, index)}
+									className='text-center cursor-pointer'
+									style={styleIndex}>
+									<Icon icon='Delete' size='lg' />
+								</td>
+								<ContentEditable
+									tagName='td'
+									style={minWith150}
+									html={item?.name}
+									onChange={(e) => handleChangeRowState(index, e, 'name')}
+								/>
+								<ContentEditable
+									tagName='td'
+									html={`${item?.quantity}`}
+									disabled={false}
+									onChange={(e) => handleChangeRowState(index, e, 'quantity')}
+								/>
+								<td style={{ border: '1px solid #c8c7c7', padding: 0 }}>
+									<SelectComponent
+										placeholder='Đơn vị tính'
+										defaultValue={item?.unit}
+										value={item?.unit}
+										onChange={(e) => handleChangeRowState(index, e, 'unit')}
+										options={units}
+									/>
+								</td>
+								<ContentEditable
+									tagName='td'
+									html={item?.note}
+									disabled={false}
+									onChange={(e) => handleChangeRowState(index, e, 'note')}
+								/>
+								<td style={{ border: '1px solid #c8c7c7', padding: 0 }}>
+									<Input
+										name='deadline'
+										placeholder='Thời hạn'
+										onChange={(e) => handleChangeRowState(index, e, 'deadline')}
+										value={item?.deadline}
+										type='date'
+										ariaLabel='Thời hạn'
+										className='border border-2 rounded-0 shadow-none'
+									/>
+								</td>
+								<ContentEditable
+									tagName='td'
+									html={item?.plan}
+									disabled={false}
+									onChange={(e) => handleChangeRowState(index, e, 'plan')}
+								/>
+							</tr>
+						);
+					})}
 				</tbody>
 			</table>
 			<Button
 				color='success'
 				size='lg'
 				isLight
-				className='mt-4 w-100 h-100 btn-circle border'
+				className='my-4 w-50 h-50 m-auto btn-circle border'
 				icon='Add'
 				onClick={handleAddRow}
 			/>
@@ -103,18 +163,20 @@ const TableWorkTrack = ({
 	);
 };
 
-TableWorkTrack.propTypes = {
+TableWorkTracking.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types
 	rowsState: PropTypes.array,
 	handleAddRow: PropTypes.func,
-	// handleChangeRowState: PropTypes.func,
+	handleChangeRowState: PropTypes.func,
 	handleRemoveRowField: PropTypes.func,
+	handleSubmit: PropTypes.func,
 };
-TableWorkTrack.defaultProps = {
+TableWorkTracking.defaultProps = {
 	rowsState: [],
 	handleAddRow: null,
-	// handleChangeRowState: null,
+	handleChangeRowState: null,
 	handleRemoveRowField: null,
+	handleSubmit: null,
 };
 
-export default TableWorkTrack;
+export default TableWorkTracking;

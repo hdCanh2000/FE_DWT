@@ -20,7 +20,7 @@ import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormListByParams } from '../../../redux/slice/kpiNormSlice';
+import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
@@ -156,12 +156,8 @@ const TaskActionsPage = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(
-			fetchKpiNormListByParams({
-				departmentId: departmentOption?.value,
-			}),
-		);
-	}, [dispatch, departmentOption?.value]);
+		dispatch(fetchKpiNormList());
+	}, [dispatch]);
 
 	useEffect(() => {
 		dispatch(fetchUnitList());

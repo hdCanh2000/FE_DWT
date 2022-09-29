@@ -46,9 +46,7 @@ const OrderBarChat = () => {
 		<Card stretch>
 			<CardHeader>
 				<CardLabel icon='ReceiptLong'>
-					<CardTitle>
-						Số lượng đơn hàng
-					</CardTitle>
+					<CardTitle>Số lượng đơn hàng</CardTitle>
 					<CardSubTitle>Báo cáo</CardSubTitle>
 				</CardLabel>
 			</CardHeader>

@@ -20,6 +20,7 @@ import { addKey, getAllKeys, updateKey, deleteKey } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const KeyPage = () => {
 	const dispatch = useDispatch();
@@ -250,7 +251,8 @@ const KeyPage = () => {
 							validate={validate}
 						/>
 					</>,
-					['admin', 'manager'],
+					['admin'],
+					<NotPermission />,
 				)}
 				<ComfirmSubtask
 					openModal={openConfirm}
