@@ -25,6 +25,7 @@ import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, updateEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import { getAllDepartmentWithUser } from '../department/services';
+import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 
 const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -40,6 +41,8 @@ const EmployeePage = ({ header }) => {
 	const [departments, setDepartments] = React.useState([]);
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
+	const [openDelete, setOpenDelete] = React.useState(false);
+	const [dataDelete, setDataDelete] = React.useState({});
 	useEffect(() => {
 		const fecth = async () => {
 			const response = await getAllDepartmentWithUser();
@@ -204,19 +207,54 @@ const EmployeePage = ({ header }) => {
 						icon='RemoveRedEye'
 						onClick={() => handleOpenDetail(item)}
 					/>
-					{/* <Button
+					<Button
 						isOutline={!darkModeStatus}
-						color='primary'
+						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => navigate(`/danh-sach-nhan-su/${item.id}`)}
-					/> */}
+						icon='Trash'
+						onClick={() => handleOpenDelete(item)}
+					/>
 				</>
 			),
 			isShow: false,
 		},
 	];
+	const handleOpenDelete = (item) => {
+		setDataDelete(item);
+		setOpenDelete(!openDelete);
+	};
+	const handleDelete = async (data) => {
+		const dataSubmit = {
+			id: data?.id,
+			name: data?.name,
+			departmentId: data?.department?.value,
+			department: {
+				id: data?.department?.value,
+				name: data?.department?.label,
+			},
+			code: data?.code,
+			email: data?.email,
+			password: '123456',
+			dateOfBirth: data?.dateOfBirth,
+			dateOfJoin: data?.dateOfJoin,
+			phone: data?.phone,
+			address: data?.address,
+			position: Number.parseInt(data?.position, 10),
+			status: Number(data?.status),
+			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
+			isDelete: 1,
+		};
+		try {
+			await updateEmployee(dataSubmit);
+			dispatch(fetchEmployeeList());
+			handleCloseForm();
+			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
+		} catch (error) {
+			handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+			throw error;
+		}
+	};
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -352,6 +390,15 @@ const EmployeePage = ({ header }) => {
 					item={dataDetail}
 					label={`Chi tiết nhân viên: ${dataDetail?.name}`}
 					fields={columns}
+				/>
+				<ComfirmSubtask
+					openModal={openDelete}
+					onCloseModal={handleOpenDelete}
+					onConfirm={() => handleDelete(dataDelete)}
+					title='Xoá nhân viên'
+					// eslint-disable-next-line eslint-comments/no-duplicate-disable
+					// eslint-disable-next-line react/prop-types
+					content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>
