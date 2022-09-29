@@ -54,9 +54,9 @@ const TaskByUser = () => {
 								<table className='table table-modern mb-0' style={{ fontSize: 14 }}>
 									<thead>
 										<tr>
-											<th>Họ và tên</th>
-											<th style={{ textAlign: 'center' }}>
-												Danh sách đầu việc
+											<th style={{ textAlign: 'center' }}>Họ và tên</th>
+											<th style={{ textAlign: 'center' , maxWidth : '65px' }}>
+												Công việc
 											</th>
 											<th style={{ textAlign: 'center' }}>Phòng ban</th>
 											<th style={{ textAlign: 'center' }}>Trạng thái</th>
@@ -68,8 +68,8 @@ const TaskByUser = () => {
 											<React.Fragment key={item.id}>
 												{/* {fecth(item.id)} */}
 												<tr>
-													<td>{item?.name}</td>
-													<td>
+													<td style={{ textAlign: 'center' }}>{item?.name}</td>
+													<td style={{ textAlign: 'center' }}>
 														<Button
 															className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
 															onClick={() => handleEpandRow(item.id)}>
