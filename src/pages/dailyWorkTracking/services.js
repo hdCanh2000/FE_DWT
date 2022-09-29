@@ -1,9 +1,16 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllWorktrack = () => {
+const getAllWorktrackByUserId = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/worktracks?_expand=unit`,
+		url: `/worktracks_by_user/${id}`,
+	});
+};
+
+const getAllWorktrackByUser = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/worktracks_by_user`,
 	});
 };
 
@@ -23,4 +30,4 @@ const updateWorktrack = (data) => {
 	});
 };
 
-export { getAllWorktrack, addWorktrack, updateWorktrack };
+export { getAllWorktrackByUserId, getAllWorktrackByUser, addWorktrack, updateWorktrack };

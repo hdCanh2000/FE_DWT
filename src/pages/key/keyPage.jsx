@@ -251,7 +251,7 @@ const KeyPage = () => {
 							validate={validate}
 						/>
 					</>,
-					['admin', 'manager'],
+					['admin'],
 					<NotPermission />,
 				)}
 				<ComfirmSubtask

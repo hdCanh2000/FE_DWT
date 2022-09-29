@@ -44,7 +44,15 @@ const EmployeePage = ({ header }) => {
 		const fecth = async () => {
 			const response = await getAllDepartmentWithUser();
 			const result = await response.data;
-			setDepartments([...result]);
+			setDepartments(
+				[...result].map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
 		};
 		fecth();
 	}, []);
@@ -177,14 +185,17 @@ const EmployeePage = ({ header }) => {
 			align: 'center',
 			render: (item) => (
 				<>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-1'
-						icon='Edit'
-						onClick={() => handleOpenForm(item)}
-					/>
+					{verifyPermissionHOC(
+						<Button
+							isOutline={!darkModeStatus}
+							color='success'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-1'
+							icon='Edit'
+							onClick={() => handleOpenForm(item)}
+						/>,
+						['admin'],
+					)}
 					<Button
 						isOutline={!darkModeStatus}
 						color='primary'
@@ -300,15 +311,18 @@ const EmployeePage = ({ header }) => {
 											<CardLabel>Danh sách nhân sự</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									<CardActions>
-										<Button
-											color='info'
-											icon='PersonPlusFill'
-											tag='button'
-											onClick={() => handleOpenForm(null)}>
-											Thêm nhân sự
-										</Button>
-									</CardActions>
+									{verifyPermissionHOC(
+										<CardActions>
+											<Button
+												color='info'
+												icon='PersonPlusFill'
+												tag='button'
+												onClick={() => handleOpenForm(null)}>
+												Thêm nhân sự
+											</Button>
+										</CardActions>,
+										['admin'],
+									)}
 								</CardHeader>
 								<div className='p-4'>
 									<TableCommon
