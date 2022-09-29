@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Toasts from '../../components/bootstrap/Toasts';
 import Page from '../../layout/Page/Page';
@@ -9,16 +10,19 @@ import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
 import { addKpiNorm } from '../kpiNorm/services';
 // import { addWorktrack } from './services';
 import TableCalendar from './TableCalendar';
-import TableWorkTracking from './TableWorkTracking';
+import TableWorkTracking from './tableWorkTracking';
 
 const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
+	const params = useParams();
 	const { addToast } = useToasts();
 	const worktracks = useSelector((state) => state.worktrack.worktracks);
 
+	const { id } = params;
+
 	useEffect(() => {
-		dispatch(fetchWorktrackList());
-	}, [dispatch]);
+		dispatch(fetchWorktrackList(id));
+	}, [dispatch, id]);
 
 	useEffect(() => {
 		setRowsState(worktracks);

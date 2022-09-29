@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
 	addWorktrack,
-	getAllWorktrack,
+	getAllWorktrackByUserId,
+	// getAllWorktrackByUser,
 	updateWorktrack,
 } from '../../pages/dailyWorkTracking/services';
 
@@ -12,8 +13,8 @@ const initialState = {
 };
 
 // Đầu tiên, tạo thunk
-export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async () => {
-	const response = await getAllWorktrack();
+export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
+	const response = await getAllWorktrackByUserId(id);
 	return response.data.map((item) => {
 		return {
 			...item,
