@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import moment from 'moment';
 import classNames from 'classnames';
 import Button from '../../components/bootstrap/Button';
-import { formatColorPriority, formatColorStatus, FORMAT_TASK_STATUS } from '../../utils/constants';
+import { formatColorPriority } from '../../utils/constants';
 import Icon from '../../components/icon/Icon';
 import Progress from '../../components/bootstrap/Progress';
 import useDarkMode from '../../hooks/useDarkMode';
@@ -32,12 +32,10 @@ const Expand = ({ idUser }) => {
 			<thead>
 				<tr>
 					<th>Tên công việc</th>
-					<th className='text-center'>Hình thức</th>
-					<th className='text-center'>Trạng thái</th>
+					<th>Hình thức</th>
 					<th className='text-center'>Hạn ngày hoàn thành</th>
-					<th className='text-center'>Giá trị KPI</th>
 					<th className='text-center'>Tiến độ</th>
-					<th className='text-center'>Thứ tự ưu tiên</th>
+					<th className='text-center'>Độ ưu tiên</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -50,22 +48,10 @@ const Expand = ({ idUser }) => {
 								{subTaskItem?.name}
 							</Link>
 						</td>
-						<td className='text-center'>
-							{subTaskItem?.userId === idUser ? 'Phụ trách chính' : 'Liên quan'}
-						</td>
-						<td className='text-center'>
-							<Button
-								isLink
-								color={formatColorStatus(subTaskItem.status)}
-								icon='Circle'
-								className='text-nowrap'>
-								{FORMAT_TASK_STATUS(subTaskItem.status)}
-							</Button>
-						</td>
+						<td>{subTaskItem?.userId === idUser ? 'Phụ trách chính' : 'Liên quan'}</td>
 						<td className='text-center'>
 							{moment(`${subTaskItem.deadlineDate}`).format('DD-MM-YYYY')}
 						</td>
-						<td className='text-center'>{subTaskItem.kpiValue}</td>
 						<td className='text-center' style={minWidth100}>
 							<div className='d-flex align-items-center'>
 								<div className='flex-shrink-0 me-3'>{`${
@@ -101,9 +87,7 @@ const Expand = ({ idUser }) => {
 					<td colSpan={12}>
 						<Button
 							className='d-flex align-items-center cursor-pointer'
-							style={{ paddingLeft: 0 }}
-							// onClick={() => onOpenModal(taskId)}
-						>
+							style={{ paddingLeft: 0 }}>
 							<Icon size='lg' icon='PlusCircle' />
 							<span className='mx-2'>Thêm công việc của nhân viên</span>
 						</Button>

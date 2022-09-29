@@ -19,7 +19,9 @@ export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () =
 	return response.data.map((item) => {
 		return {
 			...item,
-			label: `${item.name} - Số lượng: ${item.quantity} - ${item.unit?.name} - ${item.position?.name} - ${item.manday} MD`,
+			label: `${item.name} - Số lượng: ${item.quantity || ''} - ${
+				item.unit?.name || 'Chưa có đơn vị'
+			} - ${item.position?.name || 'Chưa có vị trí'} - ${item.manday || 'Chưa có'} MD`,
 			value: item.id,
 			text: item.name,
 		};
