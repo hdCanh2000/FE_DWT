@@ -172,7 +172,8 @@ const DepartmentPage = () => {
 	};
 	const departments = arrayToTree(department, { childrenField: 'items', dataField: null });
 	const handleClick = (item) => {
-		setItemEdits(item);
+		const newItem = department.filter((items) => items.id === item.id);
+		setItemEdits(newItem[0]);
 	};
 	const renderDepartmentMenu = (datas) => {
 		return datas?.map((item) => {
@@ -281,7 +282,7 @@ const DepartmentPage = () => {
 												</CardBody>
 											</Card>
 										</div>
-										{itemEdits.name !== undefined ? (
+										{department.includes(itemEdits) ? (
 											<DepartmentDetail
 												initValues={itemEdits}
 												organizationLevelOptions={organizationLevelOptions}
