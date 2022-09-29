@@ -665,29 +665,39 @@ const MissionPage = () => {
 									</div>
 								</div>
 							)}
-							<div className='row mt-4'>
-								<div className='col-12'>
-									<div className='display-6 fw-bold py-3'>
-										Công việc mới cập nhật
+							{latestTasks?.length > 0 ? (
+								<div className='row mt-4'>
+									<div className='col-12'>
+										<div className='display-6 fw-bold py-3'>
+											Công việc mới cập nhật
+										</div>
+									</div>
+									{latestTasks?.map((item) => {
+										return (
+											<Item
+												key={item?.id}
+												keys={item?.keys}
+												departmentsRelated={item?.departments}
+												usersRelated={item?.users}
+												id={item?.id}
+												name={item?.name}
+												teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
+												dueDate={`${item?.deadlineDate}`}
+												percent={item.progress || 0}
+												data-tour='project-item'
+											/>
+										);
+									})}
+								</div>
+							) : (
+								<div className='row mt-4'>
+									<div className='col-12'>
+										<div className='display-6 fw-bold py-3'>
+											Hiện chưa có công việc nào.
+										</div>
 									</div>
 								</div>
-								{latestTasks?.map((item) => {
-									return (
-										<Item
-											key={item?.id}
-											keys={item?.keys}
-											departmentsRelated={item?.departments}
-											usersRelated={item?.users}
-											id={item?.id}
-											name={item?.name}
-											teamName={`${item?.departments[0]?.name} - ${item?.users[0]?.name}`}
-											dueDate={`${item?.deadlineDate}`}
-											percent={item.progress || 0}
-											data-tour='project-item'
-										/>
-									);
-								})}
-							</div>
+							)}
 							<MissionAlertConfirm
 								openModal={toggleFormConfirm}
 								onCloseModal={handleCloseForm}

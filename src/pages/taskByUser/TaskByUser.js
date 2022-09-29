@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Icon from '../../components/icon/Icon';
@@ -54,22 +55,24 @@ const TaskByUser = () => {
 								<table className='table table-modern mb-0' style={{ fontSize: 14 }}>
 									<thead>
 										<tr>
-											<th style={{ textAlign: 'center' }}>Họ và tên</th>
-											<th style={{ textAlign: 'center' , maxWidth : '65px' }}>
-												Công việc
-											</th>
-											<th style={{ textAlign: 'center' }}>Phòng ban</th>
-											<th style={{ textAlign: 'center' }}>Trạng thái</th>
-											<th style={{ textAlign: 'center' }}>Chức vụ</th>
+											<th>Họ và tên</th>
+											<th className='text-center'>Danh sách đầu việc</th>
+											<th>Phòng ban</th>
+											<th>Chức vụ</th>
 										</tr>
 									</thead>
 									<tbody>
 										{items?.map((item) => (
 											<React.Fragment key={item.id}>
-												{/* {fecth(item.id)} */}
 												<tr>
-													<td style={{ textAlign: 'center' }}>{item?.name}</td>
-													<td style={{ textAlign: 'center' }}>
+													<td>
+														<Link
+															className='text-underline'
+															to={`${demoPages.jobsPage.subMenu.dailyWorkTracking.path}/${item.id}`}>
+															{item.name}
+														</Link>
+													</td>
+													<td>
 														<Button
 															className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
 															onClick={() => handleEpandRow(item.id)}>
@@ -84,15 +87,8 @@ const TaskByUser = () => {
 															/>
 														</Button>
 													</td>
-													<td style={{ textAlign: 'center' }}>
-														{item?.department?.label}
-													</td>
-													<td style={{ textAlign: 'center' }}>
-														{item?.status === 1
-															? 'Đang hoạt động'
-															: 'Không hoạt động'}
-													</td>
-													<td style={{ textAlign: 'center' }}>
+													<td>{item?.department?.label}</td>
+													<td>
 														{item?.roles[0] === 'manager'
 															? 'Quản lý '
 															: 'Nhân viên'}

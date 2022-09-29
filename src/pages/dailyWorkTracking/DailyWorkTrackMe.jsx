@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Toasts from '../../components/bootstrap/Toasts';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
-import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
+import { fetchWorktrackListMe } from '../../redux/slice/worktrackSlice';
 import { addKpiNorm } from '../kpiNorm/services';
 import { addWorktrack } from './services';
 import TableCalendar from './TableCalendar';
 import TableWorkTracking from './tableWorkTracking';
 
-const DailyWorkTracking = () => {
+const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
-	const params = useParams();
 	const { addToast } = useToasts();
 	const worktracks = useSelector((state) => state.worktrack.worktracks);
 
-	const { id } = params;
-
 	useEffect(() => {
-		dispatch(fetchWorktrackList(id));
-	}, [dispatch, id]);
+		dispatch(fetchWorktrackListMe());
+	}, [dispatch]);
 
 	useEffect(() => {
 		setRowsState(worktracks);
@@ -70,8 +66,6 @@ const DailyWorkTracking = () => {
 		);
 	};
 
-	// const userLogin = window.localStorage.getItem('roles');
-
 	const handleSubmit = () => {
 		const dataKPINormSubmit = [];
 		const dataWorktrackSubmit = [];
@@ -91,11 +85,10 @@ const DailyWorkTracking = () => {
 				},
 				manday: null,
 				quantity: parseInt(item.quantity, 10),
-				type: 2,
 			});
 			dataWorktrackSubmit.push({
 				name: item.name,
-				userId: parseInt(id, 10),
+				userId: parseInt(window.localStorage.getItem('userId'), 10),
 				unitId: item.unit?.value,
 				unit: {
 					name: item.unit?.name,
@@ -120,6 +113,7 @@ const DailyWorkTracking = () => {
 			addWorktrack(item)
 				.then(() => {
 					handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ thành công!`);
+					dispatch(fetchWorktrackListMe());
 				})
 				.catch((err) => {
 					handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
@@ -160,4 +154,4 @@ const DailyWorkTracking = () => {
 		</PageWrapper>
 	);
 };
-export default DailyWorkTracking;
+export default DailyWorkTrackingMe;
