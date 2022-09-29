@@ -238,7 +238,46 @@ const DepartmentPage = () => {
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />
-													{renderDepartmentMenu(departments)}
+													{departments?.map((item) => {
+														return (
+															<div>
+																{item?.items?.length === 0 && (
+																	<Tree
+																		icons={{
+																			plusIcon: plus,
+																			minusIcon: minus,
+																			closeIcon: close,
+																		}}
+																		key={item.id}
+																		content={`${item.name}`}
+																		style={treeStyles}
+																		onItemClick={() =>
+																			handleClick(item)
+																		}
+																	/>
+																)}
+																{item?.items?.length !== 0 && (
+																	<Tree
+																		icons={{
+																			plusIcon: plus,
+																			minusIcon: minus,
+																			closeIcon: close,
+																		}}
+																		key={item.id}
+																		content={item.name}
+																		style={treeStyles}
+																		open
+																		onItemClick={() =>
+																			handleClick(item)
+																		}>
+																		{renderDepartmentMenu(
+																			item.items,
+																		)}
+																	</Tree>
+																)}
+															</div>
+														);
+													})}
 												</CardBody>
 											</Card>
 										</div>
