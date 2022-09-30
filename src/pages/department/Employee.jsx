@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import Card, {
 	CardActions,
@@ -12,7 +13,6 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
-import CommonForm from '../common/ComponentCommon/CommonForm';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
@@ -21,6 +21,7 @@ import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 import { addEmployee, updateEmployee } from '../employee/services';
+import EmployeeForm from '../employee/EmployeeForm';
 
 const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -60,19 +61,19 @@ const EmployeePage = ({ header }) => {
 			isShow: true,
 		},
 		{
-			title: 'Email',
-			id: 'email',
-			key: 'email',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-		{
 			title: 'SĐT',
 			id: 'phone',
 			key: 'phone',
 			type: 'text',
 			align: 'center',
+			isShow: true,
+		},
+		{
+			title: 'Email',
+			id: 'email',
+			key: 'email',
+			type: 'text',
+			align: 'left',
 			isShow: true,
 		},
 		{
@@ -99,16 +100,25 @@ const EmployeePage = ({ header }) => {
 			),
 		},
 		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'switch',
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
 			align: 'center',
 			isShow: true,
-			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
-			title: 'Chức vụ',
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: true,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Vai trò',
 			id: 'position',
 			key: 'position',
 			type: 'singleSelect',
@@ -130,6 +140,16 @@ const EmployeePage = ({ header }) => {
 				},
 			],
 		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		},
+
 		{
 			title: 'Hành động',
 			id: 'action',
@@ -274,7 +294,7 @@ const EmployeePage = ({ header }) => {
 		setDataDetail({});
 	};
 	return (
-		<div className='col-lg-8 col-md-6'>
+		<div className='col-lg-9 col-md-6'>
 			{header === false &&
 				verifyPermissionHOC(
 					<div className='row mb-4'>
@@ -323,7 +343,7 @@ const EmployeePage = ({ header }) => {
 				['admin', 'manager'],
 			)}
 
-			<CommonForm
+			<EmployeeForm
 				show={toggleForm}
 				onClose={handleCloseForm}
 				handleSubmit={handleSubmitForm}
