@@ -27,6 +27,10 @@ import Search from '../common/ComponentCommon/Search';
 import DepartmentDetail from './DepartmentDetail';
 import Employee from './Employee';
 import NotPermission from '../presentation/auth/NotPermission';
+import company from '../../components/icon/svg-icons/company.svg';
+import diagram from '../../components/icon/svg-icons/diagram.png';
+import departmentt from '../../components/icon/svg-icons/department.png';
+import group from '../../components/icon/svg-icons/group.png';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
@@ -44,6 +48,21 @@ const DepartmentPage = () => {
 			value: items.id,
 		};
 	});
+	const showIcon = (item) => {
+		if (item.organizationLevel === 4) {
+			return <img src={company} alt='logo' style={{ width: '5%' }} />;
+		}
+		if (item.organizationLevel === 1) {
+			return <img src={diagram} alt='logo' style={{ width: '6%' }} />;
+		}
+		if (item.organizationLevel === 2) {
+			return <img src={departmentt} alt='logo' style={{ width: '6%' }} />;
+		}
+		if (item.organizationLevel === 3) {
+			return <img src={group} alt='logo' style={{ width: '5%' }} />;
+		}
+		return <img src={company} alt='logo' style={{ width: '5%' }} />;
+	};
 	const organizationLevelOptions = [
 		{
 			label: 'Khối',
@@ -176,12 +195,13 @@ const DepartmentPage = () => {
 		const newItem = department.filter((items) => items.id === item.id);
 		setItemEdits(newItem[0]);
 	};
-	const renderDepartmentMenu = (datas) => {
-		return datas?.map((item) => {
+	const renderDepartmentMenu = (data) => {
+		const a = data?.map((item) => {
 			return (
 				<div>
 					{item?.items?.length === 0 && (
 						<Tree
+							type={showIcon(item)}
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={`${item.name}`}
@@ -191,6 +211,7 @@ const DepartmentPage = () => {
 					)}
 					{item?.items?.length !== 0 && (
 						<Tree
+							type={showIcon(item)}
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={item.name}
@@ -203,6 +224,8 @@ const DepartmentPage = () => {
 				</div>
 			);
 		});
+		return a;
+	
 	};
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
@@ -240,46 +263,7 @@ const DepartmentPage = () => {
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />
-													{departments?.map((item) => {
-														return (
-															<div>
-																{item?.items?.length === 0 && (
-																	<Tree
-																		icons={{
-																			plusIcon: plus,
-																			minusIcon: minus,
-																			closeIcon: close,
-																		}}
-																		key={item.id}
-																		content={`${item.name}`}
-																		style={treeStyles}
-																		onItemClick={() =>
-																			handleClick(item)
-																		}
-																	/>
-																)}
-																{item?.items?.length !== 0 && (
-																	<Tree
-																		icons={{
-																			plusIcon: plus,
-																			minusIcon: minus,
-																			closeIcon: close,
-																		}}
-																		key={item.id}
-																		content={item.name}
-																		style={treeStyles}
-																		open
-																		onItemClick={() =>
-																			handleClick(item)
-																		}>
-																		{renderDepartmentMenu(
-																			item.items,
-																		)}
-																	</Tree>
-																)}
-															</div>
-														);
-													})}
+												{renderDepartmentMenu(departments)}
 												</CardBody>
 											</Card>
 										</div>
