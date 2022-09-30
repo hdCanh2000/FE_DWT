@@ -97,17 +97,17 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: demoPages.jobsPage.subMenu.taskByUser.path,
+		path: demoPages.jobsPage.subMenu.employee.path,
 		element: <TASKBYUSER.TASKBYUSER />,
 		exact: true,
 	},
 	{
-		path: `${demoPages.jobsPage.subMenu.dailyWorkTracking.path}`,
+		path: `${demoPages.taskAndAssign.subMenu.taskByUser.path}`,
 		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGME />,
 		exact: true,
 	},
 	{
-		path: `${demoPages.jobsPage.subMenu.dailyWorkTracking.path}/:id`,
+		path: `${demoPages.taskAndAssign.subMenu.taskByUser.path}/:id`,
 		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
 		exact: true,
 	},
@@ -130,35 +130,35 @@ const presentation = [
 		exact: true,
 	},
 	// trang thêm mới đầu việc (nhiệm vụ con) với nhiệm vụ
-	{
-		path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/them-moi`,
-		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-		exact: true,
-	},
+	// {
+	// 	path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/them-moi`,
+	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+	// 	exact: true,
+	// },
 	// trang thêm mới đầu việc (nhiệm vụ con)
-	{
-		path: `${demoPages.jobsPage.subMenu.task.path}/them-moi`,
-		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-		exact: true,
-	},
+	// {
+	// 	path: `${demoPages.jobsPage.subMenu.task.path}/them-moi`,
+	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+	// 	exact: true,
+	// },
 	// trang cập nhật đầu việc (nhiệm vụ con) với nhiệm vụ
-	{
-		path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/cap-nhat/:id`,
-		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-		exact: true,
-	},
+	// {
+	// 	path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/cap-nhat/:id`,
+	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+	// 	exact: true,
+	// },
 	// trang cập nhật đầu việc (nhiệm vụ con)
-	{
-		path: `${demoPages.jobsPage.subMenu.task.path}/cap-nhat/:id`,
-		element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-		exact: true,
-	},
+	// {
+	// 	path: `${demoPages.jobsPage.subMenu.task.path}/cap-nhat/:id`,
+	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
+	// 	exact: true,
+	// },
 	// trang danh sách đầu việc
-	{
-		path: `${demoPages.jobsPage.subMenu.task.path}`,
-		element: <TASK.SUBTASK />,
-		exact: true,
-	},
+	// {
+	// 	path: `${demoPages.jobsPage.subMenu.task.path}`,
+	// 	element: <TASK.SUBTASK />,
+	// 	exact: true,
+	// },
 	// trang chi tiết đầu việc (nhiệm vụ con)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/dau-viec/:id`,

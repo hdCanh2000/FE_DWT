@@ -4,7 +4,6 @@ import { useToasts } from 'react-toast-notifications';
 import Toasts from '../../components/bootstrap/Toasts';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import { demoPages } from '../../menu';
 import { fetchWorktrackListMe } from '../../redux/slice/worktrackSlice';
 import { addKpiNorm } from '../kpiNorm/services';
 import { addWorktrack } from './services';
@@ -14,15 +13,29 @@ import TableWorkTracking from './tableWorkTracking';
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
 	const { addToast } = useToasts();
-	const worktracks = useSelector((state) => state.worktrack.worktracks);
+	const worktrack = useSelector((state) => state.worktrack.worktrack);
 
 	useEffect(() => {
 		dispatch(fetchWorktrackListMe());
 	}, [dispatch]);
 
 	useEffect(() => {
-		setRowsState(worktracks);
-	}, [dispatch, worktracks]);
+		setRowsState(
+			worktrack?.tasks?.map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					unit: {
+						...item.unit,
+						label: item?.unit?.name,
+						value: item?.unit?.id,
+					},
+				};
+			}),
+		);
+	}, [dispatch, worktrack]);
 
 	const [rowsState, setRowsState] = useState([]);
 
@@ -123,7 +136,7 @@ const DailyWorkTrackingMe = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.jobsPage.subMenu.dailyWorkTracking.text}>
+		<PageWrapper title='Công việc hàng ngày'>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -137,6 +150,7 @@ const DailyWorkTrackingMe = () => {
 						<div className='row p-2'>
 							<div className='col-8 px-0'>
 								<TableWorkTracking
+									worktrack={worktrack}
 									rowsState={rowsState}
 									handleChangeRowState={handleChangeRowState}
 									handleAddRow={handleAddRow}

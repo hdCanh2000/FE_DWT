@@ -5,7 +5,6 @@ import { useToasts } from 'react-toast-notifications';
 import Toasts from '../../components/bootstrap/Toasts';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import { demoPages } from '../../menu';
 import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
 import { addKpiNorm } from '../kpiNorm/services';
 import { addWorktrack } from './services';
@@ -25,7 +24,21 @@ const DailyWorkTracking = () => {
 	}, [dispatch, id]);
 
 	useEffect(() => {
-		setRowsState(worktracks);
+		setRowsState(
+			worktracks?.tasks?.map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					unit: {
+						...item.unit,
+						label: item?.unit?.name,
+						value: item?.unit?.id,
+					},
+				};
+			}),
+		);
 	}, [dispatch, worktracks]);
 
 	const [rowsState, setRowsState] = useState([]);
@@ -129,7 +142,7 @@ const DailyWorkTracking = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.jobsPage.subMenu.dailyWorkTracking.text}>
+		<PageWrapper title='Công việc hàng ngày'>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
