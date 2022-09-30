@@ -74,7 +74,7 @@ export const demoPages = {
 	},
 	jobsPage: {
 		id: 'supervision',
-		text: 'Giám sát',
+		text: 'Giám sát công việc',
 		path: '/giam-sat',
 		icon: 'Monitor',
 		subMenu: {
@@ -161,17 +161,17 @@ export const demoPages = {
 		subMenu: {
 			reportList: {
 				id: 'reportList',
-				text: 'Danh sách báo cáo',
+				text: 'Xuất báo cáo',
 				path: '/danh-sach-bao-cao',
 			},
 			reportCriteria: {
 				id: 'reportCriteria',
-				text: 'Tiêu chí báo cáo',
+				text: 'Duyệt báo cáo',
 				path: '/tieu-chi-bao-cao',
 			},
 			sampleReport: {
 				id: 'sampleReport',
-				text: 'Mẫu báo cáo',
+				text: 'Báo cáo lưu',
 				path: '/mau-bao-cao',
 			},
 		},

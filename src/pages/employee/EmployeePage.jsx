@@ -27,6 +27,7 @@ import { getAllDepartmentWithUser } from '../department/services';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 import EmployeeForm from './EmployeeForm';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -330,79 +331,89 @@ const EmployeePage = ({ header }) => {
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid' style={{ padding: '0' }}>
-				{header === false &&
-					verifyPermissionHOC(
-						<div className='row mb-4'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
-								</div>
-							</div>
+				<div>
+					{verifyPermissionHOC(
+						<div>
+							{header === false &&
+								verifyPermissionHOC(
+									<div className='row mb-4'>
+										<div className='col-12'>
+											<div className='d-flex justify-content-between align-items-center'>
+												<div className='display-6 fw-bold py-3'>
+													Danh sách nhân sự
+												</div>
+											</div>
+										</div>
+									</div>,
+									['admin', 'manager'],
+								)}
+
+							{verifyPermissionHOC(
+								<div className='row mb-0'>
+									<div className='col-12'>
+										<Card className='w-100'>
+											<CardHeader>
+												<CardLabel icon='AccountCircle' iconColor='primary'>
+													<CardTitle>
+														<CardLabel>Danh sách nhân sự</CardLabel>
+													</CardTitle>
+												</CardLabel>
+												{verifyPermissionHOC(
+													<CardActions>
+														<Button
+															color='info'
+															icon='PersonPlusFill'
+															tag='button'
+															onClick={() => handleOpenForm(null)}>
+															Thêm nhân sự
+														</Button>
+													</CardActions>,
+													['admin'],
+												)}
+											</CardHeader>
+											<div className='p-4'>
+												<TableCommon
+													className='table table-modern mb-0'
+													columns={columns}
+													data={users}
+												/>
+											</div>
+										</Card>
+									</div>
+								</div>,
+								['admin', 'manager'],
+							)}
+
+							<EmployeeForm
+								show={toggleForm}
+								onClose={handleCloseForm}
+								handleSubmit={handleSubmitForm}
+								item={itemEdit}
+								label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
+								fields={columns}
+								validate={validate}
+							/>
+							<DetailForm
+								show={openDetail}
+								onClose={handleCloseDetail}
+								item={dataDetail}
+								label={`Chi tiết nhân viên: ${dataDetail?.name}`}
+								fields={columns}
+							/>
+							<ComfirmSubtask
+								openModal={openDelete}
+								onCloseModal={handleOpenDelete}
+								onConfirm={() => handleDelete(dataDelete)}
+								title='Xoá nhân viên'
+								// eslint-disable-next-line eslint-comments/no-duplicate-disable
+								// eslint-disable-next-line react/prop-types
+								content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
+							/>
 						</div>,
 						['admin', 'manager'],
+						<NotPermission />,
 					)}
-
-				{verifyPermissionHOC(
-					<div className='row mb-0'>
-						<div className='col-12'>
-							<Card className='w-100'>
-								<CardHeader>
-									<CardLabel icon='AccountCircle' iconColor='primary'>
-										<CardTitle>
-											<CardLabel>Danh sách nhân sự</CardLabel>
-										</CardTitle>
-									</CardLabel>
-									{verifyPermissionHOC(
-										<CardActions>
-											<Button
-												color='info'
-												icon='PersonPlusFill'
-												tag='button'
-												onClick={() => handleOpenForm(null)}>
-												Thêm nhân sự
-											</Button>
-										</CardActions>,
-										['admin'],
-									)}
-								</CardHeader>
-								<div className='p-4'>
-									<TableCommon
-										className='table table-modern mb-0'
-										columns={columns}
-										data={users}
-									/>
-								</div>
-							</Card>
-						</div>
-					</div>,
-					['admin', 'manager'],
-				)}
-
-				<EmployeeForm
-					show={toggleForm}
-					onClose={handleCloseForm}
-					handleSubmit={handleSubmitForm}
-					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
-					fields={columns}
-					validate={validate}
-				/>
-				<DetailForm
-					show={openDetail}
-					onClose={handleCloseDetail}
-					item={dataDetail}
-					label={`Chi tiết nhân viên: ${dataDetail?.name}`}
-					fields={columns}
-				/>
-				<ComfirmSubtask
-					openModal={openDelete}
-					onCloseModal={handleOpenDelete}
-					onConfirm={() => handleDelete(dataDelete)}
-					title='Xoá nhân viên'
-					// eslint-disable-next-line eslint-comments/no-duplicate-disable
-					// eslint-disable-next-line react/prop-types
-					content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
-				/>
+				</div>
 			</Page>
 		</PageWrapper>
 	);
