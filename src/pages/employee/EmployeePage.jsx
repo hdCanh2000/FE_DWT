@@ -24,6 +24,7 @@ import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, updateEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import { getAllDepartmentWithUser } from '../department/services';
+import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 import EmployeeForm from './EmployeeForm';
 
@@ -81,18 +82,6 @@ const EmployeePage = ({ header }) => {
 			align: 'left',
 			isShow: true,
 		},
-
-		{
-			title: 'Phòng ban',
-			id: 'department',
-			key: 'department',
-			type: 'select',
-			align: 'left',
-			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''}</span>,
-			options: departments,
-			isMulti: false,
-		},
 		{
 			title: 'SĐT',
 			id: 'phone',
@@ -109,7 +98,17 @@ const EmployeePage = ({ header }) => {
 			align: 'left',
 			isShow: true,
 		},
-
+		{
+			title: 'Phòng ban',
+			id: 'department',
+			key: 'department',
+			type: 'select',
+			align: 'left',
+			isShow: true,
+			render: (item) => <span>{item?.department?.name || ''}</span>,
+			options: departments,
+			isMulti: false,
+		},
 		{
 			title: 'Địa chỉ',
 			id: 'address',
@@ -251,6 +250,7 @@ const EmployeePage = ({ header }) => {
 		try {
 			await updateEmployee(dataSubmit);
 			dispatch(fetchEmployeeList());
+			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
 			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
 		} catch (error) {

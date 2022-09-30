@@ -117,7 +117,7 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 		setOpenDelete(!openDelete);
 	};
 	return (
-		<div className='col-lg-8 col-md-6'>
+		<div className='col-lg-9 col-md-6'>
 			<Formik initialValues={initValues} enableReinitialize>
 				<Card className='h-98'>
 					<Card className='h-100 mb-0'>
