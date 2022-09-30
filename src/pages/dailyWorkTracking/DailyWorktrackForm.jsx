@@ -22,7 +22,6 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 			resetForm();
 		},
 	});
-
 	return (
 		<Modal
 			show={show}
