@@ -53,63 +53,87 @@ export const demoPages = {
 		text: 'Cơ cấu tổ chức',
 		path: '/co-cau-to-chuc',
 		icon: 'CustomCompany',
-		// subMenu: {
-		// 	// organizational: {
-		// 	// 	id: 'organizational',
-		// 	// 	text: 'Sơ đồ tổ chức',
-		// 	// 	path: '/so-do-to-chuc',
-		// 	// },
-		// 	features: {
-		// 		id: 'features',
-		// 		text: 'Sơ đồ phòng ban',
-		// 		path: '/so-do-phong-ban',
-		// 	},
-		// 	// areas: {
-		// 	// 	id: 'areas',
-		// 	// 	text: 'Sơ đồ khu vực',
-		// 	// 	path: '/so-do-khu-vuc',
-		// 	// },
-		// },
 	},
-	jobsPage: {
-		// công việc
-		id: 'jobsPage',
-		text: 'Công việc',
-		path: 'jobs-page',
+	taskAndAssign: {
+		id: 'taskAndAssign',
+		text: 'Khai báo nhiệm vụ & Giao việc',
+		path: '/khai-bao-nhiem-vu-giao-viec',
 		icon: 'CustomBriefCase',
 		subMenu: {
 			taskByUser: {
-				id: 'taskByUser',
-				text: 'Công việc của nhân viên',
-				path: '/cong-viec-cua-nhan-vien',
-			},
-			dailyWorkTracking: {
-				id: 'dailyWorkTracking',
-				text: 'Công việc hằng ngày',
+				id: 'declare',
+				text: 'Khai báo nhiệm vụ',
 				path: '/cong-viec-hang-ngay',
 			},
+			mission: {
+				id: 'mission',
+				text: 'Giao việc',
+				path: '/nhiem-vu/them-moi',
+			},
+		},
+	},
+	jobsPage: {
+		id: 'supervision',
+		text: 'Giám sát',
+		path: '/giam-sat',
+		icon: 'Monitor',
+		subMenu: {
 			target: {
 				id: 'target',
-				text: 'Mục tiêu',
+				text: 'Theo mục tiêu',
 				path: '/muc-tieu',
 			},
 			mission: {
 				id: 'mission',
-				text: 'Nhiệm vụ',
+				text: 'Theo nhiệm vụ',
 				path: '/nhiem-vu',
 			},
-			task: {
-				id: 'task',
-				text: 'Đầu việc',
-				path: '/dau-viec',
-			},
-			process: {
-				id: 'process',
-				text: 'Quy trình',
-				path: '/quy-trinh',
+			employee: {
+				id: 'employee',
+				text: 'Theo nhân viên',
+				path: '/cong-viec-cua-nhan-vien',
 			},
 		},
 	},
+	// jobsPage: {
+	// 	// công việc
+	// 	id: 'jobsPage',
+	// 	text: 'Công việc',
+	// 	path: 'jobs-page',
+	// 	icon: 'CustomBriefCase',
+	// 	subMenu: {
+	// 		taskByUser: {
+	// 			id: 'taskByUser',
+	// 			text: 'Công việc của nhân viên',
+	// 			path: '/cong-viec-cua-nhan-vien',
+	// 		},
+	// 		dailyWorkTracking: {
+	// 			id: 'dailyWorkTracking',
+	// 			text: 'Công việc hằng ngày',
+	// 			path: '/cong-viec-hang-ngay',
+	// 		},
+	// 		target: {
+	// 			id: 'target',
+	// 			text: 'Mục tiêu',
+	// 			path: '/muc-tieu',
+	// 		},
+	// 		mission: {
+	// 			id: 'mission',
+	// 			text: 'Nhiệm vụ',
+	// 			path: '/nhiem-vu',
+	// 		},
+	// 		task: {
+	// 			id: 'task',
+	// 			text: 'Đầu việc',
+	// 			path: '/dau-viec',
+	// 		},
+	// 		process: {
+	// 			id: 'process',
+	// 			text: 'Quy trình',
+	// 			path: '/quy-trinh',
+	// 		},
+	// 	},
+	// },
 	hrRecords: {
 		id: 'hrRecords',
 		text: 'Hồ sơ nhân sự',

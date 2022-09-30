@@ -29,7 +29,7 @@ const TaskByUser = () => {
 		}
 	};
 	return (
-		<PageWrapper title={demoPages.jobsPage.subMenu.taskByUser.text}>
+		<PageWrapper title='Giám sát công việc nhân viên'>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -68,7 +68,7 @@ const TaskByUser = () => {
 													<td>
 														<Link
 															className='text-underline'
-															to={`${demoPages.jobsPage.subMenu.dailyWorkTracking.path}/${item.id}`}>
+															to={`${demoPages.taskAndAssign.subMenu.taskByUser.path}/${item.id}`}>
 															{item.name}
 														</Link>
 													</td>

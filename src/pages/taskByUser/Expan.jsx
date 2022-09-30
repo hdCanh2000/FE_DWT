@@ -2,15 +2,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 import moment from 'moment';
 import classNames from 'classnames';
-import Button from '../../components/bootstrap/Button';
+// import Button from '../../components/bootstrap/Button';
 import { formatColorPriority } from '../../utils/constants';
-import Icon from '../../components/icon/Icon';
+// import Icon from '../../components/icon/Icon';
 import Progress from '../../components/bootstrap/Progress';
 import useDarkMode from '../../hooks/useDarkMode';
-import { demoPages } from '../../menu';
 import getTaskByUser from './services';
 
 const minWidth100 = {
@@ -41,13 +39,7 @@ const Expand = ({ idUser }) => {
 			<tbody>
 				{taskByUser?.map((subTaskItem) => (
 					<tr key={subTaskItem.id}>
-						<td>
-							<Link
-								className='text-underline'
-								to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${subTaskItem?.id}`}>
-								{subTaskItem?.name}
-							</Link>
-						</td>
+						<td>{subTaskItem?.name}</td>
 						<td>{subTaskItem?.userId === idUser ? 'Phụ trách chính' : 'Liên quan'}</td>
 						<td className='text-center'>
 							{moment(`${subTaskItem.deadlineDate}`).format('DD-MM-YYYY')}
@@ -83,7 +75,7 @@ const Expand = ({ idUser }) => {
 						</td>
 					</tr>
 				))}
-				<tr>
+				{/* <tr>
 					<td colSpan={12}>
 						<Button
 							className='d-flex align-items-center cursor-pointer'
@@ -92,7 +84,7 @@ const Expand = ({ idUser }) => {
 							<span className='mx-2'>Thêm công việc của nhân viên</span>
 						</Button>
 					</td>
-				</tr>
+				</tr> */}
 			</tbody>
 		</table>
 	);
