@@ -74,7 +74,7 @@ export const demoPages = {
 	},
 	jobsPage: {
 		id: 'supervision',
-		text: 'Giám sát',
+		text: 'Giám sát công việc',
 		path: '/giam-sat',
 		icon: 'Monitor',
 		subMenu: {

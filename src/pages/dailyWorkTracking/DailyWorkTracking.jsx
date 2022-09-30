@@ -119,9 +119,11 @@ const DailyWorkTracking = () => {
 			addWorktrack(item)
 				.then(() => {
 					handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ thành công!`);
+					dispatch(fetchWorktrackList(id));
 				})
 				.catch((err) => {
 					handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
+					dispatch(fetchWorktrackList(id));
 					throw err;
 				});
 		});

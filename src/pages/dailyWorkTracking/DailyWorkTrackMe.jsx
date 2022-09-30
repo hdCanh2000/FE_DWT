@@ -116,6 +116,7 @@ const DailyWorkTrackingMe = () => {
 				})
 				.catch((err) => {
 					handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
+					dispatch(fetchWorktrackListMe());
 					throw err;
 				});
 		});
