@@ -127,7 +127,7 @@ const DailyWorkTrackingMe = () => {
 				<div className='row'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Báo cáo công việc</div>
+							<div className='display-6 fw-bold py-3'>Báo cáo công việc cá nhân</div>
 						</div>
 					</div>
 				</div>
