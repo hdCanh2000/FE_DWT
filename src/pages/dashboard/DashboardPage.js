@@ -291,24 +291,28 @@ const DashboardPage = () => {
 
 	function randomize(value, x = year) {
 		if (x === 2019) {
-			if (value.toFixed(0) % 2) {
-				return (value * 1.5).toFixed(2);
-			}
-			return (value / 1.4).toFixed(2);
+			// if (value.toFixed(0) % 2) {
+			// 	return (value * 1.5).toFixed(2);
+			// }
+			// return (value / 1.4).toFixed(2);
+			return 0;
 		}
 		if (x === 2020) {
-			if (value.toFixed(0) % 2) {
-				return (value / 1.5).toFixed(2);
-			}
-			return (value * 1.4).toFixed(2);
+			// if (value.toFixed(0) % 2) {
+			// 	return (value / 1.5).toFixed(2);
+			// }
+			// return (value * 1.4).toFixed(2);
+			return 0;
 		}
 		if (x === 2021) {
-			if (value.toFixed(0) % 2) {
-				return (value / 2).toFixed(2);
-			}
-			return (value * 1.4).toFixed(2);
+			// if (value.toFixed(0) % 2) {
+			// 	return (value / 2).toFixed(2);
+			// }
+			// return (value * 1.4).toFixed(2);
+			return 0;
 		}
-		return value.toFixed(2);
+		// return value.toFixed(2);
+		return 0;
 	}
 	function getDate(day) {
 		const arr = [];
@@ -337,17 +341,11 @@ const DashboardPage = () => {
 		series: [
 			{
 				name: 'Nữ',
-				data: [
-					-0.8, -1.05, -1.06, -1.18, -1.4, -2.2, -2.85, -3.7, -3.96, -4.22, -4.3, -4.4,
-					-4.1, -4, -4.1, -3.4, -3.1, -2.8,
-				],
+				data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 			},
 			{
 				name: 'Nam',
-				data: [
-					0.4, 0.65, 0.76, 0.88, 1.5, 2.1, 2.9, 3.8, 3.9, 4.2, 4, 4.3, 4.1, 4.2, 4.5, 3.9,
-					3.5, 3,
-				],
+				data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 			},
 		],
 		options: {
@@ -607,8 +605,8 @@ const DashboardPage = () => {
 			name: 'Thu Nhập Tháng Này',
 			type: 'column',
 			data: [
-				11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11, 15, 9, 18, 20, 22, 15, 11,
-				15, 9, 18, 20, 22, 15, 25, 30,
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0,
 			],
 		},
 	];
@@ -719,36 +717,36 @@ const DashboardPage = () => {
 			name: 'Thu Nhập Năm Nay',
 			type: 'column',
 			data: [
-				randomize(140),
-				randomize(200),
-				randomize(250),
-				randomize(275),
-				randomize(295),
-				randomize(314),
-				randomize(388),
-				randomize(406),
-				randomize(410),
-				randomize(356),
-				randomize(468),
-				randomize(555),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
 			],
 		},
 		{
 			name: 'Thu Nhập Năm Trước',
 			type: 'column',
 			data: [
-				randomize(100),
-				randomize(150),
-				randomize(200),
-				randomize(225),
-				randomize(250),
-				randomize(300),
-				randomize(333),
-				randomize(388),
-				randomize(400),
-				randomize(335.5),
-				randomize(456),
-				randomize(501),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
 			],
 		},
 	];
@@ -845,12 +843,12 @@ const DashboardPage = () => {
 		{
 			name: 'Thu Nhập Quý Năm Nay',
 			type: 'column',
-			data: [300, 450, 500, 700],
+			data: [0, 0, 0, 0],
 		},
 		{
 			name: 'Thu Nhập Quý Năm Trước',
 			type: 'column',
-			data: [250, 300, 400, 650],
+			data: [0, 0, 0, 0],
 		},
 	];
 	const yearOptions = {
@@ -924,7 +922,7 @@ const DashboardPage = () => {
 		{
 			// name: 'Thu Nhập Quý Năm Nay',
 			type: 'column',
-			data: [300, 450, 500, 600, 700, 800],
+			data: [0, 0, 0, 0, 0, 0],
 		},
 	];
 
@@ -933,36 +931,36 @@ const DashboardPage = () => {
 			name: 'Thu Nhập Năm Nay',
 			type: 'column',
 			data: [
-				randomize(140),
-				randomize(200),
-				randomize(250),
-				randomize(275),
-				randomize(295),
-				randomize(314),
-				randomize(388),
-				randomize(406),
-				randomize(410),
-				randomize(356),
-				randomize(468),
-				randomize(555),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
 			],
 		},
 		{
 			name: 'Thu Nhập Năm Ngoái',
 			type: 'column',
 			data: [
-				randomize(100),
-				randomize(150),
-				randomize(200),
-				randomize(200),
-				randomize(200),
-				randomize(267),
-				randomize(300),
-				randomize(335.5),
-				randomize(360),
-				randomize(300),
-				randomize(400),
-				randomize(488),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
 			],
 		},
 	];
@@ -1150,6 +1148,154 @@ const DashboardPage = () => {
 	return (
 		<PageWrapper title={dashboardMenu.dashboard.text}>
 			<Page container='fluid overflow-hidden'>
+				<div className='row mb-4'>
+					{verifyPermissionHOC(
+						<div className='col-md-6'>
+							<Card className='mb-0'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê mục tiêu
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+									<CardActions>
+										<Button
+											icon='ArrowForwardIos'
+											aria-label='Read More'
+											hoverShadow='default'
+											rounded={1}
+											color={darkModeStatus ? 'dark' : null}
+											onClick={handleOnClickToMissionListPage}
+										/>
+									</CardActions>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-md-12' style={{ textAlign: 'center' }}>
+											{missionReport === null ? (
+												<div style={{ height: '262px' }}>
+													<Spinner
+														animation='border'
+														variant='primary'
+														style={{
+															marginTop: '15%',
+															width: '50px',
+															height: '50px',
+														}}
+													/>
+												</div>
+											) : (
+												<MissionChartReport data={missionReport} />
+											)}
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['admin'],
+					)}
+					{verifyPermissionHOC(
+						<div className='col-md-6'>
+							<Card className='mb-0'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê công việc
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+									{verifyPermissionHOC(
+										<CardActions>
+											<Dropdown>
+												<DropdownToggle hasIcon={false}>
+													<Button
+														color='primary'
+														icon='Circle'
+														className='text-nowrap'>
+														{
+															dataDepartments.filter(
+																(item) =>
+																	item.id === departmentSelect,
+															)[0]?.name
+														}
+													</Button>
+												</DropdownToggle>
+												<DropdownMenu>
+													{dataDepartments?.map((item) => (
+														<DropdownItem
+															key={item?.id}
+															onClick={() =>
+																setDepartmentSelect(item.id)
+															}>
+															<div>{item?.name}</div>
+														</DropdownItem>
+													))}
+												</DropdownMenu>
+											</Dropdown>
+										</CardActions>,
+										['admin'],
+									)}
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-md-12'>
+											{taskReport === null ? (
+												<div style={{ height: '262px' }}>
+													<Spinner
+														animation='border'
+														variant='primary'
+														style={{
+															marginTop: '15%',
+															marginLeft: '42%',
+															width: '50px',
+															height: '50px',
+														}}
+													/>
+												</div>
+											) : (
+												<TaskChartReport data={taskReport} />
+											)}
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['admin', 'manager'],
+					)}
+					{verifyPermissionHOC(
+						<div className='col-md-6'>
+							<Card className='mb-0'>
+								<CardHeader className='py-0'>
+									<CardLabel icon='ReceiptLong'>
+										<CardTitle tag='h4' className='h5'>
+											Thống kê đầu việc của phòng
+										</CardTitle>
+										<CardSubTitle tag='h5' className='h6'>
+											Báo cáo
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody className='py-0'>
+									<div className='row'>
+										<div className='col-md-12'>
+											{subTaskReportDepartment === null ? (
+												<Spinner animation='border' />
+											) : (
+												<TaskChartReport data={subTaskReportDepartment} />
+											)}
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						</div>,
+						['manager'],
+					)}
+				</div>
 				<div className='row'>
 					{verifyPermissionHOC(
 						<div className='col-md-6'>
@@ -1354,154 +1500,6 @@ const DashboardPage = () => {
 							['admin'],
 						)}
 					</div>
-				</div>
-				<div className='row'>
-					{verifyPermissionHOC(
-						<div className='col-md-6'>
-							<Card className='mb-0'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê mục tiêu
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-									<CardActions>
-										<Button
-											icon='ArrowForwardIos'
-											aria-label='Read More'
-											hoverShadow='default'
-											rounded={1}
-											color={darkModeStatus ? 'dark' : null}
-											onClick={handleOnClickToMissionListPage}
-										/>
-									</CardActions>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-md-12' style={{ textAlign: 'center' }}>
-											{missionReport === null ? (
-												<div style={{ height: '262px' }}>
-													<Spinner
-														animation='border'
-														variant='primary'
-														style={{
-															marginTop: '15%',
-															width: '50px',
-															height: '50px',
-														}}
-													/>
-												</div>
-											) : (
-												<MissionChartReport data={missionReport} />
-											)}
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['admin'],
-					)}
-					{verifyPermissionHOC(
-						<div className='col-md-6'>
-							<Card className='mb-0'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê công việc
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-									{verifyPermissionHOC(
-										<CardActions>
-											<Dropdown>
-												<DropdownToggle hasIcon={false}>
-													<Button
-														color='primary'
-														icon='Circle'
-														className='text-nowrap'>
-														{
-															dataDepartments.filter(
-																(item) =>
-																	item.id === departmentSelect,
-															)[0]?.name
-														}
-													</Button>
-												</DropdownToggle>
-												<DropdownMenu>
-													{dataDepartments?.map((item) => (
-														<DropdownItem
-															key={item?.id}
-															onClick={() =>
-																setDepartmentSelect(item.id)
-															}>
-															<div>{item?.name}</div>
-														</DropdownItem>
-													))}
-												</DropdownMenu>
-											</Dropdown>
-										</CardActions>,
-										['admin'],
-									)}
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-md-12'>
-											{taskReport === null ? (
-												<div style={{ height: '262px' }}>
-													<Spinner
-														animation='border'
-														variant='primary'
-														style={{
-															marginTop: '15%',
-															marginLeft: '42%',
-															width: '50px',
-															height: '50px',
-														}}
-													/>
-												</div>
-											) : (
-												<TaskChartReport data={taskReport} />
-											)}
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['admin', 'manager'],
-					)}
-					{verifyPermissionHOC(
-						<div className='col-md-6'>
-							<Card className='mb-0'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê đầu việc của phòng
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-md-12'>
-											{subTaskReportDepartment === null ? (
-												<Spinner animation='border' />
-											) : (
-												<TaskChartReport data={subTaskReportDepartment} />
-											)}
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['manager'],
-					)}
 				</div>
 				<div className='row mt-0'>
 					{verifyPermissionHOC(

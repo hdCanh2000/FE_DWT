@@ -12,7 +12,7 @@ const OrderBarChat = () => {
 	const [state] = useState({
 		series: [
 			{
-				data: [400, 430, 448, 470, 540, 580, 690, 1100],
+				data: [0, 0, 0, 0, 0, 0, 0, 0],
 			},
 		],
 		options: {

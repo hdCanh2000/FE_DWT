@@ -52,7 +52,7 @@ const CommonApprovedAppointmentChart = () => {
 		series: [
 			{
 				name: 'Approved',
-				data: [44, 55, 43, 54, 65, 44, 35],
+				data: [0, 0, 0, 0, 0, 0],
 			},
 		],
 		options: {
