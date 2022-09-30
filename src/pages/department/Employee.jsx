@@ -342,7 +342,6 @@ const EmployeePage = ({ header }) => {
 				</div>,
 				['admin', 'manager'],
 			)}
-
 			<EmployeeForm
 				show={toggleForm}
 				onClose={handleCloseForm}

@@ -29,7 +29,7 @@ import Employee from './Employee';
 import NotPermission from '../presentation/auth/NotPermission';
 import company from '../../components/icon/svg-icons/company.svg';
 import diagram from '../../components/icon/svg-icons/diagram.png';
-import departmentt from '../../components/icon/svg-icons/department.png';
+import departmentt from '../../components/icon/svg-icons/department.svg';
 import group from '../../components/icon/svg-icons/group.png';
 
 const DepartmentPage = () => {
@@ -50,7 +50,7 @@ const DepartmentPage = () => {
 	});
 	const showIcon = (item) => {
 		if (item.organizationLevel === 4) {
-			return <img src={company} alt='logo' style={{ width: '5%' }} />;
+			return <img src={company} alt='logo' style={{ width: '10px' }} />;
 		}
 		if (item.organizationLevel === 1) {
 			return <img src={diagram} alt='logo' style={{ width: '6%' }} />;
