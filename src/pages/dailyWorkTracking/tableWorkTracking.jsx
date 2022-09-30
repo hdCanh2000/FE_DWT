@@ -75,7 +75,7 @@ const TableWorkTracking = ({
 								return (
 									<th
 										key={item}
-										colSpan={item?.status === 1 ? 1 : 2}
+										colSpan={rowsState?.[0]?.status === 1 ? 1 : 2}
 										style={border}
 										className='text-center'>
 										{item}
