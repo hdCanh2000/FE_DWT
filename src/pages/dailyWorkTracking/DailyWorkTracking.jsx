@@ -24,21 +24,7 @@ const DailyWorkTracking = () => {
 	}, [dispatch, id]);
 
 	useEffect(() => {
-		setRowsState(
-			worktracks?.tasks?.map((item) => {
-				return {
-					...item,
-					label: item.name,
-					value: item.id,
-					text: item.name,
-					unit: {
-						...item.unit,
-						label: item?.unit?.name,
-						value: item?.unit?.id,
-					},
-				};
-			}),
-		);
+		setRowsState(worktracks);
 	}, [dispatch, worktracks]);
 
 	const [rowsState, setRowsState] = useState([]);

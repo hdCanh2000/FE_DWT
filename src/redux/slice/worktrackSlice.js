@@ -17,38 +17,36 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
-	return response.data;
-	// .map((item) => {
-	// 	return {
-	// 		...item,
-	// 		label: item.name,
-	// 		value: item.id,
-	// 		text: item.name,
-	// 		unit: {
-	// 			...item.unit,
-	// 			label: item?.unit?.name,
-	// 			value: item?.unit?.id,
-	// 		},
-	// 	};
-	// });
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+			unit: {
+				...item.unit,
+				label: item?.unit?.name,
+				value: item?.unit?.id,
+			},
+		};
+	});
 });
 
 export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async () => {
 	const response = await getAllWorktrackByUser();
-	return response.data;
-	// .map((item) => {
-	// 	return {
-	// 		...item,
-	// 		label: item.name,
-	// 		value: item.id,
-	// 		text: item.name,
-	// 		unit: {
-	// 			...item.unit,
-	// 			label: item?.unit?.name,
-	// 			value: item?.unit?.id,
-	// 		},
-	// 	};
-	// });
+	return response.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+			unit: {
+				...item.unit,
+				label: item?.unit?.name,
+				value: item?.unit?.id,
+			},
+		};
+	});
 });
 
 export const onAddWorktrack = createAsyncThunk('worktrack/addNew', async (data) => {
@@ -73,7 +71,7 @@ export const worktrackSlice = createSlice({
 		},
 		[fetchWorktrackList.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktrack = { ...action.payload };
+			state.worktracks = [...action.payload];
 		},
 		[fetchWorktrackList.rejected]: (state, action) => {
 			state.loading = false;
@@ -85,7 +83,7 @@ export const worktrackSlice = createSlice({
 		},
 		[fetchWorktrackListMe.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktrack = { ...action.payload };
+			state.worktracks = [...action.payload];
 		},
 		[fetchWorktrackListMe.rejected]: (state, action) => {
 			state.loading = false;

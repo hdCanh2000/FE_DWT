@@ -13,28 +13,14 @@ import TableWorkTracking from './tableWorkTracking';
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
 	const { addToast } = useToasts();
-	const worktrack = useSelector((state) => state.worktrack.worktrack);
+	const worktrack = useSelector((state) => state.worktrack.worktracks);
 
 	useEffect(() => {
 		dispatch(fetchWorktrackListMe());
 	}, [dispatch]);
 
 	useEffect(() => {
-		setRowsState(
-			worktrack?.tasks?.map((item) => {
-				return {
-					...item,
-					label: item.name,
-					value: item.id,
-					text: item.name,
-					unit: {
-						...item.unit,
-						label: item?.unit?.name,
-						value: item?.unit?.id,
-					},
-				};
-			}),
-		);
+		setRowsState(worktrack);
 	}, [dispatch, worktrack]);
 
 	const [rowsState, setRowsState] = useState([]);

@@ -225,7 +225,6 @@ const DepartmentPage = () => {
 			);
 		});
 		return a;
-	
 	};
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
@@ -263,7 +262,7 @@ const DepartmentPage = () => {
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />
-												{renderDepartmentMenu(departments)}
+													{renderDepartmentMenu(departments)}
 												</CardBody>
 											</Card>
 										</div>
