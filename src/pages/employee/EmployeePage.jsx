@@ -16,7 +16,6 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
-import CommonForm from '../common/ComponentCommon/CommonForm';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
@@ -26,6 +25,7 @@ import { addEmployee, updateEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import { getAllDepartmentWithUser } from '../department/services';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
+import EmployeeForm from './EmployeeForm';
 
 const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -81,24 +81,7 @@ const EmployeePage = ({ header }) => {
 			align: 'left',
 			isShow: true,
 		},
-		{
-			title: 'Ngày sinh',
-			id: 'dateOfBirth',
-			key: 'dateOfBirth',
-			type: 'date',
-			align: 'center',
-			isShow: true,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'Ngày tham gia',
-			id: 'dateOfJoin',
-			key: 'dateOfJoin',
-			type: 'date',
-			align: 'center',
-			isShow: true,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
+
 		{
 			title: 'Phòng ban',
 			id: 'department',
@@ -111,14 +94,6 @@ const EmployeePage = ({ header }) => {
 			isMulti: false,
 		},
 		{
-			title: 'Email',
-			id: 'email',
-			key: 'email',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-		{
 			title: 'SĐT',
 			id: 'phone',
 			key: 'phone',
@@ -126,6 +101,15 @@ const EmployeePage = ({ header }) => {
 			align: 'center',
 			isShow: true,
 		},
+		{
+			title: 'Email',
+			id: 'email',
+			key: 'email',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+		},
+
 		{
 			title: 'Địa chỉ',
 			id: 'address',
@@ -150,16 +134,25 @@ const EmployeePage = ({ header }) => {
 			),
 		},
 		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'switch',
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
 			align: 'center',
 			isShow: true,
-			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
-			title: 'Chức vụ',
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: true,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Vai trò',
 			id: 'position',
 			key: 'position',
 			type: 'singleSelect',
@@ -181,6 +174,16 @@ const EmployeePage = ({ header }) => {
 				},
 			],
 		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		},
+
 		{
 			title: 'Hành động',
 			id: 'action',
@@ -375,7 +378,7 @@ const EmployeePage = ({ header }) => {
 					['admin', 'manager'],
 				)}
 
-				<CommonForm
+				<EmployeeForm
 					show={toggleForm}
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
