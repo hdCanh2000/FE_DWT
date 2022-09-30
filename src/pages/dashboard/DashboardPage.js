@@ -276,7 +276,7 @@ const DashboardPage = () => {
 	const [activeCompanyTab, setActiveCompanyTab] = useState(COMPANIES_TAB.COMP1);
 	const search = [
 		// { name: 'Tuần' },
-		{ name: '30 Ngày' },
+		{ name: 'Ngày' },
 		{ name: 'Tháng' },
 		{ name: 'Quý' },
 		{ name: 'Năm' },

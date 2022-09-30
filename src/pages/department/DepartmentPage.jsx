@@ -25,7 +25,12 @@ import Toasts from '../../components/bootstrap/Toasts';
 import { close, minus, plus } from './icon/icon';
 import Search from '../common/ComponentCommon/Search';
 import DepartmentDetail from './DepartmentDetail';
-import EmployeePage from '../employee/EmployeePage';
+import Employee from './Employee';
+import NotPermission from '../presentation/auth/NotPermission';
+import company from '../../components/icon/svg-icons/company.svg';
+import diagram from '../../components/icon/svg-icons/diagram.png';
+import departmentt from '../../components/icon/svg-icons/department.png';
+import group from '../../components/icon/svg-icons/group.png';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
@@ -43,6 +48,21 @@ const DepartmentPage = () => {
 			value: items.id,
 		};
 	});
+	const showIcon = (item) => {
+		if (item.organizationLevel === 4) {
+			return <img src={company} alt='logo' style={{ width: '5%' }} />;
+		}
+		if (item.organizationLevel === 1) {
+			return <img src={diagram} alt='logo' style={{ width: '6%' }} />;
+		}
+		if (item.organizationLevel === 2) {
+			return <img src={departmentt} alt='logo' style={{ width: '6%' }} />;
+		}
+		if (item.organizationLevel === 3) {
+			return <img src={group} alt='logo' style={{ width: '5%' }} />;
+		}
+		return <img src={company} alt='logo' style={{ width: '5%' }} />;
+	};
 	const organizationLevelOptions = [
 		{
 			label: 'Khối',
@@ -172,14 +192,16 @@ const DepartmentPage = () => {
 	};
 	const departments = arrayToTree(department, { childrenField: 'items', dataField: null });
 	const handleClick = (item) => {
-		setItemEdits(item);
+		const newItem = department.filter((items) => items.id === item.id);
+		setItemEdits(newItem[0]);
 	};
-	const renderDepartmentMenu = (datas) => {
-		return datas?.map((item) => {
+	const renderDepartmentMenu = (data) => {
+		const a = data?.map((item) => {
 			return (
 				<div>
 					{item?.items?.length === 0 && (
 						<Tree
+							type={showIcon(item)}
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={`${item.name}`}
@@ -189,6 +211,7 @@ const DepartmentPage = () => {
 					)}
 					{item?.items?.length !== 0 && (
 						<Tree
+							type={showIcon(item)}
 							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
 							key={item.id}
 							content={item.name}
@@ -201,19 +224,21 @@ const DepartmentPage = () => {
 				</div>
 			);
 		});
+		return a;
+	
 	};
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
-				<div className='row'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
-						</div>
-					</div>
-				</div>
 				{verifyPermissionHOC(
 					<>
+						<div className='row'>
+							<div className='col-12'>
+								<div className='d-flex justify-content-between align-items-center'>
+									<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
+								</div>
+							</div>
+						</div>
 						<div className='row mb-0'>
 							<div className='col-12'>
 								<Card className='w-100 ' style={{ minHeight: '900px' }}>
@@ -238,78 +263,38 @@ const DepartmentPage = () => {
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />
-													{departments?.map((item) => {
-														return (
-															<div>
-																{item?.items?.length === 0 && (
-																	<Tree
-																		icons={{
-																			plusIcon: plus,
-																			minusIcon: minus,
-																			closeIcon: close,
-																		}}
-																		key={item.id}
-																		content={`${item.name}`}
-																		style={treeStyles}
-																		onItemClick={() =>
-																			handleClick(item)
-																		}
-																	/>
-																)}
-																{item?.items?.length !== 0 && (
-																	<Tree
-																		icons={{
-																			plusIcon: plus,
-																			minusIcon: minus,
-																			closeIcon: close,
-																		}}
-																		key={item.id}
-																		content={item.name}
-																		style={treeStyles}
-																		open
-																		onItemClick={() =>
-																			handleClick(item)
-																		}>
-																		{renderDepartmentMenu(
-																			item.items,
-																		)}
-																	</Tree>
-																)}
-															</div>
-														);
-													})}
+												{renderDepartmentMenu(departments)}
 												</CardBody>
 											</Card>
 										</div>
-										{itemEdits.name !== undefined ? (
+										{department.includes(itemEdits) ? (
 											<DepartmentDetail
 												initValues={itemEdits}
 												organizationLevelOptions={organizationLevelOptions}
 												departmentList={departmentList}
 											/>
 										) : (
-											<div className='col-lg-8 col-md-6'>
-												<EmployeePage header />
-											</div>
+											<Employee header />
 										)}
 									</div>
 								</Card>
 							</div>
 						</div>
-						<CommonForm
-							setInitValues={setItemEdits}
-							show={openForm}
-							onClose={handleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label='Thêm mới phòng ban'
-							fields={columns}
-							validate={validate}
-							disable='true'
-						/>
 					</>,
-					['admin', 'manager'],
+					['admin'],
+					<NotPermission />,
 				)}
+				<CommonForm
+					setInitValues={setItemEdits}
+					show={openForm}
+					onClose={handleCloseForm}
+					handleSubmit={handleSubmitForm}
+					item={itemEdit}
+					label='Thêm mới phòng ban'
+					fields={columns}
+					validate={validate}
+					disable='true'
+				/>
 			</Page>
 		</PageWrapper>
 	);
