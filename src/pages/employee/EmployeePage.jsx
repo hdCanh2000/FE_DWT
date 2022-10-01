@@ -271,9 +271,16 @@ const EmployeePage = ({ header }) => {
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
-			position: Number.parseInt(data?.position, 10),
+			positionId: data?.position?.value,
+			position: {
+				id: data?.position?.value,
+				name: data?.position?.label,
+				value: data?.position?.value,
+				label: data?.position?.label,
+			},
+			role: Number.parseInt(data?.role, 10),
 			status: Number(data?.status),
-			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
+			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
 			isDelete: 1,
 		};
 		try {
