@@ -281,7 +281,6 @@ const CommonForm = ({
 																marginRight: 10,
 															}}>
 															<FormGroup
-																className='mr-2'
 																id='kpiName'
 																label={` ${index + 1}.`}>
 																<Select
