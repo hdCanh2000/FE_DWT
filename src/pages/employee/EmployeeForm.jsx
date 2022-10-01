@@ -193,8 +193,42 @@ const EmployeeForm = ({
 												</div>
 											);
 										}
-
 										if (field.id === 'position') {
+											return (
+												<div
+													key={field.id}
+													className={
+														field.col ? `col-${field.col}` : 'col-12'
+													}>
+													<FormGroup
+														key={field.id}
+														id={field.id}
+														label={field.title}>
+														<CustomSelect
+															placeholder={`Chọn ${field.title}`}
+															value={formik.values[field.id]}
+															onChange={(value) => {
+																formik.setFieldValue(
+																	field.id,
+																	value,
+																);
+															}}
+															isMulti={!!field.isMulti}
+															options={field.options}
+														/>
+													</FormGroup>
+													<div className='text-danger mt-1'>
+														{formik.errors[field.id] && (
+															<span className='error'>
+																{formik.errors[field.id]}
+															</span>
+														)}
+													</div>
+												</div>
+											);
+										}
+
+										if (field.id === 'role') {
 											return (
 												<div
 													key={field.id}

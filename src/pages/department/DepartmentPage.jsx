@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import Tree from 'react-animated-tree-v2';
 import { arrayToTree } from 'performant-array-to-tree';
-import axios from 'axios';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -34,10 +33,6 @@ import departmentt from '../../components/icon/svg-icons/department.svg';
 import group from '../../components/icon/svg-icons/group.png';
 
 const DepartmentPage = () => {
-	const [a, setA] = useState([]);
-
-	axios.get('https://dwt-fake-data.herokuapp.com/departments').then((res) => setA(res.data));
-	console.log(a);
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const [itemEdit, setItemEdit] = React.useState({});
@@ -205,7 +200,7 @@ const DepartmentPage = () => {
 			return (
 				<div>
 					{item?.items?.length === 0 && (
-						<div style={{ marginLeft: '20px`' }}>
+						<div style={{ marginLeft: '20px' }}>
 							<Tree
 								type={showIcon(item)}
 								icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
