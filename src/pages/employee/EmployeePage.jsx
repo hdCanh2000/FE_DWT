@@ -28,6 +28,7 @@ import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 import EmployeeForm from './EmployeeForm';
 import NotPermission from '../presentation/auth/NotPermission';
+import { getAllPosition } from '../position/services';
 
 const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -41,6 +42,7 @@ const EmployeePage = ({ header }) => {
 
 	const users = useSelector((state) => state.employee.employees);
 	const [departments, setDepartments] = React.useState([]);
+	const [positions, setPositions] = React.useState([]);
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
 	const [openDelete, setOpenDelete] = React.useState(false);
@@ -50,6 +52,22 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllDepartmentWithUser();
 			const result = await response.data;
 			setDepartments(
+				[...result].map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
+		};
+		fecth();
+	}, []);
+	useEffect(() => {
+		const fecth = async () => {
+			const response = await getAllPosition();
+			const result = await response.data;
+			setPositions(
 				[...result].map((item) => {
 					return {
 						...item,
@@ -111,6 +129,17 @@ const EmployeePage = ({ header }) => {
 			isMulti: false,
 		},
 		{
+			title: 'Vị trí làm việc',
+			id: 'position',
+			key: 'position',
+			type: 'select',
+			align: 'left',
+			isShow: true,
+			render: (item) => <span>{item?.position?.name || ''}</span>,
+			options: positions,
+			isMulti: false,
+		},
+		{
 			title: 'Địa chỉ',
 			id: 'address',
 			key: 'address',
@@ -153,8 +182,8 @@ const EmployeePage = ({ header }) => {
 		},
 		{
 			title: 'Vai trò',
-			id: 'position',
-			key: 'position',
+			id: 'role',
+			key: 'role',
 			type: 'singleSelect',
 			align: 'center',
 			isShow: true,

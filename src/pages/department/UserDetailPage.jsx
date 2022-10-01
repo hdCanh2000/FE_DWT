@@ -5,9 +5,9 @@ import Button from '../../components/bootstrap/Button';
 import { CardActions, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Toasts from '../../components/bootstrap/Toasts';
 import TableCommon from '../common/ComponentCommon/TableCommon';
-import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addEmployee, updateEmployee } from '../employee/services';
 import Popovers from '../../components/bootstrap/Popovers';
+import EmployeeForm from '../employee/EmployeeForm';
 
 // eslint-disable-next-line prettier/prettier, react/prop-types
 const DepartmentDetailPage = ({dataUser}) => {
@@ -87,15 +87,6 @@ const DepartmentDetailPage = ({dataUser}) => {
 			),
 		},
 		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'switch',
-			align: 'center',
-			isShow: true,
-			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		},
-		{
 			title: 'Chức vụ',
 			id: 'position',
 			key: 'position',
@@ -115,6 +106,15 @@ const DepartmentDetailPage = ({dataUser}) => {
 					value: 0,
 				},
 			],
+		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
 		},
 		{
 			title: 'Hành động',
@@ -224,7 +224,7 @@ const DepartmentDetailPage = ({dataUser}) => {
 					data={dataUser.users}
 				/>
 			</div>
-			<CommonForm
+			<EmployeeForm
 				show={openForm}
 				onClose={hanleCloseForm}
 				handleSubmit={handleSubmitEmployeeForm}

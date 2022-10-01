@@ -24,7 +24,7 @@ import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addPosition, updatePosition } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
-import { formatJobType } from '../../utils/constants';
+// import { formatJobType } from '../../utils/constants';
 import PositionDetail from './PositionDetail';
 import NotPermission from '../presentation/auth/NotPermission';
 
@@ -72,15 +72,6 @@ const PositionPage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Địa điểm làm việc',
-			placeholder: 'địa điểm làm việc',
-			id: 'address',
-			key: 'address',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-		{
 			title: 'Mã Vị Trí',
 			// placeholder: 'mã vị trí',
 			// id: 'code',
@@ -91,40 +82,14 @@ const PositionPage = () => {
 			render: (item) => <span>{item?.positionLevel?.code || 'No data'}</span>,
 		},
 		{
-			title: 'Mô Tả Vị Trí',
-			placeholder: 'mô tả vị trí',
-			id: 'description',
-			key: 'description',
-			type: 'textarea',
-			align: 'left',
-			isShow: true,
-		},
-		{
-			title: 'Loại hình công việc',
-			placeholder: 'loại hình công việc',
-			id: 'jobType',
-			key: 'jobType',
+			title: 'Phòng Ban',
+			id: 'departmentId',
+			key: 'departmentId',
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
-			format: (value) => formatJobType(value),
-			options: [
-				{
-					id: 1,
-					text: 'Chính thức',
-					value: 1,
-				},
-				{
-					id: 2,
-					text: 'Thực tập',
-					value: 2,
-				},
-				{
-					id: 3,
-					text: 'Thử việc',
-					value: 3,
-				},
-			],
+			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
+			options: departments,
 		},
 		{
 			title: 'Cấp Nhân Sự',
@@ -147,15 +112,51 @@ const PositionPage = () => {
 			options: positionLevels,
 		},
 		{
-			title: 'Phòng Ban',
-			id: 'departmentId',
-			key: 'departmentId',
-			type: 'singleSelect',
+			title: 'Địa điểm làm việc',
+			placeholder: 'địa điểm làm việc',
+			id: 'address',
+			key: 'address',
+			type: 'text',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
-			options: departments,
 		},
+
+		{
+			title: 'Mô Tả Vị Trí',
+			placeholder: 'mô tả vị trí',
+			id: 'description',
+			key: 'description',
+			type: 'textarea',
+			align: 'left',
+			isShow: true,
+		},
+		// {
+		// 	title: 'Loại hình công việc',
+		// 	placeholder: 'loại hình công việc',
+		// 	id: 'jobType',
+		// 	key: 'jobType',
+		// 	type: 'singleSelect',
+		// 	align: 'left',
+		// 	isShow: true,
+		// 	format: (value) => formatJobType(value),
+		// 	options: [
+		// 		{
+		// 			id: 1,
+		// 			text: 'Chính thức',
+		// 			value: 1,
+		// 		},
+		// 		{
+		// 			id: 2,
+		// 			text: 'Thực tập',
+		// 			value: 2,
+		// 		},
+		// 		{
+		// 			id: 3,
+		// 			text: 'Thử việc',
+		// 			value: 3,
+		// 		},
+		// 	],
+		// },
 		{
 			title: 'Yêu cầu năng lực',
 			id: 'requirements',

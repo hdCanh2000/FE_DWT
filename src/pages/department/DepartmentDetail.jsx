@@ -121,7 +121,13 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 			<Formik initialValues={initValues} enableReinitialize>
 				<Card className='h-98'>
 					<Card className='h-100 mb-0'>
-						<Tabs defaultActiveKey='departmentDetail' id='uncontrolled-tab-example'>
+						<Tabs defaultActiveKey='userDepartment' id='uncontrolled-tab-example'>
+							<Tab
+								eventKey='userDepartment'
+								title='Danh sách nhân viên'
+								className='mb-3'>
+								<UserDetailPage dataUser={initValues} />
+							</Tab>
 							<Tab
 								eventKey='departmentDetail'
 								title='Thông tin chi tiết'
@@ -303,12 +309,6 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 										content={`Xác nhận xoá cơ cấu tổ chức <strong>${initValues?.name}</strong> ?`}
 									/>
 								</CardBody>
-							</Tab>
-							<Tab
-								eventKey='userDepartment'
-								title='Danh sách nhân viên'
-								className='mb-3'>
-								<UserDetailPage dataUser={initValues} />
 							</Tab>
 						</Tabs>
 					</Card>

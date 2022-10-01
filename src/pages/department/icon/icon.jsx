@@ -30,12 +30,12 @@ const close = (props) => (
 		xmlns='http://www.w3.org/2000/svg'
 		xmlnsXlink='http://www.w3.org/1999/xlink'
 		version='1.1'
-		width='15'
-		height='15'
+		width='0'
+		height='0'
 		x='0'
 		y='0'
-		viewBox='0 0 24 24'
-		style={{ enableBackground: ' 0 0 512 512' }}
+		viewBox='0 0 0 0'
+		style={{ enableBackground: ' 0 0 0 0' }}
 		xmlSpace='preserve'>
 		<g>
 			<rect

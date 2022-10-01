@@ -270,13 +270,6 @@ const CommonForm = ({
 								<div>
 									{nv && (
 										<>
-											<FormGroup>
-												<Button
-													variant='success'
-													onClick={handleAddFieldKey}>
-													Thêm nhiệm vụ
-												</Button>
-											</FormGroup>
 											{kpiNormId?.map((element, index) => {
 												return (
 													<div
@@ -288,9 +281,8 @@ const CommonForm = ({
 																marginRight: 10,
 															}}>
 															<FormGroup
-																className='mr-2'
 																id='kpiName'
-																label='Tên nhiệm vụ'>
+																label={` ${index + 1}.`}>
 																<Select
 																	name='kpiName'
 																	required
@@ -338,6 +330,13 @@ const CommonForm = ({
 													</div>
 												);
 											})}
+											<FormGroup style={{ marginTop: '10px' }}>
+												<Button
+													variant='success'
+													onClick={handleAddFieldKey}>
+													Thêm nhiệm vụ
+												</Button>
+											</FormGroup>
 										</>
 									)}
 								</div>
