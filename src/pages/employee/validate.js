@@ -11,7 +11,7 @@ const validate = Yup.object().shape({
 	// dateOfBirth: Yup.string().required('Vui lòng nhập ngày sinh'),
 	// dateOfJoin: Yup.string().required('Vui lòng nhập ngày tham gia'),
 	// department: Yup.object().required('Vui lòng chọn phòng ban'),
-	position: Yup.number().required('Vui lòng chọn chức vụ'),
+	role: Yup.number().required('Vui lòng chọn chức vụ'),
 	email: Yup.string().email('Email không đúng định dạng').required('Vui lòng nhập email'),
 	// password: Yup.string().required('Vui lòng nhập mật khẩu'),
 	// confirmPassword: Yup.string().when('password', {

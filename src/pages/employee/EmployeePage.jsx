@@ -83,7 +83,6 @@ const EmployeePage = ({ header }) => {
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -107,7 +106,7 @@ const EmployeePage = ({ header }) => {
 			key: 'phone',
 			type: 'text',
 			align: 'center',
-			isShow: true,
+			isShow: false,
 		},
 		{
 			title: 'Email',
@@ -124,7 +123,7 @@ const EmployeePage = ({ header }) => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''}</span>,
+			render: (item) => <span>{item?.department?.name || ''} </span>,
 			options: departments,
 			isMulti: false,
 		},
@@ -144,8 +143,8 @@ const EmployeePage = ({ header }) => {
 			id: 'address',
 			key: 'address',
 			type: 'textarea',
-			align: 'left',
-			isShow: true,
+			align: 'center',
+			isShow: false,
 			render: (item) => (
 				<Popovers desc={item?.address} trigger='hover'>
 					<div
@@ -168,7 +167,7 @@ const EmployeePage = ({ header }) => {
 			key: 'dateOfBirth',
 			type: 'date',
 			align: 'center',
-			isShow: true,
+			isShow: false,
 			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
@@ -177,7 +176,7 @@ const EmployeePage = ({ header }) => {
 			key: 'dateOfJoin',
 			type: 'date',
 			align: 'center',
-			isShow: true,
+			isShow: false,
 			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
@@ -300,6 +299,7 @@ const EmployeePage = ({ header }) => {
 	};
 
 	const handleSubmitForm = async (data) => {
+		
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
@@ -315,9 +315,16 @@ const EmployeePage = ({ header }) => {
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
-			position: Number.parseInt(data?.position, 10),
+			positionId: data?.position?.value,
+			position: {
+				id: data?.position?.value,
+				name: data?.position?.label,
+				value: data?.position?.value,
+				label: data?.position?.label,
+			},
+			role: Number.parseInt(data?.role, 10),
 			status: Number(data?.status),
-			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
+			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
 		};
 		if (data?.id) {
 			try {
