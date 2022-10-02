@@ -6,6 +6,12 @@ const getAllPositionWithUser = () => {
 		url: '/positions?_embed=users',
 	});
 };
+const getAllPosition = () => {
+	return axiosClient({
+		method: 'GET',
+		url: '/positions',
+	});
+};
 
 const getPositionById = (id) => {
 	return axiosClient({
@@ -37,4 +43,11 @@ const deletePositions = (id) => {
 	});
 };
 
-export { getAllPositionWithUser, getPositionById, addPosition, updatePosition, deletePositions };
+export {
+	getAllPositionWithUser,
+	getPositionById,
+	addPosition,
+	updatePosition,
+	deletePositions,
+	getAllPosition,
+};

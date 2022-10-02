@@ -23,11 +23,12 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, updateEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
-import { getAllDepartment } from '../department/services';
+import { getAllDepartmentWithUser } from '../department/services';
+import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
-// import EmployeeForm from './EmployeeForm';
+import EmployeeForm from './EmployeeForm';
 import NotPermission from '../presentation/auth/NotPermission';
-import CommonForm from '../common/ComponentCommon/CommonForm';
+import { getAllPosition } from '../position/services';
 
 const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -41,16 +42,33 @@ const EmployeePage = ({ header }) => {
 
 	const users = useSelector((state) => state.employee.employees);
 	const [departments, setDepartments] = React.useState([]);
+	const [positions, setPositions] = React.useState([]);
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
 	const [openDelete, setOpenDelete] = React.useState(false);
 	const [dataDelete, setDataDelete] = React.useState({});
 	useEffect(() => {
 		const fecth = async () => {
-			const response = await getAllDepartment();
+			const response = await getAllDepartmentWithUser();
 			const result = await response.data;
 			setDepartments(
-				result.data.map((item) => {
+				[...result].map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
+		};
+		fecth();
+	}, []);
+	useEffect(() => {
+		const fecth = async () => {
+			const response = await getAllPosition();
+			const result = await response.data;
+			setPositions(
+				[...result].map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -65,7 +83,6 @@ const EmployeePage = ({ header }) => {
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -74,19 +91,6 @@ const EmployeePage = ({ header }) => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
-		},
-		{
-			title: 'Phòng ban',
-			id: 'department',
-			key: 'department',
-			type: 'select',
-			align: 'left',
-			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''}</span>,
-			options: departments,
-			isMulti: false,
-			col: 6,
 		},
 		{
 			title: 'Mã NV',
@@ -95,7 +99,6 @@ const EmployeePage = ({ header }) => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 3,
 		},
 		{
 			title: 'SĐT',
@@ -103,8 +106,7 @@ const EmployeePage = ({ header }) => {
 			key: 'phone',
 			type: 'text',
 			align: 'center',
-			isShow: true,
-			col: 4,
+			isShow: false,
 		},
 		{
 			title: 'Email',
@@ -113,59 +115,36 @@ const EmployeePage = ({ header }) => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 5,
 		},
 		{
-			title: 'Ngày sinh',
-			id: 'dateOfBirth',
-			key: 'dateOfBirth',
-			type: 'date',
-			align: 'center',
+			title: 'Phòng ban',
+			id: 'department',
+			key: 'department',
+			type: 'select',
+			align: 'left',
 			isShow: true,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			col: 4,
+			render: (item) => <span>{item?.department?.name || ''} </span>,
+			options: departments,
+			isMulti: false,
 		},
 		{
-			title: 'Ngày tham gia',
-			id: 'dateOfJoin',
-			key: 'dateOfJoin',
-			type: 'date',
-			align: 'center',
-			isShow: true,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			col: 4,
-		},
-		{
-			title: 'Vai trò',
+			title: 'Vị trí làm việc',
 			id: 'position',
 			key: 'position',
-			type: 'singleSelect',
-			align: 'center',
+			type: 'select',
+			align: 'left',
 			isShow: true,
-			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
-			options: [
-				{
-					id: 1,
-					text: 'Quản lý',
-					label: 'Quản lý',
-					value: 'Quản lý',
-				},
-				{
-					id: 2,
-					text: 'Nhân viên',
-					label: 'Nhân viên',
-					value: 'Nhân viên',
-				},
-			],
-			col: 4,
+			render: (item) => <span>{item?.position?.name || ''}</span>,
+			options: positions,
+			isMulti: false,
 		},
 		{
 			title: 'Địa chỉ',
 			id: 'address',
 			key: 'address',
 			type: 'textarea',
-			align: 'left',
-			isShow: true,
+			align: 'center',
+			isShow: false,
 			render: (item) => (
 				<Popovers desc={item?.address} trigger='hover'>
 					<div
@@ -181,6 +160,47 @@ const EmployeePage = ({ header }) => {
 					</div>
 				</Popovers>
 			),
+		},
+		{
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Vai trò',
+			id: 'role',
+			key: 'role',
+			type: 'singleSelect',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
+			options: [
+				{
+					id: 1,
+					text: 'Quản lý',
+					label: 'Quản lý',
+					value: 1,
+				},
+				{
+					id: 2,
+					text: 'Nhân viên',
+					label: 'Nhân viên',
+					value: 0,
+				},
+			],
 		},
 		{
 			title: 'Trạng thái',
@@ -251,14 +271,22 @@ const EmployeePage = ({ header }) => {
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
-			position: Number.parseInt(data?.position, 10),
+			positionId: data?.position?.value,
+			position: {
+				id: data?.position?.value,
+				name: data?.position?.label,
+				value: data?.position?.value,
+				label: data?.position?.label,
+			},
+			role: Number.parseInt(data?.role, 10),
 			status: Number(data?.status),
-			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
+			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
 			isDelete: 1,
 		};
 		try {
 			await updateEmployee(dataSubmit);
 			dispatch(fetchEmployeeList());
+			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
 			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
 		} catch (error) {
@@ -293,9 +321,16 @@ const EmployeePage = ({ header }) => {
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
-			position: Number.parseInt(data?.position, 10),
+			positionId: data?.position?.value,
+			position: {
+				id: data?.position?.value,
+				name: data?.position?.label,
+				value: data?.position?.value,
+				label: data?.position?.label,
+			},
+			role: Number.parseInt(data?.role, 10),
 			status: Number(data?.status),
-			roles: Number.parseInt(data?.position, 10) === 1 ? ['manager'] : ['user'],
+			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
 		};
 		if (data?.id) {
 			try {
@@ -391,7 +426,7 @@ const EmployeePage = ({ header }) => {
 								['admin', 'manager'],
 							)}
 
-							<CommonForm
+							<EmployeeForm
 								show={toggleForm}
 								onClose={handleCloseForm}
 								handleSubmit={handleSubmitForm}

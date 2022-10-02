@@ -29,7 +29,7 @@ import Employee from './Employee';
 import NotPermission from '../presentation/auth/NotPermission';
 import company from '../../components/icon/svg-icons/company.svg';
 import diagram from '../../components/icon/svg-icons/diagram.png';
-import departmentt from '../../components/icon/svg-icons/department.png';
+import departmentt from '../../components/icon/svg-icons/department.svg';
 import group from '../../components/icon/svg-icons/group.png';
 
 const DepartmentPage = () => {
@@ -50,18 +50,18 @@ const DepartmentPage = () => {
 	});
 	const showIcon = (item) => {
 		if (item.organizationLevel === 4) {
-			return <img src={company} alt='logo' style={{ width: '5%' }} />;
+			return <img src={company} alt='logo' style={{ width: '18px' }} />;
 		}
 		if (item.organizationLevel === 1) {
-			return <img src={diagram} alt='logo' style={{ width: '6%' }} />;
+			return <img src={diagram} alt='logo' style={{ width: '18px' }} />;
 		}
 		if (item.organizationLevel === 2) {
-			return <img src={departmentt} alt='logo' style={{ width: '6%' }} />;
+			return <img src={departmentt} alt='logo' style={{ width: '18px' }} />;
 		}
 		if (item.organizationLevel === 3) {
-			return <img src={group} alt='logo' style={{ width: '5%' }} />;
+			return <img src={group} alt='logo' style={{ width: '18px' }} />;
 		}
-		return <img src={company} alt='logo' style={{ width: '5%' }} />;
+		return <img src={company} alt='logo' style={{ width: '18px' }} />;
 	};
 	const organizationLevelOptions = [
 		{
@@ -196,18 +196,20 @@ const DepartmentPage = () => {
 		setItemEdits(newItem[0]);
 	};
 	const renderDepartmentMenu = (data) => {
-		const a = data?.map((item) => {
+		const newData = data?.map((item) => {
 			return (
 				<div>
 					{item?.items?.length === 0 && (
-						<Tree
-							type={showIcon(item)}
-							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
-							key={item.id}
-							content={`${item.name}`}
-							style={treeStyles}
-							onItemClick={() => handleClick(item)}
-						/>
+						<div style={{ marginLeft: '20px' }}>
+							<Tree
+								type={showIcon(item)}
+								icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
+								key={item.id}
+								content={`${item.name}`}
+								style={treeStyles}
+								onItemClick={() => handleClick(item)}
+							/>
+						</div>
 					)}
 					{item?.items?.length !== 0 && (
 						<Tree
@@ -224,7 +226,7 @@ const DepartmentPage = () => {
 				</div>
 			);
 		});
-		return a;
+		return newData;
 	};
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
@@ -258,7 +260,7 @@ const DepartmentPage = () => {
 										</CardActions>
 									</CardHeader>
 									<div className='row h-100 w-100'>
-										<div className='col-lg-4 col-md-6'>
+										<div className='col-lg-3 col-md-6'>
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
 													<Search />

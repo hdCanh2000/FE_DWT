@@ -24,7 +24,7 @@ import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addPosition, updatePosition } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
-import { formatJobType } from '../../utils/constants';
+// import { formatJobType } from '../../utils/constants';
 import PositionDetail from './PositionDetail';
 import NotPermission from '../presentation/auth/NotPermission';
 
@@ -70,78 +70,16 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 5,
 		},
 		{
 			title: 'Mã Vị Trí',
 			// placeholder: 'mã vị trí',
-			id: 'code',
+			// id: 'code',
 			key: 'code',
-			type: 'text',
+			// type: 'text',
 			align: 'left',
-			isShow: true,
-			col: 3,
+			// isShow: true,
 			render: (item) => <span>{item?.positionLevel?.code || 'No data'}</span>,
-		},
-		{
-			title: 'Địa điểm làm việc',
-			placeholder: 'địa điểm làm việc',
-			id: 'address',
-			key: 'address',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-			col: 4,
-		},
-		{
-			title: 'Loại hình công việc',
-			placeholder: 'loại hình công việc',
-			id: 'jobType',
-			key: 'jobType',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: true,
-			format: (value) => formatJobType(value),
-			options: [
-				{
-					id: 1,
-					text: 'Chính thức',
-					value: 1,
-				},
-				{
-					id: 2,
-					text: 'Thực tập',
-					value: 2,
-				},
-				{
-					id: 3,
-					text: 'Thử việc',
-					value: 3,
-				},
-			],
-			col: 6,
-		},
-		{
-			title: 'Cấp Nhân Sự',
-			id: 'positionLevelId',
-			key: 'positionLevelId',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: true,
-			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
-			col: 6,
-		},
-		{
-			title: 'Quản lý cấp trên',
-			id: 'manager',
-			key: 'manager',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: false,
-			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels,
-			col: 6,
 		},
 		{
 			title: 'Phòng Ban',
@@ -152,8 +90,37 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
-			col: 6,
 		},
+		{
+			title: 'Cấp Nhân Sự',
+			id: 'positionLevelId',
+			key: 'positionLevelId',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: true,
+			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
+			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
+		},
+		{
+			title: 'Quản lý cấp trên',
+			id: 'manager',
+			key: 'manager',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: false,
+			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
+			options: positionLevels,
+		},
+		{
+			title: 'Địa điểm làm việc',
+			placeholder: 'địa điểm làm việc',
+			id: 'address',
+			key: 'address',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+		},
+
 		{
 			title: 'Mô Tả Vị Trí',
 			placeholder: 'mô tả vị trí',
@@ -163,6 +130,33 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: true,
 		},
+		// {
+		// 	title: 'Loại hình công việc',
+		// 	placeholder: 'loại hình công việc',
+		// 	id: 'jobType',
+		// 	key: 'jobType',
+		// 	type: 'singleSelect',
+		// 	align: 'left',
+		// 	isShow: true,
+		// 	format: (value) => formatJobType(value),
+		// 	options: [
+		// 		{
+		// 			id: 1,
+		// 			text: 'Chính thức',
+		// 			value: 1,
+		// 		},
+		// 		{
+		// 			id: 2,
+		// 			text: 'Thực tập',
+		// 			value: 2,
+		// 		},
+		// 		{
+		// 			id: 3,
+		// 			text: 'Thử việc',
+		// 			value: 3,
+		// 		},
+		// 	],
+		// },
 		{
 			title: 'Yêu cầu năng lực',
 			id: 'requirements',
