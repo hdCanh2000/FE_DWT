@@ -1,33 +1,46 @@
-import axiosClient from '../../utils/axiosClient';
+import axiosClientNode from '../../utils/axiosClientNode';
+
+const getAllDepartment = () => {
+	return axiosClientNode({
+		method: 'GET',
+		url: '/api/departments',
+	});
+};
 
 const getAllDepartmentWithUser = () => {
-	return axiosClient({
+	return axiosClientNode({
 		method: 'GET',
-		url: '/departments?_embed=users',
+		url: '/api/departments',
 	});
 };
 
 const getDepartmentByIdWithUser = (id) => {
-	return axiosClient({
+	return axiosClientNode({
 		method: 'GET',
-		url: `/departments/${id}?_embed=users`,
+		url: `/api/departments/${id}`,
 	});
 };
 
 const addDepartment = (data) => {
-	return axiosClient({
+	return axiosClientNode({
 		method: 'POST',
-		url: `/departments`,
+		url: `/api/departments`,
 		data,
 	});
 };
 
 const updateDepartment = (data) => {
-	return axiosClient({
+	return axiosClientNode({
 		method: 'PUT',
-		url: `/departments/${data.id}`,
+		url: `/api/departments/${data.id}`,
 		data,
 	});
 };
 
-export { getAllDepartmentWithUser, getDepartmentByIdWithUser, addDepartment, updateDepartment };
+export {
+	getAllDepartment,
+	getAllDepartmentWithUser,
+	getDepartmentByIdWithUser,
+	addDepartment,
+	updateDepartment,
+};

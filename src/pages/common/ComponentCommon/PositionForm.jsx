@@ -108,239 +108,219 @@ const CommonForm = ({
 			</Modal.Header>
 			<Modal.Body className='px-4'>
 				<form>
-					<div className='row'>
-						<div className='col-md-12'>
-							<div className='row g-4'>
-								{fields?.map((field) => {
-									if (field.type === 'singleSelect') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<Select
-														ariaLabel={field.title || ''}
-														placeholder={`Chọn ${field.title}`}
-														list={field.options}
-														name={field.id}
-														size='lg'
-														className='border border-2 rounded-0 shadow-none'
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-														value={formik.values[field.id]}
-														defaultValue={formik.values[field.id]}
-														isValid={formik.isValid}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									if (field.type === 'select') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<CustomSelect
-														placeholder={`Chọn ${field.title}`}
-														value={formik.values[field.id]}
-														onChange={(value) => {
-															formik.setFieldValue(field.id, value);
-														}}
-														isMulti={!!field.isMulti}
-														options={field.options}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									if (!field.isShow) {
-										return null;
-									}
-									if (field.type === 'textarea') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<Textarea
-														rows={5}
-														ariaLabel={field.title}
-														placeholder={`Nhập ${field.title}`}
-														list={options}
-														size='lg'
-														name={field.id}
-														className='border border-2 rounded-0 shadow-none'
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-														value={formik.values[field.id]}
-														isValid={formik.isValid}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									if (field.type === 'switch') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<Checks
-														id={field.id}
-														type='switch'
-														size='lg'
-														label={
-															Number(formik.values[field.id]) === 1
-																? 'Đang hoạt động'
-																: 'Không hoạt động'
-														}
-														onChange={formik.handleChange}
-														checked={formik.values[field.id]}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									return (
-										<React.Fragment key={field.id}>
-											<FormGroup
-												className='col-12'
+					<div className='row g-4'>
+						{fields?.map((field) => {
+							if (field.type === 'singleSelect') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup id={field.id} label={field.title}>
+											<Select
+												ariaLabel={field.title || ''}
+												placeholder={`Chọn ${field.title}`}
+												list={field.options}
+												name={field.id}
+												size='lg'
+												className='border border-2 rounded-0 shadow-none'
+												onChange={formik.handleChange}
+												onBlur={formik.handleBlur}
+												value={formik.values[field.id]}
+												defaultValue={formik.values[field.id]}
+												isValid={formik.isValid}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							if (field.type === 'select') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup key={field.id} id={field.id} label={field.title}>
+											<CustomSelect
+												placeholder={`Chọn ${field.title}`}
+												value={formik.values[field.id]}
+												onChange={(value) => {
+													formik.setFieldValue(field.id, value);
+												}}
+												isMulti={!!field.isMulti}
+												options={field.options}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							if (!field.isShow) {
+								return null;
+							}
+							if (field.type === 'textarea') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup key={field.id} id={field.id} label={field.title}>
+											<Textarea
+												rows={3}
+												ariaLabel={field.title}
+												placeholder={`${field.title}`}
+												list={options}
+												size='lg'
+												name={field.id}
+												className='border border-2 rounded-0 shadow-none'
+												onChange={formik.handleChange}
+												onBlur={formik.handleBlur}
+												value={formik.values[field.id]}
+												isValid={formik.isValid}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							if (field.type === 'switch') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup key={field.id} id={field.id} label={field.title}>
+											<Checks
 												id={field.id}
-												label={field.title}>
-												<Input
-													type={field.type || 'text'}
-													name={field.id}
-													onChange={formik.handleChange}
-													value={formik.values[field.id] || ''}
-													size='lg'
-													placeholder={`Nhập ${field.title}`}
-													className='border border-2 rounded-0 shadow-none'
-													onBlur={formik.handleBlur}
-													isValid={formik.isValid}
-													isTouched={formik.touched[field.id]}
-												/>
-											</FormGroup>
-											<div className='text-danger mt-1'>
-												{formik.errors[field.id] && (
-													<span className='error'>
-														{formik.errors[field.id]}
-													</span>
-												)}
-											</div>
-										</React.Fragment>
-									);
-								})}
-								<div>
-									{nv && (
-										<>
-											{kpiNormId?.map((element, index) => {
-												return (
-													<div
-														key={element.name}
-														className='mt-4 d-flex align-items-center justify-content-between'>
-														<div
-															style={{
-																width: '100%',
-																marginRight: 10,
-															}}>
-															<FormGroup
-																id='kpiName'
-																label={` ${index + 1}.`}>
-																<Select
-																	name='kpiName'
-																	required
-																	size='lg'
-																	className='border border-2 rounded-0 shadow-none'
-																	placeholder='Chọn nhiệm vụ'
-																	value={element?.kpiName}
-																	onChange={(e) =>
-																		handleChangeKeysState(
-																			index,
-																			e,
-																		)
-																	}>
-																	{kpiNorms.map((key) => (
-																		<Option
-																			key={`${key.name}`}
-																			value={`${key.name}`}>
-																			{`${key?.name}`}
-																		</Option>
-																	))}
-																</Select>
-															</FormGroup>
-															{element.error?.kpiName && (
-																<ErrorText>
-																	{element.error?.kpiName}
-																</ErrorText>
-															)}
-														</div>
-														<FormGroup>
-															<Button
-																color='light'
-																variant='light'
-																style={{
-																	background: 'transparent',
-																	border: 0,
-																}}
-																size='lg'
-																className='mt-4 h-100'
-																onClick={(e) =>
-																	handleRemoveKeyField(e, index)
-																}>
-																<Icon icon='Trash' size='lg' />
-															</Button>
-														</FormGroup>
-													</div>
-												);
-											})}
-											<FormGroup style={{ marginTop: '10px' }}>
-												<Button
-													variant='success'
-													onClick={handleAddFieldKey}>
-													Thêm nhiệm vụ
-												</Button>
-											</FormGroup>
-										</>
-									)}
+												type='switch'
+												size='lg'
+												label={
+													Number(formik.values[field.id]) === 1
+														? 'Đang hoạt động'
+														: 'Không hoạt động'
+												}
+												onChange={formik.handleChange}
+												checked={formik.values[field.id]}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							return (
+								<div
+									key={field.id}
+									className={field.col ? `col-${field.col}` : 'col-12'}>
+									<FormGroup id={field.id} label={field.title}>
+										<Input
+											type={field.type || 'text'}
+											name={field.id}
+											onChange={formik.handleChange}
+											value={formik.values[field.id] || ''}
+											size='lg'
+											placeholder={`${field.title}`}
+											className='border border-2 rounded-0 shadow-none'
+											onBlur={formik.handleBlur}
+											isValid={formik.isValid}
+										/>
+									</FormGroup>
+									<div className='text-danger mt-1'>
+										{formik.errors[field.id] && (
+											<span className='error'>{formik.errors[field.id]}</span>
+										)}
+									</div>
 								</div>
-							</div>
+							);
+						})}
+						<div>
+							{nv && (
+								<>
+									<FormGroup>
+										<Button variant='success' onClick={handleAddFieldKey}>
+											Thêm nhiệm vụ
+										</Button>
+									</FormGroup>
+									{kpiNormId?.map((element, index) => {
+										return (
+											<div
+												key={element.name}
+												className='mt-4 d-flex align-items-center justify-content-between'>
+												<div
+													style={{
+														width: '100%',
+														marginRight: 10,
+													}}>
+													<FormGroup
+														className='mr-2'
+														id='kpiName'
+														label='Tên nhiệm vụ'>
+														<Select
+															name='kpiName'
+															required
+															size='lg'
+															className='border border-2 rounded-0 shadow-none'
+															placeholder='Chọn nhiệm vụ'
+															value={element?.kpiName}
+															onChange={(e) =>
+																handleChangeKeysState(index, e)
+															}>
+															{kpiNorms.map((key) => (
+																<Option
+																	key={`${key.name}`}
+																	value={`${key.name}`}>
+																	{`${key?.name}`}
+																</Option>
+															))}
+														</Select>
+													</FormGroup>
+													{element.error?.kpiName && (
+														<ErrorText>
+															{element.error?.kpiName}
+														</ErrorText>
+													)}
+												</div>
+												<FormGroup>
+													<Button
+														color='light'
+														variant='light'
+														style={{
+															background: 'transparent',
+															border: 0,
+														}}
+														size='lg'
+														className='mt-4 h-100'
+														onClick={(e) =>
+															handleRemoveKeyField(e, index)
+														}>
+														<Icon icon='Trash' size='lg' />
+													</Button>
+												</FormGroup>
+											</div>
+										);
+									})}
+								</>
+							)}
 						</div>
 					</div>
 				</form>

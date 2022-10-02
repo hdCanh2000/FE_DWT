@@ -43,4 +43,11 @@ const deletePositions = (id) => {
 	});
 };
 
-export { getAllPositionWithUser, getPositionById, addPosition, updatePosition, deletePositions ,getAllPosition};
+export {
+	getAllPositionWithUser,
+	getPositionById,
+	addPosition,
+	updatePosition,
+	deletePositions,
+	getAllPosition,
+};
