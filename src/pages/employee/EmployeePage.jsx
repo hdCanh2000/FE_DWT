@@ -23,10 +23,11 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, updateEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
-import { getAllDepartmentWithUser } from '../department/services';
+import { getAllDepartment } from '../department/services';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
-import EmployeeForm from './EmployeeForm';
+// import EmployeeForm from './EmployeeForm';
 import NotPermission from '../presentation/auth/NotPermission';
+import CommonForm from '../common/ComponentCommon/CommonForm';
 
 const EmployeePage = ({ header }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -46,10 +47,10 @@ const EmployeePage = ({ header }) => {
 	const [dataDelete, setDataDelete] = React.useState({});
 	useEffect(() => {
 		const fecth = async () => {
-			const response = await getAllDepartmentWithUser();
+			const response = await getAllDepartment();
 			const result = await response.data;
 			setDepartments(
-				[...result].map((item) => {
+				result.data.map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -73,16 +74,8 @@ const EmployeePage = ({ header }) => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 6,
 		},
-		{
-			title: 'Mã NV',
-			id: 'code',
-			key: 'code',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-
 		{
 			title: 'Phòng ban',
 			id: 'department',
@@ -93,6 +86,16 @@ const EmployeePage = ({ header }) => {
 			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
 			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Mã NV',
+			id: 'code',
+			key: 'code',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+			col: 3,
 		},
 		{
 			title: 'SĐT',
@@ -101,6 +104,7 @@ const EmployeePage = ({ header }) => {
 			type: 'text',
 			align: 'center',
 			isShow: true,
+			col: 4,
 		},
 		{
 			title: 'Email',
@@ -109,8 +113,52 @@ const EmployeePage = ({ header }) => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 5,
 		},
-
+		{
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
+			align: 'center',
+			isShow: true,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 4,
+		},
+		{
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: true,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 4,
+		},
+		{
+			title: 'Vai trò',
+			id: 'position',
+			key: 'position',
+			type: 'singleSelect',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
+			options: [
+				{
+					id: 1,
+					text: 'Quản lý',
+					label: 'Quản lý',
+					value: 'Quản lý',
+				},
+				{
+					id: 2,
+					text: 'Nhân viên',
+					label: 'Nhân viên',
+					value: 'Nhân viên',
+				},
+			],
+			col: 4,
+		},
 		{
 			title: 'Địa chỉ',
 			id: 'address',
@@ -133,47 +181,6 @@ const EmployeePage = ({ header }) => {
 					</div>
 				</Popovers>
 			),
-		},
-		{
-			title: 'Ngày sinh',
-			id: 'dateOfBirth',
-			key: 'dateOfBirth',
-			type: 'date',
-			align: 'center',
-			isShow: true,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'Ngày tham gia',
-			id: 'dateOfJoin',
-			key: 'dateOfJoin',
-			type: 'date',
-			align: 'center',
-			isShow: true,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'Vai trò',
-			id: 'position',
-			key: 'position',
-			type: 'singleSelect',
-			align: 'center',
-			isShow: true,
-			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
-			options: [
-				{
-					id: 1,
-					text: 'Quản lý',
-					label: 'Quản lý',
-					value: 1,
-				},
-				{
-					id: 2,
-					text: 'Nhân viên',
-					label: 'Nhân viên',
-					value: 0,
-				},
-			],
 		},
 		{
 			title: 'Trạng thái',
@@ -384,7 +391,7 @@ const EmployeePage = ({ header }) => {
 								['admin', 'manager'],
 							)}
 
-							<EmployeeForm
+							<CommonForm
 								show={toggleForm}
 								onClose={handleCloseForm}
 								handleSubmit={handleSubmitForm}
