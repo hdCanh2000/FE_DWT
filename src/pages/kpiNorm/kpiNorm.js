@@ -109,16 +109,7 @@ const EmployeePage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.unit?.name || ''}</span>,
 			isMulti: false,
-			col: 4,
-		},
-		{
-			title: 'Số lượng',
-			id: 'quantity',
-			key: 'quantity',
-			type: 'number',
-			align: 'center',
-			isShow: true,
-			col: 3,
+			col: 6,
 		},
 		{
 			title: 'Số ngày công cần thiết',
@@ -127,7 +118,7 @@ const EmployeePage = () => {
 			type: 'number',
 			align: 'center',
 			isShow: true,
-			col: 5,
+			col: 6,
 		},
 		{
 			title: 'Mô tả',
@@ -208,7 +199,6 @@ const EmployeePage = () => {
 				name: data?.unit?.name,
 			},
 			manday: data?.manday,
-			quantity: data?.quantity,
 			type: 1,
 		};
 		if (data?.id) {
@@ -324,10 +314,10 @@ const EmployeePage = () => {
 													<tr>
 														<th>Tên định mức KPI</th>
 														<th>Phòng ban</th>
-														<th className='text-center'>Số lượng</th>
 														<th>Đơn vị tính</th>
 														<th>Mô tả</th>
 														<th>Vị trí chuyên môn</th>
+														<th>Số ngày công cần thiết</th>
 														<th className='text-center'>Hành động</th>
 													</tr>
 												</thead>
@@ -337,12 +327,10 @@ const EmployeePage = () => {
 															<tr>
 																<td>{item?.name}</td>
 																<td>{item?.department?.name}</td>
-																<td className='text-center'>
-																	{item?.quantity}
-																</td>
 																<td>{item?.unit?.name}</td>
 																<td>{item?.description}</td>
 																<td>{item?.position?.name}</td>
+																<td>{item?.manday}</td>
 																<td className='text-center'>
 																	<Button
 																		isOutline={!darkModeStatus}
