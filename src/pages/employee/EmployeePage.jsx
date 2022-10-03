@@ -23,7 +23,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, updateEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
-import { getAllDepartmentWithUser } from '../department/services';
+import { getAllDepartment } from '../department/services';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 import EmployeeForm from './EmployeeForm';
@@ -49,10 +49,10 @@ const EmployeePage = ({ header }) => {
 	const [dataDelete, setDataDelete] = React.useState({});
 	useEffect(() => {
 		const fecth = async () => {
-			const response = await getAllDepartmentWithUser();
+			const response = await getAllDepartment();
 			const result = await response.data;
 			setDepartments(
-				[...result].map((item) => {
+				result.data.map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -186,7 +186,9 @@ const EmployeePage = ({ header }) => {
 			type: 'singleSelect',
 			align: 'center',
 			isShow: true,
-			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
+			format: (value) =>
+				// eslint-disable-next-line no-nested-ternary
+				value === 'Quản lý' ? 'Quản lý' : value === 'Nhân viên' ? 'Nhân viên' : 'Admin',
 			options: [
 				{
 					id: 1,
@@ -202,16 +204,6 @@ const EmployeePage = ({ header }) => {
 				},
 			],
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'switch',
-			align: 'center',
-			isShow: true,
-			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		},
-
 		{
 			title: 'Hành động',
 			id: 'action',

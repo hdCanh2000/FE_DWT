@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 
 const validate = Yup.object().shape({
 	code: Yup.string()
+		.nullable()
 		.min(3, 'Mã nhân viên tối thiểu 3 ký tự')
 		.required('Vui lòng nhập mã nhân viên'),
 	name: Yup.string()
@@ -11,8 +12,11 @@ const validate = Yup.object().shape({
 	// dateOfBirth: Yup.string().required('Vui lòng nhập ngày sinh'),
 	// dateOfJoin: Yup.string().required('Vui lòng nhập ngày tham gia'),
 	// department: Yup.object().required('Vui lòng chọn phòng ban'),
-	position: Yup.string().required('Vui lòng chọn chức vụ'),
-	email: Yup.string().email('Email không đúng định dạng').required('Vui lòng nhập email'),
+	// position: Yup.string().nullable().required('Vui lòng chọn chức vụ'),
+	email: Yup.string()
+		.nullable()
+		.email('Email không đúng định dạng')
+		.required('Vui lòng nhập email'),
 	// password: Yup.string().required('Vui lòng nhập mật khẩu'),
 	// confirmPassword: Yup.string().when('password', {
 	// 	is: (val) => !!(val && val.length > 0),
