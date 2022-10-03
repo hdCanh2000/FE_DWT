@@ -28,7 +28,7 @@
 		"no-underscore-dangle": "off",
 		"react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
 		"no-param-reassign": "off",
-		"no-empty": "warn",
+		"no-empty": "off",
 		"import/no-extraneous-dependencies": "warn",
 		"react/jsx-props-no-spreading": "off",
 		"react/no-unescaped-entities": ["error", { "forbid": [">", "}"] }],

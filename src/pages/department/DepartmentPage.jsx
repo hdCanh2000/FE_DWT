@@ -18,7 +18,7 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
+import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
@@ -40,7 +40,7 @@ const DepartmentPage = () => {
 	const department = useSelector((state) => state.department.departments);
 	const [itemEdits, setItemEdits] = useState({});
 	useEffect(() => {
-		dispatch(fetchDepartmentWithUserList());
+		dispatch(fetchDepartmentList());
 	}, [dispatch]);
 	const departmentList = department?.map((items) => {
 		return {
@@ -176,9 +176,12 @@ const DepartmentPage = () => {
 		try {
 			const response = await addDepartment(dataSubmit);
 			const result = await response.data;
-			dispatch(fetchDepartmentWithUserList());
+			dispatch(fetchDepartmentList());
 			handleCloseForm();
-			handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
+			handleShowToast(
+				`Thêm phòng ban`,
+				`Phòng ban ${result.data.name} được thêm thành công!`,
+			);
 		} catch (error) {
 			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
 		}

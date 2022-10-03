@@ -11,7 +11,7 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchRequirementList = createAsyncThunk('key/fetchList', async () => {
 	const response = await getAllRequirement();
-	return response.data.map((requirement) => {
+	return response.data.data.map((requirement) => {
 		return {
 			...requirement,
 			label: requirement.name,
