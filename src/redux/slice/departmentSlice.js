@@ -29,7 +29,14 @@ export const fetchDepartmentWithUserList = createAsyncThunk(
 	'department/fetchWithUserList',
 	async () => {
 		const response = await getAllDepartmentWithUser();
-		return response.data;
+		return response.data?.map((department) => {
+			return {
+				...department,
+				text: department?.name,
+				value: department?.id,
+				label: department?.name,
+			};
+		});
 	},
 );
 
