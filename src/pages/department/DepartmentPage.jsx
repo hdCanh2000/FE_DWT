@@ -247,7 +247,7 @@ const DepartmentPage = () => {
 							<div className='col-12'>
 								<Card className='w-100 ' style={{ minHeight: '900px' }}>
 									<CardHeader>
-										<CardLabel icon='AccountCircle' iconColor='primary'>
+										<CardLabel icon='Sort' iconColor='primary'>
 											<CardTitle>
 												<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
 											</CardTitle>
@@ -255,7 +255,7 @@ const DepartmentPage = () => {
 										<CardActions>
 											<Button
 												color='info'
-												icon='PersonPlusFill'
+												icon='AddCircleOutline'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
 												Thêm cơ cấu tổ chức

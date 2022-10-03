@@ -9,7 +9,7 @@ import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import SelectComponent from 'react-select';
-import { Modal } from 'react-bootstrap';
+import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Page from '../../../layout/Page/Page';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
@@ -87,7 +87,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	}, [item]);
 	// show toast
 
-
 	const handleChange = (e) => {
 		const { value, name } = e.target;
 		setMission({
@@ -154,7 +153,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			deadlineTime: mission?.deadlineTime,
 			kpiNorm: kpiNormOptions,
 		};
-		console.log(kpiNormOptions);
 		if (item?.index !== undefined) {
 			const newTask = tasks.map((items) => {
 				return items.index === item?.index ? dataValue : item;
@@ -416,13 +414,20 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 									<div className='row g-2'>
 										<div className='col-12'>
 											<FormGroup>
-												<Button
-													color='success'
-													type='button'
-													className='d-block w-25 py-3'
-													onClick={handleAddFieldKPINorm}>
-													Thêm nhiệm vụ phụ
-												</Button>
+												<OverlayTrigger
+													overlay={
+														<Tooltip id='addSubMission'>
+															Thêm nhiệm vụ phụ
+														</Tooltip>
+													}>
+													<Button
+														color='success'
+														type='button'
+														icon='Plus'
+														className='d-block w-10'
+														onClick={handleAddFieldKPINorm}
+													/>
+												</OverlayTrigger>
 											</FormGroup>
 											{/* eslint-disable-next-line no-shadow */}
 											{kpiNormOptions?.map((item, index) => {
@@ -431,35 +436,44 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 														// eslint-disable-next-line react/no-array-index-key
 														key={index}
 														className='row mt-4 d-flex align-items-center justify-content-between'>
-														<div className='col-11'>
+														<div
+															style={{
+																width: '4%',
+																marginLeft: '5px',
+															}}>
+															{index + 1}.
+														</div>
+														<div style={{ width: '90%' }}>
 															<div className='w-100'>
-																<FormGroup
-																	className='mr-2'
-																	id='name'
-																	label={`Nhiệm vụ phụ ${
-																		index + 1
-																	}`}>
-																	<CustomSelect
-																		placeholder='Chọn nhiệm vụ phụ'
-																		value={item}
-																		onChange={(e) => {
-																			handleChangeKpiNormOption(
-																				index,
-																				e,
-																			);
-																		}}
-																		options={kpiNorms}
-																	/>
+																<FormGroup id='name'>
+																	<OverlayTrigger
+																		overlay={
+																			<Tooltip id='addSubMission'>
+																				Chọn nhiệm vụ phụ
+																			</Tooltip>
+																		}>
+																		<CustomSelect
+																			placeholder='Chọn nhiệm vụ phụ'
+																			value={item}
+																			onChange={(e) => {
+																				handleChangeKpiNormOption(
+																					index,
+																					e,
+																				);
+																			}}
+																			options={kpiNorms}
+																		/>
+																	</OverlayTrigger>
 																</FormGroup>
 															</div>
 														</div>
-														<div className='col-1'>
+														<div style={{ width: '4%' }}>
 															<div className='w-100'>
 																<Button
 																	color='light'
 																	variant='light'
 																	size='lg'
-																	className='mt-4 h-100 bg-transparent border-0'
+																	className='h-100 bg-transparent border-0'
 																	onClick={(e) =>
 																		handleRemoveKpiNormField(
 																			e,
