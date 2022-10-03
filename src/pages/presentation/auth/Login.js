@@ -30,28 +30,22 @@ const Login = () => {
 	const handleOnClick = async (e) => {
 		e.preventDefault();
 		try {
+			const response = await login(account);
+			const result = await response.data;
+			localStorage.setItem('token', result.data.accessToken);
+			localStorage.setItem('email', result.data.email);
+			localStorage.setItem('name', result.data.name);
+			localStorage.setItem('userId', result.data.userId);
+			localStorage.setItem('roles', JSON.stringify(result.data.role));
+			window.location.href = '/';
 			// const response = await login(account);
 			// const result = await response.data;
 			// localStorage.setItem('token', result.accessToken);
-			// localStorage.setItem(
-			// 	'token',
-			// 	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IlN0ZXZlbi50cmFuQHRiaHQudm4iLCJpZCI6MSwibmFtZSI6IkFkbWluIiwiZGVwYXJ0bWVudElkIjpudWxsLCJyb2xlcyI6WyJhZG1pbiJdLCJpYXQiOjE2NjQ3NjE1MTEsImV4cCI6MTY2NDg0NzkxMX0.LX4RaxycTu8jetgMuMUnKAfDJ9U18d2I-Fq-JqHqkJk',
-			// );
-			// localStorage.setItem('token', result.data.accessToken);
-			// localStorage.setItem('email', result.data.email);
-			// localStorage.setItem('name', result.data.name);
-			// localStorage.setItem('userId', result.data.userId);
-			// localStorage.setItem('roles', JSON.stringify(result.data.role));
+			// localStorage.setItem('email', result.email);
+			// localStorage.setItem('name', result.name);
+			// localStorage.setItem('roles', JSON.stringify(result.roles));
 			// navigate('/');
 			// window.location.href = '/';
-			const response = await login(account);
-			const result = await response.data;
-			localStorage.setItem('token', result.accessToken);
-			localStorage.setItem('email', result.email);
-			localStorage.setItem('name', result.name);
-			localStorage.setItem('roles', JSON.stringify(result.roles));
-			// navigate('/');
-			window.location.href = '/';
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 		}

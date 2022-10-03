@@ -16,12 +16,10 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () => {
 	const response = await getAllKpiNorm();
-	return response.data.map((item) => {
+	return response.data.data.map((item) => {
 		return {
 			...item,
-			label: `${item.name} - Số lượng: ${item.quantity || ''} - ${
-				item.unit?.name || 'Chưa có đơn vị'
-			} - ${item.position?.name || 'Chưa có vị trí'} - ${item.manday || 'Chưa có'} MD`,
+			label: item.name,
 			value: item.id,
 			text: item.name,
 		};
@@ -32,10 +30,10 @@ export const fetchKpiNormListByParams = createAsyncThunk(
 	'kpiNorm/fetchKpiNormListByParams',
 	async (params) => {
 		const response = await fetchAllKpiNorms(params);
-		return response.data.map((item) => {
+		return response.data.data.map((item) => {
 			return {
 				...item,
-				label: `${item.name} - Số lượng: ${item.quantity} - ${item.unit?.name} - ${item.position?.name} - ${item.manday} MD`,
+				label: item.name,
 				value: item.id,
 				text: item.name,
 			};

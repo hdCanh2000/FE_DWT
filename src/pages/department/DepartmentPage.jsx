@@ -42,10 +42,11 @@ const DepartmentPage = () => {
 	useEffect(() => {
 		dispatch(fetchDepartmentWithUserList());
 	}, [dispatch]);
-	const departmentList = department?.map((items) => {
+	const departmentList = department?.map((item) => {
 		return {
-			label: items.name,
-			value: items.id,
+			...item,
+			label: item.name,
+			value: item.id,
 		};
 	});
 	const showIcon = (item) => {
@@ -89,16 +90,16 @@ const DepartmentPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 8,
 		},
 		{
-			title: 'Cấp tổ chức',
-			id: 'organizationLevel',
-			key: 'organizationLevel',
-			type: 'select',
-			align: 'center',
-			options: organizationLevelOptions,
+			title: 'Mã',
+			id: 'slug',
+			key: 'slug',
+			type: 'text',
+			align: 'left',
 			isShow: true,
-			isMulti: false,
+			col: 4,
 		},
 		{
 			title: 'Quan hệ cha con',
@@ -109,20 +110,24 @@ const DepartmentPage = () => {
 			options: departmentList,
 			isShow: true,
 			isMulti: false,
+			col: 8,
+		},
+		{
+			title: 'Cấp tổ chức',
+			id: 'organizationLevel',
+			key: 'organizationLevel',
+			type: 'select',
+			align: 'center',
+			options: organizationLevelOptions,
+			isShow: true,
+			isMulti: false,
+			col: 4,
 		},
 		{
 			title: 'Mô tả',
 			id: 'description',
 			key: 'description',
 			type: 'textarea',
-			align: 'left',
-			isShow: true,
-		},
-		{
-			title: 'Code',
-			id: 'slug',
-			key: 'slug',
-			type: 'text',
 			align: 'left',
 			isShow: true,
 		},
@@ -134,15 +139,15 @@ const DepartmentPage = () => {
 			align: 'left',
 			isShow: true,
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'switch',
-			align: 'center',
-			isShow: true,
-			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'switch',
+		// 	align: 'center',
+		// 	isShow: true,
+		// 	format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		// },
 	];
 	const handleOpenForm = (item) => {
 		setItemEdit(item);
@@ -165,20 +170,23 @@ const DepartmentPage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			organizationLevel: data?.organizationLevel?.value,
-			parentId: data?.parentId?.value,
+			parent_id: data?.parentId?.value,
 			id: data?.id,
 			name: data.name,
 			description: data.description,
 			slug: data.slug,
 			address: data.address,
-			status: Number(data.status),
+			// status: Number(data.status),
 		};
 		try {
 			const response = await addDepartment(dataSubmit);
 			const result = await response.data;
 			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
-			handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
+			handleShowToast(
+				`Thêm phòng ban`,
+				`Phòng ban ${result.data.name} được thêm thành công!`,
+			);
 		} catch (error) {
 			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
 		}

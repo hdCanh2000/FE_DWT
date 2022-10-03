@@ -11,7 +11,7 @@ const initialState = {
 
 export const fetchPositionList = createAsyncThunk('position/fetchList', async () => {
 	const response = await getAllPositions();
-	return response.data?.map((position) => {
+	return response.data?.data.map((position) => {
 		return {
 			...position,
 			id: position?.id,

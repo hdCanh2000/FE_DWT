@@ -70,16 +70,7 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-		},
-		{
-			title: 'Mã Vị Trí',
-			// placeholder: 'mã vị trí',
-			// id: 'code',
-			key: 'code',
-			// type: 'text',
-			align: 'left',
-			// isShow: true,
-			render: (item) => <span>{item?.positionLevel?.code || 'No data'}</span>,
+			col: 6,
 		},
 		{
 			title: 'Phòng Ban',
@@ -90,6 +81,7 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
+			col: 6,
 		},
 		{
 			title: 'Cấp Nhân Sự',
@@ -100,6 +92,7 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
 			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
+			col: 6,
 		},
 		{
 			title: 'Quản lý cấp trên',
@@ -110,6 +103,7 @@ const PositionPage = () => {
 			isShow: false,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
 			options: positionLevels,
+			col: 6,
 		},
 		{
 			title: 'Địa điểm làm việc',
@@ -214,8 +208,8 @@ const PositionPage = () => {
 			name: data.name,
 			address: data.address,
 			description: data.description,
-			departmentId: parseInt(data.departmentId, 10),
-			positionLevelId: parseInt(data.positionLevelId, 10),
+			department_id: parseInt(data.departmentId, 10),
+			position_levels_id: parseInt(data.positionLevelId, 10),
 			manager: parseInt(data.manager, 10),
 			jobType: parseInt(data.jobType, 10),
 			kpiNormId: data.kpiName,

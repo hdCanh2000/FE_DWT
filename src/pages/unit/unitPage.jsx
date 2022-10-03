@@ -36,7 +36,7 @@ const UnitPage = () => {
 			try {
 				const response = await getAllUnits();
 				const data = await response.data;
-				setUnits(data);
+				setUnits(data.data);
 			} catch (error) {
 				setUnits([]);
 			}
