@@ -4,21 +4,21 @@ const getAllEmployee = () => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
-		url: `/users`,
+		url: `/api/users`,
 	});
 };
 
 const getUserById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/${id}`,
+		url: `/api/users/${id}`,
 	});
 };
 
 const addEmployee = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/users`,
+		url: `/api/users`,
 		data,
 	});
 };
@@ -26,7 +26,7 @@ const addEmployee = (data) => {
 const updateEmployee = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/users/${data.id}`,
+		url: `/api/users/${data.id}`,
 		data,
 	});
 };

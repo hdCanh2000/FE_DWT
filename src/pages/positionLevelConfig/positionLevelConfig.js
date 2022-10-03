@@ -114,7 +114,10 @@ const KeyPage = () => {
 			const result = reponse.data;
 			dispatch(fetchPositionLevelList());
 			handleCloseForm();
-			handleShowToast('Thêm cấp nhân sự', `Thêm cấp nhân sự ${result.name} thành công !`);
+			handleShowToast(
+				'Thêm cấp nhân sự',
+				`Thêm cấp nhân sự ${result.data.name} thành công !`,
+			);
 		} else {
 			const reponse = await updatePositionLevel(itemSubmit);
 			const result = reponse.data;

@@ -251,11 +251,7 @@ const EmployeePage = ({ header }) => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			departmentId: data?.department?.value,
-			department: {
-				id: data?.department?.value,
-				name: data?.department?.label,
-			},
+			department_id: data?.department?.value,
 			code: data?.code,
 			email: data?.email,
 			password: '123456',
@@ -263,17 +259,12 @@ const EmployeePage = ({ header }) => {
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
-			positionId: data?.position?.value,
-			position: {
-				id: data?.position?.value,
-				name: data?.position?.label,
-				value: data?.position?.value,
-				label: data?.position?.label,
-			},
-			role: Number.parseInt(data?.role, 10),
+			position_id: data?.position?.value,
+			role:
+				// eslint-disable-next-line no-nested-ternary
+				data?.role === 'Nhân viên' ? 'user' : data?.role === 'Quản lý' ? 'manager' : null,
 			status: Number(data?.status),
 			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
-			isDelete: 1,
 		};
 		try {
 			await updateEmployee(dataSubmit);

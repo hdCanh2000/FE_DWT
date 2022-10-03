@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { useNavigate } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -13,7 +11,6 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
@@ -24,13 +21,11 @@ import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addPosition, updatePosition } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
-// import { formatJobType } from '../../utils/constants';
 import PositionDetail from './PositionDetail';
 import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
 
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -45,19 +40,11 @@ const PositionPage = () => {
 	const [dataDetail, setDataDetail] = React.useState({});
 
 	const [nvs] = React.useState(true);
+
 	useEffect(() => {
 		dispatch(fetchPositionList());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchPositionLevelList());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchDepartmentList());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchRequirementList());
 	}, [dispatch]);
 
@@ -124,33 +111,6 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: true,
 		},
-		// {
-		// 	title: 'Loại hình công việc',
-		// 	placeholder: 'loại hình công việc',
-		// 	id: 'jobType',
-		// 	key: 'jobType',
-		// 	type: 'singleSelect',
-		// 	align: 'left',
-		// 	isShow: true,
-		// 	format: (value) => formatJobType(value),
-		// 	options: [
-		// 		{
-		// 			id: 1,
-		// 			text: 'Chính thức',
-		// 			value: 1,
-		// 		},
-		// 		{
-		// 			id: 2,
-		// 			text: 'Thực tập',
-		// 			value: 2,
-		// 		},
-		// 		{
-		// 			id: 3,
-		// 			text: 'Thử việc',
-		// 			value: 3,
-		// 		},
-		// 	],
-		// },
 		{
 			title: 'Yêu cầu năng lực',
 			id: 'requirements',
@@ -191,17 +151,6 @@ const PositionPage = () => {
 		},
 	];
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
@@ -211,33 +160,23 @@ const PositionPage = () => {
 			department_id: parseInt(data.departmentId, 10),
 			position_levels_id: parseInt(data.positionLevelId, 10),
 			manager: parseInt(data.manager, 10),
-			jobType: parseInt(data.jobType, 10),
 			kpiNormId: data.kpiName,
 			requirements: data.requirements,
 		};
 		if (data.id) {
 			try {
 				const response = await updatePosition(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
-				handleShowToast(
-					`Cập nhật vị trí!`,
-					`Vị trí ${result.name} được cập nhật thành công!`,
-				);
-			} catch (error) {
-				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
-			}
+			} catch (error) {}
 		} else {
 			try {
 				const response = await addPosition(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
-				handleShowToast(`Thêm vị trí`, `Vị trí ${result.name} được thêm thành công!`);
-			} catch (error) {
-				handleShowToast(`Thêm vị trí`, `Thêm vị trí không thành công!`);
-			}
+			} catch (error) {}
 		}
 	};
 	const handleOpenDetail = (item) => {

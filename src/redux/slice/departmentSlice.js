@@ -1,9 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import {
-	getAllDepartmentWithUser,
-	// getDepartmentByIdWithUser,
-} from '../../pages/department/services';
-import { getAllDepartments } from '../../pages/work-management/mission/services';
+import { getAllDepartmentWithUser, getAllDepartment } from '../../pages/department/services';
 
 const initialState = {
 	departments: [],
@@ -14,14 +10,14 @@ const initialState = {
 
 // Đầu tiên, tạo thunk
 export const fetchDepartmentList = createAsyncThunk('department/fetchList', async () => {
-	const response = await getAllDepartments();
-	return response.data.data.map((department) => {
+	const response = await getAllDepartment();
+	return response.data?.data.map((department) => {
 		return {
 			...department,
 			text: department?.name,
 			value: department?.id,
 			label: department?.name,
-			parentId: department?.parent_id,
+			parentId: department.parent_id || null,
 		};
 	});
 });

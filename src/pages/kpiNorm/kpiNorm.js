@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useToasts } from 'react-toast-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -11,7 +10,6 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
@@ -30,7 +28,6 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const departments = useSelector((state) => state.department.departments);
@@ -49,17 +46,8 @@ const EmployeePage = () => {
 
 	useEffect(() => {
 		dispatch(fetchUnitList());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchPositionList());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchDepartmentList());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
 
@@ -127,7 +115,7 @@ const EmployeePage = () => {
 			id: 'manday',
 			key: 'manday',
 			type: 'number',
-			align: 'center',
+			align: 'right',
 			isShow: true,
 			col: 3,
 		},
@@ -176,56 +164,37 @@ const EmployeePage = () => {
 		},
 	];
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
 			description: data?.description,
+			manday: data?.manday,
 			hr: data?.hr,
 			department_id: parseInt(data?.department?.id, 10),
 			position_id: parseInt(data?.position?.id, 10),
 			unit_id: parseInt(data?.unit?.id, 10),
 			parent_id: parseInt(data?.parent?.id, 10),
-			manday: data?.manday,
 			type: 1,
 		};
 		if (data?.id) {
+			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await updateKpiNorm(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
-				handleShowToast(
-					`Cập nhật định mức KPI!`,
-					`Định mức KPI ${result?.name} được cập nhật thành công!`,
-				);
 			} catch (error) {
-				handleShowToast(`Cập nhật định mức KPI`, `Cập nhật định mức KPI không thành công!`);
 				throw error;
 			}
 		} else {
+			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await addKpiNorm(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
-				handleShowToast(
-					`Thêm định mức KPI`,
-					`Định mức KPI ${result?.name} được thêm thành công!`,
-				);
 			} catch (error) {
-				handleShowToast(`Thêm định mức KPI`, `Thêm định mức KPI không thành công!`);
 				throw error;
 			}
 		}
@@ -258,12 +227,12 @@ const EmployeePage = () => {
 	};
 
 	const handleDeleteKpiNorm = async (item) => {
+		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteKpiNorm(item);
 			dispatch(fetchKpiNormList());
-			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI thành công!`);
 		} catch (error) {
-			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI không thành công!`);
+			throw error;
 		}
 		handleCloseDelete();
 	};

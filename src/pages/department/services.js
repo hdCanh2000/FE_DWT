@@ -3,28 +3,28 @@ import axiosClient from '../../utils/axiosClient';
 const getAllDepartment = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/departments',
+		url: '/api/departments',
 	});
 };
 
 const getAllDepartmentWithUser = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/departments',
+		url: '/api/departments',
 	});
 };
 
 const getDepartmentByIdWithUser = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/departments/${id}`,
+		url: `/api/departments/${id}`,
 	});
 };
 
 const addDepartment = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/departments`,
+		url: `/api/departments`,
 		data,
 	});
 };
@@ -32,7 +32,7 @@ const addDepartment = (data) => {
 const updateDepartment = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/departments/${data.id}`,
+		url: `/api/departments/${data.id}`,
 		data,
 	});
 };
