@@ -302,8 +302,6 @@ const EmployeePage = ({ header }) => {
 			address: data?.address,
 			position_id: data?.position?.value,
 			role: data?.role,
-			status: Number(data?.status),
-			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
 		};
 		if (data?.id) {
 			try {

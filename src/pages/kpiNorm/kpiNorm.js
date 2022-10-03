@@ -64,7 +64,7 @@ const EmployeePage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Định mức KPI cha',
+			title: 'Định mức cha',
 			id: 'parent',
 			key: 'parent',
 			type: 'select',

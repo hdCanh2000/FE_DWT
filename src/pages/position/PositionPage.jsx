@@ -158,7 +158,7 @@ const PositionPage = () => {
 			address: data.address,
 			description: data.description,
 			department_id: parseInt(data.departmentId, 10),
-			positionLevels_id: parseInt(data.positionLevelId, 10),
+			position_levels_id: parseInt(data.positionLevelId, 10),
 			manager: parseInt(data.manager, 10),
 			kpiNormId: data.kpiName,
 			requirements: data.requirements,

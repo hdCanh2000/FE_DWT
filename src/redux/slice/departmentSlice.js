@@ -32,6 +32,7 @@ export const fetchDepartmentWithUserList = createAsyncThunk(
 				text: department?.name,
 				value: department?.id,
 				label: department?.name,
+				parentId: department?.parent_id,
 			};
 		});
 	},

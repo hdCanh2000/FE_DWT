@@ -9,7 +9,7 @@ const initialState = {
 
 export const fetchUnitList = createAsyncThunk('unit/fetchList', async () => {
 	const response = await getAllUnits();
-	return response.data?.data?.map((unit) => {
+	return response.data?.data.map((unit) => {
 		return {
 			...unit,
 			value: unit?.id,

@@ -30,7 +30,7 @@ export const fetchKpiNormListByParams = createAsyncThunk(
 	'kpiNorm/fetchKpiNormListByParams',
 	async (params) => {
 		const response = await fetchAllKpiNorms(params);
-		return response.data.map((item) => {
+		return response.data.data.map((item) => {
 			return {
 				...item,
 				label: item.name,
