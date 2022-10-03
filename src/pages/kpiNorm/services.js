@@ -6,6 +6,12 @@ const getAllKpiNorm = () => {
 		url: `/kpiNorms`,
 	});
 };
+const getAllKpiNormbyId = (id) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/kpiNorms/${id}`,
+	});
+};
 
 const addKpiNorm = (data) => {
 	return axiosClient({
@@ -53,4 +59,5 @@ export {
 	deleteKpiNorm,
 	fetchAllKpiNorms,
 	fetchAllSubKpiNorms,
+	getAllKpiNormbyId,
 };
