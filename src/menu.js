@@ -65,10 +65,10 @@ export const demoPages = {
 				text: 'Khai báo nhiệm vụ',
 				path: '/cong-viec-hang-ngay',
 			},
-			mission: {
-				id: 'mission',
+			orderTask: {
+				id: 'orderTask',
 				text: 'Giao việc',
-				path: '/nhiem-vu/them-moi',
+				path: '/giao-viec',
 			},
 		},
 	},
