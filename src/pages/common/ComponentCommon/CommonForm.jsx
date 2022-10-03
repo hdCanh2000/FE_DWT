@@ -21,6 +21,7 @@ const CommonForm = ({
 	options,
 	validate,
 	disable,
+	size,
 	...props
 }) => {
 	const formik = useFormik({
@@ -37,7 +38,7 @@ const CommonForm = ({
 			className={classNames(className, 'p-4')}
 			show={show}
 			onHide={onClose}
-			size='lg'
+			size={size}
 			scrollable
 			centered
 			{...props}>
@@ -223,6 +224,7 @@ CommonForm.propTypes = {
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
+	size: PropTypes.string,
 };
 CommonForm.defaultProps = {
 	className: null,
@@ -236,6 +238,7 @@ CommonForm.defaultProps = {
 	onClose: null,
 	handleSubmit: null,
 	label: '',
+	size: 'lg',
 };
 
 export default CommonForm;

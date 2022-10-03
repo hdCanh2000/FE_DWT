@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getPositionById } from '../../pages/position/services';
-import { getAllPositions } from '../../pages/work-management/mission/services';
+import { getPositionById, getAllPosition } from '../../pages/position/services';
 
 const initialState = {
 	positions: [],
@@ -10,8 +9,8 @@ const initialState = {
 };
 
 export const fetchPositionList = createAsyncThunk('position/fetchList', async () => {
-	const response = await getAllPositions();
-	return response.data?.map((position) => {
+	const response = await getAllPosition();
+	return response.data?.data.map((position) => {
 		return {
 			...position,
 			id: position?.id,
