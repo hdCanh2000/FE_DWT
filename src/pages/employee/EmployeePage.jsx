@@ -306,7 +306,6 @@ const EmployeePage = ({ header }) => {
 	};
 
 	const handleSubmitForm = async (data) => {
-		
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
