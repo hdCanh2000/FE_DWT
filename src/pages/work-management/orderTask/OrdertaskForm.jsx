@@ -170,6 +170,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		setUserRelatedOption([]);
 		onClose();
 	};
+	console.log(kpiNormOptions,'kpiNormOptions');
 	return (
 		<Modal show={show} onHide={onClose} size='xl'>
 			<Page container='fluid'>
