@@ -52,7 +52,7 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllDepartment();
 			const result = await response.data;
 			setDepartments(
-				result.data.map((item) => {
+				result.map((item) => {
 					return {
 						...item,
 						label: item.name,
