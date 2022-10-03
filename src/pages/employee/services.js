@@ -1,32 +1,32 @@
-import axiosClientNode from '../../utils/axiosClientNode';
+import axiosClient from '../../utils/axiosClient';
 
 const getAllEmployee = () => {
 	// lấy danh sách nhân viên
-	return axiosClientNode({
+	return axiosClient({
 		method: 'GET',
-		url: `/api/users`,
+		url: `/users`,
 	});
 };
 
 const getUserById = (id) => {
-	return axiosClientNode({
+	return axiosClient({
 		method: 'GET',
-		url: `/api/${id}`,
+		url: `/${id}`,
 	});
 };
 
 const addEmployee = (data) => {
-	return axiosClientNode({
+	return axiosClient({
 		method: 'POST',
-		url: `/api/users`,
+		url: `/users`,
 		data,
 	});
 };
 
 const updateEmployee = (data) => {
-	return axiosClientNode({
+	return axiosClient({
 		method: 'PUT',
-		url: `/api/users/profile/${data.id}`,
+		url: `/users/${data.id}`,
 		data,
 	});
 };
