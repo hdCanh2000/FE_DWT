@@ -1,9 +1,9 @@
-import axiosClientNode from '../../../utils/axiosClientNode';
+import axiosClient from '../../../utils/axiosClient';
 
 const login = (data) => {
-	return axiosClientNode({
+	return axiosClient({
 		method: 'POST',
-		url: '/auth/login',
+		url: '/api/auth/login',
 		data,
 	});
 };

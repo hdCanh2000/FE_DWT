@@ -1,0 +1,139 @@
+.cp_tree-table {
+	font-size: 14px;
+	color: #040402;
+	background: #fff;
+	border: 1px solid rgba(55, 53, 47, 0.2);
+}
+
+.cp_tree-table_viewport {
+	min-height: 300px;
+}
+
+/* Header */
+
+.cp_tree-table .cp_tree-table_header {
+	background: rgba(242, 241, 238, 0.6);
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+	font-weight: 600;
+	font-size: 16px;
+	height: 45px !important;
+}
+
+/* Employees & Expenses */
+
+.cp_tree-table .cp_tree-table_header-cell > .t-right {
+	width: 100%;
+	text-align: right;
+}
+
+/* Cells */
+
+.cp_tree-table .cp_tree-table_cell,
+.cp_tree-table .cp_tree-table_header-cell {
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	min-width: 200px;
+}
+
+/* Editable cell */
+
+.cp_tree-table .cp_tree-table_cell > input {
+	font-size: 14px;
+	outline: none;
+	width: 100%;
+	height: 100%;
+	padding: 5px 8px;
+	box-sizing: border-box;
+	box-shadow: inset 0 0 0 1px rgba(55, 53, 47, 0.16);
+	border: 1px solid transparent;
+}
+
+.cp_tree-table .cp_tree-table_cell > input:hover {
+	box-shadow: inset 0 0 0 1px #0f55eb;
+}
+
+.cp_tree-table .cp_tree-table_cell > input:focus {
+	background: #edf6fc;
+	box-shadow: inset 0 0 0 1px #0f55eb;
+}
+
+/* Index cell  */
+
+.cp_tree-table .cp_tree-table_cell .toggle-button {
+	position: relative;
+	display: inline-block;
+	border: none;
+	/* height: 14px; */
+	vertical-align: middle;
+	padding: 0 5px 0 0;
+	margin: 0;
+	cursor: pointer;
+	background-color: transparent;
+	outline: none;
+}
+
+.cp_tree-table .cp_tree-table_cell .toggle-button::after {
+	content: '';
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 5px 5px 0 5px;
+	border-color: #040402 transparent transparent transparent;
+	padding: 0;
+	vertical-align: middle;
+}
+
+.cp_tree-table .cp_tree-table_cell .toggle-button + span {
+	vertical-align: middle;
+}
+
+.cp_tree-table .cp_tree-table_cell > .without-children > span {
+	padding-left: 15px;
+}
+
+.cp_tree-table .cp_tree-table_cell > .with-children > span {
+	font-weight: 600;
+}
+
+/* Employees cell */
+
+.cp_tree-table .cp_tree-table_cell > .employees-cell {
+	width: 100%;
+	text-align: right;
+}
+
+/* Expenses cell */
+
+.cp_tree-table .cp_tree-table_cell > .expenses-cell {
+	font-weight: 400;
+	width: 100%;
+	padding-right: 10px;
+	text-align: left;
+}
+
+/* .cp_tree-table .cp_tree-table_cell:last-child > .expenses-cell {
+	text-align: right;
+} */
+
+.without-children {
+	padding-left: 12px;
+	font-weight: 600;
+}
+
+.cp_tree-table_row .cp_tree-table_cell:first-child {
+	min-width: 300px;
+}
+
+.cp_tree-table_header .cp_tree-table_header-cell:first-child {
+	min-width: 300px;
+}
+
+.cp_tree-table_row .cp_tree-table_cell:nth-child(4) {
+	min-width: 100px;
+}
+
+.cp_tree-table_header .cp_tree-table_header-cell:nth-child(4) {
+	min-width: 100px;
+}

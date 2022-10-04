@@ -1,10 +1,19 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { arrayToTree } from 'performant-array-to-tree';
+// import Tree from 'react-animated-tree-v2';
+import { TreeTable, TreeState } from 'cp-react-tree-table';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
+	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -19,12 +28,14 @@ import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import Search from '../common/ComponentCommon/Search';
+// import Search from '../common/ComponentCommon/Search';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+// import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import NotPermission from '../presentation/auth/NotPermission';
+import './style.css';
+import Icon from '../../components/icon/Icon';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -37,9 +48,9 @@ const EmployeePage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [openDetail, setOpenDetail] = useState(false);
 	const [dataDetail, setDataDetail] = useState(false);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [perPage, setPerPage] = useState(PER_COUNT['10']);
-	const items = dataPagination(kpiNorm, currentPage, perPage);
+	// const [currentPage, setCurrentPage] = useState(1);
+	// const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	// const items = dataPagination(kpiNorm, currentPage, perPage);
 
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
@@ -53,6 +64,14 @@ const EmployeePage = () => {
 
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
+
+	const [treeValue, setTreeValue] = React.useState(
+		TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })),
+	);
+
+	useEffect(() => {
+		setTreeValue(TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })));
+	}, [kpiNorm]);
 
 	const columns = [
 		{
@@ -209,17 +228,17 @@ const EmployeePage = () => {
 		setIsDelete(false);
 	};
 
-	const handleOpenDetail = (item) => {
-		setOpenDetail(true);
-		setDataDetail({
-			...item,
-			department: {
-				...item.department,
-				label: item?.department?.name,
-				value: item?.departmentId,
-			},
-		});
-	};
+	// const handleOpenDetail = (item) => {
+	// 	setOpenDetail(true);
+	// 	setDataDetail({
+	// 		...item,
+	// 		department: {
+	// 			...item.department,
+	// 			label: item?.department?.name,
+	// 			value: item?.departmentId,
+	// 		},
+	// 	});
+	// };
 
 	const handleCloseDetail = () => {
 		setOpenDetail(false);
@@ -238,6 +257,43 @@ const EmployeePage = () => {
 	};
 
 	const lable = 'Định mức lao động & KPI';
+
+	const handleOnChange = (newValue) => {
+		setTreeValue(newValue);
+	};
+
+	const renderIndexCell = (row) => {
+		return (
+			<div
+				style={{
+					paddingLeft: `${row.metadata.depth * 30}px`,
+					minWidth: 360,
+				}}
+				// onClick={row.toggleChildren}
+				onDoubleClick={() => handleOpenForm(row.data)}
+				className={
+					row.metadata.hasChildren
+						? 'with-children d-flex align-items-center cursor-pointer'
+						: 'without-children cursor-pointer'
+				}>
+				{row.metadata.hasChildren ? (
+					<Icon
+						color='success'
+						type='button'
+						size='lg'
+						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
+						className='d-block bg-transparent'
+						style={{ fontSize: 25 }}
+						onClick={row.toggleChildren}
+					/>
+				) : (
+					''
+				)}
+
+				<span>{row.data.name}</span>
+			</div>
+		);
+	};
 
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
@@ -270,11 +326,57 @@ const EmployeePage = () => {
 											</Button>
 										</CardActions>
 									</CardHeader>
-									<div className='p-4'>
+									<CardBody>
+										<TreeTable value={treeValue} onChange={handleOnChange}>
+											<TreeTable.Column
+												// basis='180px'
+												// grow='0'
+												style={{ minWidth: 300 }}
+												renderCell={renderIndexCell}
+												renderHeaderCell={() => <span>Tên định mức</span>}
+											/>
+											<TreeTable.Column
+												renderCell={(row) => (
+													<span className='expenses-cell text-left'>
+														{row.data.department.name}
+													</span>
+												)}
+												renderHeaderCell={() => (
+													<span className='t-left'>Phòng ban</span>
+												)}
+											/>
+											<TreeTable.Column
+												renderCell={(row) => (
+													<span className='expenses-cell text-left'>
+														{row.data.position.name}
+													</span>
+												)}
+												renderHeaderCell={() => <span>Vị trí</span>}
+											/>
+											<TreeTable.Column
+												renderCell={(row) => (
+													<span className='expenses-cell text-left'>
+														{row.data.unit.name}
+													</span>
+												)}
+												renderHeaderCell={() => (
+													<span className='t-left'>Đơn vị tính</span>
+												)}
+											/>
+											<TreeTable.Column
+												renderCell={(row) => (
+													<span className='expenses-cell text-right'>
+														{row.data.manday}
+													</span>
+												)}
+												renderHeaderCell={() => (
+													<span className='t-left'>Số ngày công</span>
+												)}
+											/>
+										</TreeTable>
+									</CardBody>
+									{/* <div className='p-4'>
 										<div className='p-4'>
-											<div style={{ maxWidth: '25%' }}>
-												<Search />
-											</div>
 											<table
 												className='table table-modern mb-0'
 												style={{ fontSize: 14 }}>
@@ -401,9 +503,10 @@ const EmployeePage = () => {
 												/>
 											</footer>
 										</div>
-									</div>
+									</div> */}
 								</Card>
 							</div>
+							{/* <div className='col-12'>{renderDepartmentMenu(treeData)}</div> */}
 						</div>
 					</>,
 					['admin'],
