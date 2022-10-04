@@ -18,7 +18,7 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
+import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
@@ -40,13 +40,12 @@ const DepartmentPage = () => {
 	const department = useSelector((state) => state.department.departments);
 	const [itemEdits, setItemEdits] = useState({});
 	useEffect(() => {
-		dispatch(fetchDepartmentList());
+		dispatch(fetchDepartmentWithUserList());
 	}, [dispatch]);
-	const departmentList = department?.map((item) => {
+	const departmentList = department?.map((items) => {
 		return {
-			...item,
-			label: item.name,
-			value: item.id,
+			label: items.name,
+			value: items.id,
 		};
 	});
 	const showIcon = (item) => {
@@ -90,27 +89,6 @@ const DepartmentPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 8,
-		},
-		{
-			title: 'Mã',
-			id: 'slug',
-			key: 'slug',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-			col: 4,
-		},
-		{
-			title: 'Quan hệ cha con',
-			id: 'parentId',
-			key: 'parentId',
-			type: 'select',
-			align: 'center',
-			options: departmentList,
-			isShow: true,
-			isMulti: false,
-			col: 8,
 		},
 		{
 			title: 'Cấp tổ chức',
@@ -121,13 +99,30 @@ const DepartmentPage = () => {
 			options: organizationLevelOptions,
 			isShow: true,
 			isMulti: false,
-			col: 4,
+		},
+		{
+			title: 'Quan hệ cha con',
+			id: 'parentId',
+			key: 'parentId',
+			type: 'select',
+			align: 'center',
+			options: departmentList,
+			isShow: true,
+			isMulti: false,
 		},
 		{
 			title: 'Mô tả',
 			id: 'description',
 			key: 'description',
 			type: 'textarea',
+			align: 'left',
+			isShow: true,
+		},
+		{
+			title: 'Code',
+			id: 'slug',
+			key: 'slug',
+			type: 'text',
 			align: 'left',
 			isShow: true,
 		},
@@ -139,15 +134,15 @@ const DepartmentPage = () => {
 			align: 'left',
 			isShow: true,
 		},
-		// {
-		// 	title: 'Trạng thái',
-		// 	id: 'status',
-		// 	key: 'status',
-		// 	type: 'switch',
-		// 	align: 'center',
-		// 	isShow: true,
-		// 	format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		// },
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		},
 	];
 	const handleOpenForm = (item) => {
 		setItemEdit(item);
@@ -170,23 +165,20 @@ const DepartmentPage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			organizationLevel: data?.organizationLevel?.value,
-			parent_id: data?.parentId?.value,
+			parentId: data?.parentId?.value,
 			id: data?.id,
 			name: data.name,
 			description: data.description,
 			slug: data.slug,
 			address: data.address,
-			// status: Number(data.status),
+			status: Number(data.status),
 		};
 		try {
 			const response = await addDepartment(dataSubmit);
 			const result = await response.data;
-			dispatch(fetchDepartmentList());
+			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
-			handleShowToast(
-				`Thêm phòng ban`,
-				`Phòng ban ${result.data.name} được thêm thành công!`,
-			);
+			handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
 		} catch (error) {
 			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
 		}

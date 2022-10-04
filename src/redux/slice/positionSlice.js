@@ -10,7 +10,7 @@ const initialState = {
 
 export const fetchPositionList = createAsyncThunk('position/fetchList', async () => {
 	const response = await getAllPosition();
-	return response.data?.data.map((position) => {
+	return response.data.map((position) => {
 		return {
 			...position,
 			id: position?.id,

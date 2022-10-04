@@ -102,9 +102,14 @@ const presentation = [
 		element: <TASKBYUSER.TASKBYUSER />,
 		exact: true,
 	},
+	// {
+	// 	path: `${demoPages.taskAndAssign.subMenu.taskByUser.path}`,
+	// 	element: <DAILYWORKTRACKING.DAILYWORKTRACKINGME />,
+	// 	exact: true,
+	// },
 	{
 		path: `${demoPages.taskAndAssign.subMenu.taskByUser.path}`,
-		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGME />,
+		element: <TASKBYUSER.TASKBYUSER />,
 		exact: true,
 	},
 	{

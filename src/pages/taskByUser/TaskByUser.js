@@ -10,9 +10,8 @@ import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
-import Search from '../common/ComponentCommon/Search';
 import NotPermission from '../presentation/auth/NotPermission';
-import Expand from './Expan';
+import TaskList from './TaskList';
 
 const TaskByUser = () => {
 	const dispatch = useDispatch();
@@ -45,17 +44,15 @@ const TaskByUser = () => {
 									</CardLabel>
 								</CardHeader>
 								<div className='p-4'>
-									<div style={{ maxWidth: '25%' }}>
-										<Search />
-									</div>
 									<table
 										className='table table-modern mb-0'
 										style={{ fontSize: 14 }}>
 										<thead>
 											<tr>
 												<th>Họ và tên</th>
-												<th className='text-center'>Danh sách đầu việc</th>
+												<th className='text-center'>Danh sách nhiệm vụ</th>
 												<th>Phòng ban</th>
+												<th>Vị trí</th>
 												<th>Chức vụ</th>
 											</tr>
 										</thead>
@@ -87,9 +84,10 @@ const TaskByUser = () => {
 																/>
 															</Button>
 														</td>
-														<td>{item?.department?.label}</td>
+														<td>{item?.department?.name}</td>
+														<td>{item?.position?.name}</td>
 														<td>
-															{item?.roles[0] === 'manager'
+															{item?.roles === 'manager'
 																? 'Quản lý '
 																: 'Nhân viên'}
 														</td>
@@ -101,8 +99,8 @@ const TaskByUser = () => {
 																padding: '5px 0 5px 50px',
 																borderRadius: '0.5rem',
 															}}>
-															{isExpan.includes(item.id) && (
-																<Expand idUser={item.id} />
+															{isExpan.includes(item?.id) && (
+																<TaskList userId={item?.id} />
 															)}
 														</td>
 													</tr>
@@ -121,11 +119,6 @@ const TaskByUser = () => {
 										/>
 									</footer>
 								</div>
-								{/* {!tasks?.length && (
-                                <Alert color='warning' isLight icon='Report' className='mt-3'>
-                                    Không có nhiệm vụ!
-                                </Alert>
-                            )} */}
 							</Card>
 						</div>
 					</div>,

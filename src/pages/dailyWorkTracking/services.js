@@ -3,21 +3,21 @@ import axiosClient from '../../utils/axiosClient';
 const getAllWorktrackByUserId = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/worktracks_by_user/${id}`,
+		url: `/api/worktracks/user/${id}`,
 	});
 };
 
 const getAllWorktrackByUser = () => {
 	return axiosClient({
 		method: 'GET',
-		url: `/worktracks_by_user`,
+		url: `/api/worktracks`,
 	});
 };
 
 const addWorktrack = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/worktracks`,
+		url: `/api/worktracks`,
 		data,
 	});
 };
@@ -25,7 +25,7 @@ const addWorktrack = (data) => {
 const updateWorktrack = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/worktracks/${data.id}`,
+		url: `/api/worktracks/${data.id}`,
 		data,
 	});
 };

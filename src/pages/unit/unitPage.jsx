@@ -35,7 +35,7 @@ const UnitPage = () => {
 	async function getUnit() {
 		try {
 			const response = await getAllUnits();
-			const data = await response.data?.data;
+			const data = await response.data;
 			setUnits(data);
 		} catch (error) {
 			setUnits([]);
