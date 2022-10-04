@@ -330,7 +330,7 @@ const EmployeePage = () => {
 																<td>{item?.unit?.name}</td>
 																<td>{item?.description}</td>
 																<td>{item?.position?.name}</td>
-																<td>{item?.manday}</td>
+																<td>{item?.manday?.name}</td>
 																<td className='text-center'>
 																	<Button
 																		isOutline={!darkModeStatus}
