@@ -52,7 +52,7 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllDepartment();
 			const result = await response.data;
 			setDepartments(
-				result.data.map((item) => {
+				result.map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -68,7 +68,7 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllPosition();
 			const result = await response.data;
 			setPositions(
-				result.data.map((item) => {
+				result.map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -325,7 +325,7 @@ const EmployeePage = ({ header }) => {
 				handleCloseForm();
 				handleShowToast(
 					`Thêm nhân viên`,
-					`Nhân viên ${result?.name} được thêm thành công!`,
+					`Nhân viên ${result.data.name} được thêm thành công!`,
 				);
 			} catch (error) {
 				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);

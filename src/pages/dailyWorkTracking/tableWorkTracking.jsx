@@ -7,7 +7,6 @@ import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import ContentEditable from 'react-contenteditable';
-import Button from '../../components/bootstrap/Button';
 import Card from '../../components/bootstrap/Card';
 import Icon from '../../components/icon/Icon';
 import Input from '../../components/bootstrap/forms/Input';
@@ -34,13 +33,7 @@ const styleHead = {
 	borderBottom: 0,
 };
 
-const TableWorkTracking = ({
-	rowsState,
-	handleAddRow,
-	handleChangeRowState,
-	handleRemoveRowField,
-	handleSubmit,
-}) => {
+const TableWorkTracking = ({ rowsState, handleChangeRowState, handleRemoveRowField }) => {
 	const columns = ['STT', 'Nhiệm vụ', 'Số lượng', 'ĐVT', 'Ghi chú', 'Thời hạn', 'KH dự kiến'];
 	const dispatch = useDispatch();
 	const units = useSelector((state) => state.unit.units);
@@ -53,19 +46,6 @@ const TableWorkTracking = ({
 		<Card className='w-100 h-100'>
 			<div style={styleHead} className='d-flex justify-content-between align-items-center'>
 				<p className='m-0 d-block fs-4 fw-bold'>Danh sách nhiệm vụ</p>
-				{rowsState?.[0]?.status !== 1 && (
-					<div className=''>
-						<Button
-							color='primary'
-							size='lg'
-							isLight
-							className='mt-0 border'
-							icon='Check'
-							onClick={handleSubmit}>
-							Lưu lại
-						</Button>
-					</div>
-				)}
 			</div>
 			<table className='table table-modern mb-0'>
 				<thead>
@@ -157,26 +137,6 @@ const TableWorkTracking = ({
 					})}
 				</tbody>
 			</table>
-			{rowsState?.[0]?.status !== 1 ? (
-				<Button
-					color='success'
-					size='lg'
-					isLight
-					className='my-4 w-50 h-50 m-auto btn-circle border'
-					icon='Add'
-					isDisable={rowsState?.[0]?.status === 1}
-					onClick={handleAddRow}
-				/>
-			) : (
-				<div className='mt-4 text-center w-100'>
-					<p className='m-0 text-black'>
-						<span className='mr-2 d-inline-block' style={{ color: 'red' }}>
-							*
-						</span>
-						Nếu muốn thêm/sửa thông tin công việc, vui lòng liên hệ phòng IT
-					</p>
-				</div>
-			)}
 		</Card>
 	);
 };
@@ -184,17 +144,13 @@ const TableWorkTracking = ({
 TableWorkTracking.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types
 	rowsState: PropTypes.array,
-	handleAddRow: PropTypes.func,
 	handleChangeRowState: PropTypes.func,
 	handleRemoveRowField: PropTypes.func,
-	handleSubmit: PropTypes.func,
 };
 TableWorkTracking.defaultProps = {
 	rowsState: [],
-	handleAddRow: null,
 	handleChangeRowState: null,
 	handleRemoveRowField: null,
-	handleSubmit: null,
 };
 
 export default TableWorkTracking;
