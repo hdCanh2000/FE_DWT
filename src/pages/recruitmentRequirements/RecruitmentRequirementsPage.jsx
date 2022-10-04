@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -12,7 +11,6 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
@@ -25,8 +23,6 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const RecruitmentRequirementPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
-
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -100,25 +96,14 @@ const RecruitmentRequirementPage = () => {
 	};
 
 	const handleDeleteRequirement = async (data) => {
+		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteRequirement(data);
 			dispatch(fetchRequirementList());
-			handleShowToast(`Xoá yêu cầu năng lực`, `Xoá yêu cầu năng lực thành công!`);
 		} catch (error) {
-			handleShowToast(`Xoá yêu cầu năng lực`, `Xoá yêu cầu năng lực thất bại!`);
+			throw error;
 		}
 		handleCloseDelete();
-	};
-
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
 	};
 
 	const handleSubmitForm = async (data) => {
@@ -128,33 +113,24 @@ const RecruitmentRequirementPage = () => {
 			description: data.description,
 		};
 		if (data.id) {
+			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await updateRequirement(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchRequirementList());
 				handleCloseForm();
-				handleShowToast(
-					`Cập nhật yêu cầu năng lực!`,
-					`Yêu câu năng lực ${result.name} được cập nhật thành công!`,
-				);
 			} catch (error) {
-				handleShowToast(
-					`Cập nhật yêu cầu năng lực`,
-					`Cập nhật yêu cầu năng lực không thành công!`,
-				);
+				throw error;
 			}
 		} else {
+			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await addRequirement(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchRequirementList());
 				handleCloseForm();
-				handleShowToast(
-					`Thêm yêu cầu năng lực`,
-					`Yêu cầu năng lực ${result.name} được thêm thành công!`,
-				);
 			} catch (error) {
-				handleShowToast(`Thêm yêu cầu năng lực`, `Thêm yêu cầu năng lực không thành công!`);
+				throw error;
 			}
 		}
 	};

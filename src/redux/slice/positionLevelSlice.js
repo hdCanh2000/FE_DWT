@@ -9,7 +9,7 @@ const initialState = {
 
 export const fetchPositionLevelList = createAsyncThunk('positionLevel/fetchLevelList', async () => {
 	const response = await getAllPositionLevel();
-	return response.data?.map((positionLevel) => {
+	return response.data?.data?.map((positionLevel) => {
 		return {
 			...positionLevel,
 			id: positionLevel?.id,

@@ -3,7 +3,7 @@ import axios from 'axios';
 const API_URL = process.env.REACT_APP_DEV_API_URL;
 
 const axiosClient = axios.create({
-	baseURL: API_URL,
+	baseURL: `${API_URL}`,
 });
 axiosClient.interceptors.request.use(async (config) => {
 	// Handle token here ...
