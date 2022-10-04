@@ -126,7 +126,6 @@ const OrderTask = () => {
 	const handleSubmit = async () => {
 		await addWorktrack(tasks);
 		handleShowToast('Giao nhiệm vụ', 'Giao nhiệm vụ thành công !');
-		setTasks([]);
 	};
 	const handleOpenForm = (item) => {
 		setItemEdit({ ...item });
