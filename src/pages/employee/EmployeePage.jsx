@@ -192,12 +192,18 @@ const EmployeePage = ({ header }) => {
 			options: [
 				{
 					id: 1,
+					text: 'Admin',
+					label: 'Admin',
+					value: 'admin',
+				},
+				{
+					id: 2,
 					text: 'Quản lý',
 					label: 'Quản lý',
 					value: 'manager',
 				},
 				{
-					id: 2,
+					id: 3,
 					text: 'Nhân viên',
 					label: 'Nhân viên',
 					value: 'user',
