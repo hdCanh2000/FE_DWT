@@ -40,13 +40,13 @@ const EmployeePage = ({ header }) => {
 	// const [dataDelete, setDataDelete] = React.useState({});
 	const [departments, setDepartments] = React.useState([]);
 	const [positions, setPositions] = React.useState([]);
-
+	
 	useEffect(() => {
 		const fecth = async () => {
 			const response = await getAllDepartmentWithUser();
 			const result = await response.data;
 			setDepartments(
-				result.data.map((item) => {
+				[...result].map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -62,7 +62,7 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllPosition();
 			const result = await response.data;
 			setPositions(
-				result.data.map((item) => {
+				[...result].map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -181,33 +181,31 @@ const EmployeePage = ({ header }) => {
 			type: 'singleSelect',
 			align: 'center',
 			isShow: true,
-			format: (value) =>
-				// eslint-disable-next-line no-nested-ternary
-				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
+			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
 			options: [
 				{
 					id: 1,
 					text: 'Quản lý',
 					label: 'Quản lý',
-					value: 'manager',
+					value: 1,
 				},
 				{
 					id: 2,
 					text: 'Nhân viên',
-					label: 'user',
+					label: 'Nhân viên',
 					value: 0,
 				},
 			],
 		},
-		// {
-		// 	title: 'Trạng thái',
-		// 	id: 'status',
-		// 	key: 'status',
-		// 	type: 'switch',
-		// 	align: 'center',
-		// 	isShow: true,
-		// 	format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		// },
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		},
 		// {
 		// 	title: 'Hành động',
 		// 	id: 'action',

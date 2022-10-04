@@ -27,7 +27,7 @@ const DepartmentDetailPage = ({dataUser}) => {
 			setUser(result.filter((item) => item.departmentId === dataUser?.id));
 		};
 		fetch();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 	React.useEffect(() => {
 		const fecth = async () => {

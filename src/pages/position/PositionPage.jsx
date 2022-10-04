@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -11,6 +13,7 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
+import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
@@ -21,11 +24,13 @@ import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addPosition, updatePosition } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
+// import { formatJobType } from '../../utils/constants';
 import PositionDetail from './PositionDetail';
 import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const { addToast } = useToasts();
 
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -40,11 +45,19 @@ const PositionPage = () => {
 	const [dataDetail, setDataDetail] = React.useState({});
 
 	const [nvs] = React.useState(true);
-
 	useEffect(() => {
 		dispatch(fetchPositionList());
+	}, [dispatch]);
+
+	useEffect(() => {
 		dispatch(fetchPositionLevelList());
+	}, [dispatch]);
+
+	useEffect(() => {
 		dispatch(fetchDepartmentList());
+	}, [dispatch]);
+
+	useEffect(() => {
 		dispatch(fetchRequirementList());
 	}, [dispatch]);
 
@@ -57,7 +70,16 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+		},
+		{
+			title: 'Mã Vị Trí',
+			// placeholder: 'mã vị trí',
+			// id: 'code',
+			key: 'code',
+			// type: 'text',
+			align: 'left',
+			// isShow: true,
+			render: (item) => <span>{item?.positionLevel?.code || 'No data'}</span>,
 		},
 		{
 			title: 'Phòng Ban',
@@ -68,7 +90,6 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
-			col: 6,
 		},
 		{
 			title: 'Cấp Nhân Sự',
@@ -79,7 +100,6 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
 			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
-			col: 6,
 		},
 		{
 			title: 'Quản lý cấp trên',
@@ -90,7 +110,6 @@ const PositionPage = () => {
 			isShow: false,
 			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
 			options: positionLevels,
-			col: 6,
 		},
 		{
 			title: 'Địa điểm làm việc',
@@ -111,6 +130,33 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: true,
 		},
+		// {
+		// 	title: 'Loại hình công việc',
+		// 	placeholder: 'loại hình công việc',
+		// 	id: 'jobType',
+		// 	key: 'jobType',
+		// 	type: 'singleSelect',
+		// 	align: 'left',
+		// 	isShow: true,
+		// 	format: (value) => formatJobType(value),
+		// 	options: [
+		// 		{
+		// 			id: 1,
+		// 			text: 'Chính thức',
+		// 			value: 1,
+		// 		},
+		// 		{
+		// 			id: 2,
+		// 			text: 'Thực tập',
+		// 			value: 2,
+		// 		},
+		// 		{
+		// 			id: 3,
+		// 			text: 'Thử việc',
+		// 			value: 3,
+		// 		},
+		// 	],
+		// },
 		{
 			title: 'Yêu cầu năng lực',
 			id: 'requirements',
@@ -151,32 +197,53 @@ const PositionPage = () => {
 		},
 	];
 
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data.name,
 			address: data.address,
 			description: data.description,
-			department_id: parseInt(data.departmentId, 10),
-			position_levels_id: parseInt(data.positionLevelId, 10),
+			departmentId: parseInt(data.departmentId, 10),
+			positionLevelId: parseInt(data.positionLevelId, 10),
 			manager: parseInt(data.manager, 10),
+			jobType: parseInt(data.jobType, 10),
 			kpiNormId: data.kpiName,
 			requirements: data.requirements,
 		};
 		if (data.id) {
 			try {
 				const response = await updatePosition(dataSubmit);
-				await response.data;
+				const result = await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
-			} catch (error) {}
+				handleShowToast(
+					`Cập nhật vị trí!`,
+					`Vị trí ${result.name} được cập nhật thành công!`,
+				);
+			} catch (error) {
+				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+			}
 		} else {
 			try {
 				const response = await addPosition(dataSubmit);
-				await response.data;
+				const result = await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
-			} catch (error) {}
+				handleShowToast(`Thêm vị trí`, `Vị trí ${result.name} được thêm thành công!`);
+			} catch (error) {
+				handleShowToast(`Thêm vị trí`, `Thêm vị trí không thành công!`);
+			}
 		}
 	};
 	const handleOpenDetail = (item) => {

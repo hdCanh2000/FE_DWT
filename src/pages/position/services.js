@@ -3,27 +3,27 @@ import axiosClient from '../../utils/axiosClient';
 const getAllPositionWithUser = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/api/positions?_embed=users',
+		url: '/positions?_embed=users',
 	});
 };
 const getAllPosition = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/api/positions',
+		url: '/positions',
 	});
 };
 
 const getPositionById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/positions/${id}`,
+		url: `/positions/${id}`,
 	});
 };
 
 const addPosition = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/api/positions`,
+		url: `/positions`,
 		data,
 	});
 };
@@ -31,7 +31,7 @@ const addPosition = (data) => {
 const updatePosition = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/positions/${data.id}`,
+		url: `/positions/${data.id}`,
 		data,
 	});
 };
@@ -39,7 +39,7 @@ const updatePosition = (data) => {
 const deletePositions = (id) => {
 	return axiosClient({
 		method: 'DELETE',
-		url: `/api/positions/${id}`,
+		url: `/positions/${id}`,
 	});
 };
 

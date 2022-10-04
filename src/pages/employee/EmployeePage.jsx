@@ -52,7 +52,7 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllDepartment();
 			const result = await response.data;
 			setDepartments(
-				result.data.map((item) => {
+				result.map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -68,7 +68,7 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllPosition();
 			const result = await response.data;
 			setPositions(
-				result.data.map((item) => {
+				[...result].map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -188,19 +188,19 @@ const EmployeePage = ({ header }) => {
 			isShow: true,
 			format: (value) =>
 				// eslint-disable-next-line no-nested-ternary
-				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
+				value === 'Quản lý' ? 'Quản lý' : value === 'Nhân viên' ? 'Nhân viên' : 'Admin',
 			options: [
 				{
 					id: 1,
 					text: 'Quản lý',
 					label: 'Quản lý',
-					value: 'manager',
+					value: 1,
 				},
 				{
 					id: 2,
 					text: 'Nhân viên',
 					label: 'Nhân viên',
-					value: 'user',
+					value: 0,
 				},
 			],
 		},
@@ -251,7 +251,11 @@ const EmployeePage = ({ header }) => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			department_id: data?.department?.value,
+			departmentId: data?.department?.value,
+			department: {
+				id: data?.department?.value,
+				name: data?.department?.label,
+			},
 			code: data?.code,
 			email: data?.email,
 			password: '123456',
@@ -259,12 +263,17 @@ const EmployeePage = ({ header }) => {
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
-			position_id: data?.position?.value,
-			role:
-				// eslint-disable-next-line no-nested-ternary
-				data?.role === 'Nhân viên' ? 'user' : data?.role === 'Quản lý' ? 'manager' : null,
+			positionId: data?.position?.value,
+			position: {
+				id: data?.position?.value,
+				name: data?.position?.label,
+				value: data?.position?.value,
+				label: data?.position?.label,
+			},
+			role: Number.parseInt(data?.role, 10),
 			status: Number(data?.status),
 			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
+			isDelete: 1,
 		};
 		try {
 			await updateEmployee(dataSubmit);
@@ -292,7 +301,11 @@ const EmployeePage = ({ header }) => {
 		const dataSubmit = {
 			id: data?.id,
 			name: data?.name,
-			department_id: data?.department?.value,
+			departmentId: data?.department?.value,
+			department: {
+				id: data?.department?.value,
+				name: data?.department?.label,
+			},
 			code: data?.code,
 			email: data?.email,
 			password: '123456',
@@ -300,8 +313,16 @@ const EmployeePage = ({ header }) => {
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
-			position_id: data?.position?.value,
-			role: data?.role,
+			positionId: data?.position?.value,
+			position: {
+				id: data?.position?.value,
+				name: data?.position?.label,
+				value: data?.position?.value,
+				label: data?.position?.label,
+			},
+			role: Number.parseInt(data?.role, 10),
+			status: Number(data?.status),
+			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
 		};
 		if (data?.id) {
 			try {

@@ -1,24 +1,17 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-
 import React, { useEffect, useState } from 'react';
+import { useToasts } from 'react-toast-notifications';
 import { useDispatch, useSelector } from 'react-redux';
-import { arrayToTree } from 'performant-array-to-tree';
-// import Tree from 'react-animated-tree-v2';
-import { TreeTable, TreeState } from 'cp-react-tree-table';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
-	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
+import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
@@ -28,17 +21,16 @@ import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-// import Search from '../common/ComponentCommon/Search';
+import Search from '../common/ComponentCommon/Search';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-// import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import NotPermission from '../presentation/auth/NotPermission';
-import './style.css';
-import Icon from '../../components/icon/Icon';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const departments = useSelector((state) => state.department.departments);
@@ -48,30 +40,31 @@ const EmployeePage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [openDetail, setOpenDetail] = useState(false);
 	const [dataDetail, setDataDetail] = useState(false);
-	// const [currentPage, setCurrentPage] = useState(1);
-	// const [perPage, setPerPage] = useState(PER_COUNT['10']);
-	// const items = dataPagination(kpiNorm, currentPage, perPage);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(kpiNorm, currentPage, perPage);
 
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	useEffect(() => {
 		dispatch(fetchUnitList());
+	}, [dispatch]);
+
+	useEffect(() => {
 		dispatch(fetchPositionList());
+	}, [dispatch]);
+
+	useEffect(() => {
 		dispatch(fetchDepartmentList());
+	}, [dispatch]);
+
+	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
 
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
-
-	const [treeValue, setTreeValue] = React.useState(
-		TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })),
-	);
-
-	useEffect(() => {
-		setTreeValue(TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })));
-	}, [kpiNorm]);
 
 	const columns = [
 		{
@@ -81,17 +74,6 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-		},
-		{
-			title: 'Định mức cha',
-			id: 'parent',
-			key: 'parent',
-			type: 'select',
-			align: 'center',
-			options: kpiNorm,
-			isShow: true,
-			isMulti: false,
-			col: 6,
 		},
 		{
 			title: 'Phòng ban',
@@ -115,7 +97,7 @@ const EmployeePage = () => {
 			render: (item) => <span>{item?.position?.name || 'No data'}</span>,
 			options: positions,
 			isMulti: false,
-			col: 5,
+			col: 6,
 		},
 		{
 			title: 'Đơn vị tính',
@@ -127,16 +109,16 @@ const EmployeePage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.unit?.name || ''}</span>,
 			isMulti: false,
-			col: 4,
+			col: 6,
 		},
 		{
-			title: 'Số ngày công',
+			title: 'Số ngày công cần thiết',
 			id: 'manday',
 			key: 'manday',
 			type: 'number',
-			align: 'right',
+			align: 'center',
 			isShow: true,
-			col: 3,
+			col: 6,
 		},
 		{
 			title: 'Mô tả',
@@ -183,37 +165,68 @@ const EmployeePage = () => {
 		},
 	];
 
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
+			point: data?.point,
 			description: data?.description,
-			manday: data?.manday,
 			hr: data?.hr,
-			department_id: parseInt(data?.department?.id, 10),
-			position_id: parseInt(data?.position?.id, 10),
-			unit_id: parseInt(data?.unit?.id, 10),
-			parent_id: parseInt(data?.parent?.id, 10),
+			departmentId: parseInt(data?.department?.id, 10),
+			department: {
+				id: data?.department?.id,
+				name: data?.department?.name,
+			},
+			positionId: parseInt(data?.position?.id, 10),
+			position: {
+				id: data?.position?.id,
+				name: data?.position?.name,
+			},
+			unitId: parseInt(data?.unit?.id, 10),
+			unit: {
+				id: data?.unit?.id,
+				name: data?.unit?.name,
+			},
+			manday: data?.manday,
 			type: 1,
 		};
 		if (data?.id) {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await updateKpiNorm(dataSubmit);
-				await response.data;
+				const result = await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
+				handleShowToast(
+					`Cập nhật định mức KPI!`,
+					`Định mức KPI ${result?.name} được cập nhật thành công!`,
+				);
 			} catch (error) {
+				handleShowToast(`Cập nhật định mức KPI`, `Cập nhật định mức KPI không thành công!`);
 				throw error;
 			}
 		} else {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await addKpiNorm(dataSubmit);
-				await response.data;
+				const result = await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
+				handleShowToast(
+					`Thêm định mức KPI`,
+					`Định mức KPI ${result?.name} được thêm thành công!`,
+				);
 			} catch (error) {
+				handleShowToast(`Thêm định mức KPI`, `Thêm định mức KPI không thành công!`);
 				throw error;
 			}
 		}
@@ -228,17 +241,17 @@ const EmployeePage = () => {
 		setIsDelete(false);
 	};
 
-	// const handleOpenDetail = (item) => {
-	// 	setOpenDetail(true);
-	// 	setDataDetail({
-	// 		...item,
-	// 		department: {
-	// 			...item.department,
-	// 			label: item?.department?.name,
-	// 			value: item?.departmentId,
-	// 		},
-	// 	});
-	// };
+	const handleOpenDetail = (item) => {
+		setOpenDetail(true);
+		setDataDetail({
+			...item,
+			department: {
+				...item.department,
+				label: item?.department?.name,
+				value: item?.departmentId,
+			},
+		});
+	};
 
 	const handleCloseDetail = () => {
 		setOpenDetail(false);
@@ -246,54 +259,17 @@ const EmployeePage = () => {
 	};
 
 	const handleDeleteKpiNorm = async (item) => {
-		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteKpiNorm(item);
 			dispatch(fetchKpiNormList());
+			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI thành công!`);
 		} catch (error) {
-			throw error;
+			handleShowToast(`Xoá định mức KPI`, `Xoá định mức KPI không thành công!`);
 		}
 		handleCloseDelete();
 	};
 
 	const lable = 'Định mức lao động & KPI';
-
-	const handleOnChange = (newValue) => {
-		setTreeValue(newValue);
-	};
-
-	const renderIndexCell = (row) => {
-		return (
-			<div
-				style={{
-					paddingLeft: `${row.metadata.depth * 30}px`,
-					minWidth: 360,
-				}}
-				// onClick={row.toggleChildren}
-				onDoubleClick={() => handleOpenForm(row.data)}
-				className={
-					row.metadata.hasChildren
-						? 'with-children d-flex align-items-center cursor-pointer'
-						: 'without-children cursor-pointer'
-				}>
-				{row.metadata.hasChildren ? (
-					<Icon
-						color='success'
-						type='button'
-						size='lg'
-						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
-						className='d-block bg-transparent'
-						style={{ fontSize: 25 }}
-						onClick={row.toggleChildren}
-					/>
-				) : (
-					''
-				)}
-
-				<span>{row.data.name}</span>
-			</div>
-		);
-	};
 
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
@@ -326,57 +302,11 @@ const EmployeePage = () => {
 											</Button>
 										</CardActions>
 									</CardHeader>
-									<CardBody>
-										<TreeTable value={treeValue} onChange={handleOnChange}>
-											<TreeTable.Column
-												// basis='180px'
-												// grow='0'
-												style={{ minWidth: 300 }}
-												renderCell={renderIndexCell}
-												renderHeaderCell={() => <span>Tên định mức</span>}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data.department.name}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Phòng ban</span>
-												)}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data.position.name}
-													</span>
-												)}
-												renderHeaderCell={() => <span>Vị trí</span>}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data.unit.name}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Đơn vị tính</span>
-												)}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-right'>
-														{row.data.manday}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Số ngày công</span>
-												)}
-											/>
-										</TreeTable>
-									</CardBody>
-									{/* <div className='p-4'>
+									<div className='p-4'>
 										<div className='p-4'>
+											<div style={{ maxWidth: '25%' }}>
+												<Search />
+											</div>
 											<table
 												className='table table-modern mb-0'
 												style={{ fontSize: 14 }}>
@@ -503,10 +433,9 @@ const EmployeePage = () => {
 												/>
 											</footer>
 										</div>
-									</div> */}
+									</div>
 								</Card>
 							</div>
-							{/* <div className='col-12'>{renderDepartmentMenu(treeData)}</div> */}
 						</div>
 					</>,
 					['admin'],
