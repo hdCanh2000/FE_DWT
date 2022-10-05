@@ -28,11 +28,11 @@ import PaginationButtons, {
 	dataPagination,
 	PER_COUNT,
 } from '../../../components/PaginationButtons';
-import { addWorktrack } from '../../dailyWorkTracking/services';
 import Toasts from '../../../components/bootstrap/Toasts';
 
 const Item = ({ data, onDelete, onOpen }) => {
 	const { name, quantity, user, startDate, deadlineDate, index } = data;
+	
 	return (
 		<Card>
 			<CardHeader>
@@ -64,6 +64,8 @@ const Item = ({ data, onDelete, onOpen }) => {
 	);
 };
 const OrderTask = () => {
+	const [dataSubMission, setDataSubMission] = React.useState([]);
+	console.log(dataSubMission);
 	const [dataDepartments, setDataDepartments] = useState([]);
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const [departmentSelect, setDepartmentSelect] = useState(1);
@@ -123,7 +125,6 @@ const OrderTask = () => {
 		);
 	};
 	const handleSubmit = async () => {
-		await addWorktrack(tasks);
 		handleShowToast('Giao nhiệm vụ', 'Giao nhiệm vụ thành công !');
 		setTasks([]);
 	};
@@ -292,6 +293,7 @@ const OrderTask = () => {
 				</div>
 			</Page>
 			<OrderTaskForm
+			setDataSubMission={setDataSubMission}
 				show={isOpenForm}
 				onClose={handleCloseForm}
 				onSubmit={handleSubmit}

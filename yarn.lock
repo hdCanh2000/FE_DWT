@@ -3904,6 +3904,11 @@
     "path-type" "^4.0.0"
     "yaml" "^1.10.0"
 
+"cp-react-tree-table@^1.1.1":
+  "integrity" "sha512-xpSgHN/BQzZHnLfJID05xoQqplNANR5juhOU0rn6uyQR/Zqnp9ojRn8A7NneUBUUcwoWk9weWraX74Sw47MaXQ=="
+  "resolved" "https://registry.npmjs.org/cp-react-tree-table/-/cp-react-tree-table-1.1.1.tgz"
+  "version" "1.1.1"
+
 "cross-fetch@3.1.5":
   "integrity" "sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw=="
   "resolved" "https://registry.npmjs.org/cross-fetch/-/cross-fetch-3.1.5.tgz"

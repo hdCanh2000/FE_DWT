@@ -59,6 +59,7 @@
 		"apexcharts": "^3.35.2",
 		"axios": "^0.27.2",
 		"classnames": "^2.3.1",
+		"cp-react-tree-table": "^1.1.1",
 		"date-fns": "^2.29.2",
 		"formik": "^2.2.9",
 		"framer-motion": "^6.3.3",

@@ -20,6 +20,7 @@ import Option from '../../../components/bootstrap/Option';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Button from '../../../components/bootstrap/Button';
 import Card, {
+	CardActions,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -33,7 +34,9 @@ import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
-
+import ListPickKpiNorm from './ListPickKpiNorm';
+import { addWorktrack } from '../../dailyWorkTracking/services';
+// import ListPickKpiNorm from './ListPickKpiNorm';
 const customStyles = {
 	control: (provided) => ({
 		...provided,
@@ -44,6 +47,7 @@ const customStyles = {
 };
 // eslint-disable-next-line react/prop-types, no-unused-vars
 const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
+	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
@@ -55,6 +59,8 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	const [userOption, setUserOption] = useState({ label: '', value: '' });
 	const [userReplatedOption, setUserRelatedOption] = useState([]);
 	const [mission, setMission] = React.useState({});
+	const [isOpen, setIsOpen] = React.useState(false);
+
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
@@ -117,38 +123,27 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		handleAddFieldKPINorm();
 		const dataValue = {
 			index: tasks?.length,
-			name: item?.name,
-			description: item?.description,
+			kpiNorm_id: item.id,
+			parent_id: null,
+			mission_id: missionOption?.id,
 			quantity: parseInt(mission?.quantity, 10),
-			departmentId: item?.departmentId,
-			department: item?.department,
-			unitId: item?.unitId,
-			unit: item?.unit,
-			position: item?.position,
-			positionId: item?.positionId,
-			parentId: missionOption?.id,
-			parent: {
-				label: missionOption?.label,
-				value: missionOption?.value,
-				id: missionOption?.id,
-			},
-			manday: parseInt(item?.manday, 10),
-			user: {
-				label: userOption?.label,
-				value: userOption?.value,
-				id: userOption?.id,
-			},
 			userId: userOption?.id,
 			priority: parseInt(mission?.priority, 10),
-			userReplated: userReplatedOption,
-			departmentReplated: departmentReplatedOption,
+			review: '',
 			note: mission?.note,
+			description: item?.description,
+			deadline: mission?.deadlineDate,
 			startDate: mission?.startDate,
-			startTime: mission?.startTime,
-			deadlineDate: mission?.deadlineDate,
-			deadlineTime: mission?.deadlineTime,
-			kpiNorm: kpiNormOptions,
 		};
+		await addWorktrack(dataValue).then((res) => {
+			dataSubMission.forEach(async (item) => {
+				await addWorktrack({
+					kpiNorm_id: item.id,
+					parent_id: res.data.id,
+					quantity: 1,
+				});
+			});
+		});
 		if (item?.index !== undefined) {
 			const newTask = tasks.map((items) => {
 				return items.index === item?.index ? dataValue : item;
@@ -165,6 +160,9 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		setUserRelatedOption([]);
 		onClose();
 	};
+	const handleShowPickListKpiNorm = () => {
+		setIsOpen(!isOpen);
+	};
 	return (
 		<Modal show={show} onHide={onClose} size='xl'>
 			<Page container='fluid'>
@@ -175,6 +173,25 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 								<CardLabel>
 									<CardTitle className='fs-4 ml-0'>Giao nhiệm vụ</CardTitle>
 								</CardLabel>
+								<CardActions>
+									<FormGroup>
+										<OverlayTrigger
+											overlay={
+												<Tooltip id='addSubMission'>
+													Thêm nhiệm vụ phụ
+												</Tooltip>
+											}>
+											<Button
+												color='success'
+												type='button'
+												icon='Plus'
+												className='d-block w-10'
+												onClick={handleShowPickListKpiNorm}>
+												Thêm nhiệm vụ
+											</Button>
+										</OverlayTrigger>
+									</FormGroup>
+								</CardActions>
 							</CardHeader>
 							<div className='col-12 p-4'>
 								<div className='row g-4'>
@@ -386,22 +403,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 									{/* Hạn ngày hoàn thành - Thời hạn hoàn thành */}
 									<div className='row g-2'>
 										<div className='col-12'>
-										<FormGroup>
-												<OverlayTrigger
-													overlay={
-														<Tooltip id='addSubMission'>
-															Thêm nhiệm vụ phụ
-														</Tooltip>
-													}>
-													<Button
-														color='success'
-														type='button'
-														icon='Plus'
-														className='d-block w-10'
-														onClick={handleAddFieldKPINorm}
-													/>
-												</OverlayTrigger>
-											</FormGroup>
 											{/* eslint-disable-next-line no-shadow */}
 											{kpiNormOptions?.map((item, index) => {
 												return (
@@ -483,6 +484,12 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 								</div>
 							</div>
 						</Card>
+						<ListPickKpiNorm
+							setDataSubMission={setDataSubMission}
+							show={isOpen}
+							data={kpiNorms}
+							handleClose={handleShowPickListKpiNorm}
+						/>
 					</div>,
 					['admin'],
 					<NotPermission />,

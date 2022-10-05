@@ -28,7 +28,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import NotPermission from '../presentation/auth/NotPermission';
 
-const EmployeePage = () => {
+const KpiNormPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
@@ -469,4 +469,4 @@ const EmployeePage = () => {
 	);
 };
 
-export default EmployeePage;
+export default KpiNormPage;
