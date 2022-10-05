@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 // import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 // import Icon from '../../components/icon/Icon';
@@ -66,11 +66,11 @@ const TaskByUser = () => {
 												<React.Fragment key={item.id}>
 													<tr>
 														<td>
-															<Link
+															<a
 																className='text-underline'
-																to={`${demoPages.taskAndAssign.subMenu.taskByUser.path}/${item.id}`}>
+																href={`${demoPages.taskAndAssign.subMenu.taskByUser.path}/${item.id}`}>
 																{item.name}
-															</Link>
+															</a>
 														</td>
 														{/* <td>
 															<Button

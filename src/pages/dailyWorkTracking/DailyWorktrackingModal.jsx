@@ -3,7 +3,7 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
@@ -53,10 +53,6 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 		column: {},
 		valueForm: {},
 	});
-
-	useEffect(() => {
-		dispatch(fetchWorktrackList(data.user_id));
-	}, [dispatch, data.user_id, showForm]);
 
 	const handleCloseForm = () => {
 		setShowForm(false);
