@@ -94,8 +94,8 @@ const DepartmentPage = () => {
 		},
 		{
 			title: 'Mã',
-			id: 'slug',
-			key: 'slug',
+			id: 'code',
+			key: 'code',
 			type: 'text',
 			align: 'left',
 			isShow: true,
@@ -169,15 +169,16 @@ const DepartmentPage = () => {
 	};
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
+			id: data?.id,
 			organizationLevel: data?.organizationLevel?.value,
 			parent_id: data?.parentId?.value,
-			id: data?.id,
-			name: data.name,
-			description: data.description,
-			slug: data.slug,
-			address: data.address,
+			name: data?.name,
+			description: data?.description,
+			code: data?.code,
+			address: data?.address,
 			// status: Number(data.status),
 		};
+		console.log(dataSubmit);
 		try {
 			const response = await addDepartment(dataSubmit);
 			const result = await response.data;

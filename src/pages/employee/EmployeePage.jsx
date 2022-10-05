@@ -301,7 +301,9 @@ const EmployeePage = ({ header }) => {
 			phone: data?.phone,
 			address: data?.address,
 			position_id: data?.position?.value,
-			role: data?.role,
+			role:
+				// eslint-disable-next-line no-nested-ternary
+				data?.role === 'Nhân viên' ? 'user' : data?.role === 'Quản lý' ? 'manager' : null,
 		};
 		if (data?.id) {
 			try {

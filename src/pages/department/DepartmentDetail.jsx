@@ -40,7 +40,7 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 	useEffect(() => {
 		formik.initialValues = {
 			id: initValues.id,
-			slug: initValues?.slug,
+			code: initValues?.code,
 			description: initValues?.description,
 			name: initValues?.name,
 			address: initValues?.address,
@@ -76,7 +76,7 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 			id: data?.id,
 			name: data.name,
 			description: data.description,
-			slug: data.slug,
+			code: data.code,
 			address: data.address,
 			status: Number(data.status),
 		};
@@ -96,7 +96,7 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 			id: data?.id,
 			name: data.name,
 			description: data.description,
-			slug: data.slug,
+			code: data.code,
 			address: data.address,
 			status: Number(data.status),
 			isDelete: 1,
