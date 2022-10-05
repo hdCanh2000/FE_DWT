@@ -7,15 +7,18 @@ import PaginationButtons, {
 } from '../../../components/PaginationButtons';
 import Search from './Search';
 
-const TableCommon = ({ data, columns, className, ...props }) => {
+const TableCommon = ({ data, columns, className, isSearch, ...props }) => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [perPage, setPerPage] = useState(PER_COUNT['10']);
 	const items = dataPagination(data, currentPage, perPage);
 	return (
 		<div>
-			<div style={{ maxWidth: '25%' }}>
-				<Search />
-			</div>
+			{isSearch && (
+				<div style={{ maxWidth: '25%' }}>
+					<Search />
+				</div>
+			)}
+
 			<table className={classNames(className)} {...props}>
 				<thead>
 					<tr>
@@ -197,11 +200,13 @@ TableCommon.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
 	// eslint-disable-next-line react/forbid-prop-types
+	isSearch: PropTypes.bool,
 };
 TableCommon.defaultProps = {
 	className: null,
 	data: [],
 	columns: [],
+	isSearch: false,
 };
 
 export default memo(TableCommon);

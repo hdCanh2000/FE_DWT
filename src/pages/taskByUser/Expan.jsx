@@ -1,92 +1,115 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
-import classNames from 'classnames';
-// import Button from '../../components/bootstrap/Button';
-import { formatColorPriority } from '../../utils/constants';
-// import Icon from '../../components/icon/Icon';
-import Progress from '../../components/bootstrap/Progress';
-import useDarkMode from '../../hooks/useDarkMode';
-import getTaskByUser from './services';
+import { isEmpty } from 'lodash';
+import { useDispatch, useSelector } from 'react-redux';
+import { arrayToTree } from 'performant-array-to-tree';
+import { TreeTable, TreeState } from 'cp-react-tree-table';
+import Icon from '../../components/icon/Icon';
+import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
 
-const minWidth100 = {
-	minWidth: 100,
-};
 const Expand = ({ idUser }) => {
-	const { themeStatus } = useDarkMode();
-	const [taskByUser, setTaskByUser] = useState([]);
+	const dispatch = useDispatch();
+
+	const worktrack = useSelector((state) => state.worktrack.worktracks);
+
+	const [treeValue, setTreeValue] = React.useState(
+		TreeState.create(arrayToTree(worktrack, { childrenField: 'children' })),
+	);
+
 	useEffect(() => {
-		const fecth = async () => {
-			const reponse = await getTaskByUser(idUser);
-			const result = await reponse.data;
-			setTaskByUser(result);
-		};
-		fecth();
-	}, [idUser]);
+		if (!isEmpty(worktrack)) {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(arrayToTree(worktrack, { childrenField: 'children' })),
+				),
+			);
+		}
+	}, [worktrack]);
+
+	useEffect(() => {
+		dispatch(fetchWorktrackList(idUser));
+	}, [dispatch]);
+
+	const renderIndexCell = (row) => {
+		return (
+			<div
+				style={{
+					paddingLeft: `${row.metadata.depth * 30}px`,
+					minWidth: 360,
+				}}
+				// onClick={row.toggleChildren}
+				// onDoubleClick={() =>
+				// 	handleOpenForm({
+				// 		...row.data,
+				// 		parent: kpiNorm.find((item) => item.id === row.data.parentId),
+				// 	})
+				// }
+				className={
+					row.metadata.hasChildren
+						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
+						: 'without-children cursor-pointer user-select-none'
+				}>
+				{row.metadata.hasChildren ? (
+					<Icon
+						color='success'
+						type='button'
+						size='lg'
+						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
+						className='d-block bg-transparent'
+						style={{ fontSize: 25 }}
+						onClick={row.toggleChildren}
+					/>
+				) : (
+					''
+				)}
+
+				<span>{row.data?.kpiNorm?.name || ''}</span>
+			</div>
+		);
+	};
+
+	const handleOnChange = (newValue) => {
+		setTreeValue(newValue);
+	};
+
 	return (
-		<table className='table table-modern'>
-			<thead>
-				<tr>
-					<th>Tên công việc</th>
-					<th>Hình thức</th>
-					<th className='text-center'>Hạn ngày hoàn thành</th>
-					<th className='text-center'>Tiến độ</th>
-					<th className='text-center'>Độ ưu tiên</th>
-				</tr>
-			</thead>
-			<tbody>
-				{taskByUser?.map((subTaskItem) => (
-					<tr key={subTaskItem.id}>
-						<td>{subTaskItem?.name}</td>
-						<td>{subTaskItem?.userId === idUser ? 'Phụ trách chính' : 'Liên quan'}</td>
-						<td className='text-center'>
-							{moment(`${subTaskItem.deadlineDate}`).format('DD-MM-YYYY')}
-						</td>
-						<td className='text-center' style={minWidth100}>
-							<div className='d-flex align-items-center'>
-								<div className='flex-shrink-0 me-3'>{`${
-									subTaskItem.progress || 0
-								}%`}</div>
-								<Progress
-									className='flex-grow-1'
-									isAutoColor
-									value={subTaskItem.progress || 0}
-									style={{ height: 10 }}
-								/>
-							</div>
-						</td>
-						<td className='text-center'>
-							<div className='d-flex align-items-center justify-content-center'>
-								<span
-									style={{ paddingRight: '1rem', paddingLeft: '1rem' }}
-									className={classNames(
-										'badge',
-										'border border-2',
-										[`border-${themeStatus}`],
-										'bg-success',
-										'pt-2 pb-2 me-2',
-										`bg-${formatColorPriority(subTaskItem.priority)}`,
-									)}>
-									<span className=''>{`Cấp ${subTaskItem.priority}`}</span>
-								</span>
-							</div>
-						</td>
-					</tr>
-				))}
-				{/* <tr>
-					<td colSpan={12}>
-						<Button
-							className='d-flex align-items-center cursor-pointer'
-							style={{ paddingLeft: 0 }}>
-							<Icon size='lg' icon='PlusCircle' />
-							<span className='mx-2'>Thêm công việc của nhân viên</span>
-						</Button>
-					</td>
-				</tr> */}
-			</tbody>
-		</table>
+		<TreeTable value={treeValue} onChange={handleOnChange}>
+			<TreeTable.Column
+				style={{ minWidth: 300 }}
+				renderCell={renderIndexCell}
+				renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
+			/>
+			<TreeTable.Column
+				renderCell={(row) => (
+					<span className='expenses-cell text-left'>
+						{row.data?.department?.name || ''}
+					</span>
+				)}
+				renderHeaderCell={() => <span className='t-left'>Phòng ban</span>}
+			/>
+			<TreeTable.Column
+				renderCell={(row) => (
+					<span className='expenses-cell text-left'>
+						{row.data?.position?.name || ''}
+					</span>
+				)}
+				renderHeaderCell={() => <span>Vị trí</span>}
+			/>
+			<TreeTable.Column
+				renderCell={(row) => (
+					<span className='expenses-cell text-left'>{row.data?.unit?.name || ''}</span>
+				)}
+				renderHeaderCell={() => <span className='t-left'>Đơn vị tính</span>}
+			/>
+			<TreeTable.Column
+				renderCell={(row) => (
+					<span className='expenses-cell text-right'>{row.data?.manday || ''}</span>
+				)}
+				renderHeaderCell={() => <span className='t-left'>Số ngày công</span>}
+			/>
+		</TreeTable>
 	);
 };
 

@@ -192,12 +192,18 @@ const EmployeePage = ({ header }) => {
 			options: [
 				{
 					id: 1,
+					text: 'Admin',
+					label: 'Admin',
+					value: 'admin',
+				},
+				{
+					id: 2,
 					text: 'Quản lý',
 					label: 'Quản lý',
 					value: 'manager',
 				},
 				{
-					id: 2,
+					id: 3,
 					text: 'Nhân viên',
 					label: 'Nhân viên',
 					value: 'user',
@@ -306,13 +312,10 @@ const EmployeePage = ({ header }) => {
 		if (data?.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
-				handleShowToast(
-					`Cập nhật nhân viên!`,
-					`Nhân viên ${result?.name} được cập nhật thành công!`,
-				);
+				handleShowToast(`Cập nhật nhân viên!`, `Cập nhật nhân viên thành công!`);
 			} catch (error) {
 				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
 				throw error;
@@ -320,13 +323,10 @@ const EmployeePage = ({ header }) => {
 		} else {
 			try {
 				const response = await addEmployee(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
-				handleShowToast(
-					`Thêm nhân viên`,
-					`Nhân viên ${result?.name} được thêm thành công!`,
-				);
+				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên thành công!`);
 			} catch (error) {
 				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
 				throw error;
