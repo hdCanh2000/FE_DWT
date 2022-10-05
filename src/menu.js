@@ -62,8 +62,13 @@ export const demoPages = {
 		subMenu: {
 			taskByUser: {
 				id: 'declare',
-				text: 'Khai báo nhiệm vụ',
+				text: 'Công việc hàng ngày',
 				path: '/cong-viec-hang-ngay',
+			},
+			employees: {
+				id: 'declare',
+				text: 'Nhiệm vụ nhân viên',
+				path: '/nhiem-vu-nhan-vien',
 			},
 			orderTask: {
 				id: 'orderTask',

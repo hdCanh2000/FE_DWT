@@ -113,6 +113,11 @@ const presentation = [
 		exact: true,
 	},
 	{
+		path: `${demoPages.taskAndAssign.subMenu.employees.path}`,
+		element: <TASKBYUSER.TASKBYUSER />,
+		exact: true,
+	},
+	{
 		path: `${demoPages.taskAndAssign.subMenu.orderTask.path}`,
 		element: <DAILYWORKTRACKING.ORDERTASK />,
 		exact: true,

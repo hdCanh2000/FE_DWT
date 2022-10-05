@@ -1,125 +1,98 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
-import Toasts from '../../components/bootstrap/Toasts';
+import { arrayToTree } from 'performant-array-to-tree';
+import { TreeTable, TreeState } from 'cp-react-tree-table';
+import { isEmpty } from 'lodash';
+import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import { fetchWorktrackListMe } from '../../redux/slice/worktrackSlice';
-import { addKpiNorm } from '../kpiNorm/services';
-import { addWorktrack } from './services';
-import TableCalendar from './TableCalendar';
-import TableWorkTracking from './tableWorkTracking';
+import Icon from '../../components/icon/Icon';
+import './style.css';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import DailyWorktrackingModal from './DailyWorktrackingModal';
+import { getAllWorktrackByUserId } from './services';
 
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
-	const { addToast } = useToasts();
-	const worktrack = useSelector((state) => state.worktrack.worktracks);
+
+	const [worktrack, setWorktrack] = useState([]);
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const [treeValue, setTreeValue] = React.useState([]);
 
 	useEffect(() => {
-		dispatch(fetchWorktrackListMe());
-	}, [dispatch]);
+		if (!isEmpty(worktrack) && id) {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(arrayToTree(worktrack, { childrenField: 'children' })),
+				),
+			);
+		}
+	}, [worktrack, id]);
 
+	const id = localStorage.getItem('userId');
 	useEffect(() => {
-		setRowsState(worktrack);
-	}, [dispatch, worktrack]);
-
-	const [rowsState, setRowsState] = useState([]);
-
-	const handleAddRow = () => {
-		const item = {
-			name: '',
-			quantity: '',
-			unit: '',
-			note: '',
-			deadline: '',
-			plan: '',
-		};
-		setRowsState((prev) => [...prev, item]);
-	};
-
-	// hàm onchange cho input key
-	const handleChangeRowState = (index, event, name) => {
-		setRowsState((prev) => {
-			return prev.map((row, i) => {
-				if (i !== index) return row;
-				return {
-					...row,
-					[name]: name === 'unit' ? event : event.target?.value,
-				};
+		async function fetchData() {
+			getAllWorktrackByUserId(id).then((res) => {
+				setWorktrack(
+					res.data.data.map((item) => {
+						return {
+							...item,
+							label: item.name,
+							value: item.id,
+							text: item.name,
+							parentId: item.parent_id,
+						};
+					}),
+				);
 			});
-		});
-	};
+		}
+		fetchData();
+	}, [dispatch, id]);
 
-	const handleRemoveRowField = (e, index) => {
-		setRowsState((prev) => prev.filter((state) => state !== prev[index]));
-	};
+	const renderIndexCell = (row) => {
+		return (
+			<div
+				style={{
+					paddingLeft: `${row.metadata.depth * 30}px`,
+					minWidth: 360,
+				}}
+				onDoubleClick={() =>
+					handleOpenForm({
+						...row.data,
+						parent: worktrack.find((item) => item.id === row.data.parentId),
+					})
+				}
+				className={
+					row.metadata.hasChildren
+						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
+						: 'without-children cursor-pointer user-select-none'
+				}>
+				{row.metadata.hasChildren ? (
+					<Icon
+						color='success'
+						type='button'
+						size='lg'
+						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
+						className='d-block bg-transparent'
+						style={{ fontSize: 25 }}
+						onClick={row.toggleChildren}
+					/>
+				) : (
+					''
+				)}
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
+				<span>{row.data?.kpiNorm?.name || ''}</span>
+			</div>
 		);
 	};
 
-	const handleSubmit = () => {
-		const dataKPINormSubmit = [];
-		const dataWorktrackSubmit = [];
-		rowsState.forEach((item) => {
-			dataKPINormSubmit.push({
-				name: item.name,
-				description: null,
-				hr: null,
-				departmentId: null,
-				department: null,
-				positionId: null,
-				position: null,
-				unitId: item.unit?.value,
-				unit: {
-					name: item.unit?.name,
-					id: item.unit?.value,
-				},
-				manday: null,
-				quantity: parseInt(item.quantity, 10),
-			});
-			dataWorktrackSubmit.push({
-				name: item.name,
-				userId: parseInt(window.localStorage.getItem('userId'), 10),
-				unitId: item.unit?.value,
-				unit: {
-					name: item.unit?.name,
-					id: item.unit?.value,
-				},
-				quantity: parseInt(item.quantity, 10),
-				note: item.note,
-				deadline: item.deadline,
-				plan: item.plan,
-				trackings: [],
-				status: 1,
-			});
-		});
-		dataKPINormSubmit.forEach((item) => {
-			addKpiNorm(item)
-				.then(() => {})
-				.catch((err) => {
-					throw err;
-				});
-		});
-		dataWorktrackSubmit.forEach((item) => {
-			addWorktrack(item)
-				.then(() => {
-					handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ thành công!`);
-					dispatch(fetchWorktrackListMe());
-				})
-				.catch((err) => {
-					handleShowToast(`Thêm nhiệm vụ`, `Thêm nhiệm vụ không thành công!`);
-					dispatch(fetchWorktrackListMe());
-					throw err;
-				});
-		});
+	const handleOnChange = (newValue) => {
+		setTreeValue(newValue);
 	};
 
 	return (
@@ -128,29 +101,78 @@ const DailyWorkTrackingMe = () => {
 				<div className='row'>
 					<div className='col-12'>
 						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Báo cáo công việc cá nhân</div>
+							<div className='display-6 fw-bold py-3'>Báo cáo công việc</div>
 						</div>
 					</div>
 				</div>
 				<div className='row mb-0 h-100'>
 					<div className='col-12'>
-						<div className='row p-2'>
-							<div className='col-8 px-0'>
-								<TableWorkTracking
-									worktrack={worktrack}
-									rowsState={rowsState}
-									handleChangeRowState={handleChangeRowState}
-									handleAddRow={handleAddRow}
-									handleRemoveRowField={handleRemoveRowField}
-									handleSubmit={handleSubmit}
-								/>
-							</div>
-							<div className='col-4 px-0'>
-								<TableCalendar rowsState={rowsState} />
-							</div>
-						</div>
+						<Card className='w-100'>
+							<CardHeader>
+								<CardLabel icon='AccountCircle' iconColor='primary'>
+									<CardTitle>
+										<CardLabel>Danh sách nhiệm vụ</CardLabel>
+									</CardTitle>
+								</CardLabel>
+							</CardHeader>
+							<CardBody>
+								<TreeTable value={treeValue} onChange={handleOnChange}>
+									<TreeTable.Column
+										// basis='180px'
+										// grow='0'
+										style={{ minWidth: 300 }}
+										renderCell={renderIndexCell}
+										renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
+									/>
+									<TreeTable.Column
+										renderCell={(row) => (
+											<span className='expenses-cell text-left'>
+												{row.data?.mission?.name || 'Không'}
+											</span>
+										)}
+										renderHeaderCell={() => <span>Thuộc mục tiêu</span>}
+									/>
+									<TreeTable.Column
+										renderCell={(row) => (
+											<span className='expenses-cell text-left'>
+												{row.data?.quantity || ''}
+											</span>
+										)}
+										renderHeaderCell={() => (
+											<span className='t-left'>Số lượng</span>
+										)}
+									/>
+									<TreeTable.Column
+										renderCell={(row) => (
+											<span className='expenses-cell text-left'>
+												{moment(`${row.data.deadline}`).format(
+													'DD-MM-YYYY',
+												) || ''}
+											</span>
+										)}
+										renderHeaderCell={() => <span>Hạn hoàn thành</span>}
+									/>
+									<TreeTable.Column
+										renderCell={(row) => (
+											<span className='expenses-cell text-right'>
+												{row.data?.kpiNorm?.manday || ''}
+											</span>
+										)}
+										renderHeaderCell={() => (
+											<span className='t-left'>Số ngày công</span>
+										)}
+									/>
+								</TreeTable>
+							</CardBody>
+						</Card>
 					</div>
 				</div>
+				<DailyWorktrackingModal
+					data={itemEdit}
+					worktrack={worktrack}
+					handleClose={handleCloseForm}
+					show={toggleForm}
+				/>
 			</Page>
 		</PageWrapper>
 	);

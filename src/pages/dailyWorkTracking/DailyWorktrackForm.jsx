@@ -10,8 +10,8 @@ import Textarea from '../../components/bootstrap/forms/Textarea';
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
 		initialValues: {
-			message: data.valueForm?.message || '',
-			status: data.valueForm?.status || 1,
+			note: data?.row?.note || '',
+			status: data?.row?.status || 'inProgress',
 		},
 		enableReinitialize: true,
 		onSubmit: (values, { resetForm }) => {
@@ -32,29 +32,26 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 			keyboard={false}
 			centered>
 			<Modal.Header closeButton className='text-center pb-0'>
-				<Modal.Title className='text-center w-100'>
-					Báo cáo công việc: {data.row.name}
-				</Modal.Title>
+				<Modal.Title className='text-center w-100'>Báo cáo công việc</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<Modal.Title className='pb-4 pt-0 text-center w-100'>
-					Ngày:{' '}
-					{`${data.column?.day}/${new Date().getMonth() + 1}/${new Date().getFullYear()}`}
+					Ngày: {data.valueForm.date}
 				</Modal.Title>
 				<form>
 					<div className='row g-4'>
 						<div className='col-12'>
-							<FormGroup id='message' label='Ghi chú'>
+							<FormGroup id='note' label='Ghi chú'>
 								<Textarea
 									rows={5}
 									ariaLabel='Ghi chú'
 									placeholder='Ghi chú'
 									size='lg'
-									name='message'
+									name='note'
 									className='border border-2 rounded-0 shadow-none'
 									onChange={formik.handleChange}
 									onBlur={formik.handleBlur}
-									value={formik.values.message}
+									value={formik.values.note}
 									isValid={formik.isValid}
 								/>
 							</FormGroup>
@@ -68,17 +65,17 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 										{
 											id: 1,
 											text: 'Đang thực hiện',
-											value: 1,
+											value: 'inProgress',
 										},
 										{
 											id: 2,
 											text: 'Đã hoàn thành',
-											value: 2,
+											value: 'completed',
 										},
 										{
 											id: 3,
 											text: 'Quá hạn',
-											value: 3,
+											value: 'expired',
 										},
 									]}
 									name='status'

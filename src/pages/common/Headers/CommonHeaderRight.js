@@ -23,6 +23,7 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 		localStorage.removeItem('email');
 		localStorage.removeItem('name');
 		localStorage.removeItem('roles');
+		localStorage.removeItem('userId');
 		navigate('/dang-nhap');
 	};
 
