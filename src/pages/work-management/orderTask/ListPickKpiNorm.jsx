@@ -90,6 +90,12 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 						)}
 						renderHeaderCell={() => <span className='t-left'>Số ngày công</span>}
 					/>
+					{/* <TreeTable.Column
+						renderCell={(row) => (
+							<Input onChange={handleQuanlity}  />
+						)}
+						renderHeaderCell={() => <span className='t-left'>Số lượng</span>}
+					/> */}
 				</TreeTable>
 			</Modal.Body>
 			<Modal.Footer>
