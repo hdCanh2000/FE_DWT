@@ -100,45 +100,6 @@ export const demoPages = {
 			},
 		},
 	},
-	// jobsPage: {
-	// 	// công việc
-	// 	id: 'jobsPage',
-	// 	text: 'Công việc',
-	// 	path: 'jobs-page',
-	// 	icon: 'CustomBriefCase',
-	// 	subMenu: {
-	// 		taskByUser: {
-	// 			id: 'taskByUser',
-	// 			text: 'Công việc của nhân viên',
-	// 			path: '/cong-viec-cua-nhan-vien',
-	// 		},
-	// 		dailyWorkTracking: {
-	// 			id: 'dailyWorkTracking',
-	// 			text: 'Công việc hằng ngày',
-	// 			path: '/cong-viec-hang-ngay',
-	// 		},
-	// 		target: {
-	// 			id: 'target',
-	// 			text: 'Mục tiêu',
-	// 			path: '/muc-tieu',
-	// 		},
-	// 		mission: {
-	// 			id: 'mission',
-	// 			text: 'Nhiệm vụ',
-	// 			path: '/nhiem-vu',
-	// 		},
-	// 		task: {
-	// 			id: 'task',
-	// 			text: 'Đầu việc',
-	// 			path: '/dau-viec',
-	// 		},
-	// 		process: {
-	// 			id: 'process',
-	// 			text: 'Quy trình',
-	// 			path: '/quy-trinh',
-	// 		},
-	// 	},
-	// },
 	hrRecords: {
 		id: 'hrRecords',
 		text: 'Hồ sơ nhân sự',
@@ -187,6 +148,16 @@ export const demoPages = {
 		path: 'cau-hinh',
 		icon: 'Settings',
 		subMenu: {
+			kpiNorm: {
+				id: 'kpiNorm',
+				text: 'Định mức lao động & KPI',
+				path: '/dinh-muc-lao-dong-kpi',
+			},
+			positionLevelConfig: {
+				id: 'positionLevelConfig',
+				text: 'Cấu hình cấp nhân sự',
+				path: '/cauhinh-cap-nhan-su',
+			},
 			kpi: {
 				id: 'kpi',
 				text: 'Cấu hình Key',
@@ -201,16 +172,6 @@ export const demoPages = {
 				id: 'authorization',
 				text: 'Cấu hình vai trò',
 				path: '/cau-hinh-vai-tro',
-			},
-			kpiNorm: {
-				id: 'kpiNorm',
-				text: 'Định mức lao động & KPI',
-				path: '/dinh-muc-lao-dong-kpi',
-			},
-			positionLevelConfig: {
-				id: 'positionLevelConfig',
-				text: 'Cấu hình cấp nhân sự',
-				path: '/cauhinh-cap-nhan-su',
 			},
 			recruitmentRequirements: {
 				id: 'recruitmentRequirements',
@@ -232,11 +193,6 @@ export const demoPages = {
 				text: 'Cấu hình mục tiêu',
 				path: '/cau-hinh-muc-tieu',
 			},
-			// role: {
-			// 	id: 'role',
-			// 	text: 'Cầu hình vai trò',
-			// 	path: '/cau-hinh-vai-tro',
-			// },
 			report: {
 				id: 'report',
 				text: 'Cấu hình báo cáo',
