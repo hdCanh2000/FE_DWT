@@ -38,10 +38,19 @@ const addWorktrackLog = (data) => {
 	});
 };
 
+const updateWorktrackLog = (data) => {
+	return axiosClient({
+		method: 'PUT',
+		url: `/api/worktrackLogs/${data.id}`,
+		data,
+	});
+};
+
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
 	addWorktrack,
 	updateWorktrack,
 	addWorktrackLog,
+	updateWorktrackLog,
 };
