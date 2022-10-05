@@ -261,7 +261,12 @@ const KpiNormPage = () => {
 					minWidth: 360,
 				}}
 				// onClick={row.toggleChildren}
-				onDoubleClick={() => handleOpenForm(row.data)}
+				onDoubleClick={() =>
+					handleOpenForm({
+						...row.data,
+						parent: kpiNorm.find((item) => item.id === row.data.parentId),
+					})
+				}
 				className={
 					row.metadata.hasChildren
 						? 'with-children d-flex align-items-center cursor-pointer user-select-none'

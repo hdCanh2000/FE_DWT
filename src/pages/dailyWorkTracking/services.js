@@ -3,14 +3,14 @@ import axiosClient from '../../utils/axiosClient';
 const getAllWorktrackByUserId = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/worktracks_by_user/${id}`,
+		url: `/api/worktracks/user/${id}`,
 	});
 };
 
 const getAllWorktrackByUser = () => {
 	return axiosClient({
 		method: 'GET',
-		url: `/worktracks_by_user`,
+		url: `/api/worktracks`,
 	});
 };
 
@@ -30,4 +30,18 @@ const updateWorktrack = (data) => {
 	});
 };
 
-export { getAllWorktrackByUserId, getAllWorktrackByUser, addWorktrack, updateWorktrack };
+const addWorktrackLog = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/api/worktrackLogs`,
+		data,
+	});
+};
+
+export {
+	getAllWorktrackByUserId,
+	getAllWorktrackByUser,
+	addWorktrack,
+	updateWorktrack,
+	addWorktrackLog,
+};
