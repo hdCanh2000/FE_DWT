@@ -28,15 +28,15 @@ import Card, {
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
+import { fetchKeyList } from '../../../redux/slice/keySlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
-import { fetchKeyList } from '../../../redux/slice/keySlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 import ListPickKpiNorm from './ListPickKpiNorm';
+import { addWorktrack } from '../../dailyWorkTracking/services';
 // import ListPickKpiNorm from './ListPickKpiNorm';
-
 const customStyles = {
 	control: (provided) => ({
 		...provided,
@@ -45,9 +45,9 @@ const customStyles = {
 		borderRadius: '1.25rem',
 	}),
 };
-
 // eslint-disable-next-line react/prop-types, no-unused-vars
 const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
+	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
@@ -60,26 +60,22 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	const [userReplatedOption, setUserRelatedOption] = useState([]);
 	const [mission, setMission] = React.useState({});
 	const [isOpen, setIsOpen] = React.useState(false);
+
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchKeyList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchMissionList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchUnitList());
 	}, [dispatch]);
@@ -94,18 +90,12 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		setUserRelatedOption(item?.userReplated || []);
 	}, [item]);
 	// show toast
-
 	const handleChange = (e) => {
 		const { value, name } = e.target;
 		setMission({
 			...mission,
 			[name]: value,
 		});
-	};
-	// thêm field nhiệm vụ phụ
-	const handleAddFieldKPINorm = () => {
-		const initKeyState = {};
-		setKpiNormOptions((prev) => [...prev, initKeyState]);
 	};
 	// hàm onchange chọn nhiệm vụ
 	const handleChangeKpiNormOption = (index, event) => {
@@ -120,56 +110,43 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			});
 		});
 	};
-
 	// xoá các nhiệm vụ theo index
 	const handleRemoveKpiNormField = (e, index) => {
 		setKpiNormOptions((prev) => prev.filter((state) => state !== prev[index]));
 	};
 	const handleSubmit = async () => {
-		handleAddFieldKPINorm();
 		const dataValue = {
 			index: tasks?.length,
-			name: item?.name,
-			description: item?.description,
+			kpiNorm_id: item.id,
+			parent_id: null,
+			mission_id: missionOption?.id,
 			quantity: parseInt(mission?.quantity, 10),
-			departmentId: item?.departmentId,
-			department: item?.department,
-			unitId: item?.unitId,
-			unit: item?.unit,
-			position: item?.position,
-			positionId: item?.positionId,
-			parentId: missionOption?.id,
-			parent: {
-				label: missionOption?.label,
-				value: missionOption?.value,
-				id: missionOption?.id,
-			},
-			manday: parseInt(item?.manday, 10),
-			user: {
-				label: userOption?.label,
-				value: userOption?.value,
-				id: userOption?.id,
-			},
 			userId: userOption?.id,
 			priority: parseInt(mission?.priority, 10),
-			userReplated: userReplatedOption,
-			departmentReplated: departmentReplatedOption,
 			note: mission?.note,
+			description: item?.description,
+			deadline: mission?.deadlineDate,
 			startDate: mission?.startDate,
-			startTime: mission?.startTime,
-			deadlineDate: mission?.deadlineDate,
-			deadlineTime: mission?.deadlineTime,
-			kpiNorm: kpiNormOptions,
 		};
-		if (item?.index !== undefined) {
-			const newTask = tasks.map((items) => {
-				return items.index === item?.index ? dataValue : item;
+		await addWorktrack(dataValue).then((res) => {
+			dataSubMission.forEach(async (item) => {
+				await addWorktrack({
+					kpiNorm_id: item.id,
+					parent_id: res.data.id,
+					quantity: 1,
+				});
 			});
-			setTasks([...newTask]);
-		} else {
-			setTasks([...tasks, dataValue]);
-		}
-
+		});
+		setTasks([
+			...tasks,
+			{
+				...item,
+				quantity: parseInt(mission?.quantity, 10),
+				deadline: mission?.deadlineDate,
+				startDate: mission?.startDate,
+				user: userOption,
+			},
+		]);
 		setMission({});
 		setKpiNormOptions([]);
 		setMissionOption({});
@@ -503,6 +480,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 							</div>
 						</Card>
 						<ListPickKpiNorm
+							setDataSubMission={setDataSubMission}
 							show={isOpen}
 							data={kpiNorms}
 							handleClose={handleShowPickListKpiNorm}
@@ -515,7 +493,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		</Modal>
 	);
 };
-
 // OrderTaskForm.propTypes = {
 // 	isEdit: PropTypes.bool,
 // };

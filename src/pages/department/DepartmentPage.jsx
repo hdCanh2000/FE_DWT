@@ -165,28 +165,24 @@ const DepartmentPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
+			id: data?.id,
 			organizationLevel: data?.organizationLevel?.value,
 			parent_id: data?.parentId?.value,
-			id: data?.id,
-			name: data.name,
-			description: data.description,
-			code: data.code,
-			address: data.address,
+			name: data?.name,
+			description: data?.description,
+			code: data?.code,
+			address: data?.address,
 		};
-		if (data.id) {
+		if (data?.id) {
 			try {
 				const response = await updateDepartment(dataSubmit);
-				const result = await response.data;
+				await response.data;
 				dispatch(fetchDepartmentList());
 				handleCloseForm();
-				handleShowToast(
-					`Cập nhật phòng ban`,
-					`Phòng ban ${result.data.name} được cập nhật thành công!`,
-				);
-				setTreeValue(TreeState.expandAll(treeValue));
+				handleShowToast(`Cập nhật phòng ban!`, `Cập nhật phòng ban thành công!`);
 			} catch (error) {
 				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
-				setTreeValue(TreeState.expandAll(treeValue));
+				throw error;
 			}
 		} else {
 			try {

@@ -1,7 +1,7 @@
 import * as Yup from 'yup';
 
 const validate = Yup.object({
-	// slug: Yup.string().required('Vui lòng nhập mã phòng ban'),
+	// code: Yup.string().required('Vui lòng nhập mã phòng ban'),
 	name: Yup.string()
 		.min(3, 'Tên phòng tối thiểu 3 kí tự')
 		.required('Vui lòng nhập tên phòng ban'),
