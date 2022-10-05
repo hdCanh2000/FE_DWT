@@ -5,10 +5,12 @@ import { arrayToTree } from 'performant-array-to-tree';
 import { Button, Form, Modal } from 'react-bootstrap';
 import './pickList.css';
 import Icon from '../../../components/icon/Icon';
+import Input from '../../../components/bootstrap/forms/Input';
 
 // eslint-disable-next-line no-unused-vars
 const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 	const [dataValue, setDataValue] = React.useState([]);
+	const [quantity, setquantity] = React.useState([]);
 	const [treeValue, setTreeValue] = React.useState(
 		TreeState.create(arrayToTree(data, { childrenField: 'children' })),
 	);
@@ -64,6 +66,17 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 			</div>
 		);
 	};
+	const handlequantity = (e, row) => {
+		setquantity([
+			...quantity,
+			{
+				value: e.target.value,
+				id: row.data.id,
+			},
+		]);
+		const newData = dataValue.filter((item) => item.id !== row.data.id);
+		setDataValue([...newData, { ...row.data, quantity: parseInt(e.target.value, 10) }]);
+	};
 	return (
 		<Modal show={show} size='lg' onHide={handleClose}>
 			<Modal.Header closeButton>
@@ -90,12 +103,18 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 						)}
 						renderHeaderCell={() => <span className='t-left'>Số ngày công</span>}
 					/>
-					{/* <TreeTable.Column
+					<TreeTable.Column
 						renderCell={(row) => (
-							<Input onChange={handleQuanlity}  />
+							<Input
+								name='quantity'
+								disabled={
+									!dataValue.filter((items) => items.id === row.data.id).length
+								}
+								onChange={(e) => handlequantity(e, row)}
+							/>
 						)}
 						renderHeaderCell={() => <span className='t-left'>Số lượng</span>}
-					/> */}
+					/>
 				</TreeTable>
 			</Modal.Body>
 			<Modal.Footer>
