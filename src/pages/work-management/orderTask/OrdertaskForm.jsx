@@ -121,7 +121,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			parent_id: null,
 			mission_id: missionOption?.id,
 			quantity: parseInt(mission?.quantity, 10),
-			userId: userOption?.id,
+			user_id: userOption?.id,
 			priority: parseInt(mission?.priority, 10),
 			note: mission?.note,
 			description: item?.description,
@@ -132,7 +132,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			dataSubMission.forEach(async (item) => {
 				await addWorktrack({
 					kpiNorm_id: item.id,
-					parent_id: res.data.id,
+					parent_id: res.data.data.id,
 					quantity: 1,
 				});
 			});

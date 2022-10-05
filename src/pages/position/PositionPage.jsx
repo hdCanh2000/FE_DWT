@@ -169,6 +169,7 @@ const PositionPage = () => {
 				await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
+				// eslint-disable-next-line no-empty
 			} catch (error) {}
 		} else {
 			try {
@@ -176,6 +177,7 @@ const PositionPage = () => {
 				await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
+			// eslint-disable-next-line no-empty
 			} catch (error) {}
 		}
 	};
