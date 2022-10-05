@@ -29,7 +29,7 @@ export const fetchDepartmentWithUserList = createAsyncThunk(
 	'department/fetchWithUserList',
 	async () => {
 		const response = await getAllDepartmentWithUser();
-		return response.data?.map((department) => {
+		return response.data.map((department) => {
 			return {
 				...department,
 				text: department?.name,

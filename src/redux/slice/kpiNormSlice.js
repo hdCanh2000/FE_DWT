@@ -24,6 +24,22 @@ export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () =
 			} - ${item.position?.name || 'Chưa có vị trí'} - ${item.manday || 'Chưa có'} MD`,
 			value: item.id,
 			text: item.name,
+			// parentId: item.parent_id,
+			// department: {
+			// 	...item.department,
+			// 	label: item.department.name,
+			// 	value: item.department.value,
+			// },
+			// position: {
+			// 	...item.position,
+			// 	label: item.position.name,
+			// 	value: item.position.value,
+			// },
+			// unit: {
+			// 	...item.unit,
+			// 	label: item.unit.name,
+			// 	value: item.unit.value,
+			// },
 		};
 	});
 });

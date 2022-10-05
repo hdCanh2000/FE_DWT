@@ -11,7 +11,7 @@ const getAllEmployee = () => {
 const getUserById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/${id}`,
+		url: `/users/${id}`,
 	});
 };
 

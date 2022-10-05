@@ -3,7 +3,6 @@ import {
 	addWorktrack,
 	getAllWorktrackByUser,
 	getAllWorktrackByUserId,
-	// getAllWorktrackByUser,
 	updateWorktrack,
 } from '../../pages/dailyWorkTracking/services';
 
@@ -14,16 +13,20 @@ const initialState = {
 	error: false,
 };
 
-// Đầu tiên, tạo thunk
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
-	return response.data.data.map((item) => {
+	return response.data?.data?.map((item) => {
+		const worktrackKpiNorms = item.workTrackKpiNorms;
+		item.workTrackKpiNorms = worktrackKpiNorms.map((worktrackKpiNorm) => {
+			return {
+				...worktrackKpiNorm,
+				name: worktrackKpiNorm.kpiNorm.name,
+				parentId: worktrackKpiNorm.worktrack_id,
+			};
+		});
 		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			parentId: item.parent_id,
+			data: item,
+			children: { children: item.workTrackKpiNorms, data: item.workTrackKpiNorms },
 		};
 	});
 });

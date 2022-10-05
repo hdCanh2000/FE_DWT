@@ -17,7 +17,7 @@ const getAllWorktrackByUser = () => {
 const addWorktrack = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/worktracks`,
+		url: `/api/worktracks`,
 		data,
 	});
 };
@@ -25,7 +25,7 @@ const addWorktrack = (data) => {
 const updateWorktrack = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/worktracks/${data.id}`,
+		url: `/api/worktracks/${data.id}`,
 		data,
 	});
 };

@@ -68,7 +68,7 @@ const EmployeePage = ({ header }) => {
 			const response = await getAllPosition();
 			const result = await response.data;
 			setPositions(
-				[...result].map((item) => {
+				result.map((item) => {
 					return {
 						...item,
 						label: item.name,
@@ -338,10 +338,13 @@ const EmployeePage = ({ header }) => {
 		} else {
 			try {
 				const response = await addEmployee(dataSubmit);
-				await response.data;
+				const result= await response.data;
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
-				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên thành công!`);
+				handleShowToast(
+					`Thêm nhân viên`,
+					`Nhân viên ${result.data.name} được thêm thành công!`,
+				);
 			} catch (error) {
 				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
 				throw error;
