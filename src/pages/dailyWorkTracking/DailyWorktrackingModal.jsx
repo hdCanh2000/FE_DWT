@@ -83,7 +83,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 				.then(() => {
 					handleCloseForm();
 					dispatch(fetchWorktrackList(data.user_id));
-					window.location.reload();
+					// window.location.reload();
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
@@ -94,7 +94,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 				.then(() => {
 					handleCloseForm();
 					dispatch(fetchWorktrackList(data.user_id));
-					window.location.reload();
+					// window.location.reload();
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
