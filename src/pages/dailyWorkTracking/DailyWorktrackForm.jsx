@@ -11,7 +11,7 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
 		initialValues: {
 			note: data?.row?.note || '',
-			status: data?.row?.status || 1,
+			status: data?.row?.status || 'inProgress',
 		},
 		enableReinitialize: true,
 		onSubmit: (values, { resetForm }) => {

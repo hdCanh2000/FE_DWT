@@ -375,7 +375,7 @@ const KpiNormPage = () => {
 							</div>
 						</div>
 					</>,
-					['admin'],
+					['admin', 'manager'],
 					<NotPermission />,
 				)}
 				<CommonForm
