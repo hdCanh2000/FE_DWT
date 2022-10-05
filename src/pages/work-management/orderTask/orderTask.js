@@ -12,7 +12,6 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-import { demoPages } from '../../../menu';
 import { getAllDepartments } from '../mission/services';
 import Button from '../../../components/bootstrap/Button';
 import Dropdown, {
@@ -137,7 +136,7 @@ const OrderTask = () => {
 		setTasks([...data]);
 	};
 	return (
-		<PageWrapper title={demoPages.jobsPage.subMenu.mission.text}>
+		<PageWrapper title='Giao việc'>
 			<Page container='fluid'>
 				<div className='col-12'>
 					<Card className='w-100'>

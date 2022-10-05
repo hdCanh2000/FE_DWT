@@ -12,7 +12,7 @@ const Aside = () => {
 	// 	setIsShow(!isShow);
 	// };
 	return (
-		<div className='position-fixed aside-head top-0 left-0' style={{ maxWidth: 260 }}>
+		<div className='position-fixed aside-head top-0 left-0' style={{ minWidth: 260 }}>
 			<Card className='mt-4' style={{ height: '100vh' }}>
 				<div style={{ marginTop: '10px' }}>
 					<Link to='/'>
@@ -25,7 +25,7 @@ const Aside = () => {
 					/> */}
 				</div>
 				<Navigation menu={demoPages} id='aside-demo-pages' />
-				<div className='p-3'>* Đây chỉ là phiên bản thử nghiệm *</div>
+				<div className='p-3'>* Phiên bản thử nghiệm *</div>
 			</Card>
 		</div>
 	);

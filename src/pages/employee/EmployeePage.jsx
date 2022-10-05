@@ -93,7 +93,7 @@ const EmployeePage = ({ header }) => {
 			isShow: true,
 		},
 		{
-			title: 'Mã NV',
+			title: 'Mã nhân sự',
 			id: 'code',
 			key: 'code',
 			type: 'text',
@@ -109,7 +109,7 @@ const EmployeePage = ({ header }) => {
 			isShow: false,
 		},
 		{
-			title: 'Email',
+			title: 'Email liên hệ',
 			id: 'email',
 			key: 'email',
 			type: 'text',
@@ -117,7 +117,7 @@ const EmployeePage = ({ header }) => {
 			isShow: true,
 		},
 		{
-			title: 'Phòng ban',
+			title: 'Phòng ban công tác',
 			id: 'department',
 			key: 'department',
 			type: 'select',
@@ -180,11 +180,11 @@ const EmployeePage = ({ header }) => {
 			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
 		},
 		{
-			title: 'Vai trò',
+			title: 'Chức vụ',
 			id: 'role',
 			key: 'role',
 			type: 'singleSelect',
-			align: 'center',
+			align: 'left',
 			isShow: true,
 			format: (value) =>
 				// eslint-disable-next-line no-nested-ternary
@@ -211,7 +211,7 @@ const EmployeePage = ({ header }) => {
 			],
 		},
 		{
-			title: 'Hành động',
+			title: '',
 			id: 'action',
 			key: 'action',
 			align: 'center',

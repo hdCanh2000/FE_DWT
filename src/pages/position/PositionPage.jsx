@@ -177,7 +177,7 @@ const PositionPage = () => {
 				await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
-			// eslint-disable-next-line no-empty
+				// eslint-disable-next-line no-empty
 			} catch (error) {}
 		}
 	};
@@ -197,7 +197,7 @@ const PositionPage = () => {
 						<div className='row mb-4'>
 							<div className='col-12'>
 								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Quản lý vị trí</div>
+									<div className='display-6 fw-bold py-3'>Danh sách vị trí</div>
 								</div>
 							</div>
 						</div>

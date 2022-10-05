@@ -5,10 +5,6 @@ const LANDING = {
 	DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
 };
 
-const MISSION = {
-	MISSION: lazy(() => import('../pages/work-management/mission/MissionPage')),
-	MISSION_DETAIL: lazy(() => import('../pages/work-management/mission/MissionDetailPage')),
-};
 const TASKBYUSER = {
 	TASKBYUSER: lazy(() => import('../pages/taskByUser/TaskByUser')),
 };
@@ -59,9 +55,6 @@ const AUTH = {
 	LOGIN: lazy(() => import('../pages/presentation/auth/Login')),
 };
 
-const KEY = {
-	KEY: lazy(() => import('../pages/key/keyPage')),
-};
 const UNIT = {
 	UNIT: lazy(() => import('../pages/unit/unitPage')),
 };
@@ -71,30 +64,14 @@ const KPINORM = {
 };
 
 const presentation = [
-	/**
-	 * Landing
-	 */
 	{
 		path: dashboardMenu.dashboard.path,
 		element: <LANDING.DASHBOARD />,
 		exact: true,
 	},
-	/** Trang quản lý mục tiêu */
-	{
-		path: demoPages.jobsPage.subMenu.target.path,
-		element: <MISSION.MISSION />,
-		exact: true,
-	},
-	/** Trang chi tiết mục tiêu */
-	{
-		path: `/${demoPages.jobsPage.subMenu.target.path}/:id`,
-		element: <MISSION.MISSION_DETAIL />,
-		exact: true,
-	},
-	/** * Trang danh sách công việc (nhiệm vụ cha) */
 	{
 		path: demoPages.jobsPage.subMenu.mission.path,
-		element: <TASK.TASKLIST />,
+		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
 		exact: true,
 	},
 	{
@@ -103,138 +80,73 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: `${demoPages.taskAndAssign.subMenu.taskByUser.path}`,
+		path: `${demoPages.taskPage.path}`,
 		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGME />,
 		exact: true,
 	},
 	{
-		path: `${demoPages.taskAndAssign.subMenu.taskByUser.path}/:id`,
+		path: `${demoPages.jobsPage.subMenu.employee.path}/:id`,
 		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
 		exact: true,
 	},
 	{
-		path: `${demoPages.taskAndAssign.subMenu.employees.path}`,
-		element: <TASKBYUSER.TASKBYUSER />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.taskAndAssign.subMenu.orderTask.path}`,
+		path: `${demoPages.taskAndAssign.path}`,
 		element: <DAILYWORKTRACKING.ORDERTASK />,
 		exact: true,
 	},
-	// trang chi tiết công việc (nhiệm vụ)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/:id`,
 		element: <TASK.TASKDETAIL />,
 		exact: true,
 	},
-	// trang thêm mới công việc (nhiệm vụ)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/them-moi`,
 		element: <TASK.ADD_OR_UPDATE_TASK />,
 		exact: true,
 	},
-	// trang cập nhật công việc (nhiệm vụ)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/:id`,
 		element: <TASK.ADD_OR_UPDATE_TASK />,
 		exact: true,
 	},
-	// trang thêm mới đầu việc (nhiệm vụ con) với nhiệm vụ
-	// {
-	// 	path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/them-moi`,
-	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-	// 	exact: true,
-	// },
-	// trang thêm mới đầu việc (nhiệm vụ con)
-	// {
-	// 	path: `${demoPages.jobsPage.subMenu.task.path}/them-moi`,
-	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-	// 	exact: true,
-	// },
-	// trang cập nhật đầu việc (nhiệm vụ con) với nhiệm vụ
-	// {
-	// 	path: `${demoPages.jobsPage.subMenu.task.path}/:taskId/cap-nhat/:id`,
-	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-	// 	exact: true,
-	// },
-	// trang cập nhật đầu việc (nhiệm vụ con)
-	// {
-	// 	path: `${demoPages.jobsPage.subMenu.task.path}/cap-nhat/:id`,
-	// 	element: <TASK.ADD_OR_UPDATE_SUB_TASK />,
-	// 	exact: true,
-	// },
-	// trang danh sách đầu việc
-	// {
-	// 	path: `${demoPages.jobsPage.subMenu.task.path}`,
-	// 	element: <TASK.SUBTASK />,
-	// 	exact: true,
-	// },
-	// trang chi tiết đầu việc (nhiệm vụ con)
 	{
 		path: `${demoPages.jobsPage.subMenu.mission.path}/dau-viec/:id`,
 		element: <TASK.SUBTASK_STEP />,
 		exact: true,
 	},
-	// trang danh sách nhân sự
 	{
 		path: `${demoPages.hrRecords.subMenu.hrList.path}`,
 		element: <MANAGEMENT.EMPLOYEE />,
 		exact: true,
 	},
-	// trang danh sách nhân sự
 	{
 		path: `${demoPages.hrRecords.subMenu.hrList.path}/:id`,
 		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
 		exact: true,
 	},
-	// trang danh sách phòng ban
 	{
 		path: `${demoPages.companyPage.path}`,
 		element: <MANAGEMENT.DEPARTMENT />,
 		exact: true,
 	},
-	// Quản lý Vị Trí
 	{
 		path: demoPages.hrRecords.subMenu.position.path,
 		element: <MANAGEMENT.POSITION />,
 	},
-	// Quản lý chỉ số key
-	// cấu hình - configure
-	// cấu hình kpi
-	// {
-	// 	path: `${demoPages.hrRecords.subMenu.position.path}/:id`,
-	// 	element: <MANAGEMENT.POSITION_DETAIL />,
-	// 	exact: true,
-	// },
-	// Quản lý Keys
-	{
-		path: demoPages.cauHinh.subMenu.kpi.path,
-		element: <KEY.KEY />,
-		exact: true,
-	},
-	// Quản lý đơn vị
 	{
 		path: demoPages.cauHinh.subMenu.unit.path,
 		element: <UNIT.UNIT />,
-	},
-	// cấu hình role & permission
-	{
-		path: demoPages.cauHinh.subMenu.authorization.path,
-		element: <MANAGEMENT.PERMISSION />,
 	},
 	{
 		path: demoPages.cauHinh.subMenu.kpiNorm.path,
 		element: <KPINORM.KPINORM />,
 		exact: true,
 	},
-	// trang quản lí cấp nhân sư
 	{
-		path: demoPages.cauHinh.subMenu.positionLevelConfig.path,
+		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
 		exact: true,
 	},
-	// yêu cầu năng luc tuyển dụng
 	{
 		path: demoPages.cauHinh.subMenu.recruitmentRequirements.path,
 		element: <MANAGEMENT.RECRUITMENT_REQUIREMENT />,

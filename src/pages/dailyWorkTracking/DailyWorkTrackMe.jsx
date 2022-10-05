@@ -116,53 +116,57 @@ const DailyWorkTrackingMe = () => {
 								</CardLabel>
 							</CardHeader>
 							<CardBody>
-								<TreeTable value={treeValue} onChange={handleOnChange}>
-									<TreeTable.Column
-										// basis='180px'
-										// grow='0'
-										style={{ minWidth: 300 }}
-										renderCell={renderIndexCell}
-										renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
-									/>
-									<TreeTable.Column
-										renderCell={(row) => (
-											<span className='expenses-cell text-left'>
-												{row.data?.mission?.name || 'Không'}
-											</span>
-										)}
-										renderHeaderCell={() => <span>Thuộc mục tiêu</span>}
-									/>
-									<TreeTable.Column
-										renderCell={(row) => (
-											<span className='expenses-cell text-left'>
-												{row.data?.quantity || ''}
-											</span>
-										)}
-										renderHeaderCell={() => (
-											<span className='t-left'>Số lượng</span>
-										)}
-									/>
-									<TreeTable.Column
-										renderCell={(row) => (
-											<span className='expenses-cell text-left'>
-												{moment(`${row.data.deadline}`).format(
-													'DD-MM-YYYY',
-												) || ''}
-											</span>
-										)}
-										renderHeaderCell={() => <span>Hạn hoàn thành</span>}
-									/>
-									<TreeTable.Column
-										renderCell={(row) => (
-											<span className='expenses-cell text-right'>
-												{row.data?.kpiNorm?.manday || ''}
-											</span>
-										)}
-										renderHeaderCell={() => (
-											<span className='t-left'>Số ngày công</span>
-										)}
-									/>
-								</TreeTable>
+								{worktrack?.length > 0 ? (
+									<TreeTable value={treeValue} onChange={handleOnChange}>
+										<TreeTable.Column
+											style={{ minWidth: 300 }}
+											renderCell={renderIndexCell}
+											renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-left'>
+													{row.data?.mission?.name || 'Không'}
+												</span>
+											)}
+											renderHeaderCell={() => <span>Thuộc mục tiêu</span>}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-left'>
+													{row.data?.quantity || ''}
+												</span>
+											)}
+											renderHeaderCell={() => (
+												<span className='t-left'>Số lượng</span>
+											)}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-left'>
+													{moment(`${row.data.deadline}`).format(
+														'DD-MM-YYYY',
+													) || ''}
+												</span>
+											)}
+											renderHeaderCell={() => <span>Hạn hoàn thành</span>}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-right'>
+													{row.data?.kpiNorm?.manday || ''}
+												</span>
+											)}
+											renderHeaderCell={() => (
+												<span className='t-left'>Số ngày công</span>
+											)}
+										/>
+									</TreeTable>
+								) : (
+									<h1 className='text-center py-4'>
+										Hiện chưa có công việc nào!
+									</h1>
+								)}
 							</CardBody>
 						</Card>
 					</div>

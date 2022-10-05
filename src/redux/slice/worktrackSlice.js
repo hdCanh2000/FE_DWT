@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
 	addWorktrack,
+	getAllWorktrack,
 	getAllWorktrackByUser,
 	getAllWorktrackByUserId,
 	// getAllWorktrackByUser,
@@ -15,6 +16,19 @@ const initialState = {
 };
 
 // Đầu tiên, tạo thunk
+export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async () => {
+	const response = await getAllWorktrack();
+	return response.data.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+			parentId: item.parent_id,
+		};
+	});
+});
+
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
 	return response.data.data.map((item) => {
@@ -61,6 +75,18 @@ export const worktrackSlice = createSlice({
 	initialState,
 	reducers: {},
 	extraReducers: {
+		// fetch list all
+		[fetchWorktrackListAll.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchWorktrackListAll.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.worktracks = [...action.payload];
+		},
+		[fetchWorktrackListAll.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
 		// fetch list
 		[fetchWorktrackList.pending]: (state) => {
 			state.loading = true;

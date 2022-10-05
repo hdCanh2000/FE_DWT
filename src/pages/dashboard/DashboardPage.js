@@ -31,6 +31,8 @@ import { getAllWorktrackByUserId } from '../dailyWorkTracking/services';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from '../dailyWorkTracking/DailyWorktrackingModal';
 import Icon from '../../components/icon/Icon';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 
 const DashboardPage = () => {
 	const dispatch = useDispatch();
@@ -42,6 +44,14 @@ const DashboardPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const users = useSelector((state) => state.employee.employees);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(users, currentPage, perPage);
+	useEffect(() => {
+		dispatch(fetchEmployeeList());
+	}, [dispatch]);
 
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
@@ -1153,6 +1163,72 @@ const DashboardPage = () => {
 					)}
 				</div>
 				{verifyPermissionHOC(
+					<div className='row my-4'>
+						<div className='col-md-12'>
+							<Card>
+								<CardHeader>
+									<CardLabel icon='Task' iconColor='danger'>
+										<CardTitle>
+											<CardLabel>Thống kê công việc theo nhân viên</CardLabel>
+										</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<div className='p-4'>
+									<table
+										className='table table-modern mb-0'
+										style={{ fontSize: 14 }}>
+										<thead>
+											<tr>
+												<th>Họ và tên</th>
+												<th>Phòng ban</th>
+												<th>Vị trí</th>
+												<th className='text-center'>Số nhiệm vụ đang có</th>
+												<th>Chức vụ</th>
+											</tr>
+										</thead>
+										<tbody>
+											{items?.map((item) => (
+												<React.Fragment key={item.id}>
+													<tr>
+														<td>
+															<a
+																className='text-underline'
+																href={`/cong-viec-hang-ngay/${item.id}`}>
+																{item.name}
+															</a>
+														</td>
+														<td>{item?.department?.name}</td>
+														<td>{item?.position?.name}</td>
+														<td className='text-center'>
+															{item?.workTracks?.length || 0}
+														</td>
+														<td>
+															{item?.role === 'manager'
+																? 'Quản lý '
+																: 'Nhân viên'}
+														</td>
+													</tr>
+												</React.Fragment>
+											))}
+										</tbody>
+									</table>
+									<hr />
+									<footer>
+										<PaginationButtons
+											data={users}
+											setCurrentPage={setCurrentPage}
+											currentPage={currentPage}
+											perPage={perPage}
+											setPerPage={setPerPage}
+										/>
+									</footer>
+								</div>
+							</Card>
+						</div>
+					</div>,
+					['manager'],
+				)}
+				{verifyPermissionHOC(
 					<div className='row mt-4'>
 						<div className='col-md-12 h-100'>
 							<Card className='h-100'>
@@ -1221,7 +1297,7 @@ const DashboardPage = () => {
 							show={toggleForm}
 						/>
 					</div>,
-					['user'],
+					['user', 'manager'],
 				)}
 				{verifyPermissionHOC(
 					<div className='row'>
