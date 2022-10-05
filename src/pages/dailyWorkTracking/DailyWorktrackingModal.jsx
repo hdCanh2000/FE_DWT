@@ -26,7 +26,7 @@ const columns = () => {
 	for (let i = 1; i <= days; i += 1) {
 		result.push({
 			day: i,
-			date: `${i > 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
+			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
 		});
 	}
 	return result;
@@ -44,6 +44,14 @@ const renderColor = (status) => {
 			return 'transparent';
 	}
 };
+
+// const formatDate = (date = '') => {
+// 	const tmp = date.split('-');
+// 	const year = tmp[2];
+// 	const month = tmp[1];
+// 	const d = tmp[0];
+// 	return `${month}/${d}/${year}`;
+// };
 
 const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 	const dispatch = useDispatch();
@@ -133,37 +141,41 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 											key={item?.day}
 											style={{
 												border: '1px solid #c8c7c7',
-												background: renderColor(
-													new Date(
-														data?.workTrackLogs?.find(
-															(i) =>
-																new Date(i?.date).getTime() -
-																	new Date(
-																		item?.date,
-																	).getTime() ===
-																0,
-														)?.date,
-													).getTime() -
-														new Date(item?.date).getTime() ===
-														0
-														? data?.workTrackLogs?.find(
-																(i) =>
-																	new Date(i?.date).getTime() -
-																		new Date(
-																			item?.date,
-																		).getTime() ===
-																	0,
-														  ).status
-														: '',
+												backgroundColor: renderColor(
+													data?.workTrackLogs?.find(
+														(i) => i?.date === item?.date,
+													)?.status,
 												),
+												// background: renderColor(
+												// 	new Date(
+												// 		data?.workTrackLogs?.find(
+												// 			(i) =>
+												// 				new Date(i?.date).getTime() -
+												// 					new Date(
+												// 						formatDate(item?.date),
+												// 					).getTime() ===
+												// 				0,
+												// 		)?.date,
+												// 	).getTime() -
+												// 		new Date(
+												// 			formatDate(item?.date),
+												// 		).getTime() ===
+												// 		0
+												// 		? data?.workTrackLogs?.find(
+												// 				(i) =>
+												// 					new Date(i?.date).getTime() -
+												// 						new Date(
+												// 							formatDate(item?.date),
+												// 						).getTime() ===
+												// 					0,
+												// 		  ).status
+												// 		: '',
+												// ),
 											}}
 											onClick={() =>
 												handleShowForm(
 													data?.workTrackLogs?.find(
-														(i) =>
-															new Date(i?.date).getTime() -
-																new Date(item?.date).getTime() ===
-															0,
+														(i) => i?.date === item?.date,
 													),
 													item,
 												)
