@@ -112,55 +112,55 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 					</div>
 					<table className='table table-modern mb-0 py-4'>
 						<thead>
-							{data?.workTrackLogs?.length > 0 ? (
-								data?.workTrackLogs?.map((row, index) => {
+							<tr className='d-flex flex-wrap'>
+								{columns().map((item) => {
 									return (
-										// eslint-disable-next-line react/no-array-index-key
-										<tr key={index} className='d-flex flex-wrap'>
-											{columns().map((item) => {
-												return (
-													<th
-														key={item?.day}
-														style={{
-															border: '1px solid #c8c7c7',
-															background: renderColor(
-																new Date(row.date).getTime() -
+										<th
+											key={item?.day}
+											style={{
+												border: '1px solid #c8c7c7',
+												background: renderColor(
+													new Date(
+														data?.workTrackLogs?.find(
+															(i) =>
+																new Date(i?.date).getTime() -
 																	new Date(
-																		item.date,
+																		item?.date,
 																	).getTime() ===
-																	0
-																	? row.status
-																	: '',
-															),
-														}}
-														onClick={() => handleShowForm(row, item)}
-														className='text-center mb-2 rounded-0 cursor-pointer'>
-														<span className='d-block'>Ngày</span>
-														{item?.day}
-													</th>
-												);
-											})}
-										</tr>
+																0,
+														)?.date,
+													).getTime() -
+														new Date(item?.date).getTime() ===
+														0
+														? data?.workTrackLogs?.find(
+																(i) =>
+																	new Date(i?.date).getTime() -
+																		new Date(
+																			item?.date,
+																		).getTime() ===
+																	0,
+														  ).status
+														: '',
+												),
+											}}
+											onClick={() =>
+												handleShowForm(
+													data?.workTrackLogs?.find(
+														(i) =>
+															new Date(i?.date).getTime() -
+																new Date(item?.date).getTime() ===
+															0,
+													),
+													item,
+												)
+											}
+											className='text-center mb-2 rounded-0 cursor-pointer'>
+											<span className='d-block'>Ngày</span>
+											{item?.day}
+										</th>
 									);
-								})
-							) : (
-								<tr className='d-flex flex-wrap'>
-									{columns().map((item) => {
-										return (
-											<th
-												key={item?.day}
-												style={{
-													border: '1px solid #c8c7c7',
-												}}
-												onClick={() => handleShowForm({}, item)}
-												className='text-center mb-2 rounded-0 cursor-pointer'>
-												<span className='d-block'>Ngày</span>
-												{item?.day}
-											</th>
-										);
-									})}
-								</tr>
-							)}
+								})}
+							</tr>
 						</thead>
 					</table>
 				</Card>
