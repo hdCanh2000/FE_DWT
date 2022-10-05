@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import Button from '../../components/bootstrap/Button';
+// import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
-import Icon from '../../components/icon/Icon';
+// import Icon from '../../components/icon/Icon';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import Page from '../../layout/Page/Page';
@@ -12,24 +12,24 @@ import { demoPages } from '../../menu';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import Search from '../common/ComponentCommon/Search';
 import NotPermission from '../presentation/auth/NotPermission';
-import Expand from './Expan';
+// import Expand from './Expan';
 
 const TaskByUser = () => {
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
-	const [isExpan, setIsExpan] = useState([]);
+	// const [isExpan, setIsExpan] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [perPage, setPerPage] = useState(PER_COUNT['10']);
 	const items = dataPagination(users, currentPage, perPage);
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-	const handleEpandRow = (idExpan) => {
-		setIsExpan([...isExpan, idExpan]);
-		if (isExpan.includes(idExpan)) {
-			setIsExpan(isExpan.filter((item) => item !== idExpan));
-		}
-	};
+	// const handleEpandRow = (idExpan) => {
+	// 	setIsExpan([...isExpan, idExpan]);
+	// 	if (isExpan.includes(idExpan)) {
+	// 		setIsExpan(isExpan.filter((item) => item !== idExpan));
+	// 	}
+	// };
 	return (
 		<PageWrapper title='Giám sát công việc nhân viên'>
 			<Page container='fluid'>
@@ -54,8 +54,10 @@ const TaskByUser = () => {
 										<thead>
 											<tr>
 												<th>Họ và tên</th>
-												<th className='text-center'>Danh sách đầu việc</th>
+												{/* <th className='text-center'>Danh sách nhiệm vụ</th> */}
 												<th>Phòng ban</th>
+												<th>Vị trí</th>
+												<th className='text-center'>Số nhiệm vụ đang có</th>
 												<th>Chức vụ</th>
 											</tr>
 										</thead>
@@ -70,7 +72,7 @@ const TaskByUser = () => {
 																{item.name}
 															</Link>
 														</td>
-														<td>
+														{/* <td>
 															<Button
 																className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
 																onClick={() =>
@@ -86,15 +88,19 @@ const TaskByUser = () => {
 																	}`}
 																/>
 															</Button>
+														</td> */}
+														<td>{item?.department?.name}</td>
+														<td>{item?.position?.name}</td>
+														<td className='text-center'>
+															{item?.workTracks?.length || 0}
 														</td>
-														<td>{item?.department?.label}</td>
 														<td>
-															{item?.roles[0] === 'manager'
+															{item?.role === 'manager'
 																? 'Quản lý '
 																: 'Nhân viên'}
 														</td>
 													</tr>
-													<tr>
+													{/* <tr>
 														<td
 															colSpan='12'
 															style={{
@@ -105,7 +111,7 @@ const TaskByUser = () => {
 																<Expand idUser={item.id} />
 															)}
 														</td>
-													</tr>
+													</tr> */}
 												</React.Fragment>
 											))}
 										</tbody>
@@ -121,11 +127,6 @@ const TaskByUser = () => {
 										/>
 									</footer>
 								</div>
-								{/* {!tasks?.length && (
-                                <Alert color='warning' isLight icon='Report' className='mt-3'>
-                                    Không có nhiệm vụ!
-                                </Alert>
-                            )} */}
 							</Card>
 						</div>
 					</div>,

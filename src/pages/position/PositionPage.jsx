@@ -39,7 +39,7 @@ const PositionPage = () => {
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
 
-	const [nvs] = React.useState(true);
+	// const [nvs] = React.useState(true);
 
 	useEffect(() => {
 		dispatch(fetchPositionList());
@@ -61,8 +61,8 @@ const PositionPage = () => {
 		},
 		{
 			title: 'Phòng Ban',
-			id: 'departmentId',
-			key: 'departmentId',
+			id: 'department_id',
+			key: 'department_id',
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
@@ -72,8 +72,8 @@ const PositionPage = () => {
 		},
 		{
 			title: 'Cấp Nhân Sự',
-			id: 'positionLevelId',
-			key: 'positionLevelId',
+			id: 'position_levels_id',
+			key: 'position_levels_id',
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
@@ -113,8 +113,8 @@ const PositionPage = () => {
 		},
 		{
 			title: 'Yêu cầu năng lực',
-			id: 'requirements',
-			key: 'requirements',
+			id: 'requirement_id',
+			key: 'requirement_id',
 			type: 'select',
 			align: 'left',
 			isShow: false,
@@ -154,16 +154,16 @@ const PositionPage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
-			name: data.name,
-			address: data.address,
-			description: data.description,
-			department_id: parseInt(data.departmentId, 10),
-			position_levels_id: parseInt(data.positionLevelId, 10),
+			name: data?.name,
+			address: data?.address,
+			description: data?.description,
+			department_id: parseInt(data.department_id, 10),
+			position_levels_id: parseInt(data.position_levels_id, 10),
 			manager: parseInt(data.manager, 10),
-			kpiNormId: data.kpiName,
-			requirements: data.requirements,
+			// kpiNormId: data?.kpiName,
+			requirement_id: parseInt(data.requirement_id, 10),
 		};
-		if (data.id) {
+		if (data?.id) {
 			try {
 				const response = await updatePosition(dataSubmit);
 				await response.data;
@@ -235,7 +235,7 @@ const PositionPage = () => {
 							item={itemEdit}
 							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
-							nv={nvs}
+							// nv={nvs}
 							validate={validate}
 						/>
 						<PositionDetail
@@ -244,7 +244,7 @@ const PositionPage = () => {
 							item={dataDetail}
 							label={`Chi tiết vị trí: ${dataDetail?.name}`}
 							fields={columns}
-							nv
+							// nv
 						/>
 					</>,
 					['admin'],

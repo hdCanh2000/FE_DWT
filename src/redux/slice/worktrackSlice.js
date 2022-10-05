@@ -17,17 +17,13 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
-	return response.data.map((item) => {
+	return response.data.data.map((item) => {
 		return {
 			...item,
 			label: item.name,
 			value: item.id,
 			text: item.name,
-			unit: {
-				...item.unit,
-				label: item?.unit?.name,
-				value: item?.unit?.id,
-			},
+			parentId: item.parent_id,
 		};
 	});
 });

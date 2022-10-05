@@ -1,10 +1,14 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable react/self-closing-comp */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+
 import React, { useEffect, useState } from 'react';
+import { isEmpty } from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
-import Tree from 'react-animated-tree-v2';
 import { arrayToTree } from 'performant-array-to-tree';
+import { TreeTable, TreeState } from 'cp-react-tree-table';
+import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -20,28 +24,48 @@ import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addDepartment } from './services';
+import { addDepartment, updateDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
-import { close, minus, plus } from './icon/icon';
-import Search from '../common/ComponentCommon/Search';
-import DepartmentDetail from './DepartmentDetail';
 import Employee from './Employee';
 import NotPermission from '../presentation/auth/NotPermission';
-import company from '../../components/icon/svg-icons/company.svg';
-import diagram from '../../components/icon/svg-icons/diagram.png';
-import departmentt from '../../components/icon/svg-icons/department.svg';
-import group from '../../components/icon/svg-icons/group.png';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import Icon from '../../components/icon/Icon';
+import './style.scss';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
-	const [itemEdit, setItemEdit] = React.useState({});
-	const [openForm, setOpenForm] = React.useState(false);
 	const department = useSelector((state) => state.department.departments);
-	const [itemEdits, setItemEdits] = useState({});
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const [toggle, setToggle] = useState(true);
+	const [dataDepartment, setDepartmentId] = useState(true);
+
+	const [treeValue, setTreeValue] = React.useState(
+		TreeState.create(arrayToTree(department, { childrenField: 'children' })),
+	);
+
+	// useEffect(() => {
+	// 	setTreeValue(TreeState.create(arrayToTree(department, { childrenField: 'children' })));
+	// }, [department]);
+
+	useEffect(() => {
+		if (!isEmpty(department)) {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(arrayToTree(department, { childrenField: 'children' })),
+				),
+			);
+		}
+	}, [department]);
+
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
+
 	const departmentList = department?.map((item) => {
 		return {
 			...item,
@@ -49,21 +73,7 @@ const DepartmentPage = () => {
 			value: item.id,
 		};
 	});
-	const showIcon = (item) => {
-		if (item.organizationLevel === 4) {
-			return <img src={company} alt='logo' style={{ width: '18px' }} />;
-		}
-		if (item.organizationLevel === 1) {
-			return <img src={diagram} alt='logo' style={{ width: '18px' }} />;
-		}
-		if (item.organizationLevel === 2) {
-			return <img src={departmentt} alt='logo' style={{ width: '18px' }} />;
-		}
-		if (item.organizationLevel === 3) {
-			return <img src={group} alt='logo' style={{ width: '18px' }} />;
-		}
-		return <img src={company} alt='logo' style={{ width: '18px' }} />;
-	};
+
 	const organizationLevelOptions = [
 		{
 			label: 'Khối',
@@ -82,6 +92,7 @@ const DepartmentPage = () => {
 			value: 3,
 		},
 	];
+
 	const columns = [
 		{
 			title: 'Tên phòng ban',
@@ -149,14 +160,7 @@ const DepartmentPage = () => {
 		// 	format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
 		// },
 	];
-	const handleOpenForm = (item) => {
-		setItemEdit(item);
-		setOpenForm(true);
-	};
-	const handleCloseForm = () => {
-		setItemEdit({});
-		setOpenForm(false);
-	};
+
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -167,6 +171,7 @@ const DepartmentPage = () => {
 			},
 		);
 	};
+
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
@@ -178,64 +183,88 @@ const DepartmentPage = () => {
 			address: data?.address,
 			// status: Number(data.status),
 		};
-		try {
-			const response = await addDepartment(dataSubmit);
-			const result = await response.data;
-			dispatch(fetchDepartmentList());
-			handleCloseForm();
-			handleShowToast(
-				`Thêm phòng ban`,
-				`Phòng ban ${result.data.name} được thêm thành công!`,
-			);
-		} catch (error) {
-			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+		if (data?.id) {
+			try {
+				const response = await updateDepartment(dataSubmit);
+				await response.data;
+				dispatch(fetchDepartmentList());
+				handleCloseForm();
+				handleShowToast(`Cập nhật phòng ban!`, `Cập nhật phòng ban thành công!`);
+			} catch (error) {
+				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+				throw error;
+			}
+		} else {
+			try {
+				const response = await addDepartment(dataSubmit);
+				const result = await response.data;
+				dispatch(fetchDepartmentList());
+				handleCloseForm();
+				handleShowToast(
+					`Thêm phòng ban`,
+					`Phòng ban ${result.data.name} được thêm thành công!`,
+				);
+				setTreeValue(TreeState.expandAll(treeValue));
+			} catch (error) {
+				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+				setTreeValue(TreeState.expandAll(treeValue));
+			}
 		}
 	};
-	const treeStyles = {
-		cursor: 'pointer',
-		color: 'black',
-		fill: 'black',
-		width: '100%',
-		fontSize: '15px',
+
+	const handleOnChange = (newValue) => {
+		setTreeValue(newValue);
 	};
-	const departments = arrayToTree(department, { childrenField: 'items', dataField: null });
-	const handleClick = (item) => {
-		const newItem = department.filter((items) => items.id === item.id);
-		setItemEdits(newItem[0]);
+
+	const renderIndexCell = (row) => {
+		return (
+			<div
+				style={{
+					paddingLeft: `${row.metadata.depth * 30}px`,
+					minWidth: 360,
+					fontSize: 14,
+				}}
+				onClick={() => setDepartmentId(row.data)}
+				onDoubleClick={() =>
+					handleOpenForm({
+						...row.data,
+						parentId: department.find((item) => item.id === row.data.parentId),
+					})
+				}
+				className={
+					row.metadata.hasChildren
+						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
+						: 'without-children cursor-pointer user-select-none'
+				}>
+				{row.metadata.hasChildren ? (
+					<Icon
+						color='success'
+						type='button'
+						size='lg'
+						icon={row?.$state?.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
+						className='d-block bg-transparent'
+						style={{ fontSize: 25 }}
+						onClick={row.toggleChildren}
+					/>
+				) : (
+					''
+				)}
+
+				<span>{row.data.name || ''}</span>
+			</div>
+		);
 	};
-	const renderDepartmentMenu = (data) => {
-		const newData = data?.map((item) => {
-			return (
-				<div>
-					{item?.items?.length === 0 && (
-						<div style={{ marginLeft: '20px' }}>
-							<Tree
-								type={showIcon(item)}
-								icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
-								key={item.id}
-								content={`${item.name}`}
-								style={treeStyles}
-								onItemClick={() => handleClick(item)}
-							/>
-						</div>
-					)}
-					{item?.items?.length !== 0 && (
-						<Tree
-							type={showIcon(item)}
-							icons={{ plusIcon: plus, minusIcon: minus, closeIcon: close }}
-							key={item.id}
-							content={item.name}
-							style={treeStyles}
-							open
-							onItemClick={() => handleClick(item)}>
-							{renderDepartmentMenu(item.items)}
-						</Tree>
-					)}
-				</div>
-			);
-		});
-		return newData;
+
+	const toggleExpand = () => {
+		if (!toggle) {
+			setToggle(!toggle);
+			setTreeValue(TreeState.expandAll(treeValue));
+		} else {
+			setToggle(!toggle);
+			setTreeValue(TreeState.collapseAll(treeValue));
+		}
 	};
+
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
@@ -271,20 +300,40 @@ const DepartmentPage = () => {
 										<div className='col-lg-3 col-md-6'>
 											<Card className='h-100' style={{ minHeight: '900px' }}>
 												<CardBody>
-													<Search />
-													{renderDepartmentMenu(departments)}
+													<div className='d-flex align-items-center justify-content-start'>
+														<Button
+															color='info'
+															icon={
+																!toggle
+																	? 'ExpandMore'
+																	: 'ExpandLess'
+															}
+															tag='button'
+															onClick={toggleExpand}>
+															{!toggle
+																? 'Hiển thị tất cả'
+																: 'Thu gọn'}
+														</Button>
+													</div>
+													<TreeTable
+														value={treeValue}
+														onChange={handleOnChange}>
+														<TreeTable.Column
+															style={{ minWidth: 300 }}
+															renderCell={renderIndexCell}
+															renderHeaderCell={() => <span />}
+														/>
+													</TreeTable>
 												</CardBody>
 											</Card>
 										</div>
-										{department.includes(itemEdits) ? (
-											<DepartmentDetail
-												initValues={itemEdits}
-												organizationLevelOptions={organizationLevelOptions}
-												departmentList={departmentList}
-											/>
-										) : (
-											<Employee header />
-										)}
+										<div className='col-lg-9 col-md-6'>
+											<Card className='h-100' style={{ minHeight: '900px' }}>
+												<CardBody>
+													<Employee dataDepartment={dataDepartment} />
+												</CardBody>
+											</Card>
+										</div>
 									</div>
 								</Card>
 							</div>
@@ -294,15 +343,13 @@ const DepartmentPage = () => {
 					<NotPermission />,
 				)}
 				<CommonForm
-					setInitValues={setItemEdits}
-					show={openForm}
+					show={toggleForm}
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
-					label='Thêm mới phòng ban'
+					label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
 					fields={columns}
 					validate={validate}
-					disable='true'
 				/>
 			</Page>
 		</PageWrapper>

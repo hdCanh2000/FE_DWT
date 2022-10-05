@@ -6,8 +6,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { arrayToTree } from 'performant-array-to-tree';
-// import Tree from 'react-animated-tree-v2';
 import { TreeTable, TreeState } from 'cp-react-tree-table';
+import { isEmpty } from 'lodash';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -28,16 +28,14 @@ import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-// import Search from '../common/ComponentCommon/Search';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-// import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import NotPermission from '../presentation/auth/NotPermission';
 import './style.css';
 import Icon from '../../components/icon/Icon';
 
-const EmployeePage = () => {
+const KpiNormPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
@@ -48,9 +46,6 @@ const EmployeePage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [openDetail, setOpenDetail] = useState(false);
 	const [dataDetail, setDataDetail] = useState(false);
-	// const [currentPage, setCurrentPage] = useState(1);
-	// const [perPage, setPerPage] = useState(PER_COUNT['10']);
-	// const items = dataPagination(kpiNorm, currentPage, perPage);
 
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
@@ -70,7 +65,13 @@ const EmployeePage = () => {
 	);
 
 	useEffect(() => {
-		setTreeValue(TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })));
+		if (!isEmpty(kpiNorm)) {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })),
+				),
+			);
+		}
 	}, [kpiNorm]);
 
 	const columns = [
@@ -197,23 +198,25 @@ const EmployeePage = () => {
 			type: 1,
 		};
 		if (data?.id) {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await updateKpiNorm(dataSubmit);
 				await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
+				setTreeValue(TreeState.expandAll(treeValue));
 			} catch (error) {
+				setTreeValue(TreeState.expandAll(treeValue));
 				throw error;
 			}
 		} else {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await addKpiNorm(dataSubmit);
 				await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
+				setTreeValue(TreeState.expandAll(treeValue));
 			} catch (error) {
+				setTreeValue(TreeState.expandAll(treeValue));
 				throw error;
 			}
 		}
@@ -227,18 +230,6 @@ const EmployeePage = () => {
 	const handleCloseDelete = () => {
 		setIsDelete(false);
 	};
-
-	// const handleOpenDetail = (item) => {
-	// 	setOpenDetail(true);
-	// 	setDataDetail({
-	// 		...item,
-	// 		department: {
-	// 			...item.department,
-	// 			label: item?.department?.name,
-	// 			value: item?.departmentId,
-	// 		},
-	// 	});
-	// };
 
 	const handleCloseDetail = () => {
 		setOpenDetail(false);
@@ -270,11 +261,16 @@ const EmployeePage = () => {
 					minWidth: 360,
 				}}
 				// onClick={row.toggleChildren}
-				onDoubleClick={() => handleOpenForm(row.data)}
+				onDoubleClick={() =>
+					handleOpenForm({
+						...row.data,
+						parent: kpiNorm.find((item) => item.id === row.data.parentId),
+					})
+				}
 				className={
 					row.metadata.hasChildren
-						? 'with-children d-flex align-items-center cursor-pointer'
-						: 'without-children cursor-pointer'
+						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
+						: 'without-children cursor-pointer user-select-none'
 				}>
 				{row.metadata.hasChildren ? (
 					<Icon
@@ -290,7 +286,7 @@ const EmployeePage = () => {
 					''
 				)}
 
-				<span>{row.data.name}</span>
+				<span>{row.data.name || ''}</span>
 			</div>
 		);
 	};
@@ -338,7 +334,7 @@ const EmployeePage = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-left'>
-														{row.data.department.name}
+														{row.data.department.name || ''}
 													</span>
 												)}
 												renderHeaderCell={() => (
@@ -348,7 +344,7 @@ const EmployeePage = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-left'>
-														{row.data.position.name}
+														{row.data.position.name || ''}
 													</span>
 												)}
 												renderHeaderCell={() => <span>Vị trí</span>}
@@ -356,7 +352,7 @@ const EmployeePage = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-left'>
-														{row.data.unit.name}
+														{row.data.unit.name || ''}
 													</span>
 												)}
 												renderHeaderCell={() => (
@@ -366,7 +362,7 @@ const EmployeePage = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-right'>
-														{row.data.manday}
+														{row.data.manday || ''}
 													</span>
 												)}
 												renderHeaderCell={() => (
@@ -375,138 +371,8 @@ const EmployeePage = () => {
 											/>
 										</TreeTable>
 									</CardBody>
-									{/* <div className='p-4'>
-										<div className='p-4'>
-											<table
-												className='table table-modern mb-0'
-												style={{ fontSize: 14 }}>
-												<thead>
-													<tr>
-														<th>Tên định mức KPI</th>
-														<th>Phòng ban</th>
-														<th>Đơn vị tính</th>
-														<th>Mô tả</th>
-														<th>Vị trí chuyên môn</th>
-														<th>Số ngày công cần thiết</th>
-														<th className='text-center'>Hành động</th>
-													</tr>
-												</thead>
-												<tbody>
-													{items?.map((item) => (
-														<React.Fragment key={item.id}>
-															<tr>
-																<td>{item?.name}</td>
-																<td>{item?.department?.name}</td>
-																<td>{item?.unit?.name}</td>
-																<td>{item?.description}</td>
-																<td>{item?.position?.name}</td>
-																<td>{item?.manday?.name}</td>
-																<td className='text-center'>
-																	<Button
-																		isOutline={!darkModeStatus}
-																		color='success'
-																		isLight={darkModeStatus}
-																		className='text-nowrap mx-1'
-																		icon='Edit'
-																		onClick={() =>
-																			handleOpenForm({
-																				...item,
-																				department: {
-																					...item.department,
-																					value: item
-																						.department
-																						?.value,
-																					label: item
-																						.department
-																						?.name,
-																				},
-																				position: {
-																					...item.position,
-																					value: item
-																						.position
-																						?.value,
-																					label: item
-																						.position
-																						?.name,
-																				},
-																				unit: {
-																					...item.unit,
-																					value: item.unit
-																						?.value,
-																					label: item.unit
-																						?.name,
-																				},
-																			})
-																		}
-																	/>
-																	<Button
-																		isOutline={!darkModeStatus}
-																		color='primary'
-																		isLight={darkModeStatus}
-																		className='text-nowrap mx-1'
-																		icon='RemoveRedEye'
-																		onClick={() =>
-																			handleOpenDetail({
-																				...item,
-																				department: {
-																					...item.department,
-																					value: item
-																						.department
-																						?.value,
-																					label: item
-																						.department
-																						?.name,
-																				},
-																				position: {
-																					...item.position,
-																					value: item
-																						.position
-																						?.value,
-																					label: item
-																						.position
-																						?.name,
-																				},
-																				unit: {
-																					...item.unit,
-																					value: item.unit
-																						?.value,
-																					label: item.unit
-																						?.name,
-																				},
-																			})
-																		}
-																	/>
-																	<Button
-																		isOutline={!darkModeStatus}
-																		color='danger'
-																		isLight={darkModeStatus}
-																		className='text-nowrap mx-1'
-																		icon='Trash'
-																		onClick={() =>
-																			handleOpenDelete(item)
-																		}
-																	/>
-																</td>
-															</tr>
-														</React.Fragment>
-													))}
-												</tbody>
-											</table>
-											<hr />
-											<footer>
-												<PaginationButtons
-													data={kpiNorm}
-													setCurrentPage={setCurrentPage}
-													currentPage={currentPage}
-													perPage={perPage}
-													setPerPage={setPerPage}
-												/>
-											</footer>
-										</div>
-									</div> */}
 								</Card>
 							</div>
-							{/* <div className='col-12'>{renderDepartmentMenu(treeData)}</div> */}
 						</div>
 					</>,
 					['admin'],
@@ -540,4 +406,4 @@ const EmployeePage = () => {
 	);
 };
 
-export default EmployeePage;
+export default KpiNormPage;

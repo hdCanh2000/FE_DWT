@@ -8,6 +8,14 @@ const getAllEmployee = () => {
 	});
 };
 
+const getAllEmployeeByDepartment = (id) => {
+	// lấy danh sách nhân viên
+	return axiosClient({
+		method: 'GET',
+		url: `/api/users/department/${id}`,
+	});
+};
+
 const getUserById = (id) => {
 	return axiosClient({
 		method: 'GET',
@@ -26,9 +34,9 @@ const addEmployee = (data) => {
 const updateEmployee = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/users/${data.id}`,
+		url: `/api/users/profile/${data.id}`,
 		data,
 	});
 };
 
-export { getAllEmployee, getUserById, addEmployee, updateEmployee };
+export { getAllEmployee, getAllEmployeeByDepartment, getUserById, addEmployee, updateEmployee };
