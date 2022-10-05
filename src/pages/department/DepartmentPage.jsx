@@ -150,15 +150,6 @@ const DepartmentPage = () => {
 			align: 'left',
 			isShow: true,
 		},
-		// {
-		// 	title: 'Trạng thái',
-		// 	id: 'status',
-		// 	key: 'status',
-		// 	type: 'switch',
-		// 	align: 'center',
-		// 	isShow: true,
-		// 	format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		// },
 	];
 
 	const handleShowToast = (title, content) => {
@@ -181,7 +172,6 @@ const DepartmentPage = () => {
 			description: data?.description,
 			code: data?.code,
 			address: data?.address,
-			// status: Number(data.status),
 		};
 		if (data?.id) {
 			try {
@@ -229,6 +219,9 @@ const DepartmentPage = () => {
 					handleOpenForm({
 						...row.data,
 						parentId: department.find((item) => item.id === row.data.parentId),
+						organizationLevel: organizationLevelOptions.find(
+							(item) => item.value === row.data.organizationLevel,
+						),
 					})
 				}
 				className={
