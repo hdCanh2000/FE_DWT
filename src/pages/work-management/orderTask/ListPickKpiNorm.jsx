@@ -3,9 +3,7 @@ import { TreeTable, TreeState } from 'cp-react-tree-table';
 import PropTypes from 'prop-types';
 import { arrayToTree } from 'performant-array-to-tree';
 import { Button, Form, Modal } from 'react-bootstrap';
-import './pickList.css';
 import Icon from '../../../components/icon/Icon';
-import Input from '../../../components/bootstrap/forms/Input';
 
 // eslint-disable-next-line no-unused-vars
 const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
@@ -42,7 +40,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 				className={
 					row.metadata.hasChildren
 						? 'with-children d-flex align-items-center cursor-pointer'
-						: 'without-children cursor-pointer'
+						: 'without-children align-items-center cursor-pointer'
 				}>
 				{row.metadata.hasChildren ? (
 					<Icon
@@ -55,9 +53,10 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 						onClick={row.toggleChildren}
 					/>
 				) : (
-					''
+					' '
 				)}
 				<Form.Check
+				style={!row.metadata.hasChildren?{marginLeft: '25px'}:{}}
 					type='checkbox'
 					id={`default-${row}`}
 					onClick={() => handleCheckBox(row.data)}
@@ -105,7 +104,8 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 					/>
 					<TreeTable.Column
 						renderCell={(row) => (
-							<Input
+							<input
+							style={{width: '100px'}}
 								name='quantity'
 								disabled={
 									!dataValue.filter((items) => items.id === row.data.id).length

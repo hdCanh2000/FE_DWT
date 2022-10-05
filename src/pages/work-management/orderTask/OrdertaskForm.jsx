@@ -48,7 +48,6 @@ const customStyles = {
 // eslint-disable-next-line react/prop-types, no-unused-vars
 const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	const [dataSubMission, setDataSubMission] = React.useState([]);
-	console.log(dataSubMission);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);

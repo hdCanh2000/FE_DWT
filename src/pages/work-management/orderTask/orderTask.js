@@ -63,7 +63,6 @@ const Item = ({ data, onDelete, onOpen }) => {
 	);
 };
 const OrderTask = () => {
-	console.log(tasks,'tasks');
 	const [dataDepartments, setDataDepartments] = useState([]);
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const [departmentSelect, setDepartmentSelect] = useState(1);
