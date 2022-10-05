@@ -1,30 +1,57 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import TableCommon from '../common/ComponentCommon/TableCommon';
-import Card from '../../components/bootstrap/Card';
-import { fetchEmployeeList, fetchEmployeeListByDepartment } from '../../redux/slice/employeeSlice';
-import { fetchPositionList } from '../../redux/slice/positionSlice';
+import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import Popovers from '../../components/bootstrap/Popovers';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import { getAllDepartmentWithUser } from './services';
+import { getAllPosition } from '../position/services';
+import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 
-const EmployeePage = ({ dataDepartment }) => {
+const EmployeePage = ({ header }) => {
 	const dispatch = useDispatch();
-
 	const users = useSelector((state) => state.employee.employees);
-	const departments = useSelector((state) => state.department.departments);
-	const positions = useSelector((state) => state.position.positions);
+	const [departments, setDepartments] = React.useState([]);
+	const [positions, setPositions] = React.useState([]);
 
 	useEffect(() => {
-		dispatch(fetchPositionList());
+		const fecth = async () => {
+			const response = await getAllDepartmentWithUser();
+			const result = await response.data;
+			setDepartments(
+				[...result].map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
+		};
+		fecth();
+	}, []);
+	useEffect(() => {
+		const fecth = async () => {
+			const response = await getAllPosition();
+			const result = await response.data;
+			setPositions(
+				[...result].map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+					};
+				}),
+			);
+		};
+		fecth();
+	}, []);
+
+	useEffect(() => {
+		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-
-	useEffect(() => {
-		if (dataDepartment.id && dataDepartment.parentId !== null) {
-			dispatch(fetchEmployeeListByDepartment(dataDepartment.id));
-		} else {
-			dispatch(fetchEmployeeList());
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch, dataDepartment.id]);
 
 	const columns = [
 		{
@@ -36,9 +63,9 @@ const EmployeePage = ({ dataDepartment }) => {
 			isShow: true,
 		},
 		{
-			title: 'Email',
-			id: 'email',
-			key: 'email',
+			title: 'Mã NV',
+			id: 'code',
+			key: 'code',
 			type: 'text',
 			align: 'left',
 			isShow: true,
@@ -50,6 +77,14 @@ const EmployeePage = ({ dataDepartment }) => {
 			type: 'text',
 			align: 'center',
 			isShow: false,
+		},
+		{
+			title: 'Email',
+			id: 'email',
+			key: 'email',
+			type: 'text',
+			align: 'left',
+			isShow: true,
 		},
 		{
 			title: 'Phòng ban',
@@ -74,62 +109,124 @@ const EmployeePage = ({ dataDepartment }) => {
 			isMulti: false,
 		},
 		{
+			title: 'Địa chỉ',
+			id: 'address',
+			key: 'address',
+			type: 'textarea',
+			align: 'center',
+			isShow: false,
+			render: (item) => (
+				<Popovers desc={item?.address} trigger='hover'>
+					<div
+						style={{
+							maxWidth: 150,
+							WebkitLineClamp: '2',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							display: '-webkit-box',
+							WebkitBoxOrient: 'vertical',
+						}}>
+						{item?.address}
+					</div>
+				</Popovers>
+			),
+		},
+		{
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+		},
+		{
 			title: 'Vai trò',
 			id: 'role',
 			key: 'role',
 			type: 'singleSelect',
+			align: 'center',
 			isShow: true,
-			format: (value) =>
-				// eslint-disable-next-line no-nested-ternary
-				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
+			format: (value) => (value === 1 ? 'Quản lý' : 'Nhân viên'),
 			options: [
 				{
 					id: 1,
 					text: 'Quản lý',
 					label: 'Quản lý',
-					value: 'manager',
+					value: 1,
 				},
 				{
 					id: 2,
 					text: 'Nhân viên',
-					label: 'user',
+					label: 'Nhân viên',
 					value: 0,
 				},
 			],
 		},
+		{
+			title: 'Trạng thái',
+			id: 'status',
+			key: 'status',
+			type: 'switch',
+			align: 'center',
+			isShow: true,
+			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
+		},
 	];
-
 	return (
-		<div className='col-lg-12 col-md-6'>
-			<div className='row mb-4'>
-				<div className='col-12'>
-					<div className='d-flex justify-content-between align-items-center'>
-						<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
-					</div>
-				</div>
-			</div>
-			<div className='row mb-0'>
-				<div className='col-12'>
-					<Card className='w-100'>
-						<div className='p-4 col-lg-12'>
-							<TableCommon
-								className='table table-modern mb-0'
-								columns={columns}
-								data={users}
-							/>
+		<div className='col-lg-9 col-md-6'>
+			{header === false &&
+				verifyPermissionHOC(
+					<div className='row mb-4'>
+						<div className='col-12'>
+							<div className='d-flex justify-content-between align-items-center'>
+								<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
+							</div>
 						</div>
-					</Card>
-				</div>
-			</div>
+					</div>,
+					['admin', 'manager'],
+				)}
+
+			{verifyPermissionHOC(
+				<div className='row mb-0'>
+					<div className='col-12'>
+						<Card className='w-100'>
+							<CardHeader>
+								<CardLabel icon='AccountCircle' iconColor='primary'>
+									<CardTitle>
+										<CardLabel>Danh sách nhân sự</CardLabel>
+									</CardTitle>
+								</CardLabel>
+							</CardHeader>
+							<div className='p-4 col-lg-12'>
+								<TableCommon
+									className='table table-modern mb-0'
+									columns={columns}
+									data={users}
+								/>
+							</div>
+						</Card>
+					</div>
+				</div>,
+				['admin', 'manager'],
+			)}
 		</div>
 	);
 };
 EmployeePage.propTypes = {
-	// eslint-disable-next-line react/forbid-prop-types
-	dataDepartment: PropTypes.object || PropTypes.bool,
+	header: PropTypes.bool,
 };
 EmployeePage.defaultProps = {
-	dataDepartment: null || true,
+	header: false,
 };
 
 export default EmployeePage;

@@ -4,29 +4,21 @@ const getAllEmployee = () => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
-		url: `/api/users`,
-	});
-};
-
-const getAllEmployeeByDepartment = (id) => {
-	// lấy danh sách nhân viên
-	return axiosClient({
-		method: 'GET',
-		url: `/api/users/department/${id}`,
+		url: `/users`,
 	});
 };
 
 const getUserById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/users/${id}`,
+		url: `/${id}`,
 	});
 };
 
 const addEmployee = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/api/users`,
+		url: `/users`,
 		data,
 	});
 };
@@ -34,9 +26,9 @@ const addEmployee = (data) => {
 const updateEmployee = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/users/${data.id}`,
+		url: `/users/${data.id}`,
 		data,
 	});
 };
 
-export { getAllEmployee, getAllEmployeeByDepartment, getUserById, addEmployee, updateEmployee };
+export { getAllEmployee, getUserById, addEmployee, updateEmployee };

@@ -3,21 +3,21 @@ import axiosClient from '../../utils/axiosClient';
 const getAllUnits = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/api/units',
+		url: '/units',
 	});
 };
 
 const getUnitByIdWithUser = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/units/${id}`,
+		url: `/units/${id}`,
 	});
 };
 
 const addUnit = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/api/units`,
+		url: `/units`,
 		data,
 	});
 };
@@ -25,14 +25,14 @@ const addUnit = (data) => {
 const updateUnit = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/units/${data.id}`,
+		url: `/units/${data.id}`,
 		data,
 	});
 };
 const deleteUnit = (id) => {
 	return axiosClient({
 		method: 'DELETE',
-		url: `/api/units/${id}`,
+		url: `/units/${id}`,
 	});
 };
 

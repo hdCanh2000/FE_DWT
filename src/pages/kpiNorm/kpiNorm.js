@@ -32,7 +32,7 @@ import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import NotPermission from '../presentation/auth/NotPermission';
-import './style.css';
+// import './style.css';
 import Icon from '../../components/icon/Icon';
 
 const KpiNormPage = () => {

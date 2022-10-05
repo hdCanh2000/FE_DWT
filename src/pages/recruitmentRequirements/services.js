@@ -3,21 +3,21 @@ import axiosClient from '../../utils/axiosClient';
 const getAllRequirement = () => {
 	return axiosClient({
 		method: 'GET',
-		url: '/api/requirements',
+		url: '/requirements',
 	});
 };
 
 const getRequirementById = (id) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/requirements/${id}`,
+		url: `/requirements/${id}`,
 	});
 };
 
 const addRequirement = (data) => {
 	return axiosClient({
 		method: 'POST',
-		url: `/api/requirements`,
+		url: `/requirements`,
 		data,
 	});
 };
@@ -25,7 +25,7 @@ const addRequirement = (data) => {
 const updateRequirement = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/requirements/${data.id}`,
+		url: `/requirements/${data.id}`,
 		data,
 	});
 };
@@ -33,7 +33,7 @@ const updateRequirement = (data) => {
 const deleteRequirement = (id) => {
 	return axiosClient({
 		method: 'DELETE',
-		url: `/api/requirements/${id}`,
+		url: `/requirements/${id}`,
 	});
 };
 

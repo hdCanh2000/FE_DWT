@@ -1,10 +1,10 @@
 import * as Yup from 'yup';
 
 const validate = Yup.object().shape({
-	// code: Yup.string()
-	// 	.nullable()
-	// 	.min(3, 'Mã nhân viên tối thiểu 3 ký tự')
-	// 	.required('Vui lòng nhập mã nhân viên'),
+	code: Yup.string()
+		.nullable()
+		.min(3, 'Mã nhân viên tối thiểu 3 ký tự')
+		.required('Vui lòng nhập mã nhân viên'),
 	name: Yup.string()
 		.max(30, 'Họ tên tối đa 30 kí tự')
 		.min(3, 'Họ tên tối thiểu 3 kí tự')
