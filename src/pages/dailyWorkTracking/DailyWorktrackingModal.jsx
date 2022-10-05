@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
 import Card from '../../components/bootstrap/Card';
 import DailyWorktrackForm from './DailyWorktrackForm';
-import { addWorktrackLog } from './services';
+import { addWorktrackLog, updateWorktrackLog } from './services';
 import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
 
 const styleHead = {
@@ -72,21 +72,35 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 
 	const handleSubmit = (item) => {
 		const dataSubmit = {
+			id: item.data?.row?.id,
 			status: item.status,
 			date: dataShow.valueForm.date,
 			note: item.note,
 			workTrack_id: data.id,
 		};
-		addWorktrackLog(dataSubmit)
-			.then(() => {
-				handleCloseForm();
-				dispatch(fetchWorktrackList(data.user_id));
-				window.location.reload();
-			})
-			.catch((err) => {
-				// eslint-disable-next-line no-console
-				console.log(err);
-			});
+		if (item?.data?.row?.id) {
+			updateWorktrackLog(dataSubmit)
+				.then(() => {
+					handleCloseForm();
+					dispatch(fetchWorktrackList(data.user_id));
+					window.location.reload();
+				})
+				.catch((err) => {
+					// eslint-disable-next-line no-console
+					console.log(err);
+				});
+		} else {
+			addWorktrackLog(dataSubmit)
+				.then(() => {
+					handleCloseForm();
+					dispatch(fetchWorktrackList(data.user_id));
+					window.location.reload();
+				})
+				.catch((err) => {
+					// eslint-disable-next-line no-console
+					console.log(err);
+				});
+		}
 	};
 
 	return (
