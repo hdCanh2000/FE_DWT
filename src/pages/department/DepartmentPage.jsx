@@ -24,7 +24,7 @@ import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addDepartment } from './services';
+import { addDepartment, updateDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
 import Employee from './Employee';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -105,8 +105,8 @@ const DepartmentPage = () => {
 		},
 		{
 			title: 'Mã',
-			id: 'slug',
-			key: 'slug',
+			id: 'code',
+			key: 'code',
 			type: 'text',
 			align: 'left',
 			isShow: true,
@@ -174,27 +174,41 @@ const DepartmentPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
+			id: data?.id,
 			organizationLevel: data?.organizationLevel?.value,
 			parent_id: data?.parentId?.value,
-			id: data?.id,
-			name: data.name,
-			description: data.description,
-			slug: data.slug,
-			address: data.address,
+			name: data?.name,
+			description: data?.description,
+			code: data?.code,
+			address: data?.address,
+			// status: Number(data.status),
 		};
-		try {
-			const response = await addDepartment(dataSubmit);
-			const result = await response.data;
-			dispatch(fetchDepartmentList());
-			handleCloseForm();
-			handleShowToast(
-				`Thêm phòng ban`,
-				`Phòng ban ${result.data.name} được thêm thành công!`,
-			);
-			setTreeValue(TreeState.expandAll(treeValue));
-		} catch (error) {
-			handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
-			setTreeValue(TreeState.expandAll(treeValue));
+		if (data?.id) {
+			try {
+				const response = await updateDepartment(dataSubmit);
+				await response.data;
+				dispatch(fetchDepartmentList());
+				handleCloseForm();
+				handleShowToast(`Cập nhật phòng ban!`, `Cập nhật phòng ban thành công!`);
+			} catch (error) {
+				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+				throw error;
+			}
+		} else {
+			try {
+				const response = await addDepartment(dataSubmit);
+				const result = await response.data;
+				dispatch(fetchDepartmentList());
+				handleCloseForm();
+				handleShowToast(
+					`Thêm phòng ban`,
+					`Phòng ban ${result.data.name} được thêm thành công!`,
+				);
+				setTreeValue(TreeState.expandAll(treeValue));
+			} catch (error) {
+				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+				setTreeValue(TreeState.expandAll(treeValue));
+			}
 		}
 	};
 

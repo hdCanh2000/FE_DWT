@@ -34,7 +34,7 @@ const addEmployee = (data) => {
 const updateEmployee = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/users/profile`,
+		url: `/api/users/profile/${data.id}`,
 		data,
 	});
 };
