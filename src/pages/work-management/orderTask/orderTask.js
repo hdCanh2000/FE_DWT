@@ -32,7 +32,6 @@ import Toasts from '../../../components/bootstrap/Toasts';
 
 const Item = ({ data, onDelete, onOpen }) => {
 	const { name, quantity, user, startDate, deadlineDate, index } = data;
-	
 	return (
 		<Card>
 			<CardHeader>
@@ -64,8 +63,7 @@ const Item = ({ data, onDelete, onOpen }) => {
 	);
 };
 const OrderTask = () => {
-	const [dataSubMission, setDataSubMission] = React.useState([]);
-	console.log(dataSubMission);
+	console.log(tasks,'tasks');
 	const [dataDepartments, setDataDepartments] = useState([]);
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const [departmentSelect, setDepartmentSelect] = useState(1);
@@ -293,7 +291,6 @@ const OrderTask = () => {
 				</div>
 			</Page>
 			<OrderTaskForm
-			setDataSubMission={setDataSubMission}
 				show={isOpenForm}
 				onClose={handleCloseForm}
 				onSubmit={handleSubmit}

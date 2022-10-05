@@ -31,18 +31,21 @@ const UnitPage = () => {
 	const [units, setUnits] = useState([]);
 	const [deletes, setDeletes] = React.useState({});
 	const [openConfirm, set0penConfirm] = React.useState(false);
-	useEffect(() => {
-		async function getUnit() {
-			try {
-				const response = await getAllUnits();
-				const data = await response.data;
-				setUnits(data);
-			} catch (error) {
-				setUnits([]);
-			}
+
+	async function getUnit() {
+		try {
+			const response = await getAllUnits();
+			const data = await response.data?.data;
+			setUnits(data);
+		} catch (error) {
+			setUnits([]);
 		}
+	}
+
+	useEffect(() => {
 		getUnit();
 	}, []);
+
 	const handleOpenConfirm = (item) => {
 		setDeletes({
 			id: item.id,
@@ -158,6 +161,7 @@ const UnitPage = () => {
 				setUnits(newUnits.map((item) => (item.id === data.id ? { ...result } : item)));
 				handleClearValueForm();
 				hanleCloseForm();
+				getUnit();
 				handleShowToast(
 					`Cập nhật đơn vị!`,
 					`Đơn vị ${result.name} được cập nhật thành công!`,
@@ -175,7 +179,8 @@ const UnitPage = () => {
 				setUnits(newUnits);
 				handleClearValueForm();
 				hanleCloseForm();
-				handleShowToast(`Thêm đơn vị`, `Đơn vị ${result.name} được thêm thành công!`);
+				getUnit();
+				handleShowToast(`Thêm đơn vị`, `Đơn vị ${result.data.name} được thêm thành công!`);
 			} catch (error) {
 				setUnits(units);
 				handleShowToast(`Thêm đơn vị`, `Thêm đơn vị không thành công!`);

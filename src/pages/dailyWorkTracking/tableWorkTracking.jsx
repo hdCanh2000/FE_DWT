@@ -32,8 +32,7 @@ const styleHead = {
 	borderBottom: 0,
 };
 
-// eslint-disable-next-line no-unused-vars
-const TableWorkTracking = ({ rowsState, handleChangeRowState, handleRemoveRowField }) => {
+const TableWorkTracking = ({ rowsState, handleChangeRowState }) => {
 	const columns = ['STT', 'Nhiệm vụ', 'Số lượng', 'ĐVT', 'Ghi chú', 'Thời hạn', 'KH dự kiến'];
 	const dispatch = useDispatch();
 	const units = useSelector((state) => state.unit.units);
@@ -127,12 +126,10 @@ TableWorkTracking.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types
 	rowsState: PropTypes.array,
 	handleChangeRowState: PropTypes.func,
-	handleRemoveRowField: PropTypes.func,
 };
 TableWorkTracking.defaultProps = {
 	rowsState: [],
 	handleChangeRowState: null,
-	handleRemoveRowField: null,
 };
 
 export default TableWorkTracking;

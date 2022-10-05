@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllEmployee, addEmployee, updateEmployee } from '../../pages/employee/services';
+import {
+	getAllEmployee,
+	getAllEmployeeByDepartment,
+	addEmployee,
+	updateEmployee,
+} from '../../pages/employee/services';
 
 const initialState = {
 	employees: [],
@@ -10,15 +15,50 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchEmployeeList = createAsyncThunk('employee/fetchList', async () => {
 	const response = await getAllEmployee();
-	return response.data?.map((item) => {
+	return response.data?.data?.map((item) => {
 		return {
 			...item,
 			label: item.name,
 			value: item.id,
 			text: item.name,
+			department: {
+				...item?.department,
+				label: item?.department?.name,
+				value: item?.department?.id,
+			},
+			position: {
+				...item?.position,
+				label: item?.position?.name,
+				value: item?.position?.id,
+			},
 		};
 	});
 });
+
+export const fetchEmployeeListByDepartment = createAsyncThunk(
+	'employee/fetchListByDepartment',
+	async (id) => {
+		const response = await getAllEmployeeByDepartment(id);
+		return response.data?.data?.map((item) => {
+			return {
+				...item,
+				label: item.name,
+				value: item.id,
+				text: item.name,
+				department: {
+					...item?.department,
+					label: item?.department?.name,
+					value: item?.department?.id,
+				},
+				position: {
+					...item?.position,
+					label: item?.position?.name,
+					value: item?.position?.id,
+				},
+			};
+		});
+	},
+);
 
 export const onAddEmployee = createAsyncThunk('employee/addNew', async (data) => {
 	const response = await addEmployee(data);
@@ -45,6 +85,18 @@ export const employeeSlice = createSlice({
 			state.employees = [...action.payload];
 		},
 		[fetchEmployeeList.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list by department
+		[fetchEmployeeListByDepartment.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchEmployeeListByDepartment.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.employees = [...action.payload];
+		},
+		[fetchEmployeeListByDepartment.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},

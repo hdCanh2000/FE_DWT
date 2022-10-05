@@ -25,7 +25,7 @@ const addWorktrack = (data) => {
 const updateWorktrack = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/worktracks/${data.id}`,
+		url: `/worktracks/${data.id}`,
 		data,
 	});
 };

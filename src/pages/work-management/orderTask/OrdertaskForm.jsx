@@ -35,7 +35,7 @@ import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 import ListPickKpiNorm from './ListPickKpiNorm';
-import { addWorktrack } from '../../dailyWorkTracking/services';
+// import { addWorktrack } from '../../dailyWorkTracking/services';
 // import ListPickKpiNorm from './ListPickKpiNorm';
 const customStyles = {
 	control: (provided) => ({
@@ -48,6 +48,7 @@ const customStyles = {
 // eslint-disable-next-line react/prop-types, no-unused-vars
 const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	const [dataSubMission, setDataSubMission] = React.useState([]);
+	console.log(dataSubMission);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const users = useSelector((state) => state.employee.employees);
@@ -97,11 +98,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			[name]: value,
 		});
 	};
-	// thêm field nhiệm vụ phụ
-	const handleAddFieldKPINorm = () => {
-		const initKeyState = {};
-		setKpiNormOptions((prev) => [...prev, initKeyState]);
-	};
 	// hàm onchange chọn nhiệm vụ
 	const handleChangeKpiNormOption = (index, event) => {
 		setKpiNormOptions((prev) => {
@@ -120,7 +116,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		setKpiNormOptions((prev) => prev.filter((state) => state !== prev[index]));
 	};
 	const handleSubmit = async () => {
-		handleAddFieldKPINorm();
 		const dataValue = {
 			index: tasks?.length,
 			kpiNorm_id: item.id,
@@ -129,29 +124,31 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			quantity: parseInt(mission?.quantity, 10),
 			userId: userOption?.id,
 			priority: parseInt(mission?.priority, 10),
-			review: '',
 			note: mission?.note,
 			description: item?.description,
 			deadline: mission?.deadlineDate,
 			startDate: mission?.startDate,
 		};
-		await addWorktrack(dataValue).then((res) => {
-			dataSubMission.forEach(async (item) => {
-				await addWorktrack({
-					kpiNorm_id: item.id,
-					parent_id: res.data.id,
-					quantity: 1,
-				});
-			});
-		});
-		if (item?.index !== undefined) {
-			const newTask = tasks.map((items) => {
-				return items.index === item?.index ? dataValue : item;
-			});
-			setTasks([...newTask]);
-		} else {
-			setTasks([...tasks, dataValue]);
-		}
+		console.log(dataValue);
+		// await addWorktrack(dataValue).then((res) => {
+		// 	dataSubMission.forEach(async (item) => {
+		// 		await addWorktrack({
+		// 			kpiNorm_id: item.id,
+		// 			parent_id: res.data.id,
+		// 			quantity: 1,
+		// 		});
+		// 	});
+		// });
+		setTasks([
+			...tasks,
+			{
+				...item,
+				quantity: parseInt(mission?.quantity, 10),
+				deadline: mission?.deadlineDate,
+				startDate: mission?.startDate,
+				user: userOption,
+			},
+		]);
 		setMission({});
 		setKpiNormOptions([]);
 		setMissionOption({});
