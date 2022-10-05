@@ -56,7 +56,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 					' '
 				)}
 				<Form.Check
-				style={!row.metadata.hasChildren?{marginLeft: '25px'}:{}}
+					style={!row.metadata.hasChildren ? { marginLeft: '25px' } : {}}
 					type='checkbox'
 					id={`default-${row}`}
 					onClick={() => handleCheckBox(row.data)}
@@ -77,7 +77,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 		setDataValue([...newData, { ...row.data, quantity: parseInt(e.target.value, 10) }]);
 	};
 	return (
-		<Modal show={show} size='lg' onHide={handleClose}>
+		<Modal show={show} size='xl' onHide={handleClose}>
 			<Modal.Header closeButton>
 				<Modal.Title>Nhiệm vụ con</Modal.Title>
 			</Modal.Header>
@@ -88,7 +88,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 						// grow='0'
 						style={{ minWidth: 300 }}
 						renderCell={renderIndexCell}
-						renderHeaderCell={() => <span>Tên định mức</span>}
+						renderHeaderCell={() => <span className='t-center'>Tên định mức</span>}
 					/>
 					<TreeTable.Column
 						renderCell={(row) => (
@@ -105,7 +105,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 					<TreeTable.Column
 						renderCell={(row) => (
 							<input
-							style={{width: '100px'}}
+								style={{ width: '100px' }}
 								name='quantity'
 								disabled={
 									!dataValue.filter((items) => items.id === row.data.id).length
