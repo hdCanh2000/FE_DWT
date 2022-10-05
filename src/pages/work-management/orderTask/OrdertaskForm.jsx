@@ -19,13 +19,17 @@ import { PRIORITIES } from '../../../utils/constants';
 import Option from '../../../components/bootstrap/Option';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Button from '../../../components/bootstrap/Button';
-import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
+import Card, {
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
+import { fetchKeyList } from '../../../redux/slice/keySlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
-import { fetchKeyList } from '../../../redux/slice/keySlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
@@ -38,7 +42,6 @@ const customStyles = {
 		borderRadius: '1.25rem',
 	}),
 };
-
 // eslint-disable-next-line react/prop-types, no-unused-vars
 const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	const dispatch = useDispatch();
@@ -55,23 +58,18 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchKeyList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchMissionList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchUnitList());
 	}, [dispatch]);
@@ -86,7 +84,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		setUserRelatedOption(item?.userReplated || []);
 	}, [item]);
 	// show toast
-
 	const handleChange = (e) => {
 		const { value, name } = e.target;
 		setMission({
@@ -112,12 +109,12 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			});
 		});
 	};
-
 	// xoá các nhiệm vụ theo index
 	const handleRemoveKpiNormField = (e, index) => {
 		setKpiNormOptions((prev) => prev.filter((state) => state !== prev[index]));
 	};
 	const handleSubmit = async () => {
+		handleAddFieldKPINorm();
 		const dataValue = {
 			index: tasks?.length,
 			name: item?.name,
@@ -146,7 +143,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			userReplated: userReplatedOption,
 			departmentReplated: departmentReplatedOption,
 			note: mission?.note,
-			review: mission?.review,
 			startDate: mission?.startDate,
 			startTime: mission?.startTime,
 			deadlineDate: mission?.deadlineDate,
@@ -161,7 +157,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		} else {
 			setTasks([...tasks, dataValue]);
 		}
-
 		setMission({});
 		setKpiNormOptions([]);
 		setMissionOption({});
@@ -170,7 +165,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		setUserRelatedOption([]);
 		onClose();
 	};
-	console.log(kpiNormOptions,'kpiNormOptions');
 	return (
 		<Modal show={show} onHide={onClose} size='xl'>
 			<Page container='fluid'>
@@ -224,7 +218,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 									</Card>
 									{/* Thuộc mục tiêu */}
 									<div className='row g-2'>
-										<div className='col-8'>
+										<div className='col-5'>
 											<FormGroup id='task' label='Thuộc mục tiêu'>
 												<SelectComponent
 													placeholder='Thuộc mục tiêu'
@@ -235,20 +229,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-4'>
-											<FormGroup id='quantity' label='Số lượng'>
-												<Input
-													type='text'
-													name='quantity'
-													onChange={handleChange}
-													value={mission?.quantity || ''}
-													placeholder='Số lượng'
-													className='border border-2 rounded-0 shadow-none'
-												/>
-											</FormGroup>
-										</div>
-									</div>
-									<div className='row g-2'>
 										<div className='col-4'>
 											<FormGroup id='userOption' label='Nguời phụ trách'>
 												<SelectComponent
@@ -261,7 +241,19 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-4'>
+										<div className='col-1'>
+											<FormGroup id='quantity' label='Số lượng'>
+												<Input
+													type='text'
+													name='quantity'
+													onChange={handleChange}
+													value={mission?.quantity || ''}
+													placeholder='Số lượng'
+													className='border border-2 rounded-0 shadow-none'
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-2'>
 											<FormGroup id='priority' label='Độ ưu tiên'>
 												<Select
 													name='priority'
@@ -278,21 +270,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 												</Select>
 											</FormGroup>
 										</div>
-										<div className='col-4'>
-											<FormGroup id='review' label='Thưởng/Phạt'>
-												<Input
-													onChange={handleChange}
-													value={mission?.review || ''}
-													name='review'
-													ariaLabel='Thưởng/Phạt'
-													placeholder='Thưởng/Phạt'
-													className='border border-2 rounded-0 shadow-none'
-												/>
-											</FormGroup>
-										</div>
 									</div>
-									{/* Người phụ trách - Phòng ban phụ trách - Thưởng/Phạt */}
-									{/* Phòng ban hỗ trợ - Người hỗ trợ */}
 									<div className='row g-2'>
 										<div className='col-6'>
 											<FormGroup
@@ -345,11 +323,8 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 									</div>
 									{/* Thời gian bắt đầu - Thời gian dự kiến */}
 									<div className='row g-2'>
-										<div className='d-flex align-items-center justify-content-between'>
-											<FormGroup
-												className='w-50 me-2'
-												id='startDate'
-												label='Ngày bắt đầu'>
+										<div className='col-3'>
+											<FormGroup id='startDate' label='Ngày bắt đầu'>
 												<Input
 													name='startDate'
 													placeholder='Ngày bắt đầu'
@@ -360,10 +335,9 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
-											<FormGroup
-												className='w-50 ms-2'
-												id='startTime'
-												label='Thời gian bắt đầu'>
+										</div>
+										<div className='col-3'>
+											<FormGroup id='startTime' label='Thời gian bắt đầu'>
 												<Input
 													name='startTime'
 													placeholder='Thời gian bắt đầu'
@@ -375,12 +349,8 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 												/>
 											</FormGroup>
 										</div>
-									</div>
-									{/* Hạn ngày hoàn thành - Thời hạn hoàn thành */}
-									<div className='row g-2'>
-										<div className='d-flex align-items-center justify-content-between'>
+										<div className='col-3'>
 											<FormGroup
-												className='w-50 me-2'
 												id='deadlineDate'
 												label='Hạn ngày hoàn thành'>
 												<Input
@@ -396,8 +366,9 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
+										</div>
+										<div className='col-3'>
 											<FormGroup
-												className='w-50 ms-2'
 												id='deadlineTime'
 												label='Hạn thời gian hoàn thành'>
 												<Input
@@ -412,9 +383,10 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 											</FormGroup>
 										</div>
 									</div>
+									{/* Hạn ngày hoàn thành - Thời hạn hoàn thành */}
 									<div className='row g-2'>
 										<div className='col-12'>
-											<FormGroup>
+										<FormGroup>
 												<OverlayTrigger
 													overlay={
 														<Tooltip id='addSubMission'>
@@ -519,7 +491,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 		</Modal>
 	);
 };
-
 // OrderTaskForm.propTypes = {
 // 	isEdit: PropTypes.bool,
 // };

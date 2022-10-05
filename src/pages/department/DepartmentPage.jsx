@@ -101,7 +101,7 @@ const DepartmentPage = () => {
 			isMulti: false,
 		},
 		{
-			title: 'Quan hệ cha con',
+			title: 'Phòng ban quản lí',
 			id: 'parentId',
 			key: 'parentId',
 			type: 'select',

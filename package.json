@@ -86,6 +86,7 @@
 		"react-credit-cards": "^0.8.3",
 		"react-date-range": "^1.4.0",
 		"react-dom": "^18.1.0",
+		"react-dropdown-tree-select": "^2.7.1",
 		"react-i18next": "^11.16.9",
 		"react-image-webp": "^0.8.0",
 		"react-input-mask": "^2.0.4",

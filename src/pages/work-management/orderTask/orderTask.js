@@ -79,7 +79,6 @@ const OrderTask = () => {
 	const [perPage, setPerPage] = useState(PER_COUNT['10']);
 	const [newItem, setNewItem] = React.useState([]);
 	const items = dataPagination(newItem, currentPage, perPage);
-
 	useEffect(() => {
 		const fecth = () => {
 			if (kpiNorm) {
@@ -126,6 +125,7 @@ const OrderTask = () => {
 	const handleSubmit = async () => {
 		await addWorktrack(tasks);
 		handleShowToast('Giao nhiệm vụ', 'Giao nhiệm vụ thành công !');
+		setTasks([]);
 	};
 	const handleOpenForm = (item) => {
 		setItemEdit({ ...item });
@@ -171,6 +171,11 @@ const OrderTask = () => {
 											<Search />
 										</div>
 										<div>
+											<div style={{ textAlign: 'center' }}>
+												{tasks.length === 0 &&
+													'Chưa có nhiệm vụ nào được giao !'}
+											</div>
+
 											{tasks?.map((item) => (
 												<Item
 													data={item}
@@ -297,5 +302,4 @@ const OrderTask = () => {
 		</PageWrapper>
 	);
 };
-
 export default OrderTask;
