@@ -35,7 +35,7 @@ import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 import ListPickKpiNorm from './ListPickKpiNorm';
-// import { addWorktrack } from '../../dailyWorkTracking/services';
+import { addWorktrack } from '../../dailyWorkTracking/services';
 // import ListPickKpiNorm from './ListPickKpiNorm';
 const customStyles = {
 	control: (provided) => ({
@@ -129,16 +129,15 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			deadline: mission?.deadlineDate,
 			startDate: mission?.startDate,
 		};
-		console.log(dataValue);
-		// await addWorktrack(dataValue).then((res) => {
-		// 	dataSubMission.forEach(async (item) => {
-		// 		await addWorktrack({
-		// 			kpiNorm_id: item.id,
-		// 			parent_id: res.data.id,
-		// 			quantity: 1,
-		// 		});
-		// 	});
-		// });
+		await addWorktrack(dataValue).then((res) => {
+			dataSubMission.forEach(async (item) => {
+				await addWorktrack({
+					kpiNorm_id: item.id,
+					parent_id: res.data.id,
+					quantity: 1,
+				});
+			});
+		});
 		setTasks([
 			...tasks,
 			{
