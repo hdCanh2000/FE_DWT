@@ -178,7 +178,6 @@ const DepartmentPage = () => {
 			address: data?.address,
 			// status: Number(data.status),
 		};
-		console.log(dataSubmit);
 		try {
 			const response = await addDepartment(dataSubmit);
 			const result = await response.data;
