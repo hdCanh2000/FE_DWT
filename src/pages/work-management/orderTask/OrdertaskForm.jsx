@@ -29,8 +29,6 @@ import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
-import Icon from '../../../components/icon/Icon';
-import CustomSelect from '../../../components/form/CustomSelect';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
@@ -53,7 +51,7 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 	const users = useSelector((state) => state.employee.employees);
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 	const missions = useSelector((state) => state.mission.missions);
-	const [kpiNormOptions, setKpiNormOptions] = useState([]);
+	console.log(missions,'missions');
 	const [missionOption, setMissionOption] = useState({});
 	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
 	const [userOption, setUserOption] = useState({ label: '', value: '' });
@@ -81,7 +79,6 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 	}, [dispatch]);
 	useEffect(() => {
 		setMission({ ...item });
-		setKpiNormOptions(item?.kpiNorm || []);
 		setMissionOption({ ...item?.parent });
 		// eslint-disable-next-line no-unsafe-optional-chaining
 		setDepartmentRelatedOption(item?.departmentReplated || []);
@@ -98,22 +95,6 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 		});
 	};
 	// hàm onchange chọn nhiệm vụ
-	const handleChangeKpiNormOption = (index, event) => {
-		setKpiNormOptions((prev) => {
-			return prev.map((key, i) => {
-				if (i !== index) return key;
-				return {
-					...key,
-					...event,
-					[event?.target?.name]: event?.target?.value,
-				};
-			});
-		});
-	};
-	// xoá các nhiệm vụ theo index
-	const handleRemoveKpiNormField = (e, index) => {
-		setKpiNormOptions((prev) => prev.filter((state) => state !== prev[index]));
-	};
 	const handleSubmit = async () => {
 		const dataValue = {
 			kpiNorm_id: item.id,
@@ -130,15 +111,21 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 		addWorktrack(dataValue).then((res) => {
 			dataSubMission.forEach(async (item) => {
 				await addWorktrack({
+					priority: parseInt(mission?.priority, 10),
+					note: mission?.note,
+					description: item?.description,
+					deadline: mission?.deadlineDate,
+					startDate: mission?.startDate,
 					kpiNorm_id: item.id,
 					parent_id: res.data.data.id,
 					quantity: item.quantity,
+					user_id: userOption?.id,
+					mission_id: missionOption?.id,
 				});
 			});
 		});
 		onClose();
 		setMission({});
-		setKpiNormOptions([]);
 		setMissionOption({});
 		setDepartmentRelatedOption([]);
 		setUserOption({});
@@ -269,7 +256,7 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 													onChange={setDepartmentRelatedOption}
 													options={departments.filter(
 														(department) =>
-															department.id !== item?.departmentId,
+															department.id !== item?.department_id,
 													)}
 													isMulti
 												/>
@@ -360,68 +347,6 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 									{/* Thời gian bắt đầu - Thời gian dự kiến */}
 
 									{/* Hạn ngày hoàn thành - Thời hạn hoàn thành */}
-									<div className='row g-2'>
-										<div className='col-12'>
-											{/* eslint-disable-next-line no-shadow */}
-											{kpiNormOptions?.map((item, index) => {
-												return (
-													<div
-														// eslint-disable-next-line react/no-array-index-key
-														key={index}
-														className='row mt-4 d-flex align-items-center justify-content-between'>
-														<div
-															style={{
-																width: '4%',
-																marginLeft: '5px',
-															}}>
-															{index + 1}.
-														</div>
-														<div style={{ width: '90%' }}>
-															<div className='w-100'>
-																<FormGroup id='name'>
-																	<OverlayTrigger
-																		overlay={
-																			<Tooltip id='addSubMission'>
-																				Chọn nhiệm vụ phụ
-																			</Tooltip>
-																		}>
-																		<CustomSelect
-																			placeholder='Chọn nhiệm vụ phụ'
-																			value={item}
-																			onChange={(e) => {
-																				handleChangeKpiNormOption(
-																					index,
-																					e,
-																				);
-																			}}
-																			options={kpiNorms}
-																		/>
-																	</OverlayTrigger>
-																</FormGroup>
-															</div>
-														</div>
-														<div style={{ width: '4%' }}>
-															<div className='w-100'>
-																<Button
-																	color='light'
-																	variant='light'
-																	size='lg'
-																	className='h-100 bg-transparent border-0'
-																	onClick={(e) =>
-																		handleRemoveKpiNormField(
-																			e,
-																			index,
-																		)
-																	}>
-																	<Icon icon='Trash' size='lg' />
-																</Button>
-															</div>
-														</div>
-													</div>
-												);
-											})}
-										</div>
-									</div>
 								</div>
 							</div>
 							<div className='col-12 my-4'>
