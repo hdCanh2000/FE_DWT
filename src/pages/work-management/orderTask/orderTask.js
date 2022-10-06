@@ -108,7 +108,8 @@ const OrderTask = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await getAllDepartments();
-			const result = await response.data;
+			const result = await response.data.data;
+			console.log(result,'result');
 			setDataDepartments(
 				result
 					.reverse()
@@ -222,6 +223,7 @@ const OrderTask = () => {
 																color='primary'
 																icon='Circle'
 																className='text-nowrap'>
+																	{console.log(dataDepartments)}
 																{
 																	dataDepartments.filter(
 																		(item) =>

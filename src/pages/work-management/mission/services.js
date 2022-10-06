@@ -62,7 +62,7 @@ const getAllDepartments = () => {
 	// lấy danh sách phòng ban
 	return axiosClient({
 		method: 'GET',
-		url: '/departments',
+		url: '/api/departments',
 	});
 };
 
