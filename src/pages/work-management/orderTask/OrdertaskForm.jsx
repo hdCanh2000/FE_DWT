@@ -46,7 +46,7 @@ const customStyles = {
 	}),
 };
 // eslint-disable-next-line react/prop-types, no-unused-vars
-const OrderTaskForm = ({ show, onClose, item  }) => {
+const OrderTaskForm = ({ show, onClose, item }) => {
 	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
@@ -127,7 +127,7 @@ const OrderTaskForm = ({ show, onClose, item  }) => {
 			deadline: mission?.deadlineDate,
 			startDate: mission?.startDate,
 		};
-		 addWorktrack(dataValue).then((res) => {
+		addWorktrack(dataValue).then((res) => {
 			dataSubMission.forEach(async (item) => {
 				await addWorktrack({
 					kpiNorm_id: item.id,
@@ -255,7 +255,6 @@ const OrderTaskForm = ({ show, onClose, item  }) => {
 												/>
 											</FormGroup>
 										</div>
-										
 									</div>
 									<div className='row g-2'>
 										<div className='col-6'>
@@ -323,7 +322,6 @@ const OrderTaskForm = ({ show, onClose, item  }) => {
 													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
-											
 										</div>
 										<div className='col-4'>
 											<FormGroup id='priority' label='Độ ưu tiên'>
@@ -343,7 +341,7 @@ const OrderTaskForm = ({ show, onClose, item  }) => {
 											</FormGroup>
 										</div>
 									</div>
-									
+
 									{/* Ghi chú */}
 									<div className='row g-2'>
 										<div className='col-12'>
@@ -360,7 +358,7 @@ const OrderTaskForm = ({ show, onClose, item  }) => {
 										</div>
 									</div>
 									{/* Thời gian bắt đầu - Thời gian dự kiến */}
-									
+
 									{/* Hạn ngày hoàn thành - Thời hạn hoàn thành */}
 									<div className='row g-2'>
 										<div className='col-12'>
