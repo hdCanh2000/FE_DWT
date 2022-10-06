@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
-import { demoPages } from '../../../menu';
 import Card, {
 	CardActions,
 	CardHeader,
@@ -212,7 +211,7 @@ const ConfigPermissionPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.cauHinh.subMenu.authorization.text}>
+		<PageWrapper title='Vai trò'>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>

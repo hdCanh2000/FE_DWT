@@ -54,28 +54,17 @@ export const demoPages = {
 		path: '/co-cau-to-chuc',
 		icon: 'CustomCompany',
 	},
+	taskPage: {
+		id: 'taskPage',
+		text: 'Nhiệm vụ của tôi',
+		path: '/cong-viec-hang-ngay',
+		icon: 'TaskAlt',
+	},
 	taskAndAssign: {
 		id: 'taskAndAssign',
 		text: 'Khai báo nhiệm vụ & Giao việc',
-		path: '/khai-bao-nhiem-vu-giao-viec',
+		path: '/giao-viec',
 		icon: 'CustomBriefCase',
-		subMenu: {
-			taskByUser: {
-				id: 'declare',
-				text: 'Công việc hàng ngày',
-				path: '/cong-viec-hang-ngay',
-			},
-			employees: {
-				id: 'declare',
-				text: 'Nhiệm vụ nhân viên',
-				path: '/nhiem-vu-nhan-vien',
-			},
-			orderTask: {
-				id: 'orderTask',
-				text: 'Giao việc',
-				path: '/giao-viec',
-			},
-		},
 	},
 	jobsPage: {
 		id: 'supervision',
@@ -83,14 +72,9 @@ export const demoPages = {
 		path: '/giam-sat',
 		icon: 'Monitor',
 		subMenu: {
-			target: {
-				id: 'target',
-				text: 'Theo mục tiêu',
-				path: '/muc-tieu',
-			},
 			mission: {
 				id: 'mission',
-				text: 'Theo nhiệm vụ',
+				text: 'Danh sách nhiệm vụ',
 				path: '/nhiem-vu',
 			},
 			employee: {
@@ -100,48 +84,9 @@ export const demoPages = {
 			},
 		},
 	},
-	// jobsPage: {
-	// 	// công việc
-	// 	id: 'jobsPage',
-	// 	text: 'Công việc',
-	// 	path: 'jobs-page',
-	// 	icon: 'CustomBriefCase',
-	// 	subMenu: {
-	// 		taskByUser: {
-	// 			id: 'taskByUser',
-	// 			text: 'Công việc của nhân viên',
-	// 			path: '/cong-viec-cua-nhan-vien',
-	// 		},
-	// 		dailyWorkTracking: {
-	// 			id: 'dailyWorkTracking',
-	// 			text: 'Công việc hằng ngày',
-	// 			path: '/cong-viec-hang-ngay',
-	// 		},
-	// 		target: {
-	// 			id: 'target',
-	// 			text: 'Mục tiêu',
-	// 			path: '/muc-tieu',
-	// 		},
-	// 		mission: {
-	// 			id: 'mission',
-	// 			text: 'Nhiệm vụ',
-	// 			path: '/nhiem-vu',
-	// 		},
-	// 		task: {
-	// 			id: 'task',
-	// 			text: 'Đầu việc',
-	// 			path: '/dau-viec',
-	// 		},
-	// 		process: {
-	// 			id: 'process',
-	// 			text: 'Quy trình',
-	// 			path: '/quy-trinh',
-	// 		},
-	// 	},
-	// },
 	hrRecords: {
 		id: 'hrRecords',
-		text: 'Hồ sơ nhân sự',
+		text: 'Nhân sự',
 		path: '/ho-so-nhan-su',
 		icon: 'PersonOutline',
 		subMenu: {
@@ -154,6 +99,11 @@ export const demoPages = {
 				id: 'position',
 				text: 'Vị trí công việc',
 				path: '/vi-tri-cong-viec',
+			},
+			positionLevelConfig: {
+				id: 'positionLevelConfig',
+				text: 'Cấp nhân sự',
+				path: '/cauhinh-cap-nhan-su',
 			},
 		},
 	},
@@ -187,30 +137,15 @@ export const demoPages = {
 		path: 'cau-hinh',
 		icon: 'Settings',
 		subMenu: {
-			kpi: {
-				id: 'kpi',
-				text: 'Cấu hình Key',
-				path: '/cau-hinh-key',
-			},
-			unit: {
-				id: 'unit',
-				text: 'Cấu hình đơn vị',
-				path: '/cau-hinh-don-vi',
-			},
-			authorization: {
-				id: 'authorization',
-				text: 'Cấu hình vai trò',
-				path: '/cau-hinh-vai-tro',
-			},
 			kpiNorm: {
 				id: 'kpiNorm',
 				text: 'Định mức lao động & KPI',
 				path: '/dinh-muc-lao-dong-kpi',
 			},
-			positionLevelConfig: {
-				id: 'positionLevelConfig',
-				text: 'Cấu hình cấp nhân sự',
-				path: '/cauhinh-cap-nhan-su',
+			unit: {
+				id: 'unit',
+				text: 'Cấu hình đơn vị',
+				path: '/cau-hinh-don-vi',
 			},
 			recruitmentRequirements: {
 				id: 'recruitmentRequirements',
@@ -232,11 +167,6 @@ export const demoPages = {
 				text: 'Cấu hình mục tiêu',
 				path: '/cau-hinh-muc-tieu',
 			},
-			// role: {
-			// 	id: 'role',
-			// 	text: 'Cầu hình vai trò',
-			// 	path: '/cau-hinh-vai-tro',
-			// },
 			report: {
 				id: 'report',
 				text: 'Cấu hình báo cáo',

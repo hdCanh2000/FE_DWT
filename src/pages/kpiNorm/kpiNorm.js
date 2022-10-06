@@ -309,7 +309,7 @@ const KpiNormPage = () => {
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách định mức KPI</CardLabel>
+												<CardLabel>Danh sách nhiệm vụ</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions>
@@ -318,7 +318,7 @@ const KpiNormPage = () => {
 												icon='PersonPlusFill'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
-												Thêm định mức KPI
+												Thêm nhiệm vụ
 											</Button>
 										</CardActions>
 									</CardHeader>
@@ -329,7 +329,7 @@ const KpiNormPage = () => {
 												// grow='0'
 												style={{ minWidth: 300 }}
 												renderCell={renderIndexCell}
-												renderHeaderCell={() => <span>Tên định mức</span>}
+												renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
 											/>
 											<TreeTable.Column
 												renderCell={(row) => (
@@ -383,7 +383,7 @@ const KpiNormPage = () => {
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật định mức KPI' : 'Thêm mới định mức KPI'}
+					label={itemEdit?.id ? 'Cập nhật nhiệm vụ' : 'Thêm mới nhiệm vụ'}
 					fields={columns}
 					validate={validate}
 				/>
@@ -398,8 +398,8 @@ const KpiNormPage = () => {
 					openModal={isDelete}
 					onCloseModal={handleCloseDelete}
 					onConfirm={() => handleDeleteKpiNorm(itemDelete?.id)}
-					title='Xoá định mức KPI'
-					content={`Xác nhận xoá định mức <strong>${itemDelete?.name}</strong> ?`}
+					title='Xoá nhiệm vụ'
+					content={`Xác nhận xoá nhiệm vụ <strong>${itemDelete?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>

@@ -1,35 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-// import { Link } from 'react-router-dom';
-// import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
-// import Icon from '../../components/icon/Icon';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import { demoPages } from '../../menu';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import Search from '../common/ComponentCommon/Search';
 import NotPermission from '../presentation/auth/NotPermission';
-// import Expand from './Expan';
 
 const TaskByUser = () => {
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
-	// const [isExpan, setIsExpan] = useState([]);
 	const [currentPage, setCurrentPage] = useState(1);
 	const [perPage, setPerPage] = useState(PER_COUNT['10']);
 	const items = dataPagination(users, currentPage, perPage);
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-	// const handleEpandRow = (idExpan) => {
-	// 	setIsExpan([...isExpan, idExpan]);
-	// 	if (isExpan.includes(idExpan)) {
-	// 		setIsExpan(isExpan.filter((item) => item !== idExpan));
-	// 	}
-	// };
+
 	return (
 		<PageWrapper title='Giám sát công việc nhân viên'>
 			<Page container='fluid'>
@@ -54,7 +43,6 @@ const TaskByUser = () => {
 										<thead>
 											<tr>
 												<th>Họ và tên</th>
-												{/* <th className='text-center'>Danh sách nhiệm vụ</th> */}
 												<th>Phòng ban</th>
 												<th>Vị trí</th>
 												<th className='text-center'>Số nhiệm vụ đang có</th>
@@ -68,27 +56,10 @@ const TaskByUser = () => {
 														<td>
 															<a
 																className='text-underline'
-																href={`${demoPages.taskAndAssign.subMenu.taskByUser.path}/${item.id}`}>
+																href={`/cong-viec-hang-ngay/${item.id}`}>
 																{item.name}
 															</a>
 														</td>
-														{/* <td>
-															<Button
-																className='d-flex align-items-center justify-content-center cursor-pointer m-auto'
-																onClick={() =>
-																	handleEpandRow(item.id)
-																}>
-																<Icon
-																	color='info'
-																	size='sm'
-																	icon={`${
-																		isExpan.includes(item.id)
-																			? 'CaretUpFill'
-																			: 'CaretDownFill'
-																	}`}
-																/>
-															</Button>
-														</td> */}
 														<td>{item?.department?.name}</td>
 														<td>{item?.position?.name}</td>
 														<td className='text-center'>
@@ -100,18 +71,6 @@ const TaskByUser = () => {
 																: 'Nhân viên'}
 														</td>
 													</tr>
-													{/* <tr>
-														<td
-															colSpan='12'
-															style={{
-																padding: '5px 0 5px 50px',
-																borderRadius: '0.5rem',
-															}}>
-															{isExpan.includes(item.id) && (
-																<Expand idUser={item.id} />
-															)}
-														</td>
-													</tr> */}
 												</React.Fragment>
 											))}
 										</tbody>
