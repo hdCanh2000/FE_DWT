@@ -56,7 +56,7 @@ const TaskByUser = () => {
 														<td>
 															<a
 																className='text-underline'
-																href={`/cong-viec-hang-ngay/${item.id}`}>
+																href={`/cong-viec-cua-nhan-vien/${item.id}`}>
 																{item.name}
 															</a>
 														</td>
