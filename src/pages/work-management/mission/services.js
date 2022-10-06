@@ -4,7 +4,7 @@ const getAllMission = () => {
 	// lấy toàn bộ danh sách mục tiêu
 	return axiosClient({
 		method: 'GET',
-		url: '/api/missions?_embed=tasks',
+		url: '/api/mission',
 	});
 };
 
@@ -28,7 +28,7 @@ const getMissionById = (id) => {
 	// lấy thông tin mục tiêu theo id
 	return axiosClient({
 		method: 'GET',
-		url: `/api/missions/${id}`,
+		url: `/api/mission/${id}`,
 	});
 };
 
@@ -36,7 +36,7 @@ const addNewMission = (data) => {
 	// thêm mục tiêu mới
 	return axiosClient({
 		method: 'POST',
-		url: '/api/missions',
+		url: '/api/mission',
 		data,
 	});
 };
@@ -45,7 +45,7 @@ const updateMissionById = (data) => {
 	// cập nhật mục tiêu
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/missions/${data.id}`,
+		url: `/api/mission/${data.id}`,
 		data,
 	});
 };
@@ -54,7 +54,7 @@ const deleteMissionById = (id) => {
 	// xoá mục tiêu
 	return axiosClient({
 		method: 'DELETE',
-		url: `/api/missions/${id}`,
+		url: `/api/mission/${id}`,
 	});
 };
 

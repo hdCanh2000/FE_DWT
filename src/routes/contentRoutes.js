@@ -10,6 +10,7 @@ const TASKBYUSER = {
 };
 const DAILYWORKTRACKING = {
 	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTracking')),
+	DAILYWORKTRACKINGUSER: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackingUser')),
 	DAILYWORKTRACKINGME: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTrackMe')),
 	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/orderTask')),
 };
@@ -63,6 +64,10 @@ const KPINORM = {
 	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
 };
 
+const MISSION = {
+	MISSION: lazy(() => import('../pages/work-management/mission/MissionPage')),
+};
+
 const presentation = [
 	{
 		path: dashboardMenu.dashboard.path,
@@ -87,6 +92,11 @@ const presentation = [
 	{
 		path: `${demoPages.jobsPage.subMenu.employee.path}/:id`,
 		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.jobsPage.subMenu.mission.path}/:id`,
+		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGUSER />,
 		exact: true,
 	},
 	{
@@ -150,6 +160,14 @@ const presentation = [
 	{
 		path: demoPages.cauHinh.subMenu.recruitmentRequirements.path,
 		element: <MANAGEMENT.RECRUITMENT_REQUIREMENT />,
+	},
+	{
+		path: demoPages.cauHinh.subMenu.target.path,
+		element: <MISSION.MISSION />,
+	},
+	{
+		path: demoPages.mission.path,
+		element: <MISSION.MISSION />,
 	},
 	{
 		path: '*',

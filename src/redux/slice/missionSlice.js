@@ -17,14 +17,13 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchMissionList = createAsyncThunk('mission/fetchList', async () => {
 	const response = await getAllMission();
-	return response.data;
-	// response.data.data.map((item) => {
-	// 	return {
-	// 		...item,
-	// 		label: item.name,
-	// 		value: item.id,
-	// 	};
-	// });
+	return response.data.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+		};
+	});
 });
 
 export const fetchMissionById = createAsyncThunk('mission/fetchId', async (id) => {
