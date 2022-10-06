@@ -14,12 +14,19 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 	useEffect(() => {
 		const newData = arrayToTree(data, { childrenField: 'children' });
 		// eslint-disable-next-line react/prop-types
-		setTreeValue(TreeState.create(newData.filter((item) => item.data.id === initItem.id)));
+		setTreeValue(
+			TreeState.expandAll(
+				// eslint-disable-next-line react/prop-types
+				TreeState.create(newData.filter((item) => item.data.id === initItem.id)),
+			),
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data]);
+
 	const handleOnChange = (newValue) => {
 		setTreeValue(newValue);
 	};
+
 	const handleCheckBox = (item) => {
 		const newData = dataValue.filter((items) => items === item);
 		if (newData.length === 0) {
@@ -28,10 +35,12 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 			setDataValue(dataValue.filter((items) => items !== item));
 		}
 	};
+
 	const handleSubmit = () => {
 		setDataSubMission(dataValue);
 		handleClose();
 	};
+
 	const renderIndexCell = (row) => {
 		return (
 			<div
@@ -63,10 +72,12 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 					id={`default-${row}`}
 					onClick={() => handleCheckBox(row.data)}
 					label={row.data.name}
+					disabled={row.data.parentId === null}
 				/>
 			</div>
 		);
 	};
+
 	const handlequantity = (e, row) => {
 		setquantity([
 			...quantity,
@@ -78,6 +89,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 		const newData = dataValue.filter((item) => item.id !== row.data.id);
 		setDataValue([...newData, { ...row.data, quantity: parseInt(e.target.value, 10) }]);
 	};
+
 	return (
 		<Modal show={show} size='lg' onHide={handleClose}>
 			<Modal.Header closeButton>
@@ -86,23 +98,21 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 			<Modal.Body>
 				<TreeTable value={treeValue} onChange={handleOnChange}>
 					<TreeTable.Column
-						// basis='180px'
-						// grow='0'
 						style={{ minWidth: 300 }}
 						renderCell={renderIndexCell}
-						renderHeaderCell={() => <span className='t-center'>Tên định mức</span>}
+						renderHeaderCell={() => <span className='t-center'>Tên nhiệm vụ</span>}
 					/>
 					<TreeTable.Column
 						renderCell={(row) => (
-							<span className='expenses-cell text-left'>{row.data.unit.name}</span>
+							<span className='expenses-cell text-left'>{row.data.tasktype}</span>
 						)}
-						renderHeaderCell={() => <span className='t-left'>Đơn vị tính</span>}
+						renderHeaderCell={() => <span className='t-left'>Loại nhiệm vụ</span>}
 					/>
 					<TreeTable.Column
 						renderCell={(row) => (
-							<span className='expenses-cell text-right'>{row.data.manday}</span>
+							<span className='expenses-cell text-right'>{row.data.kpiValue}</span>
 						)}
-						renderHeaderCell={() => <span className='t-left'>Số ngày công</span>}
+						renderHeaderCell={() => <span className='t-left'>Giá trị KPI</span>}
 					/>
 					<TreeTable.Column
 						renderCell={(row) => (
@@ -124,7 +134,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 					Đóng
 				</Button>
 				<Button variant='primary' onClick={handleSubmit}>
-					lưu nhiệm vụ con
+					Xác nhận
 				</Button>
 			</Modal.Footer>
 		</Modal>
