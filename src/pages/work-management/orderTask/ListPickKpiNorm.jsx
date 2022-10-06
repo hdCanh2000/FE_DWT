@@ -5,15 +5,17 @@ import { arrayToTree } from 'performant-array-to-tree';
 import { Button, Form, Modal } from 'react-bootstrap';
 import Icon from '../../../components/icon/Icon';
 
-// eslint-disable-next-line no-unused-vars
-const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
+// eslint-disable-next-line no-unused-vars, prettier/prettier, react/prop-types
+const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem}) => {
+
 	const [dataValue, setDataValue] = React.useState([]);
 	const [quantity, setquantity] = React.useState([]);
-	const [treeValue, setTreeValue] = React.useState(
-		TreeState.create(arrayToTree(data, { childrenField: 'children' })),
-	);
+	const [treeValue, setTreeValue] = React.useState(TreeState.create([]));
 	useEffect(() => {
-		setTreeValue(TreeState.create(arrayToTree(data, { childrenField: 'children' })));
+		const newData = arrayToTree(data, { childrenField: 'children' });
+		// eslint-disable-next-line react/prop-types
+		setTreeValue(TreeState.create(newData.filter((item) => item.data.id === initItem.id)));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data]);
 	const handleOnChange = (newValue) => {
 		setTreeValue(newValue);
@@ -77,7 +79,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission }) => {
 		setDataValue([...newData, { ...row.data, quantity: parseInt(e.target.value, 10) }]);
 	};
 	return (
-		<Modal show={show} size='xl' onHide={handleClose}>
+		<Modal show={show} size='lg' onHide={handleClose}>
 			<Modal.Header closeButton>
 				<Modal.Title>Nhiệm vụ con</Modal.Title>
 			</Modal.Header>
