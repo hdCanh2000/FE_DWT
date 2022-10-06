@@ -91,7 +91,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 	};
 
 	return (
-		<Modal show={show} size='lg' onHide={handleClose}>
+		<Modal show={show} size='xl' onHide={handleClose}>
 			<Modal.Header closeButton>
 				<Modal.Title>Nhiệm vụ con</Modal.Title>
 			</Modal.Header>

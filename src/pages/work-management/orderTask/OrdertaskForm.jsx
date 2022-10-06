@@ -84,7 +84,6 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 			[name]: value,
 		});
 	};
-
 	const handleSubmit = async () => {
 		const dataValue = {
 			kpiNorm_id: item.id,
@@ -101,13 +100,15 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 		addWorktrack(dataValue).then((res) => {
 			dataSubMission.forEach(async (item) => {
 				await addWorktrack({
+					priority: parseInt(mission?.priority, 10),
+					note: mission?.note,
+					description: item?.description,
+					deadline: mission?.deadlineDate,
+					startDate: mission?.startDate,
 					kpiNorm_id: item.id,
 					parent_id: res.data.data.id,
 					quantity: item.quantity,
 					user_id: userOption?.id,
-					deadline: mission?.deadlineDate,
-					startDate: mission?.startDate,
-					priority: parseInt(mission?.priority, 10),
 				});
 			});
 		});

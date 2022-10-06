@@ -7,7 +7,7 @@ import { useToasts } from 'react-toast-notifications';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-import Button from '../../../components/bootstrap/Button';
+// import Button from '../../../components/bootstrap/Button';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import OrderTaskForm from './OrdertaskForm';
 import PaginationButtons, {
@@ -70,7 +70,6 @@ const OrderTask = () => {
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
 	const { addToast } = useToasts();
 	const handleShowToast = (title, content) => {
 		addToast(
@@ -210,7 +209,7 @@ const OrderTask = () => {
 									</Card>
 								</div>
 							</div>
-							<div className='col-12 my-4'>
+							{/* <div className='col-12 my-4'>
 								<div className='w-100 mt-4 text-center'>
 									<Button
 										color='primary'
@@ -220,7 +219,7 @@ const OrderTask = () => {
 										Chốt nhiệm vụ
 									</Button>
 								</div>
-							</div>
+							</div> */}
 						</Card>
 					</div>,
 					['admin', 'manager'],
