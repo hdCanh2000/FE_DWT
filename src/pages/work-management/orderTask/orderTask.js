@@ -28,9 +28,10 @@ import PaginationButtons, {
 	PER_COUNT,
 } from '../../../components/PaginationButtons';
 import Toasts from '../../../components/bootstrap/Toasts';
+import { getAllWorktrackByUser } from '../../dailyWorkTracking/services';
 
-const Item = ({ data, onDelete, onOpen }) => {
-	const { name, quantity, user, startDate, deadlineDate, index } = data;
+const Item = ({ data, onDelete, onOpen, showUser, showKpiNorm }) => {
+	const { quantity, startDate, deadlineDate, index } = data;
 	return (
 		<Card>
 			<CardHeader>
@@ -38,7 +39,7 @@ const Item = ({ data, onDelete, onOpen }) => {
 					// onClick={()=>handleOpenForm(data)}
 					style={{ cursor: 'pointer' }}>
 					<CardTitle onClick={() => onOpen(data)}>
-						<CardLabel>{name}</CardLabel>
+						<CardLabel>{showKpiNorm(data.kpiNorm_id)}</CardLabel>
 					</CardTitle>
 				</CardLabel>
 				<CardActions>
@@ -51,7 +52,7 @@ const Item = ({ data, onDelete, onOpen }) => {
 				</CardActions>
 			</CardHeader>
 			<div className=' row p-4'>
-				<div className='col-12'>Người phụ trách : {user?.label}</div>
+				<div className='col-12'>Người phụ trách : {showUser(data.user_id)}</div>
 				<div className='col-12'>
 					Thời gian : {moment(startDate).format('DD-MM-YYYY')} -{' '}
 					{moment(deadlineDate).format('DD-MM-YYYY')}
@@ -64,6 +65,7 @@ const Item = ({ data, onDelete, onOpen }) => {
 const OrderTask = () => {
 	const [dataDepartments, setDataDepartments] = useState([]);
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+	const users = useSelector((state) => state.employee.employees);
 	const [departmentSelect, setDepartmentSelect] = useState(1);
 	const [isOpenForm, setIsOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({
@@ -78,11 +80,21 @@ const OrderTask = () => {
 	const [newItem, setNewItem] = React.useState([]);
 	const items = dataPagination(newItem, currentPage, perPage);
 	useEffect(() => {
+		const fetch = async () => {
+			const response = await getAllWorktrackByUser();
+			const result = await response.data.data;
+			setTasks(result.filter((item) => item.user_id !== null));
+		};
+		fetch();
+	}, []);
+	useEffect(() => {
 		const fecth = () => {
 			if (kpiNorm) {
 				setNewItem(
 					kpiNorm?.filter(
-						(item) => item?.departmentId === departmentSelect || departmentSelect === 1,
+						(item) =>
+							(item?.departmentId === departmentSelect && item?.parent_id === null) ||
+							(departmentSelect === 1 && item?.parent_id === null),
 					),
 				);
 			}
@@ -96,7 +108,8 @@ const OrderTask = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			const response = await getAllDepartments();
-			const result = await response.data;
+			const result = await response.data.data;
+			console.log(result,'result');
 			setDataDepartments(
 				result
 					.reverse()
@@ -122,7 +135,6 @@ const OrderTask = () => {
 	};
 	const handleSubmit = async () => {
 		handleShowToast('Giao nhiệm vụ', 'Giao nhiệm vụ thành công !');
-		setTasks([]);
 	};
 	const handleOpenForm = (item) => {
 		setItemEdit({ ...item });
@@ -131,9 +143,19 @@ const OrderTask = () => {
 	const handleCloseForm = () => {
 		setIsOpenForm(false);
 	};
-	const handleDeleteTasks = (index) => {
-		const data = tasks?.filter((item) => item.index !== index);
-		setTasks([...data]);
+	const showUser = (userId) => {
+		const newUser = users.filter((item) => item.id === userId);
+		if (newUser.length !== 0) {
+			return newUser[0].label;
+		}
+		return 'null';
+	};
+	const showKpiNorm = (kpiNormId) => {
+		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
+		if (newKpiNorm.length !== 0) {
+			return newKpiNorm[0].label;
+		}
+		return 'null';
 	};
 	return (
 		<PageWrapper title='Giao việc'>
@@ -172,11 +194,11 @@ const OrderTask = () => {
 												{tasks.length === 0 &&
 													'Chưa có nhiệm vụ nào được giao !'}
 											</div>
-
 											{tasks?.map((item) => (
 												<Item
+													showKpiNorm={showKpiNorm}
 													data={item}
-													onDelete={handleDeleteTasks}
+													showUser={showUser}
 													onOpen={handleOpenForm}
 												/>
 											))}
@@ -201,6 +223,7 @@ const OrderTask = () => {
 																color='primary'
 																icon='Circle'
 																className='text-nowrap'>
+																	{console.log(dataDepartments)}
 																{
 																	dataDepartments.filter(
 																		(item) =>
@@ -293,8 +316,6 @@ const OrderTask = () => {
 				onClose={handleCloseForm}
 				onSubmit={handleSubmit}
 				item={itemEdit}
-				setTasks={setTasks}
-				tasks={tasks}
 			/>
 		</PageWrapper>
 	);
