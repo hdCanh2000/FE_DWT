@@ -51,7 +51,6 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 	const users = useSelector((state) => state.employee.employees);
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 	const missions = useSelector((state) => state.mission.missions);
-	console.log(missions,'missions');
 	const [missionOption, setMissionOption] = useState({});
 	const [departmentReplatedOption, setDepartmentRelatedOption] = useState([]);
 	const [userOption, setUserOption] = useState({ label: '', value: '' });

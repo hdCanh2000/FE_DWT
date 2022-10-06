@@ -37,9 +37,9 @@ const Item = ({ data, onDelete, showUser, showKpiNorm }) => {
 		<Card>
 			<CardHeader>
 				<CardLabel
-					// onClick={()=>handleOpenForm(data)}
-					// style={{ cursor: 'pointer' }}
-					>
+				// onClick={()=>handleOpenForm(data)}
+				// style={{ cursor: 'pointer' }}
+				>
 					<CardTitle>
 						<CardLabel>{showKpiNorm(data.kpiNorm_id)}</CardLabel>
 					</CardTitle>
@@ -233,7 +233,7 @@ const OrderTask = () => {
 																}
 															</Button>
 														</DropdownToggle>
-														<DropdownMenu >
+														<DropdownMenu>
 															{dataDepartments?.map((item) => (
 																<DropdownItem
 																	key={item?.id}
@@ -277,8 +277,12 @@ const OrderTask = () => {
 															<td>{item?.department?.name}</td>
 															<td>{item?.unit?.name}</td>
 															<td>{item?.position?.name}</td>
-															<td><Icon icon='ArrowBack' color='primary' /> </td>
-
+															<td>
+																<Icon
+																	icon='ArrowBack'
+																	color='primary'
+																/>{' '}
+															</td>
 														</tr>
 													</React.Fragment>
 												))}
