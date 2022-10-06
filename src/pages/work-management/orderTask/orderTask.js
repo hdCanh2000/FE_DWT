@@ -29,16 +29,18 @@ import PaginationButtons, {
 } from '../../../components/PaginationButtons';
 import Toasts from '../../../components/bootstrap/Toasts';
 import { getAllWorktrackByUser } from '../../dailyWorkTracking/services';
+import Icon from '../../../components/icon/Icon';
 
-const Item = ({ data, onDelete, onOpen, showUser, showKpiNorm }) => {
+const Item = ({ data, onDelete, showUser, showKpiNorm }) => {
 	const { quantity, startDate, deadlineDate, index } = data;
 	return (
 		<Card>
 			<CardHeader>
 				<CardLabel
-					// onClick={()=>handleOpenForm(data)}
-					style={{ cursor: 'pointer' }}>
-					<CardTitle onClick={() => onOpen(data)}>
+				// onClick={()=>handleOpenForm(data)}
+				// style={{ cursor: 'pointer' }}
+				>
+					<CardTitle>
 						<CardLabel>{showKpiNorm(data.kpiNorm_id)}</CardLabel>
 					</CardTitle>
 				</CardLabel>
@@ -109,7 +111,6 @@ const OrderTask = () => {
 		const fetchData = async () => {
 			const response = await getAllDepartments();
 			const result = await response.data.data;
-			console.log(result,'result');
 			setDataDepartments(
 				result
 					.reverse()
@@ -223,7 +224,6 @@ const OrderTask = () => {
 																color='primary'
 																icon='Circle'
 																className='text-nowrap'>
-																	{console.log(dataDepartments)}
 																{
 																	dataDepartments.filter(
 																		(item) =>
@@ -263,8 +263,8 @@ const OrderTask = () => {
 													<th>Tên định mức KPI</th>
 													<th>Phòng ban</th>
 													<th>Đơn vị tính</th>
-													<th>Mô tả</th>
 													<th>Vị trí chuyên môn</th>
+													<th> </th>
 												</tr>
 											</thead>
 											<tbody>
@@ -276,8 +276,13 @@ const OrderTask = () => {
 															<td>{item?.name}</td>
 															<td>{item?.department?.name}</td>
 															<td>{item?.unit?.name}</td>
-															<td>{item?.description}</td>
 															<td>{item?.position?.name}</td>
+															<td>
+																<Icon
+																	icon='ArrowBack'
+																	color='primary'
+																/>{' '}
+															</td>
 														</tr>
 													</React.Fragment>
 												))}

@@ -14,7 +14,10 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 	useEffect(() => {
 		const newData = arrayToTree(data, { childrenField: 'children' });
 		// eslint-disable-next-line react/prop-types
-		setTreeValue(TreeState.create(newData.filter((item) => item.data.id === initItem.id)));
+		setTreeValue(
+			// eslint-disable-next-line react/prop-types
+			TreeState.create(newData.filter((item) => item.data.id === initItem.id)[0].children),
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data]);
 	const handleOnChange = (newValue) => {
@@ -79,45 +82,52 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 		setDataValue([...newData, { ...row.data, quantity: parseInt(e.target.value, 10) }]);
 	};
 	return (
-		<Modal show={show} size='lg' onHide={handleClose}>
+		<Modal show={show} size='xl' onHide={handleClose}>
 			<Modal.Header closeButton>
 				<Modal.Title>Nhiệm vụ con</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
-				<TreeTable value={treeValue} onChange={handleOnChange}>
-					<TreeTable.Column
-						// basis='180px'
-						// grow='0'
-						style={{ minWidth: 300 }}
-						renderCell={renderIndexCell}
-						renderHeaderCell={() => <span className='t-center'>Tên định mức</span>}
-					/>
-					<TreeTable.Column
-						renderCell={(row) => (
-							<span className='expenses-cell text-left'>{row.data.unit.name}</span>
-						)}
-						renderHeaderCell={() => <span className='t-left'>Đơn vị tính</span>}
-					/>
-					<TreeTable.Column
-						renderCell={(row) => (
-							<span className='expenses-cell text-right'>{row.data.manday}</span>
-						)}
-						renderHeaderCell={() => <span className='t-left'>Số ngày công</span>}
-					/>
-					<TreeTable.Column
-						renderCell={(row) => (
-							<input
-								style={{ width: '100px' }}
-								name='quantity'
-								disabled={
-									!dataValue.filter((items) => items.id === row.data.id).length
-								}
-								onChange={(e) => handlequantity(e, row)}
-							/>
-						)}
-						renderHeaderCell={() => <span className='t-left'>Số lượng</span>}
-					/>
-				</TreeTable>
+				{treeValue.data.length !== 0 ? (
+					<TreeTable value={treeValue} onChange={handleOnChange}>
+						<TreeTable.Column
+							// basis='180px'
+							// grow='0'
+							style={{ minWidth: 300 }}
+							renderCell={renderIndexCell}
+							renderHeaderCell={() => <span className='t-center'>Tên định mức</span>}
+						/>
+						<TreeTable.Column
+							renderCell={(row) => (
+								<span className='expenses-cell text-left'>
+									{row.data.unit.name}
+								</span>
+							)}
+							renderHeaderCell={() => <span className='t-left'>Đơn vị tính</span>}
+						/>
+						<TreeTable.Column
+							renderCell={(row) => (
+								<span className='expenses-cell text-right'>{row.data.manday}</span>
+							)}
+							renderHeaderCell={() => <span className='t-left'>Số ngày công</span>}
+						/>
+						<TreeTable.Column
+							renderCell={(row) => (
+								<input
+									style={{ width: '100px' }}
+									name='quantity'
+									disabled={
+										!dataValue.filter((items) => items.id === row.data.id)
+											.length
+									}
+									onChange={(e) => handlequantity(e, row)}
+								/>
+							)}
+							renderHeaderCell={() => <span className='t-left'>Số lượng</span>}
+						/>
+					</TreeTable>
+				) : (
+					'Không có nhiệm vụ con !'
+				)}
 			</Modal.Body>
 			<Modal.Footer>
 				<Button variant='secondary' onClick={handleClose}>
