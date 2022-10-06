@@ -46,7 +46,7 @@ const customStyles = {
 	}),
 };
 // eslint-disable-next-line react/prop-types, no-unused-vars
-const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
+const OrderTaskForm = ({ show, onClose, item }) => {
 	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
@@ -116,7 +116,6 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 	};
 	const handleSubmit = async () => {
 		const dataValue = {
-			index: tasks?.length,
 			kpiNorm_id: item.id,
 			parent_id: null,
 			mission_id: missionOption?.id,
@@ -128,38 +127,28 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 			deadline: mission?.deadlineDate,
 			startDate: mission?.startDate,
 		};
-		await addWorktrack(dataValue).then((res) => {
+		addWorktrack(dataValue).then((res) => {
 			dataSubMission.forEach(async (item) => {
 				await addWorktrack({
 					kpiNorm_id: item.id,
 					parent_id: res.data.data.id,
-					quantity: 1,
+					quantity: item.quantity,
 				});
 			});
 		});
-		setTasks([
-			...tasks,
-			{
-				...item,
-				quantity: parseInt(mission?.quantity, 10),
-				deadline: mission?.deadlineDate,
-				startDate: mission?.startDate,
-				user: userOption,
-			},
-		]);
+		onClose();
 		setMission({});
 		setKpiNormOptions([]);
 		setMissionOption({});
 		setDepartmentRelatedOption([]);
 		setUserOption({});
 		setUserRelatedOption([]);
-		onClose();
 	};
 	const handleShowPickListKpiNorm = () => {
 		setIsOpen(!isOpen);
 	};
 	return (
-		<Modal show={show} onHide={onClose} size='xl'>
+		<Modal show={show} onHide={onClose} size='lg'>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='row mx-4 px-4 my-4'>
@@ -253,33 +242,17 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-1'>
+										<div className='col-3'>
 											<FormGroup id='quantity' label='Số lượng'>
 												<Input
 													type='text'
 													name='quantity'
+													defaultValue=''
 													onChange={handleChange}
-													value={mission?.quantity || ''}
+													value={mission?.quantity}
 													placeholder='Số lượng'
 													className='border border-2 rounded-0 shadow-none'
 												/>
-											</FormGroup>
-										</div>
-										<div className='col-2'>
-											<FormGroup id='priority' label='Độ ưu tiên'>
-												<Select
-													name='priority'
-													ariaLabel='Board select'
-													className='border border-2 rounded-0 shadow-none'
-													placeholder='Độ ưu tiên'
-													onChange={handleChange}
-													value={mission?.priority}>
-													{PRIORITIES.map((priority) => (
-														<Option key={priority} value={priority}>
-															{`Cấp ${priority}`}
-														</Option>
-													))}
-												</Select>
 											</FormGroup>
 										</div>
 									</div>
@@ -318,24 +291,8 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 											</FormGroup>
 										</div>
 									</div>
-									{/* Ghi chú */}
 									<div className='row g-2'>
-										<div className='col-12'>
-											<FormGroup id='note' label='Ghi chú'>
-												<Textarea
-													name='note'
-													onChange={handleChange}
-													value={mission?.note || ''}
-													ariaLabel='Ghi chú'
-													placeholder='Ghi chú'
-													className='border border-2 rounded-0 shadow-none'
-												/>
-											</FormGroup>
-										</div>
-									</div>
-									{/* Thời gian bắt đầu - Thời gian dự kiến */}
-									<div className='row g-2'>
-										<div className='col-3'>
+										<div className='col-4'>
 											<FormGroup id='startDate' label='Ngày bắt đầu'>
 												<Input
 													name='startDate'
@@ -348,20 +305,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-3'>
-											<FormGroup id='startTime' label='Thời gian bắt đầu'>
-												<Input
-													name='startTime'
-													placeholder='Thời gian bắt đầu'
-													type='time'
-													value={mission.startTime || '08:00'}
-													onChange={handleChange}
-													ariaLabel='Thời gian bắt đầu'
-													className='border border-2 rounded-0 shadow-none'
-												/>
-											</FormGroup>
-										</div>
-										<div className='col-3'>
+										<div className='col-4'>
 											<FormGroup
 												id='deadlineDate'
 												label='Hạn ngày hoàn thành'>
@@ -379,22 +323,42 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-3'>
-											<FormGroup
-												id='deadlineTime'
-												label='Hạn thời gian hoàn thành'>
-												<Input
-													name='deadlineTime'
-													placeholder='Hạn thời gian hoàn thành'
-													type='time'
-													value={mission.deadlineTime || '17:30'}
+										<div className='col-4'>
+											<FormGroup id='priority' label='Độ ưu tiên'>
+												<Select
+													name='priority'
+													ariaLabel='Board select'
+													className='border border-2 rounded-0 shadow-none'
+													placeholder='Độ ưu tiên'
 													onChange={handleChange}
-													ariaLabel='Hạn thời gian hoàn thành'
+													value={mission?.priority}>
+													{PRIORITIES.map((priority) => (
+														<Option key={priority} value={priority}>
+															{`Cấp ${priority}`}
+														</Option>
+													))}
+												</Select>
+											</FormGroup>
+										</div>
+									</div>
+
+									{/* Ghi chú */}
+									<div className='row g-2'>
+										<div className='col-12'>
+											<FormGroup id='note' label='Ghi chú'>
+												<Textarea
+													name='note'
+													onChange={handleChange}
+													value={mission?.note || ''}
+													ariaLabel='Ghi chú'
+													placeholder='Ghi chú'
 													className='border border-2 rounded-0 shadow-none'
 												/>
 											</FormGroup>
 										</div>
 									</div>
+									{/* Thời gian bắt đầu - Thời gian dự kiến */}
+
 									{/* Hạn ngày hoàn thành - Thời hạn hoàn thành */}
 									<div className='row g-2'>
 										<div className='col-12'>
@@ -484,6 +448,7 @@ const OrderTaskForm = ({ show, onClose, item, setTasks, tasks }) => {
 							show={isOpen}
 							data={kpiNorms}
 							handleClose={handleShowPickListKpiNorm}
+							initItem={item}
 						/>
 					</div>,
 					['admin'],
