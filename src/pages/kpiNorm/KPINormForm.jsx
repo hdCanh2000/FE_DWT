@@ -222,12 +222,12 @@ const KPINormForm = ({
 							{showForm === 1 && (
 								<div className='row g-4'>
 									<div className='col-3'>
-										<FormGroup id='kpiValue' label='Thang điểm'>
+										<FormGroup id='kpivalue' label='Thang điểm'>
 											<Input
 												type='number'
-												name='kpiValue'
+												name='kpivalue'
 												onChange={formik.handleChange}
-												value={formik.values.kpiValue || ''}
+												value={formik.values.kpivalue || ''}
 												size='lg'
 												placeholder='Thang điểm'
 												className='border border-2 rounded-0 shadow-none'
@@ -237,13 +237,13 @@ const KPINormForm = ({
 									</div>
 									<div className='col-6'>
 										<FormGroup
-											id='descriptionKpiValue'
+											id='descriptionkpivalue'
 											label='Tương đương với kết quả'>
 											<Input
 												type='text'
-												name='descriptionKpiValue'
+												name='descriptionkpivalue'
 												onChange={formik.handleChange}
-												value={formik.values.descriptionKpiValue || ''}
+												value={formik.values.descriptionkpivalue || ''}
 												size='lg'
 												placeholder='Tương đương với kết quả'
 												className='border border-2 rounded-0 shadow-none'

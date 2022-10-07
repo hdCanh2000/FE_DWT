@@ -119,8 +119,8 @@ const KpiNormPage = () => {
 		},
 		{
 			title: 'Loại nhiệm vụ',
-			id: 'taskType',
-			key: 'taskType',
+			id: 'tasktype',
+			key: 'tasktype',
 			type: 'select',
 			align: 'center',
 			options: [
@@ -181,16 +181,16 @@ const KpiNormPage = () => {
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
-			name: data.name,
-			description: data.description || null,
-			descriptionkpivalue: data.descriptionKpiValue || null,
+			name: data?.name,
+			description: data?.description || null,
+			descriptionkpivalue: data?.descriptionkpivalue || null,
 			department_id: parseInt(data?.position?.department?.id, 10) || null,
 			position_id: parseInt(data?.position?.id, 10),
 			parent_id: parseInt(data?.parent?.id, 10),
-			kpi_value: parseInt(data?.kpiValue, 10),
+			kpi_value: parseInt(data?.kpivalue, 10),
 			quantity: parseInt(data?.quantity, 10),
 			unit_id: 1,
-			tasktype: data.taskType.value,
+			tasktype: data?.tasktype.value,
 			type: 1,
 		};
 		if (data.id) {
