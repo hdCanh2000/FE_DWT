@@ -58,13 +58,31 @@ export const demoPages = {
 		id: 'taskPage',
 		text: 'Nhiệm vụ của tôi',
 		path: '/cong-viec-hang-ngay',
-		icon: 'TaskAlt',
+		icon: 'AssignmentInd',
 	},
 	taskAndAssign: {
 		id: 'taskAndAssign',
 		text: 'Khai báo nhiệm vụ & Giao việc',
 		path: '/giao-viec',
 		icon: 'CustomBriefCase',
+		subMenu: {
+			kpiNorm: {
+				id: 'kpiNorm',
+				text: 'Khai báo nhiệm vụ',
+				path: '/dinh-muc-lao-dong-kpi',
+			},
+			assign: {
+				id: 'assign',
+				text: 'Giao việc',
+				path: '/giao-viec',
+			},
+		},
+	},
+	mission: {
+		id: 'mission',
+		text: 'Mục tiêu',
+		path: '/muc-tieu',
+		icon: 'TaskAlt',
 	},
 	jobsPage: {
 		id: 'supervision',
@@ -137,11 +155,6 @@ export const demoPages = {
 		path: 'cau-hinh',
 		icon: 'Settings',
 		subMenu: {
-			kpiNorm: {
-				id: 'kpiNorm',
-				text: 'Định mức lao động & KPI',
-				path: '/dinh-muc-lao-dong-kpi',
-			},
 			unit: {
 				id: 'unit',
 				text: 'Cấu hình đơn vị',

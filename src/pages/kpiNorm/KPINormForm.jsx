@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
+import Form from 'react-bootstrap/Form';
 import { Button, Modal } from 'react-bootstrap';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
@@ -10,7 +11,7 @@ import Checks from '../../components/bootstrap/forms/Checks';
 import CustomSelect from '../../components/form/CustomSelect';
 import Select from '../../components/bootstrap/forms/Select';
 
-const CommonForm = ({
+const KPINormForm = ({
 	className,
 	show,
 	onClose,
@@ -21,6 +22,7 @@ const CommonForm = ({
 	options,
 	validate,
 	disable,
+	size,
 	...props
 }) => {
 	const formik = useFormik({
@@ -32,12 +34,14 @@ const CommonForm = ({
 			resetForm();
 		},
 	});
+	const [showForm, setShowForm] = useState(true);
+
 	return (
 		<Modal
 			className={classNames(className, 'p-4')}
 			show={show}
 			onHide={onClose}
-			size='lg'
+			size={size}
 			scrollable
 			centered
 			{...props}>
@@ -46,197 +50,223 @@ const CommonForm = ({
 			</Modal.Header>
 			<Modal.Body className='px-4'>
 				<form>
-					<div className='row'>
-						<div className='col-md-12'>
-							<div className='row g-4'>
-								{fields?.map((field) => {
-									if (field.type === 'singleSelect') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<Select
-														ariaLabel={field.title || ''}
-														placeholder={`Chọn ${field.title}`}
-														list={field.options}
-														name={field.id}
-														size='lg'
-														className='border border-2 rounded-0 shadow-none'
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-														value={formik.values[field.id]}
-														defaultValue={formik.values[field.id]}
-														isValid={formik.isValid}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									if (field.type === 'select') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<CustomSelect
-														placeholder={`Chọn ${field.title}`}
-														value={formik.values[field.id]}
-														onChange={(value) => {
-															formik.setFieldValue(field.id, value);
-														}}
-														isMulti={!!field.isMulti}
-														options={field.options}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									if (!field.isShow) {
-										return null;
-									}
-									if (field.type === 'textarea') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<Textarea
-														rows={5}
-														ariaLabel={field.title}
-														placeholder={`Nhập ${field.title}`}
-														list={options}
-														size='lg'
-														name={field.id}
-														className='border border-2 rounded-0 shadow-none'
-														onChange={formik.handleChange}
-														onBlur={formik.handleBlur}
-														value={formik.values[field.id]}
-														isValid={formik.isValid}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									if (field.type === 'key') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<Checks
-														id={field.id}
-														type='switch'
-														size='lg'
-														label={
-															Number(formik.values[field.id]) === 1
-																? 'Là Key'
-																: 'Không phải Key'
-														}
-														onChange={formik.handleChange}
-														checked={formik.values[field.id]}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									if (field.type === 'switch') {
-										return (
-											<React.Fragment key={field.id}>
-												<FormGroup
-													key={field.id}
-													className='col-12'
-													id={field.id}
-													label={field.title}>
-													<Checks
-														id={field.id}
-														type='switch'
-														size='lg'
-														label={
-															Number(formik.values[field.id]) === 1
-																? 'Đang hoạt động'
-																: 'Không hoạt động'
-														}
-														onChange={formik.handleChange}
-														checked={formik.values[field.id]}
-													/>
-												</FormGroup>
-												<div className='text-danger mt-1'>
-													{formik.errors[field.id] && (
-														<span className='error'>
-															{formik.errors[field.id]}
-														</span>
-													)}
-												</div>
-											</React.Fragment>
-										);
-									}
-									return (
-										<React.Fragment key={field.id}>
-											<FormGroup
-												className='col-12'
+					<div className='row g-4'>
+						{fields?.map((field) => {
+							if (field.type === 'singleSelect') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup id={field.id} label={field.title}>
+											<Select
+												ariaLabel={field.title || ''}
+												placeholder={`${field.title}`}
+												list={field.options}
+												name={field.id}
+												size='lg'
+												className='border border-2 rounded-0 shadow-none'
+												onChange={formik.handleChange}
+												onBlur={formik.handleBlur}
+												value={formik.values[field.id]}
+												defaultValue={formik.values[field.id]}
+												isValid={formik.isValid}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							if (field.type === 'select') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup key={field.id} id={field.id} label={field.title}>
+											<CustomSelect
+												placeholder={`${field.title}`}
+												value={formik.values[field.id]}
+												onChange={(value) => {
+													formik.setFieldValue(field.id, value);
+												}}
+												isMulti={!!field.isMulti}
+												options={field.options}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							if (!field.isShow) {
+								return null;
+							}
+							if (field.type === 'textarea') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup key={field.id} id={field.id} label={field.title}>
+											<Textarea
+												rows={3}
+												ariaLabel={field.title}
+												placeholder={`${field.title}`}
+												list={options}
+												size='lg'
+												name={field.id}
+												className='border border-2 rounded-0 shadow-none'
+												onChange={formik.handleChange}
+												onBlur={formik.handleBlur}
+												value={formik.values[field.id]}
+												isValid={formik.isValid}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							if (field.type === 'switch') {
+								return (
+									<div
+										key={field.id}
+										className={field.col ? `col-${field.col}` : 'col-12'}>
+										<FormGroup key={field.id} id={field.id} label={field.title}>
+											<Checks
 												id={field.id}
-												label={field.title}>
-												<Input
-													type={field.type || 'text'}
-													name={field.id}
-													onChange={formik.handleChange}
-													value={formik.values[field.id] || ''}
-													size='lg'
-													placeholder={`Nhập ${field.title}`}
-													className='border border-2 rounded-0 shadow-none'
-													onBlur={formik.handleBlur}
-													isValid={formik.isValid}
-													isTouched={formik.touched[field.id]}
-												/>
-											</FormGroup>
-											<div className='text-danger mt-1'>
-												{formik.errors[field.id] && (
-													<span className='error'>
-														{formik.errors[field.id]}
-													</span>
-												)}
-											</div>
-										</React.Fragment>
-									);
-								})}
+												type='switch'
+												size='lg'
+												label={
+													Number(formik.values[field.id]) === 1
+														? 'Đang hoạt động'
+														: 'Không hoạt động'
+												}
+												onChange={formik.handleChange}
+												checked={formik.values[field.id]}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{formik.errors[field.id] && (
+												<span className='error'>
+													{formik.errors[field.id]}
+												</span>
+											)}
+										</div>
+									</div>
+								);
+							}
+							return (
+								<div
+									key={field.id}
+									className={field.col ? `col-${field.col}` : 'col-12'}>
+									<FormGroup id={field.id} label={field.title}>
+										<Input
+											type={field.type || 'text'}
+											name={field.id}
+											onChange={formik.handleChange}
+											value={formik.values[field.id] || ''}
+											size='lg'
+											placeholder={`${field.title}`}
+											className='border border-2 rounded-0 shadow-none'
+											onBlur={formik.handleBlur}
+											isValid={formik.isValid}
+										/>
+									</FormGroup>
+									<div className='text-danger mt-1'>
+										{formik.errors[field.id] && (
+											<span className='error'>{formik.errors[field.id]}</span>
+										)}
+									</div>
+								</div>
+							);
+						})}
+						<div className='d-flex align-items-center'>
+							{/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+							<label className='form-label me-4 mb-0'>Định mức KPI:</label>
+							<div className='ml-2 d-flex'>
+								<Form.Check
+									type='radio'
+									id='show1'
+									name='check'
+									label='Thang điểm'
+									className='me-2'
+									defaultChecked
+									value={1}
+									onChange={() => setShowForm(1)}
+								/>
+								<Form.Check
+									type='radio'
+									id='show2'
+									name='check'
+									label='Tổng điểm'
+									onChange={() => setShowForm(2)}
+								/>
 							</div>
+						</div>
+						<div className='mb-4'>
+							{showForm === 1 && (
+								<div className='row g-4'>
+									<div className='col-3'>
+										<FormGroup id='kpiValue' label='Thang điểm'>
+											<Input
+												type='number'
+												name='kpiValue'
+												onChange={formik.handleChange}
+												value={formik.values.kpiValue || ''}
+												size='lg'
+												placeholder='Thang điểm'
+												className='border border-2 rounded-0 shadow-none'
+												onBlur={formik.handleBlur}
+											/>
+										</FormGroup>
+									</div>
+									<div className='col-6'>
+										<FormGroup
+											id='descriptionKpiValue'
+											label='Tương đương với kết quả'>
+											<Input
+												type='text'
+												name='descriptionKpiValue'
+												onChange={formik.handleChange}
+												value={formik.values.descriptionKpiValue || ''}
+												size='lg'
+												placeholder='Tương đương với kết quả'
+												className='border border-2 rounded-0 shadow-none'
+												onBlur={formik.handleBlur}
+											/>
+										</FormGroup>
+									</div>
+									<div className='col-3'>
+										<FormGroup id='quantity' label='Số lượng'>
+											<Input
+												type='number'
+												name='quantity'
+												onChange={formik.handleChange}
+												value={formik.values.quantity || ''}
+												size='lg'
+												placeholder='Số lượng'
+												className='border border-2 rounded-0 shadow-none'
+												onBlur={formik.handleBlur}
+											/>
+										</FormGroup>
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 				</form>
@@ -253,7 +283,7 @@ const CommonForm = ({
 	);
 };
 
-CommonForm.propTypes = {
+KPINormForm.propTypes = {
 	className: PropTypes.string,
 	disable: PropTypes.string,
 	show: PropTypes.bool,
@@ -270,8 +300,9 @@ CommonForm.propTypes = {
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
+	size: PropTypes.string,
 };
-CommonForm.defaultProps = {
+KPINormForm.defaultProps = {
 	className: null,
 	disable: null,
 	show: false,
@@ -283,6 +314,7 @@ CommonForm.defaultProps = {
 	onClose: null,
 	handleSubmit: null,
 	label: '',
+	size: 'lg',
 };
 
-export default CommonForm;
+export default KPINormForm;
