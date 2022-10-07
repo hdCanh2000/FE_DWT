@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import _ from 'lodash';
 import {
 	getAllKpiNorm,
 	addKpiNorm,
@@ -25,18 +26,18 @@ export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () =
 			parentId: item.parent_id,
 			department: {
 				...item.department,
-				label: item.department.name,
-				value: item.department.value,
+				label: _.get(item, 'department.name'),
+				value: _.get(item, 'department.value'),
 			},
 			position: {
 				...item.position,
-				label: item.position.name,
-				value: item.position.value,
+				label: _.get(item, 'position.name'),
+				value: _.get(item, 'position.value'),
 			},
 			unit: {
 				...item.unit,
-				label: item.unit.name,
-				value: item.unit.value,
+				label: _.get(item, 'unit.name'),
+				value:  _.get(item, 'unit.value'),
 			},
 		};
 	});
