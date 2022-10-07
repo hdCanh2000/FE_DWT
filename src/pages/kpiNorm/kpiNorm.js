@@ -35,6 +35,23 @@ import './style.css';
 import Icon from '../../components/icon/Icon';
 import KPINormForm from './KPINormForm';
 
+const createDataTree = (dataset) => {
+	const hashTable = Object.create(null);
+	dataset.forEach((aData) => {
+		hashTable[aData.id] = { data: aData, children: [] };
+	});
+	const dataTree = [];
+	dataset.forEach((aData) => {
+		if (aData.parentId) {
+			hashTable[aData.parentId].children.push(hashTable[aData.id]);
+			// hashTable[aData.parentId]
+		} else {
+			dataTree.push(hashTable[aData.id]);
+		}
+	});
+	return dataTree;
+};
+
 const KpiNormPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const dispatch = useDispatch();
@@ -62,11 +79,8 @@ const KpiNormPage = () => {
 
 	useEffect(() => {
 		if (!isEmpty(kpiNorm)) {
-			setTreeValue(
-				TreeState.expandAll(
-					TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })),
-				),
-			);
+			const treeData = createDataTree(kpiNorm);
+			setTreeValue(TreeState.expandAll(TreeState.create(treeData)));
 		}
 	}, [kpiNorm]);
 
@@ -242,12 +256,6 @@ const KpiNormPage = () => {
 					paddingLeft: `${row.metadata.depth * 30}px`,
 					minWidth: 360,
 				}}
-				onClick={() =>
-					handleOpenForm({
-						...row.data,
-						parent: kpiNorm.find((item) => item.id === row.data.parentId),
-					})
-				}
 				className={
 					row.metadata.hasChildren
 						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
@@ -267,7 +275,15 @@ const KpiNormPage = () => {
 					''
 				)}
 
-				<span>{row.data.name || ''}</span>
+				<div
+					onClick={() =>
+						handleOpenForm({
+							...row.data,
+							parent: kpiNorm.find((item) => item.id === row.data.parentId),
+						})
+					}>
+					{row.data.name || ''}
+				</div>
 			</div>
 		);
 	};
