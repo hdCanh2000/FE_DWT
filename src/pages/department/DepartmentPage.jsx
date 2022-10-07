@@ -291,34 +291,31 @@ const DepartmentPage = () => {
 									</CardHeader>
 									<div className='row h-100 w-100'>
 										<div className='col-lg-3 col-md-6'>
-											<Card className='h-100' style={{ minHeight: '900px' }}>
-												<CardBody>
-													<div className='d-flex align-items-center justify-content-start'>
-														<Button
-															color='info'
-															icon={
-																!toggle
-																	? 'ExpandMore'
-																	: 'ExpandLess'
-															}
-															tag='button'
-															onClick={toggleExpand}>
-															{!toggle
-																? 'Hiển thị tất cả'
-																: 'Thu gọn'}
-														</Button>
-													</div>
-													<TreeTable
-														value={treeValue}
-														onChange={handleOnChange}>
-														<TreeTable.Column
-															style={{ minWidth: 300 }}
-															renderCell={renderIndexCell}
-															renderHeaderCell={() => <span />}
-														/>
-													</TreeTable>
-												</CardBody>
-											</Card>
+											{/* <Card className='h-100' style={{ minHeight: '900px' }}>
+												<CardBody> */}
+											<div className='p-4'>
+												<div className='d-flex align-items-center justify-content-start'>
+													<Button
+														color='info'
+														icon={!toggle ? 'ExpandMore' : 'ExpandLess'}
+														tag='button'
+														onClick={toggleExpand}>
+														{!toggle ? 'Hiển thị tất cả' : 'Thu gọn'}
+													</Button>
+												</div>
+												<TreeTable
+													value={treeValue}
+													onChange={handleOnChange}
+													height={900}>
+													<TreeTable.Column
+														style={{ minWidth: 300 }}
+														renderCell={renderIndexCell}
+														renderHeaderCell={() => <span />}
+													/>
+												</TreeTable>
+											</div>
+											{/* </CardBody>
+											</Card> */}
 										</div>
 										<div className='col-lg-9 col-md-6'>
 											<Card className='h-100' style={{ minHeight: '900px' }}>
