@@ -97,7 +97,7 @@
 
 .without-children {
 	padding-left: 12px;
-	font-weight: 600;
+	/* font-weight: 600; */
 }
 
 .cp_tree-table_row .cp_tree-table_cell:first-child {

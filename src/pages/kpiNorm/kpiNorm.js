@@ -261,6 +261,15 @@ const KpiNormPage = () => {
 						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
 						: 'without-children cursor-pointer user-select-none'
 				}>
+				<div
+					onClick={() =>
+						handleOpenForm({
+							...row.data,
+							parent: kpiNorm.find((item) => item.id === row.data.parentId),
+						})
+					}>
+					{row.data.name || ''}
+				</div>
 				{row.metadata.hasChildren ? (
 					<Icon
 						color='success'
@@ -274,16 +283,6 @@ const KpiNormPage = () => {
 				) : (
 					''
 				)}
-
-				<div
-					onClick={() =>
-						handleOpenForm({
-							...row.data,
-							parent: kpiNorm.find((item) => item.id === row.data.parentId),
-						})
-					}>
-					{row.data.name || ''}
-				</div>
 			</div>
 		);
 	};
