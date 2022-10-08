@@ -180,7 +180,7 @@ const TableCommon = ({ data, columns, className, isSearch, ...props }) => {
 				</tbody>
 			</table>
 			<hr />
-			<footer>
+			<div>
 				<PaginationButtons
 					data={data}
 					setCurrentPage={setCurrentPage}
@@ -188,7 +188,7 @@ const TableCommon = ({ data, columns, className, isSearch, ...props }) => {
 					perPage={perPage}
 					setPerPage={setPerPage}
 				/>
-			</footer>
+			</div>
 		</div>
 	);
 };

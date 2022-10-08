@@ -115,3 +115,10 @@
 .cp_tree-table_header .cp_tree-table_header-cell:nth-child(4) {
 	min-width: 100px;
 }
+
+.cp_tree-table_header .cp_tree-table_header-cell:nth-child(2) {
+    min-width: 300px;
+}
+.cp_tree-table_row .cp_tree-table_cell:nth-child(2) {
+    min-width: 300px;
+}

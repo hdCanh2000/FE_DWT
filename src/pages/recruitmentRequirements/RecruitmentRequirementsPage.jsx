@@ -41,8 +41,8 @@ const RecruitmentRequirementPage = () => {
 
 	const columns = [
 		{
-			title: 'Tên yêu cầu tuyển dụng',
-			placeholder: 'tên yêu cầu tuyển dụng',
+			title: 'Tên yêu cầu',
+			placeholder: 'tên yêu cầu',
 			id: 'name',
 			key: 'name',
 			type: 'text',
@@ -50,8 +50,8 @@ const RecruitmentRequirementPage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Mô tả yêu cầu tuyển dụng',
-			placeholder: 'mô tả yêu cầu tuyển dụng',
+			title: 'Mô tả',
+			placeholder: 'mô tả',
 			id: 'description',
 			key: 'description',
 			type: 'textarea',
@@ -140,40 +140,37 @@ const RecruitmentRequirementPage = () => {
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
-						<div className='row mb-4'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>
-										Quản lý yêu cầu tuyển dụng
-									</div>
-								</div>
-							</div>
-						</div>
-						<div className='row mb-0'>
+						<div
+							className='row mb-0'
+							style={{ maxWidth: '60%', minWidth: '60%', margin: '0 auto' }}>
 							<div className='col-12'>
 								<Card className='w-100'>
-									<CardHeader>
-										<CardLabel icon='AccountCircle' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách yêu cầu tuyển dụng</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='PersonPlusFill'
-												tag='button'
-												onClick={() => handleOpenForm(null)}>
-												Thêm yêu cầu năng lực
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={columns}
-											data={requirements}
-										/>
+									<div style={{ margin: '24px 24px 0' }}>
+										<CardHeader>
+											<CardLabel icon='AccountCircle' iconColor='primary'>
+												<CardTitle>
+													<CardLabel>
+														Danh sách yêu cầu tuyển dụng
+													</CardLabel>
+												</CardTitle>
+											</CardLabel>
+											<CardActions>
+												<Button
+													color='info'
+													icon='PersonPlusFill'
+													tag='button'
+													onClick={() => handleOpenForm(null)}>
+													Thêm mới
+												</Button>
+											</CardActions>
+										</CardHeader>
+										<div className='p-4'>
+											<TableCommon
+												className='table table-modern mb-0'
+												columns={columns}
+												data={requirements}
+											/>
+										</div>
 									</div>
 								</Card>
 							</div>

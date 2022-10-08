@@ -102,7 +102,11 @@ export const Item = ({
 	const _Inner = (
 		<>
 			<span className='navigation-link-info'>
-				{icon && <Icon className='navigation-icon' icon={icon} />}
+				{icon ? (
+					<Icon className='navigation-icon' icon={icon} />
+				) : (
+					<div style={{ marginRight: '23px' }}> </div>
+				)}
 				<span className='navigation-text'>{t(title)}</span>
 			</span>
 			{(!!children || !!notification) && (

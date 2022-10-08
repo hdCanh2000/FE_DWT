@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import TableCommon from '../common/ComponentCommon/TableCommon';
-import Card from '../../components/bootstrap/Card';
 import { fetchEmployeeList, fetchEmployeeListByDepartment } from '../../redux/slice/employeeSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 
@@ -110,15 +109,13 @@ const EmployeePage = ({ dataDepartment }) => {
 			</div>
 			<div className='row mb-0'>
 				<div className='col-12'>
-					<Card className='w-100'>
-						<div className='p-4 col-lg-12'>
-							<TableCommon
-								className='table table-modern mb-0'
-								columns={columns}
-								data={users}
-							/>
-						</div>
-					</Card>
+					<div className='p-4 col-lg-12'>
+						<TableCommon
+							className='table table-modern mb-0'
+							columns={columns}
+							data={users}
+						/>
+					</div>
 				</div>
 			</div>
 		</div>

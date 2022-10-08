@@ -197,38 +197,35 @@ const PositionPage = () => {
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
-						<div className='row mb-4'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Danh sách vị trí</div>
-								</div>
-							</div>
-						</div>
-						<div className='row mb-0'>
+						<div
+							className='row mb-0'
+							style={{ maxWidth: '80%', minWidth: '60%', margin: '0 auto' }}>
 							<div className='col-12'>
 								<Card className='w-100'>
-									<CardHeader>
-										<CardLabel icon='AccountCircle' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách vị trí</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='PersonPlusFill'
-												tag='button'
-												onClick={() => handleOpenForm(null)}>
-												Thêm vị trí
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={columns}
-											data={positions}
-										/>
+									<div style={{ margin: '24px 24px 0' }}>
+										<CardHeader>
+											<CardLabel icon='AccountCircle' iconColor='primary'>
+												<CardTitle>
+													<CardLabel>Danh sách vị trí</CardLabel>
+												</CardTitle>
+											</CardLabel>
+											<CardActions>
+												<Button
+													color='info'
+													icon='PersonPlusFill'
+													tag='button'
+													onClick={() => handleOpenForm(null)}>
+													Thêm mới
+												</Button>
+											</CardActions>
+										</CardHeader>
+										<div className='p-4'>
+											<TableCommon
+												className='table table-modern mb-0'
+												columns={columns}
+												data={positions}
+											/>
+										</div>
 									</div>
 								</Card>
 							</div>

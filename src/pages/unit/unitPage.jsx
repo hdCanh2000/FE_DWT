@@ -59,7 +59,7 @@ const UnitPage = () => {
 	};
 	async function fetchUnits() {
 		const res = await getAllUnits();
-		setUnits(res.data);
+		setUnits(res.data.data);
 	}
 	const handleDelete = async (valueDelete) => {
 		try {
@@ -193,38 +193,35 @@ const UnitPage = () => {
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
-						<div className='row mb-4'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Danh sách đơn vị</div>
-								</div>
-							</div>
-						</div>
-						<div className='row mb-0'>
+						<div
+							className='row mb-0'
+							style={{ maxWidth: '60%', minWidth: '60%', margin: '0 auto' }}>
 							<div className='col-12'>
 								<Card className='w-100'>
-									<CardHeader>
-										<CardLabel icon='ReceiptLong' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách đơn vị</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='ReceiptLong'
-												tag='button'
-												onClick={() => handleOpenActionForm(null)}>
-												Tạo đơn vị
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={columns}
-											data={units}
-										/>
+									<div style={{ margin: '24px 24px 0' }}>
+										<CardHeader>
+											<CardLabel icon='ReceiptLong' iconColor='primary'>
+												<CardTitle>
+													<CardLabel>Danh sách đơn vị tính</CardLabel>
+												</CardTitle>
+											</CardLabel>
+											<CardActions>
+												<Button
+													color='info'
+													icon='ReceiptLong'
+													tag='button'
+													onClick={() => handleOpenActionForm(null)}>
+													Thêm mới
+												</Button>
+											</CardActions>
+										</CardHeader>
+										<div className='p-4'>
+											<TableCommon
+												className='table table-modern mb-0'
+												columns={columns}
+												data={units}
+											/>
+										</div>
 									</div>
 								</Card>
 							</div>
@@ -234,7 +231,7 @@ const UnitPage = () => {
 							onClose={hanleCloseForm}
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật đơn vị' : 'Tạo đơn vị mới'}
+							label={itemEdit?.id ? 'Cập nhật đơn vị tính' : 'Tạo đơn vị mới tính'}
 							fields={columns}
 							validate={validate}
 						/>
@@ -246,8 +243,8 @@ const UnitPage = () => {
 					openModal={openConfirm}
 					onCloseModal={handleCloseDeleteComfirm}
 					onConfirm={() => handleDelete(deletes)}
-					title='Xoá đơn vị'
-					content={`Xác nhận xoá đơn vị <strong>${deletes?.name}</strong> ?`}
+					title='Xoá đơn vị tính'
+					content={`Xác nhận xoá đơn vị tính <strong>${deletes?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>

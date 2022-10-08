@@ -110,25 +110,12 @@ const OrderTask = () => {
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='col-12'>
-						<Card className='w-100'>
-							<CardHeader>
-								<CardLabel>
-									<CardTitle>
-										<CardLabel> </CardLabel>
-									</CardTitle>
-								</CardLabel>
-							</CardHeader>
 							<div className='row h-100 w-100'>
 								<div
 									className='col-lg-4 col-md-6 pb-4'
-									style={{ minHeight: '900px' }}>
-									<Card
-										style={{
-											height: '100%',
-											maxHeight: '900px',
-											minHeight: '900px',
-											overflow: 'scroll',
-										}}>
+								>
+									<Card style={{height : '100%'}}
+								>
 										<CardHeader>
 											<CardLabel>
 												<CardTitle>
@@ -138,7 +125,7 @@ const OrderTask = () => {
 										</CardHeader>
 										<div className='p-4'>
 											<div>
-												<div style={{ textAlign: 'center' }}>
+												<div>
 													{tasks.length === 0 &&
 														'Chưa giao nhiệm vụ nào!'}
 												</div>
@@ -154,8 +141,8 @@ const OrderTask = () => {
 										</div>
 									</Card>
 								</div>
-								<div className='col-lg-8 col-md-6' style={{ minHeight: '900px' }}>
-									<Card style={{ minHeight: '900px' }}>
+								<div className='col-lg-8 col-md-6' >
+									<Card>
 										<CardHeader>
 											<CardLabel>
 												<CardTitle>
@@ -166,7 +153,7 @@ const OrderTask = () => {
 										<div className='p-4'>
 											<table
 												className='table table-modern mb-0'
-												style={{ fontSize: 14 }}>
+											>
 												<thead>
 													<tr>
 														<th>Tên nhiệm vụ</th>
@@ -209,18 +196,6 @@ const OrderTask = () => {
 									</Card>
 								</div>
 							</div>
-							{/* <div className='col-12 my-4'>
-								<div className='w-100 mt-4 text-center'>
-									<Button
-										color='primary'
-										className='w-15 p-3 m-1'
-										type='button'
-										onClick={handleSubmit}>
-										Chốt nhiệm vụ
-									</Button>
-								</div>
-							</div> */}
-						</Card>
 					</div>,
 					['admin', 'manager'],
 					<NotPermission />,
