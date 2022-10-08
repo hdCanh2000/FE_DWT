@@ -95,8 +95,9 @@ const OrderTask = () => {
 				setNewItem(
 					kpiNorm?.filter(
 						(item) =>
-							(item?.departmentId === departmentSelect && item?.parent_id === null) ||
-							(departmentSelect === 1 && item?.parent_id === null),
+							(item?.department_id === departmentSelect &&
+								item?.parent_id === null) ||
+							departmentSelect === 1,
 					),
 				);
 			}
