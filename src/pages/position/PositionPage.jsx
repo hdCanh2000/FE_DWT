@@ -101,7 +101,6 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: true,
 		},
-
 		{
 			title: 'Mô Tả Vị Trí',
 			placeholder: 'mô tả vị trí',
@@ -113,8 +112,8 @@ const PositionPage = () => {
 		},
 		{
 			title: 'Yêu cầu năng lực',
-			id: 'requirement_id',
-			key: 'requirement_id',
+			id: 'requirement',
+			key: 'requirement',
 			type: 'select',
 			align: 'left',
 			isShow: false,
@@ -150,7 +149,11 @@ const PositionPage = () => {
 			isShow: false,
 		},
 	];
-
+	// const handleDataRequirement = (data) => {
+	// 	const newData = data.map((item) => {
+	// 		return item.id,
+	// 	})
+	// };
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
@@ -161,7 +164,7 @@ const PositionPage = () => {
 			position_levels_id: parseInt(data.position_levels_id, 10),
 			manager: parseInt(data.manager, 10),
 			// kpiNormId: data?.kpiName,
-			requirement_id: parseInt(data.requirement_id, 10),
+			requirements: data?.requirement,
 		};
 		if (data?.id) {
 			try {

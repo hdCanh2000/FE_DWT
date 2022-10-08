@@ -148,7 +148,7 @@ const presentation = [
 		element: <UNIT.UNIT />,
 	},
 	{
-		path: demoPages.cauHinh.subMenu.kpiNorm.path,
+		path: demoPages.taskAndAssign.subMenu.kpiNorm.path,
 		element: <KPINORM.KPINORM />,
 		exact: true,
 	},

@@ -2,6 +2,8 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable no-unused-vars */
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,8 +22,6 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
-import CommonForm from '../common/ComponentCommon/CommonForm';
-import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
@@ -29,19 +29,34 @@ import validate from './validate';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
-import { fetchUnitList } from '../../redux/slice/unitSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import './style.css';
 import Icon from '../../components/icon/Icon';
+import KPINormForm from './KPINormForm';
+
+const createDataTree = (dataset) => {
+	const hashTable = Object.create(null);
+	dataset.forEach((aData) => {
+		hashTable[aData.id] = { data: aData, children: [] };
+	});
+	const dataTree = [];
+	dataset.forEach((aData) => {
+		if (aData.parentId) {
+			hashTable[aData.parentId].children.push(hashTable[aData.id]);
+			// hashTable[aData.parentId]
+		} else {
+			dataTree.push(hashTable[aData.id]);
+		}
+	});
+	return dataTree;
+};
 
 const KpiNormPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
-	const departments = useSelector((state) => state.department.departments);
 	const positions = useSelector((state) => state.position.positions);
-	const units = useSelector((state) => state.unit.units);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [openDetail, setOpenDetail] = useState(false);
@@ -51,9 +66,7 @@ const KpiNormPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	useEffect(() => {
-		dispatch(fetchUnitList());
 		dispatch(fetchPositionList());
-		dispatch(fetchDepartmentList());
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
 
@@ -66,25 +79,35 @@ const KpiNormPage = () => {
 
 	useEffect(() => {
 		if (!isEmpty(kpiNorm)) {
-			setTreeValue(
-				TreeState.expandAll(
-					TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })),
-				),
-			);
+			const treeData = createDataTree(kpiNorm);
+			setTreeValue(TreeState.expandAll(TreeState.create(treeData)));
 		}
 	}, [kpiNorm]);
 
 	const columns = [
 		{
-			title: 'Tên định mức Kpi',
+			title: 'Tên nhiệm vụ',
 			id: 'name',
 			key: 'name',
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 6,
 		},
 		{
-			title: 'Định mức cha',
+			title: 'Vị trí đảm nhiệm',
+			id: 'position',
+			key: 'position',
+			type: 'select',
+			align: 'center',
+			isShow: true,
+			render: (item) => <span>{item?.position?.name || 'No data'}</span>,
+			options: positions,
+			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Thuộc nhiệm vụ cha (nếu có)',
 			id: 'parent',
 			key: 'parent',
 			type: 'select',
@@ -95,62 +118,33 @@ const KpiNormPage = () => {
 			col: 6,
 		},
 		{
-			title: 'Phòng ban',
-			id: 'department',
-			key: 'department',
+			title: 'Loại nhiệm vụ',
+			id: 'tasktype',
+			key: 'tasktype',
 			type: 'select',
 			align: 'center',
+			options: [
+				{
+					label: 'Thường xuyên',
+					value: 'Thường xuyên',
+				},
+				{
+					label: 'Không thường xuyên',
+					value: 'Không thường xuyên',
+				},
+				{
+					label: 'Kinh doanh',
+					value: 'Kinh doanh',
+				},
+			],
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
-			options: departments,
 			isMulti: false,
 			col: 6,
 		},
 		{
-			title: 'Vị trí chuyên môn',
-			id: 'position',
-			key: 'position',
-			type: 'select',
-			align: 'center',
-			isShow: true,
-			render: (item) => <span>{item?.position?.name || 'No data'}</span>,
-			options: positions,
-			isMulti: false,
-			col: 5,
-		},
-		{
-			title: 'Đơn vị tính',
-			id: 'unit',
-			key: 'unit',
-			type: 'select',
-			align: 'center',
-			options: units,
-			isShow: true,
-			render: (item) => <span>{item?.unit?.name || ''}</span>,
-			isMulti: false,
-			col: 4,
-		},
-		{
-			title: 'Số ngày công',
-			id: 'manday',
-			key: 'manday',
-			type: 'number',
-			align: 'right',
-			isShow: true,
-			col: 3,
-		},
-		{
-			title: 'Mô tả',
+			title: 'Mô tả/Diễn giải',
 			id: 'description',
 			key: 'description',
-			type: 'textarea',
-			align: 'center',
-			isShow: true,
-		},
-		{
-			title: 'Nguồn nhân lực',
-			id: 'hr',
-			key: 'hr',
 			type: 'textarea',
 			align: 'center',
 			isShow: true,
@@ -188,16 +182,18 @@ const KpiNormPage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			description: data?.description,
-			manday: data?.manday,
-			hr: data?.hr,
-			department_id: parseInt(data?.department?.id, 10),
+			description: data?.description || null,
+			descriptionkpivalue: data?.descriptionkpivalue || null,
+			department_id: parseInt(data?.position?.department?.id, 10) || null,
 			position_id: parseInt(data?.position?.id, 10),
-			unit_id: parseInt(data?.unit?.id, 10),
 			parent_id: parseInt(data?.parent?.id, 10),
+			kpi_value: parseInt(data?.kpivalue, 10),
+			quantity: parseInt(data?.quantity, 10),
+			unit_id: 1,
+			tasktype: data?.tasktype.value,
 			type: 1,
 		};
-		if (data?.id) {
+		if (data.id) {
 			try {
 				const response = await updateKpiNorm(dataSubmit);
 				await response.data;
@@ -260,18 +256,20 @@ const KpiNormPage = () => {
 					paddingLeft: `${row.metadata.depth * 30}px`,
 					minWidth: 360,
 				}}
-				// onClick={row.toggleChildren}
-				onDoubleClick={() =>
-					handleOpenForm({
-						...row.data,
-						parent: kpiNorm.find((item) => item.id === row.data.parentId),
-					})
-				}
 				className={
 					row.metadata.hasChildren
 						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
 						: 'without-children cursor-pointer user-select-none'
 				}>
+				<div
+					onClick={() =>
+						handleOpenForm({
+							...row.data,
+							parent: kpiNorm.find((item) => item.id === row.data.parentId),
+						})
+					}>
+					{row.data.name || ''}
+				</div>
 				{row.metadata.hasChildren ? (
 					<Icon
 						color='success'
@@ -285,14 +283,12 @@ const KpiNormPage = () => {
 				) : (
 					''
 				)}
-
-				<span>{row.data.name || ''}</span>
 			</div>
 		);
 	};
 
 	return (
-		<PageWrapper title={demoPages.cauHinh.subMenu.kpiNorm.text}>
+		<PageWrapper title='Khai báo nhiệm vụ'>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
@@ -325,8 +321,6 @@ const KpiNormPage = () => {
 									<CardBody>
 										<TreeTable value={treeValue} onChange={handleOnChange}>
 											<TreeTable.Column
-												// basis='180px'
-												// grow='0'
 												style={{ minWidth: 300 }}
 												renderCell={renderIndexCell}
 												renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
@@ -334,12 +328,10 @@ const KpiNormPage = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-left'>
-														{row.data.department.name || ''}
+														{row.data.tasktype || ''}
 													</span>
 												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Phòng ban</span>
-												)}
+												renderHeaderCell={() => <span>Loại nhiệm vụ</span>}
 											/>
 											<TreeTable.Column
 												renderCell={(row) => (
@@ -347,26 +339,28 @@ const KpiNormPage = () => {
 														{row.data.position.name || ''}
 													</span>
 												)}
-												renderHeaderCell={() => <span>Vị trí</span>}
+												renderHeaderCell={() => (
+													<span>Vị trí đảm nhiệm</span>
+												)}
 											/>
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-left'>
-														{row.data.unit.name || ''}
+														{row.data.quantity || ''}
 													</span>
 												)}
 												renderHeaderCell={() => (
-													<span className='t-left'>Đơn vị tính</span>
+													<span className='t-left'>Số lượng</span>
 												)}
 											/>
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-right'>
-														{row.data.manday || ''}
+														{row.data.kpi_value || ''}
 													</span>
 												)}
 												renderHeaderCell={() => (
-													<span className='t-left'>Số ngày công</span>
+													<span className='t-left'>Giá trị KPI</span>
 												)}
 											/>
 										</TreeTable>
@@ -378,7 +372,7 @@ const KpiNormPage = () => {
 					['admin', 'manager'],
 					<NotPermission />,
 				)}
-				<CommonForm
+				<KPINormForm
 					show={toggleForm}
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}

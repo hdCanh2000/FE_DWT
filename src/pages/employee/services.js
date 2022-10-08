@@ -39,4 +39,19 @@ const updateEmployee = (data) => {
 	});
 };
 
-export { getAllEmployee, getAllEmployeeByDepartment, getUserById, addEmployee, updateEmployee };
+const deleteEmployee = (data) => {
+	return axiosClient({
+		method: 'PUT',
+		url: `/api/users/${data.id}`,
+		data,
+	});
+};
+
+export {
+	getAllEmployee,
+	getAllEmployeeByDepartment,
+	getUserById,
+	addEmployee,
+	updateEmployee,
+	deleteEmployee,
+};

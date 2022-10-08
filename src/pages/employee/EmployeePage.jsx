@@ -21,7 +21,7 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
-import { addEmployee, updateEmployee } from './services';
+import { addEmployee, updateEmployee, deleteEmployee } from './services';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import { getAllDepartment } from '../department/services';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
@@ -256,30 +256,31 @@ const EmployeePage = ({ header }) => {
 	const handleDelete = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data?.name,
-			department_id: data?.department?.value,
-			code: data?.code,
-			email: data?.email,
-			password: '123456',
-			dateOfBirth: data?.dateOfBirth,
-			dateOfJoin: data?.dateOfJoin,
-			phone: data?.phone,
-			address: data?.address,
-			position_id: data?.position?.value,
-			role:
-				// eslint-disable-next-line no-nested-ternary
-				data?.role === 'Nhân viên' ? 'user' : data?.role === 'Quản lý' ? 'manager' : null,
-			status: Number(data?.status),
-			roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
+			isDelete: data?.isDelete === true,
+			// name: data?.name,
+			// department_id: data?.department?.value,
+			// code: data?.code,
+			// email: data?.email,
+			// password: '123456',
+			// dateOfBirth: data?.dateOfBirth,
+			// dateOfJoin: data?.dateOfJoin,
+			// phone: data?.phone,
+			// address: data?.address,
+			// position_id: data?.position?.value,
+			// role:
+			// 	// eslint-disable-next-line no-nested-ternary
+			// 	data?.role === 'Nhân viên' ? 'user' : data?.role === 'Quản lý' ? 'manager' : null,
+			// status: Number(data?.status),
+			// roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
 		};
 		try {
-			await updateEmployee(dataSubmit);
+			await deleteEmployee(dataSubmit);
 			dispatch(fetchEmployeeList());
 			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
 			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
 		} catch (error) {
-			handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+			handleShowToast(`Xóa nhân viên`, `Xóa nhật nhân viên không thành công!`);
 			throw error;
 		}
 	};

@@ -57,7 +57,7 @@ const CommonForm = ({
 										<FormGroup id={field.id} label={field.title}>
 											<Select
 												ariaLabel={field.title || ''}
-												placeholder={`Chọn ${field.title}`}
+												placeholder={`${field.title}`}
 												list={field.options}
 												name={field.id}
 												size='lg'
@@ -86,7 +86,7 @@ const CommonForm = ({
 										className={field.col ? `col-${field.col}` : 'col-12'}>
 										<FormGroup key={field.id} id={field.id} label={field.title}>
 											<CustomSelect
-												placeholder={`Chọn ${field.title}`}
+												placeholder={`${field.title}`}
 												value={formik.values[field.id]}
 												onChange={(value) => {
 													formik.setFieldValue(field.id, value);

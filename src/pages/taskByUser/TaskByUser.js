@@ -66,9 +66,9 @@ const TaskByUser = () => {
 															{item?.workTracks?.length || 0}
 														</td>
 														<td>
-															{item?.role === 'manager'
-																? 'Quản lý '
-																: 'Nhân viên'}
+															{item?.role === 'manager' && 'Quản lý '}
+															{item?.role === 'admin' && 'Admin '}
+															{item?.role === 'user' && 'Nhân viên'}
 														</td>
 													</tr>
 												</React.Fragment>
