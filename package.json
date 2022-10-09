@@ -34,6 +34,7 @@
 		"@omtanke/react-use-event-outside": "^1.0.1",
 		"@popperjs/core": "^2.11.5",
 		"@reduxjs/toolkit": "^1.8.5",
+		"@syncfusion/ej2-base": "^20.3.48",
 		"@syncfusion/ej2-react-treegrid": "^20.3.48",
 		"@testing-library/jest-dom": "^5.16.4",
 		"@testing-library/react": "^13.2.0",
