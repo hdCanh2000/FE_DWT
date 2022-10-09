@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useState, memo, useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
@@ -26,7 +25,6 @@ import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 import './style.scss';
 
-// eslint-disable-next-line eslint-comments/no-duplicate-disable
 // eslint-disable-next-line react/prop-types
 const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues }) => {
 	const [initData, setInitData] = useState({});
@@ -304,8 +302,6 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 										onCloseModal={handleOpenDelete}
 										onConfirm={() => handleDelete(initValues)}
 										title='Xoá cơ cấu tổ chức'
-										// eslint-disable-next-line eslint-comments/no-duplicate-disable
-										// eslint-disable-next-line react/prop-types
 										content={`Xác nhận xoá cơ cấu tổ chức <strong>${initValues?.name}</strong> ?`}
 									/>
 								</CardBody>
