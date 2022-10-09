@@ -285,7 +285,7 @@ const DepartmentPage = () => {
 									<div className='col-lg-3 col-md-6 pb-4'>
 										<Card className='h-100'>
 											<CardBody>
-												<div className='p-4'>
+												<div className='p-4' style={{height : '100%'}}>
 													<div className='d-flex align-items-center justify-content-start'>
 														<Button
 															color='info'
@@ -303,6 +303,7 @@ const DepartmentPage = () => {
 													</div>
 													<TreeTable
 														value={treeValue}
+														height={400}
 														onChange={handleOnChange}>
 														<TreeTable.Column
 															style={{ minWidth: 300 }}

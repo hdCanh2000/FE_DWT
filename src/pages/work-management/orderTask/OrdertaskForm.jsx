@@ -41,7 +41,7 @@ const customStyles = {
 	}),
 };
 // eslint-disable-next-line react/prop-types, no-unused-vars
-const OrderTaskForm = ({ show, onClose, item }) => {
+const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
@@ -112,6 +112,7 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 				});
 			});
 		});
+		fetch();
 		onClose();
 		setMission({});
 		setMissionOption({});

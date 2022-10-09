@@ -293,7 +293,7 @@ const KpiNormPage = () => {
 						className='row mb-0'
 						style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
 						<div className='col-12'>
-							<Card className='w-100'>
+							<Card className='w-100 h-100'>
 								<div style={{ margin: '24px 24px 0' }}>
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
@@ -315,7 +315,8 @@ const KpiNormPage = () => {
 										<TreeTable
 											value={treeValue}
 											onChange={handleOnChange}
-											height={1000}>
+											height={700}
+											>
 											<TreeTable.Column
 												style={{ minWidth: 300 }}
 												renderCell={renderIndexCell}
