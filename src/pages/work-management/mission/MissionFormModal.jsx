@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useState, memo } from 'react';
 import { Button, Modal } from 'react-bootstrap';
