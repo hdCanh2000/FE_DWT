@@ -3,12 +3,17 @@ import React from 'react';
 import { createRoot } from 'react-dom/client'; // For React 18
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { registerLicense } from '@syncfusion/ej2-base';
 import './styles/styles.scss';
 import App from './App/App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeContextProvider } from './contexts/themeContext';
 import { store } from './redux/store/index';
 import './i18n';
+
+registerLicense(
+	'ORg4AjUWIQA/Gnt2VVhjQlFaclhJXGJWdkx0RWFbb19wflVGalxSVAciSV9jS3xSdkVqWH9ed3dWT2BfVg==',
+);
 
 const children = (
 	<Router>
