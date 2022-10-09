@@ -1,8 +1,5 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-unused-vars */
 
 import React, { useEffect, useState } from 'react';
@@ -315,8 +312,7 @@ const KpiNormPage = () => {
 										<TreeTable
 											value={treeValue}
 											onChange={handleOnChange}
-											height={700}
-											>
+											height={700}>
 											<TreeTable.Column
 												style={{ minWidth: 300 }}
 												renderCell={renderIndexCell}
@@ -353,7 +349,7 @@ const KpiNormPage = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-right'>
-														{row.data.kpi_value || ''}
+														{row.data.kpi_value || 'Không'}
 													</span>
 												)}
 												renderHeaderCell={() => (

@@ -5,8 +5,6 @@ import styled from 'styled-components';
 import { Button, Dropdown, Form } from 'react-bootstrap';
 import Avatar, { AvatarGroup } from '../../../components/Avatar';
 import Card, { CardBody, CardHeader, CardTitle } from '../../../components/bootstrap/Card';
-import UserImage4 from '../../../assets/img/wanna/wanna4.png';
-import UserImage4Webp from '../../../assets/img/wanna/wanna4.webp';
 import Icon from '../../../components/icon/Icon';
 import './style.scss';
 
@@ -16,8 +14,8 @@ const USER = {
 	name: 'Ryan',
 	surname: 'McGrath',
 	position: 'Worker',
-	src: UserImage4,
-	srcSet: UserImage4Webp,
+	src: '',
+	srcSet: '',
 	isOnline: false,
 	color: 'info',
 };

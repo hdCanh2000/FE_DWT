@@ -6,9 +6,6 @@
 	"extends": [
 		"plugin:react/recommended",
 		"airbnb",
-		"plugin:eslint-comments/recommended",
-		"plugin:import/errors",
-		"plugin:import/warnings",
 		"plugin:prettier/recommended",
 		"prettier"
 	],
@@ -20,7 +17,7 @@
 		"sourceType": "module",
 		"allowImportExportEverywhere": true
 	},
-	"plugins": ["import", "prettier", "eslint-comments", "react", "jsx-a11y", "react-hooks"],
+	"plugins": ["import", "prettier", "react", "react-hooks"],
 	"rules": {
 		"prettier/prettier": ["warn"],
 		"no-use-before-define": "off",

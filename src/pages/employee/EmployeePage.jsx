@@ -21,7 +21,6 @@ import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, updateEmployee, deleteEmployee } from './services';
-import DetailForm from '../common/ComponentCommon/DetailForm';
 import { getAllDepartment } from '../department/services';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
@@ -42,8 +41,6 @@ const EmployeePage = () => {
 	const users = useSelector((state) => state.employee.employees);
 	const [departments, setDepartments] = React.useState([]);
 	const [positions, setPositions] = React.useState([]);
-	const [openDetail, setOpenDetail] = React.useState(false);
-	const [dataDetail, setDataDetail] = React.useState({});
 	const [openDelete, setOpenDelete] = React.useState(false);
 	const [dataDelete, setDataDelete] = React.useState({});
 	useEffect(() => {
@@ -217,32 +214,26 @@ const EmployeePage = () => {
 			render: (item) => (
 				<>
 					{verifyPermissionHOC(
-						<Button
-							isOutline={!darkModeStatus}
-							color='success'
-							isLight={darkModeStatus}
-							className='text-nowrap mx-1'
-							icon='Edit'
-							onClick={() => handleOpenForm(item)}
-						/>,
+						<div className='d-flex align-items-center'>
+							<Button
+								isOutline={!darkModeStatus}
+								color='success'
+								isLight={darkModeStatus}
+								className='text-nowrap mx-1'
+								icon='Edit'
+								onClick={() => handleOpenForm(item)}
+							/>
+							<Button
+								isOutline={!darkModeStatus}
+								color='danger'
+								isLight={darkModeStatus}
+								className='text-nowrap mx-2'
+								icon='Trash'
+								onClick={() => handleOpenDelete(item)}
+							/>
+						</div>,
 						['admin'],
 					)}
-					<Button
-						isOutline={!darkModeStatus}
-						color='primary'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='RemoveRedEye'
-						onClick={() => handleOpenDetail(item)}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
-						color='danger'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
-					/>
 				</>
 			),
 			isShow: false,
@@ -333,14 +324,7 @@ const EmployeePage = () => {
 			}
 		}
 	};
-	const handleOpenDetail = (item) => {
-		setOpenDetail(true);
-		setDataDetail({ ...item });
-	};
-	const handleCloseDetail = () => {
-		setOpenDetail(false);
-		setDataDetail({});
-	};
+
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
@@ -404,20 +388,11 @@ const EmployeePage = () => {
 								fields={columns}
 								validate={validate}
 							/>
-							<DetailForm
-								show={openDetail}
-								onClose={handleCloseDetail}
-								item={dataDetail}
-								label={`Chi tiết nhân viên: ${dataDetail?.name}`}
-								fields={columns}
-							/>
 							<ComfirmSubtask
 								openModal={openDelete}
 								onCloseModal={handleOpenDelete}
 								onConfirm={() => handleDelete(dataDelete)}
 								title='Xoá nhân viên'
-								// eslint-disable-next-line eslint-comments/no-duplicate-disable
-								// eslint-disable-next-line react/prop-types
 								content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
 							/>
 						</div>,

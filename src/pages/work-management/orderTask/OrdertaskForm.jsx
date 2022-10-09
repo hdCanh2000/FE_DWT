@@ -1,12 +1,9 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable eslint-comments/no-duplicate-disable */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable no-shadow */
 import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import _ from 'lodash';
 import SelectComponent from 'react-select';
 import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
@@ -26,7 +23,6 @@ import Card, {
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
-import { fetchKeyList } from '../../../redux/slice/keySlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import ListPickKpiNorm from './ListPickKpiNorm';
 import Icon from '../../../components/icon/Icon';
@@ -41,7 +37,7 @@ const customStyles = {
 	}),
 };
 // eslint-disable-next-line react/prop-types, no-unused-vars
-const OrderTaskForm = ({ show, onClose, item,fetch }) => {
+const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
@@ -49,33 +45,32 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 	const missions = useSelector((state) => state.mission.missions);
 	const [missionOption, setMissionOption] = useState({});
 	const [userOption, setUserOption] = useState({ label: '', value: '' });
-	const [mission, setMission] = React.useState({});
+	const [mission, setMission] = React.useState({
+		quantity: '',
+		startDate: '',
+		deadlineDate: '',
+		priority: 2,
+		note: '',
+	});
 	const [isOpen, setIsOpen] = React.useState(false);
 
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
-	}, [dispatch]);
-	useEffect(() => {
-		dispatch(fetchKeyList());
-	}, [dispatch]);
-	useEffect(() => {
 		dispatch(fetchMissionList());
-	}, [dispatch]);
-	useEffect(() => {
 		dispatch(fetchEmployeeList());
+		dispatch(fetchUnitList());
 	}, [dispatch]);
+
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-	useEffect(() => {
-		dispatch(fetchUnitList());
-	}, [dispatch]);
+
 	useEffect(() => {
 		setMission({ ...item });
-		// setKpiNormOptions(item?.kpiNorm || []);
-		setMissionOption({ ...item?.parent });
+		setMissionOption({ ..._.get(item, 'parent') });
 		setUserOption({ ...item?.user });
 	}, [item]);
+
 	// show toast
 	const handleChange = (e) => {
 		const { value, name } = e.target;
@@ -156,19 +151,19 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 									marginLeft: '20px',
 									marginBottom: '20px',
 								}}>
-								<tr style={{ height: '30px' }}>
-									<td>
-										Tên nhiệm vụ: <b>{item?.name || item?.kpiNorm?.name}</b>
-									</td>
-									<td>
-										Định mức KPI: <b>{item.kpiValue || 'Không'}</b>
-									</td>
-								</tr>
-								<tr style={{ height: '30px' }}>
-									<td>
-										Loại nhiệm vụ: <b>{item.taskType || 'Thường xuyên'}</b>
-									</td>
-								</tr>
+								<tbody>
+									<tr style={{ height: '30px' }}>
+										<td>
+											Tên nhiệm vụ: <b>{item?.name || item?.kpiNorm?.name}</b>
+										</td>
+										<td>
+											Định mức KPI: <b>{item.kpiValue || 'Không'}</b>
+										</td>
+										<td>
+											Loại nhiệm vụ: <b>{item.taskType || 'Thường xuyên'}</b>
+										</td>
+									</tr>
+								</tbody>
 							</table>
 							{/* Thuộc mục tiêu */}
 							<div className='row g-2'>
@@ -176,8 +171,8 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 									<FormGroup id='task' label='Thuộc mục tiêu'>
 										<SelectComponent
 											placeholder='Thuộc mục tiêu'
-											defaultValue={missionOption}
 											value={missionOption}
+											defaultValue={missionOption}
 											onChange={setMissionOption}
 											options={missions}
 										/>
@@ -188,8 +183,8 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 										<SelectComponent
 											style={customStyles}
 											placeholder='Chọn nguời phụ trách'
-											defaultValue={userOption}
 											value={userOption}
+											defaultValue={userOption}
 											onChange={setUserOption}
 											options={users}
 										/>
@@ -200,9 +195,8 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 										<Input
 											type='text'
 											name='quantity'
-											defaultValue=''
 											onChange={handleChange}
-											value={mission?.quantity}
+											value={mission.quantity || ''}
 											placeholder='Số lượng'
 											className='border border-2 rounded-0 shadow-none'
 										/>
@@ -216,7 +210,10 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 											name='startDate'
 											placeholder='Ngày bắt đầu'
 											onChange={handleChange}
-											value={mission.startDate}
+											value={
+												mission.startDate ||
+												moment().add(1, 'days').format('YYYY-MM-DD')
+											}
 											type='date'
 											ariaLabel='Ngày bắt đầu'
 											className='border border-2 rounded-0 shadow-none'
@@ -247,7 +244,7 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 											className='border border-2 rounded-0 shadow-none'
 											placeholder='Độ ưu tiên'
 											onChange={handleChange}
-											value={mission?.priority}>
+											value={mission.priority || 2}>
 											{PRIORITIES.map((priority) => (
 												<Option key={priority} value={priority}>
 													{`Cấp ${priority}`}
@@ -265,7 +262,7 @@ const OrderTaskForm = ({ show, onClose, item,fetch }) => {
 										<Textarea
 											name='note'
 											onChange={handleChange}
-											value={mission?.note || ''}
+											value={mission.note || ''}
 											ariaLabel='Ghi chú'
 											placeholder='Ghi chú'
 											className='border border-2 rounded-0 shadow-none'

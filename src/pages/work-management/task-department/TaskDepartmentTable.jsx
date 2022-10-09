@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Icon from '../../../components/icon/Icon';
 import Avatar from '../../../components/Avatar';
-import UserImage4 from '../../../assets/img/wanna/wanna4.png';
-import UserImage4Webp from '../../../assets/img/wanna/wanna4.webp';
 import { dataTable1 } from './dataTable';
 import Button from '../../../components/bootstrap/Button';
 
@@ -13,8 +11,8 @@ const user = {
 	name: 'Ryan',
 	surname: 'McGrath',
 	position: 'Worker',
-	src: UserImage4,
-	srcSet: UserImage4Webp,
+	src: '',
+	srcSet: '',
 	isOnline: false,
 	color: 'info',
 };

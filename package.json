@@ -10,30 +10,12 @@
 		"serve": "serve -s build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
-		"lint": "eslint .",
-		"lint:fix": "eslint --fix --ext .js --ext .jsx ./src",
-		"lint:check-scss": "stylelint-config-prettier-scss-check",
-		"lint:scss": "stylelint **/*.scss",
-		"lint:fix-scss": "stylelint --fix **/*.scss",
-		"icon": "svgr SvgIcons -d src/components/icon/svg-icons",
-		"storybook": "start-storybook -p 6006",
-		"storybook-withoutCache": "start-storybook -p 6006 --no-manager-cache",
-		"build-storybook": "build-storybook"
+		"icon": "svgr SvgIcons -d src/components/icon/svg-icons"
 	},
 	"eslintConfig": {
 		"extends": [
 			"react-app",
 			"react-app/jest"
-		],
-		"overrides": [
-			{
-				"files": [
-					"**/*.stories.*"
-				],
-				"rules": {
-					"import/no-anonymous-default-export": "off"
-				}
-			}
 		]
 	},
 	"browserslist": {
@@ -53,7 +35,6 @@
 		"@popperjs/core": "^2.11.5",
 		"@reduxjs/toolkit": "^1.8.5",
 		"@syncfusion/ej2-react-treegrid": "^20.3.48",
-		"@tanstack/react-query": "^4.3.4",
 		"@testing-library/jest-dom": "^5.16.4",
 		"@testing-library/react": "^13.2.0",
 		"@testing-library/user-event": "^14.1.1",
@@ -125,29 +106,12 @@
 		"eslint": "^8.15.0",
 		"eslint-config-airbnb": "^19.0.4",
 		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-eslint-comments": "^3.2.0",
-		"eslint-plugin-flowtype": "^8.0.3",
-		"eslint-plugin-import": "^2.26.0",
-		"eslint-plugin-jsx-a11y": "^6.5.1",
 		"eslint-plugin-prettier": "^4.0.0",
-		"eslint-plugin-react": "^7.29.4",
-		"eslint-plugin-react-hooks": "^4.5.0",
 		"postcss-loader": "^6.2.1",
 		"prettier": "^2.6.2",
 		"react-scripts": "5.0.1",
 		"sass": "^1.51.0",
 		"sass-loader": "^12.6.0",
-		"stylelint": "^14.8.2",
-		"stylelint-config-prettier-scss": "^0.0.1",
-		"stylelint-config-standard": "^25.0.0",
-		"stylelint-config-standard-scss": "^3.0.0",
-		"stylelint-config-twbs-bootstrap": "^3.0.1",
-		"stylelint-declaration-block-no-ignored-properties": "^2.5.0",
-		"stylelint-declaration-strict-value": "^1.8.0",
-		"stylelint-no-px": "^1.0.1",
-		"stylelint-order": "^5.0.0",
-		"stylelint-prettier": "^2.0.0",
-		"stylelint-scss": "^4.2.0",
 		"trim-newlines": "^4.0.2",
 		"webpack": "5"
 	},

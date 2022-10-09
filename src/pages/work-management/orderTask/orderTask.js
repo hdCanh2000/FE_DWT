@@ -1,12 +1,11 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
+import _ from 'lodash';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-// import Button from '../../../components/bootstrap/Button';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import OrderTaskForm from './OrdertaskForm';
 import PaginationButtons, {
@@ -17,22 +16,21 @@ import { getAllWorktrackByUser } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 
-const Item = ({ data, showUser, showKpiNorm }) => {
-	const { quantity, startDate, deadlineDate } = data;
+const Item = ({ data, showKpiNorm }) => {
+	const { quantity, deadlineDate } = data;
 	return (
 		<Card>
 			<CardHeader>
 				<CardLabel style={{ cursor: 'pointer' }}>
 					<CardTitle>
-						<CardLabel>{showKpiNorm(data.kpiNorm_id)}</CardLabel>
+						<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
 					</CardTitle>
 				</CardLabel>
 			</CardHeader>
 			<div className='row px-4 pb-2'>
-				<div className='col-12'>Người phụ trách : {showUser(data.user_id)}</div>
+				<div className='col-12'>Người phụ trách: {_.get(data, 'user.name')}</div>
 				<div className='col-12'>
-					Thời gian : {moment(startDate).format('DD-MM-YYYY')} -{' '}
-					{moment(deadlineDate).format('DD-MM-YYYY')}
+					Thời hạn hoàn thành: {moment(deadlineDate).format('DD-MM-YYYY')}
 				</div>
 				<div className='col-12'>Số lượng : {quantity}</div>
 			</div>
@@ -41,7 +39,6 @@ const Item = ({ data, showUser, showKpiNorm }) => {
 };
 const OrderTask = () => {
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
-	const users = useSelector((state) => state.employee.employees);
 	const [isOpenForm, setIsOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({
 		kpiNorm: [],
@@ -75,13 +72,7 @@ const OrderTask = () => {
 	const handleCloseForm = () => {
 		setIsOpenForm(false);
 	};
-	const showUser = (userId) => {
-		const newUser = users.filter((item) => item.id === userId);
-		if (newUser.length !== 0) {
-			return newUser[0].label;
-		}
-		return 'null';
-	};
+
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
 		if (newKpiNorm.length !== 0) {
@@ -111,9 +102,9 @@ const OrderTask = () => {
 											</div>
 											{tasks?.map((item) => (
 												<Item
+													key={item.id}
 													showKpiNorm={showKpiNorm}
 													data={item}
-													showUser={showUser}
 													onOpen={handleOpenForm}
 												/>
 											))}
@@ -143,19 +134,21 @@ const OrderTask = () => {
 											<tbody>
 												{items?.map((item) => (
 													<React.Fragment key={item.id}>
-														<tr onClick={() => handleOpenForm(item)}>
+														<tr
+															onClick={() => handleOpenForm(item)}
+															className='cursor-pointer'>
 															<td>{item?.name}</td>
 															<td>
 																{item?.taskType || 'Thường xuyên'}
 															</td>
-															<td>{item?.position?.name}</td>
-															<td>{item?.kpiValue}</td>
+															<td>{_.get(item, 'position.name')}</td>
+															<td>{item?.kpiValue || 'Không'}</td>
 														</tr>
 													</React.Fragment>
 												))}
 											</tbody>
 										</table>
-										<footer>
+										<div>
 											<hr />
 											<PaginationButtons
 												data={kpiNorm.filter(
@@ -166,7 +159,7 @@ const OrderTask = () => {
 												perPage={perPage}
 												setPerPage={setPerPage}
 											/>
-										</footer>
+										</div>
 									</div>
 								</Card>
 							</div>
