@@ -1,17 +1,19 @@
-.cp_tree-table {
+.kpi-norm-container .cp_tree-table {
 	font-size: 14px;
 	color: #040402;
 	background: #fff;
 	border: 1px solid rgba(55, 53, 47, 0.2);
 }
 
-.cp_tree-table_viewport {
+.kpi-norm-container .cp_tree-table_viewport {
 	min-height: 300px;
+	/* height: 100% !important; */
+	/* max-height: 900px; */
 }
 
 /* Header */
 
-.cp_tree-table .cp_tree-table_header {
+.kpi-norm-container .cp_tree-table .cp_tree-table_header {
 	background: rgba(242, 241, 238, 0.6);
 	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
 	font-weight: 600;

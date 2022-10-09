@@ -312,7 +312,10 @@ const KpiNormPage = () => {
 										</CardActions>
 									</CardHeader>
 									<CardBody>
-										<TreeTable value={treeValue} onChange={handleOnChange}>
+										<TreeTable
+											value={treeValue}
+											onChange={handleOnChange}
+											height={1000}>
 											<TreeTable.Column
 												style={{ minWidth: 300 }}
 												renderCell={renderIndexCell}

@@ -34,7 +34,7 @@ const KPINormForm = ({
 			resetForm();
 		},
 	});
-	const [showForm, setShowForm] = useState(true);
+	const [showForm, setShowForm] = useState(1);
 
 	return (
 		<Modal
