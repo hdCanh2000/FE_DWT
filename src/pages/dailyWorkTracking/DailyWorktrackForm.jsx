@@ -27,7 +27,6 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 			show={show}
 			onHide={handleClose}
 			aria-labelledby='contained-modal-title-vcenter'
-			backdrop='static'
 			size='lg'
 			keyboard={false}
 			centered>
@@ -53,6 +52,7 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									onBlur={formik.handleBlur}
 									value={formik.values.note}
 									isValid={formik.isValid}
+									disabled={data.row?.status}
 								/>
 							</FormGroup>
 						</div>
@@ -61,6 +61,7 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 								<Select
 									ariaLabel='Trạng thái'
 									placeholder='Trạng thái'
+									disabled={data.row?.status}
 									list={[
 										{
 											id: 1,
@@ -95,7 +96,11 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 				<Button variant='secondary' onClick={handleClose}>
 					Đóng
 				</Button>
-				<Button variant='primary' type='submit' onClick={formik.handleSubmit}>
+				<Button
+					variant='primary'
+					type='submit'
+					disabled={data.row?.status}
+					onClick={formik.handleSubmit}>
 					Xác nhận
 				</Button>
 			</Modal.Footer>
