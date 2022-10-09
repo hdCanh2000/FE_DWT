@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
-import { useToasts } from 'react-toast-notifications';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -14,7 +13,6 @@ import PaginationButtons, {
 	dataPagination,
 	PER_COUNT,
 } from '../../../components/PaginationButtons';
-import Toasts from '../../../components/bootstrap/Toasts';
 import { getAllWorktrackByUser } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
@@ -59,31 +57,17 @@ const OrderTask = () => {
 		currentPage,
 		perPage,
 	);
+	const fetch = async () => {
+		const response = await getAllWorktrackByUser();
+		const result = await response.data.data;
+		setTasks(result.filter((item) => item.user_id !== null));
+	};
 	useEffect(() => {
-		const fetch = async () => {
-			const response = await getAllWorktrackByUser();
-			const result = await response.data.data;
-			setTasks(result.filter((item) => item.user_id !== null));
-		};
 		fetch();
 	}, []);
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-	const { addToast } = useToasts();
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-	const handleSubmit = async () => {
-		handleShowToast('Giao nhiệm vụ', 'Giao nhiệm vụ thành công !');
-	};
 	const handleOpenForm = (item) => {
 		setItemEdit({ ...item });
 		setIsOpenForm(true);
@@ -110,126 +94,92 @@ const OrderTask = () => {
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<div className='col-12'>
-						<Card className='w-100'>
-							<CardHeader>
-								<CardLabel>
-									<CardTitle>
-										<CardLabel> </CardLabel>
-									</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<div className='row h-100 w-100'>
-								<div
-									className='col-lg-4 col-md-6 pb-4'
-									style={{ minHeight: '900px' }}>
-									<Card
-										style={{
-											height: '100%',
-											maxHeight: '900px',
-											minHeight: '900px',
-											overflow: 'scroll',
-										}}>
-										<CardHeader>
-											<CardLabel>
-												<CardTitle>
-													<CardLabel>Nhiệm vụ đã giao</CardLabel>
-												</CardTitle>
-											</CardLabel>
-										</CardHeader>
-										<div className='p-4'>
+						<div className='row h-100 w-100'>
+							<div className='col-4' style={{ height: '800px' }}>
+								<Card style={{ height: '800px' }}>
+									<CardHeader>
+										<CardLabel>
+											<CardTitle>
+												<CardLabel>Nhiệm vụ đã giao</CardLabel>
+											</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<div className='p-4' style={{ overflow: 'scroll' }}>
+										<div>
 											<div>
-												<div style={{ textAlign: 'center' }}>
-													{tasks.length === 0 &&
-														'Chưa giao nhiệm vụ nào!'}
-												</div>
-												{tasks?.map((item) => (
-													<Item
-														showKpiNorm={showKpiNorm}
-														data={item}
-														showUser={showUser}
-														onOpen={handleOpenForm}
-													/>
-												))}
+												{tasks.length === 0 && 'Chưa giao nhiệm vụ nào!'}
 											</div>
-										</div>
-									</Card>
-								</div>
-								<div className='col-lg-8 col-md-6' style={{ minHeight: '900px' }}>
-									<Card style={{ minHeight: '900px' }}>
-										<CardHeader>
-											<CardLabel>
-												<CardTitle>
-													<CardLabel>Danh sách nhiệm vụ</CardLabel>
-												</CardTitle>
-											</CardLabel>
-										</CardHeader>
-										<div className='p-4'>
-											<table
-												className='table table-modern mb-0'
-												style={{ fontSize: 14 }}>
-												<thead>
-													<tr>
-														<th>Tên nhiệm vụ</th>
-														<th>Loại nhiệm vụ</th>
-														<th>Vị trí đảm nhiệm</th>
-														<th>Giá trị KPI</th>
-													</tr>
-												</thead>
-												<tbody>
-													{items?.map((item) => (
-														<React.Fragment key={item.id}>
-															<tr
-																onClick={() => handleOpenForm(item)}
-																style={{ cursor: 'pointer' }}>
-																<td>{item?.name}</td>
-																<td>
-																	{item?.taskType ||
-																		'Thường xuyên'}
-																</td>
-																<td>{item?.position?.name}</td>
-																<td>{item?.kpiValue}</td>
-															</tr>
-														</React.Fragment>
-													))}
-												</tbody>
-											</table>
-											<footer>
-												<hr />
-												<PaginationButtons
-													data={kpiNorm.filter(
-														(item) => item.parentId === null,
-													)}
-													setCurrentPage={setCurrentPage}
-													currentPage={currentPage}
-													perPage={perPage}
-													setPerPage={setPerPage}
+											{tasks?.map((item) => (
+												<Item
+													showKpiNorm={showKpiNorm}
+													data={item}
+													showUser={showUser}
+													onOpen={handleOpenForm}
 												/>
-											</footer>
+											))}
 										</div>
-									</Card>
-								</div>
+									</div>
+								</Card>
 							</div>
-							{/* <div className='col-12 my-4'>
-								<div className='w-100 mt-4 text-center'>
-									<Button
-										color='primary'
-										className='w-15 p-3 m-1'
-										type='button'
-										onClick={handleSubmit}>
-										Chốt nhiệm vụ
-									</Button>
-								</div>
-							</div> */}
-						</Card>
+							<div className='col-8' style={{ height: '800px' }}>
+								<Card style={{ height: '800px' }}>
+									<CardHeader>
+										<CardLabel>
+											<CardTitle>
+												<CardLabel>Danh sách nhiệm vụ</CardLabel>
+											</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<div className='p-4'>
+										<table className='table table-modern mb-0'>
+											<thead>
+												<tr>
+													<th>Tên nhiệm vụ</th>
+													<th>Loại nhiệm vụ</th>
+													<th>Vị trí đảm nhiệm</th>
+													<th>Giá trị KPI</th>
+												</tr>
+											</thead>
+											<tbody>
+												{items?.map((item) => (
+													<React.Fragment key={item.id}>
+														<tr onClick={() => handleOpenForm(item)}>
+															<td>{item?.name}</td>
+															<td>
+																{item?.taskType || 'Thường xuyên'}
+															</td>
+															<td>{item?.position?.name}</td>
+															<td>{item?.kpiValue}</td>
+														</tr>
+													</React.Fragment>
+												))}
+											</tbody>
+										</table>
+										<footer>
+											<hr />
+											<PaginationButtons
+												data={kpiNorm.filter(
+													(item) => item.parentId === null,
+												)}
+												setCurrentPage={setCurrentPage}
+												currentPage={currentPage}
+												perPage={perPage}
+												setPerPage={setPerPage}
+											/>
+										</footer>
+									</div>
+								</Card>
+							</div>
+						</div>
 					</div>,
 					['admin', 'manager'],
 					<NotPermission />,
 				)}
 			</Page>
 			<OrderTaskForm
+				fetch={fetch}
 				show={isOpenForm}
 				onClose={handleCloseForm}
-				onSubmit={handleSubmit}
 				item={itemEdit}
 			/>
 		</PageWrapper>

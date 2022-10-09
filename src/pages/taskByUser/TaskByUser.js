@@ -23,9 +23,10 @@ const TaskByUser = () => {
 		<PageWrapper title='Giám sát công việc nhân viên'>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
-					<div className='row my-4'>
+					<div className='row mb-0' 	style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
 						<div className='col-md-12'>
 							<Card>
+							<div style={{ margin: '24px 24px 0' }}>
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
 										<CardTitle>
@@ -85,6 +86,7 @@ const TaskByUser = () => {
 											setPerPage={setPerPage}
 										/>
 									</footer>
+								</div>
 								</div>
 							</Card>
 						</div>

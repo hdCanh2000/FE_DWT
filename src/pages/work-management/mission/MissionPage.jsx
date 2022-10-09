@@ -79,6 +79,7 @@ const MissionPage = () => {
 			id: 'quantity',
 			key: 'quantity',
 			type: 'number',
+			align: 'center',
 		},
 		{
 			title: 'Số ngày công',
@@ -165,44 +166,42 @@ const MissionPage = () => {
 				<div>
 					{verifyPermissionHOC(
 						<>
-							<div className='row'>
-								<div className='col-12'>
-									<div className='d-flex justify-content-between align-items-center'>
-										<div className='display-6 fw-bold py-3'>
-											Danh sách mục tiêu
-										</div>
-									</div>
-								</div>
-							</div>
-							<div className='row'>
+							<div
+								className='row'
+								style={{ maxWidth: '75%', minWidth: '60%', margin: '0 auto' }}>
 								<div className='col-12'>
 									<Card>
-										<CardHeader>
-											<CardLabel icon='Task' iconColor='danger'>
-												<CardTitle>
-													<CardLabel>Danh sách mục tiêu</CardLabel>
-												</CardTitle>
-											</CardLabel>
-											{verifyPermissionHOC(
-												<CardActions>
-													<Button
-														color='info'
-														icon='Plus'
-														tag='button'
-														onClick={() => handleOpenFormEdit(null)}>
-														Thêm mục tiêu
-													</Button>
-												</CardActions>,
-												['admin'],
-											)}
-										</CardHeader>
-										<div className='p-4'>
-											<TableCommon
-												className='table table-modern mb-0'
-												columns={columns}
-												data={missions}
-											/>
+										<div style={{ margin: '24px 24px 0' }}>
+											<CardHeader>
+												<CardLabel icon='Task' iconColor='danger'>
+													<CardTitle>
+														<CardLabel>Danh sách mục tiêu</CardLabel>
+													</CardTitle>
+												</CardLabel>
+												{verifyPermissionHOC(
+													<CardActions>
+														<Button
+															color='info'
+															icon='Plus'
+															tag='button'
+															onClick={() =>
+																handleOpenFormEdit(null)
+															}>
+															Thêm mới
+														</Button>
+													</CardActions>,
+													['admin'],
+												)}
+											</CardHeader>
+											<div className='p-4'>
+												<TableCommon
+													className='table table-modern mb-0'
+													columns={columns}
+													data={missions}
+												/>
+											</div>
 										</div>
+
 										{!missions?.length && (
 											<Alert
 												color='warning'

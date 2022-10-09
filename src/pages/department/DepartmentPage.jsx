@@ -262,73 +262,70 @@ const DepartmentPage = () => {
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
-					<>
-						<div className='row'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>Cơ cấu tổ chức</div>
-								</div>
-							</div>
-						</div>
-						<div className='row mb-0'>
-							<div className='col-12'>
-								<Card className='w-100 ' style={{ minHeight: '900px' }}>
-									<CardHeader>
-										<CardLabel icon='Sort' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='AddCircleOutline'
-												tag='button'
-												onClick={() => handleOpenForm(null)}>
-												Thêm cơ cấu tổ chức
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<div className='row h-100 w-100'>
-										<div className='col-lg-3 col-md-6'>
-											{/* <Card className='h-100' style={{ minHeight: '900px' }}>
-												<CardBody> */}
-											<div className='p-4'>
-												<div className='d-flex align-items-center justify-content-start'>
-													<Button
-														color='info'
-														icon={!toggle ? 'ExpandMore' : 'ExpandLess'}
-														tag='button'
-														onClick={toggleExpand}>
-														{!toggle ? 'Hiển thị tất cả' : 'Thu gọn'}
-													</Button>
+					<div className='row mb-0'>
+						<div className='col-12'>
+							<Card className='w-100 '>
+								<CardHeader>
+									<CardLabel icon='Sort' iconColor='primary'>
+										<CardTitle>
+											<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
+										</CardTitle>
+									</CardLabel>
+									<CardActions>
+										<Button
+											color='info'
+											icon='AddCircleOutline'
+											tag='button'
+											onClick={() => handleOpenForm(null)}>
+											Thêm mới
+										</Button>
+									</CardActions>
+								</CardHeader>
+								<div className='row h-100 w-100'>
+									<div className='col-lg-3 col-md-6 pb-4'>
+										<Card className='h-100'>
+											<CardBody>
+												<div className='p-4' style={{height : '100%'}}>
+													<div className='d-flex align-items-center justify-content-start'>
+														<Button
+															color='info'
+															icon={
+																!toggle
+																	? 'ExpandMore'
+																	: 'ExpandLess'
+															}
+															tag='button'
+															onClick={toggleExpand}>
+															{!toggle
+																? 'Hiển thị tất cả'
+																: 'Thu gọn'}
+														</Button>
+													</div>
+													<TreeTable
+														value={treeValue}
+														height={400}
+														onChange={handleOnChange}>
+														<TreeTable.Column
+															style={{ minWidth: 300 }}
+															renderCell={renderIndexCell}
+															renderHeaderCell={() => <span />}
+														/>
+													</TreeTable>
 												</div>
-												<TreeTable
-													value={treeValue}
-													onChange={handleOnChange}
-													height={900}>
-													<TreeTable.Column
-														style={{ minWidth: 300 }}
-														renderCell={renderIndexCell}
-														renderHeaderCell={() => <span />}
-													/>
-												</TreeTable>
-											</div>
-											{/* </CardBody>
-											</Card> */}
-										</div>
-										<div className='col-lg-9 col-md-6'>
-											<Card className='h-100' style={{ minHeight: '900px' }}>
-												<CardBody>
-													<Employee dataDepartment={dataDepartment} />
-												</CardBody>
-											</Card>
-										</div>
+											</CardBody>
+										</Card>
 									</div>
-								</Card>
-							</div>
+									<div className='col-lg-9 col-md-6'>
+										<Card>
+											<CardBody>
+												<Employee dataDepartment={dataDepartment} />
+											</CardBody>
+										</Card>
+									</div>
+								</div>
+							</Card>
 						</div>
-					</>,
+					</div>,
 					['admin'],
 					<NotPermission />,
 				)}

@@ -86,13 +86,6 @@ const DailyWorkTracking = () => {
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
-				<div className='row'>
-					<div className='col-12'>
-						<div className='d-flex justify-content-between align-items-center'>
-							<div className='display-6 fw-bold py-3'>Danh sách nhiệm vụ</div>
-						</div>
-					</div>
-				</div>
 				<div className='row mb-0 h-100'>
 					<div className='col-12'>
 						<Card className='w-100'>

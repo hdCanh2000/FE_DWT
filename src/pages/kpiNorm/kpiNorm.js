@@ -243,8 +243,6 @@ const KpiNormPage = () => {
 		handleCloseDelete();
 	};
 
-	const lable = 'Định mức lao động & KPI';
-
 	const handleOnChange = (newValue) => {
 		setTreeValue(newValue);
 	};
@@ -291,17 +289,12 @@ const KpiNormPage = () => {
 		<PageWrapper title='Khai báo nhiệm vụ'>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
-					<>
-						<div className='row'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>{lable}</div>
-								</div>
-							</div>
-						</div>
-						<div className='row mb-0'>
-							<div className='col-12'>
-								<Card className='w-100 kpi-norm-container'>
+					<div
+						className='row mb-0'
+						style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+						<div className='col-12'>
+							<Card className='w-100 h-100'>
+								<div style={{ margin: '24px 24px 0' }}>
 									<CardHeader>
 										<CardLabel icon='AccountCircle' iconColor='primary'>
 											<CardTitle>
@@ -314,7 +307,7 @@ const KpiNormPage = () => {
 												icon='PersonPlusFill'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
-												Thêm nhiệm vụ
+												Thêm mới
 											</Button>
 										</CardActions>
 									</CardHeader>
@@ -322,7 +315,8 @@ const KpiNormPage = () => {
 										<TreeTable
 											value={treeValue}
 											onChange={handleOnChange}
-											height={1000}>
+											height={700}
+											>
 											<TreeTable.Column
 												style={{ minWidth: 300 }}
 												renderCell={renderIndexCell}
@@ -368,10 +362,10 @@ const KpiNormPage = () => {
 											/>
 										</TreeTable>
 									</CardBody>
-								</Card>
-							</div>
+								</div>
+							</Card>
 						</div>
-					</>,
+					</div>,
 					['admin', 'manager'],
 					<NotPermission />,
 				)}

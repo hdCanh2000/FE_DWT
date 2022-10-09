@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -30,7 +29,7 @@ import EmployeeForm from './EmployeeForm';
 import NotPermission from '../presentation/auth/NotPermission';
 import { getAllPosition } from '../position/services';
 
-const EmployeePage = ({ header }) => {
+const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
@@ -344,53 +343,51 @@ const EmployeePage = ({ header }) => {
 	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
-			<Page container='fluid' style={{ padding: '0' }}>
+			<Page container='fluid'>
 				<div>
 					{verifyPermissionHOC(
 						<div>
-							{header === false &&
-								verifyPermissionHOC(
-									<div className='row mb-4'>
-										<div className='col-12'>
-											<div className='d-flex justify-content-between align-items-center'>
-												<div className='display-6 fw-bold py-3'>
-													Danh sách nhân sự
-												</div>
-											</div>
-										</div>
-									</div>,
-									['admin', 'manager'],
-								)}
-
 							{verifyPermissionHOC(
-								<div className='row mb-0'>
+								<div
+									className='row mb-0'
+									style={{
+										maxWidth: '80%',
+										minWidth: '60%',
+										margin: '0 auto',
+									}}>
 									<div className='col-12'>
 										<Card className='w-100'>
-											<CardHeader>
-												<CardLabel icon='AccountCircle' iconColor='primary'>
-													<CardTitle>
-														<CardLabel>Danh sách nhân sự</CardLabel>
-													</CardTitle>
-												</CardLabel>
-												{verifyPermissionHOC(
-													<CardActions>
-														<Button
-															color='info'
-															icon='PersonPlusFill'
-															tag='button'
-															onClick={() => handleOpenForm(null)}>
-															Thêm nhân sự
-														</Button>
-													</CardActions>,
-													['admin'],
-												)}
-											</CardHeader>
-											<div className='p-4'>
-												<TableCommon
-													className='table table-modern mb-0'
-													columns={columns}
-													data={users}
-												/>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel
+														icon='AccountCircle'
+														iconColor='primary'>
+														<CardTitle>
+															<CardLabel>Danh sách nhân sự</CardLabel>
+														</CardTitle>
+													</CardLabel>
+													{verifyPermissionHOC(
+														<CardActions>
+															<Button
+																color='info'
+																icon='PersonPlusFill'
+																tag='button'
+																onClick={() =>
+																	handleOpenForm(null)
+																}>
+																Thêm mới
+															</Button>
+														</CardActions>,
+														['admin'],
+													)}
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={users}
+													/>
+												</div>
 											</div>
 										</Card>
 									</div>
@@ -432,11 +429,7 @@ const EmployeePage = ({ header }) => {
 		</PageWrapper>
 	);
 };
-EmployeePage.propTypes = {
-	header: PropTypes.bool,
-};
-EmployeePage.defaultProps = {
-	header: false,
-};
+EmployeePage.propTypes = {};
+EmployeePage.defaultProps = {};
 
 export default EmployeePage;

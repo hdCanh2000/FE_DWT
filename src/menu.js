@@ -157,8 +157,8 @@ export const demoPages = {
 		subMenu: {
 			unit: {
 				id: 'unit',
-				text: 'Cấu hình đơn vị',
-				path: '/cau-hinh-don-vi',
+				text: 'Đơn vị tính',
+				path: '/don-vi-tinh',
 			},
 			recruitmentRequirements: {
 				id: 'recruitmentRequirements',
