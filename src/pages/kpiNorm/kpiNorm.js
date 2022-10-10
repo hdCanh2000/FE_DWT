@@ -1,15 +1,13 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable no-unused-vars */
-
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { arrayToTree } from 'performant-array-to-tree';
-import { TreeTable, TreeState } from 'cp-react-tree-table';
+import {
+	TreeGridComponent,
+	ColumnsDirective,
+	ColumnDirective,
+} from '@syncfusion/ej2-react-treegrid';
 import { isEmpty } from 'lodash';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
 	CardBody,
@@ -25,11 +23,10 @@ import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { fetchPositionList } from '../../redux/slice/positionSlice';
+import { fetchPositionList } from '../../redux/slice/positionSlice'; 
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import './style.css';
-import Icon from '../../components/icon/Icon';
 import KPINormForm from './KPINormForm';
 
 const createDataTree = (dataset) => {
@@ -70,14 +67,12 @@ const KpiNormPage = () => {
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
 
-	const [treeValue, setTreeValue] = React.useState(
-		TreeState.create(arrayToTree(kpiNorm, { childrenField: 'children' })),
-	);
+	const [treeValue, setTreeValue] = React.useState([]);
 
 	useEffect(() => {
 		if (!isEmpty(kpiNorm)) {
 			const treeData = createDataTree(kpiNorm);
-			setTreeValue(TreeState.expandAll(TreeState.create(treeData)));
+			setTreeValue(treeData);
 		}
 	}, [kpiNorm]);
 
@@ -196,9 +191,8 @@ const KpiNormPage = () => {
 				await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
-				setTreeValue(TreeState.expandAll(treeValue));
 			} catch (error) {
-				setTreeValue(TreeState.expandAll(treeValue));
+				dispatch(fetchKpiNormList());
 				throw error;
 			}
 		} else {
@@ -207,9 +201,8 @@ const KpiNormPage = () => {
 				await response.data;
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
-				setTreeValue(TreeState.expandAll(treeValue));
 			} catch (error) {
-				setTreeValue(TreeState.expandAll(treeValue));
+				dispatch(fetchKpiNormList());
 				throw error;
 			}
 		}
@@ -240,48 +233,6 @@ const KpiNormPage = () => {
 		handleCloseDelete();
 	};
 
-	const handleOnChange = (newValue) => {
-		setTreeValue(newValue);
-	};
-
-	const renderIndexCell = (row) => {
-		return (
-			<div
-				style={{
-					paddingLeft: `${row.metadata.depth * 30}px`,
-					minWidth: 360,
-				}}
-				className={
-					row.metadata.hasChildren
-						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
-						: 'without-children cursor-pointer user-select-none'
-				}>
-				<div
-					onClick={() =>
-						handleOpenForm({
-							...row.data,
-							parent: kpiNorm.find((item) => item.id === row.data.parentId),
-						})
-					}>
-					{row.data.name || ''}
-				</div>
-				{row.metadata.hasChildren ? (
-					<Icon
-						color='success'
-						type='button'
-						size='lg'
-						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
-						className='d-block bg-transparent'
-						style={{ fontSize: 25 }}
-						onClick={row.toggleChildren}
-					/>
-				) : (
-					''
-				)}
-			</div>
-		);
-	};
-
 	return (
 		<PageWrapper title='Khai báo nhiệm vụ'>
 			<Page container='fluid'>
@@ -309,54 +260,45 @@ const KpiNormPage = () => {
 										</CardActions>
 									</CardHeader>
 									<CardBody>
-										<TreeTable
-											value={treeValue}
-											onChange={handleOnChange}
-											height={700}>
-											<TreeTable.Column
-												style={{ minWidth: 300 }}
-												renderCell={renderIndexCell}
-												renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data.tasktype || ''}
-													</span>
-												)}
-												renderHeaderCell={() => <span>Loại nhiệm vụ</span>}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data.position.name || ''}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span>Vị trí đảm nhiệm</span>
-												)}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data.quantity || ''}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Số lượng</span>
-												)}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-right'>
-														{row.data.kpi_value || 'Không'}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Giá trị KPI</span>
-												)}
-											/>
-										</TreeTable>
+										<div className='control-pane'>
+											<div className='control-section'>
+												<TreeGridComponent
+													dataSource={treeValue}
+													treeColumnIndex={0}
+													className='cursor-pointer'
+													rowSelected={(item) => {
+														handleOpenForm(item.data.data);
+													}}
+													childMapping='children'
+													height='410'>
+													<ColumnsDirective>
+														<ColumnDirective
+															field='data.name'
+															headerText='Tên nhiệm vụ'
+															width='200'
+														/>
+														<ColumnDirective
+															field='data.position.name'
+															headerText='Vị trí đảm nhiệm'
+															width='90'
+															textAlign='Left'
+														/>
+														<ColumnDirective
+															field='data.quantity'
+															headerText='Số lượng'
+															width='90'
+															textAlign='Right'
+														/>
+														<ColumnDirective
+															field='data.kpi_value'
+															headerText='Giá trị KPI'
+															width='90'
+															textAlign='Right'
+														/>
+													</ColumnsDirective>
+												</TreeGridComponent>
+											</div>
+										</div>
 									</CardBody>
 								</div>
 							</Card>

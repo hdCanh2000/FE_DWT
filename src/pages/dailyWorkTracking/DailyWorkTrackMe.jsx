@@ -1,17 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
-import { arrayToTree } from 'performant-array-to-tree';
-import { TreeTable, TreeState } from 'cp-react-tree-table';
+import {
+	TreeGridComponent,
+	ColumnsDirective,
+	ColumnDirective,
+} from '@syncfusion/ej2-react-treegrid';
 import { isEmpty } from 'lodash';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import Icon from '../../components/icon/Icon';
 import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
 import { getAllWorktrackByUserId } from './services';
+
+const createDataTree = (dataset) => {
+	const hashTable = Object.create(null);
+	dataset.forEach((aData) => {
+		hashTable[aData.id] = { data: aData, children: [] };
+	});
+	const dataTree = [];
+	dataset.forEach((aData) => {
+		if (aData.parentId) {
+			hashTable[aData.parentId].children.push(hashTable[aData.id]);
+			// hashTable[aData.parentId]
+		} else {
+			dataTree.push(hashTable[aData.id]);
+		}
+	});
+	return dataTree;
+};
 
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
@@ -23,16 +41,6 @@ const DailyWorkTrackingMe = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = React.useState([]);
-
-	useEffect(() => {
-		if (!isEmpty(worktrack) && id) {
-			setTreeValue(
-				TreeState.expandAll(
-					TreeState.create(arrayToTree(worktrack, { childrenField: 'children' })),
-				),
-			);
-		}
-	}, [worktrack, id]);
 
 	const id = localStorage.getItem('userId');
 	useEffect(() => {
@@ -54,46 +62,12 @@ const DailyWorkTrackingMe = () => {
 		fetchData();
 	}, [dispatch, id]);
 
-	const renderIndexCell = (row) => {
-		return (
-			<div
-				style={{
-					paddingLeft: `${row.metadata.depth * 30}px`,
-					minWidth: 360,
-				}}
-				onDoubleClick={() =>
-					handleOpenForm({
-						...row.data,
-						parent: worktrack.find((item) => item.id === row.data.parentId),
-					})
-				}
-				className={
-					row.metadata.hasChildren
-						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
-						: 'without-children cursor-pointer user-select-none'
-				}>
-				{row.metadata.hasChildren ? (
-					<Icon
-						color='success'
-						type='button'
-						size='lg'
-						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
-						className='d-block bg-transparent'
-						style={{ fontSize: 25 }}
-						onClick={row.toggleChildren}
-					/>
-				) : (
-					''
-				)}
-
-				<span>{row.data?.kpiNorm?.name || ''}</span>
-			</div>
-		);
-	};
-
-	const handleOnChange = (newValue) => {
-		setTreeValue(newValue);
-	};
+	useEffect(() => {
+		if (!isEmpty(worktrack)) {
+			const treeData = createDataTree(worktrack);
+			setTreeValue(treeData);
+		}
+	}, [worktrack]);
 
 	return (
 		<PageWrapper title='Công việc hàng ngày'>
@@ -113,58 +87,51 @@ const DailyWorkTrackingMe = () => {
 									</CardLabel>
 								</CardHeader>
 								<CardBody>
-									{worktrack?.length > 0 ? (
-										<TreeTable value={treeValue} onChange={handleOnChange}>
-											<TreeTable.Column
-												style={{ minWidth: 300 }}
-												renderCell={renderIndexCell}
-												renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data?.mission?.name || 'Không'}
-													</span>
-												)}
-												renderHeaderCell={() => <span>Thuộc mục tiêu</span>}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data?.quantity || 'Không'}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Số lượng</span>
-												)}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-left'>
-														{row.data.deadline &&
-															moment(`${row.data.deadline}`).format(
-																'DD-MM-YYYY',
-															)}
-													</span>
-												)}
-												renderHeaderCell={() => <span>Hạn hoàn thành</span>}
-											/>
-											<TreeTable.Column
-												renderCell={(row) => (
-													<span className='expenses-cell text-right'>
-														{row.data?.kpiNorm?.manday || 'Không'}
-													</span>
-												)}
-												renderHeaderCell={() => (
-													<span className='t-left'>Số ngày công</span>
-												)}
-											/>
-										</TreeTable>
-									) : (
-										<h1 className='text-center py-4'>
-											Hiện chưa có công việc nào!
-										</h1>
-									)}
+									<div className='control-pane'>
+										<div className='control-section'>
+											<TreeGridComponent
+												dataSource={treeValue}
+												treeColumnIndex={0}
+												className='cursor-pointer user-select-none'
+												rowSelected={(item) => {
+													handleOpenForm({
+														...item.data.data,
+														parent: worktrack.find(
+															(i) => i.id === item.data.data.parentId,
+														),
+													});
+												}}
+												childMapping='children'
+												height='410'>
+												<ColumnsDirective>
+													<ColumnDirective
+														field='data.kpiNorm.name'
+														headerText='Tên nhiệm vụ'
+														width='200'
+													/>
+													<ColumnDirective
+														field='data.mission.name'
+														headerText='Thuộc mục tiêu'
+														width='90'
+														textAlign='Left'
+													/>
+													<ColumnDirective
+														field='data.deadline'
+														headerText='Hạn hoàn thành'
+														format='yMd'
+														width='90'
+														textAlign='Center'
+													/>
+													<ColumnDirective
+														field='data.quantity'
+														headerText='Số lượng'
+														width='90'
+														textAlign='Right'
+													/>
+												</ColumnsDirective>
+											</TreeGridComponent>
+										</div>
+									</div>
 								</CardBody>
 							</div>
 						</Card>
