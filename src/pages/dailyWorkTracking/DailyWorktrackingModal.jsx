@@ -6,7 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import Card from '../../components/bootstrap/Card';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog, getWorktrackById, updateWorktrackLog } from './services';
-import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
+import { fetchWorktrackList, fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
 
 const styleHead = {
 	border: '1px solid #c8c7c7',
@@ -93,8 +93,8 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 				.then(() => {
 					handleCloseForm();
 					dispatch(fetchWorktrackList(worktrack.user_id));
+					dispatch(fetchWorktrackListAll());
 					getById(worktrack.id);
-					// window.location.reload();
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
@@ -106,7 +106,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 					handleCloseForm();
 					dispatch(fetchWorktrackList(worktrack.user_id));
 					getById(worktrack.id);
-					// window.location.reload();
+					dispatch(fetchWorktrackListAll());
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
