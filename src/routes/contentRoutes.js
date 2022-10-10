@@ -10,6 +10,7 @@ const TASKBYUSER = {
 };
 const DAILYWORKTRACKING = {
 	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTracking')),
+	DAILYWORKTRACKING2: lazy(() => import('../pages/dailyWorkTracking/DailyWorktracking2')),
 	DAILYWORKTRACKINGUSER: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackingUser')),
 	DAILYWORKTRACKINGME: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTrackMe')),
 	DAILYWORKTRACKINGME2: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackMe2')),
@@ -79,6 +80,11 @@ const presentation = [
 	{
 		path: demoPages.jobsPage.subMenu.mission.path,
 		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
+		exact: true,
+	},
+	{
+		path: 'nhiem-vu-2',
+		element: <DAILYWORKTRACKING.DAILYWORKTRACKING2 />,
 		exact: true,
 	},
 	{
