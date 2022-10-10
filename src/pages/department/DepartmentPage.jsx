@@ -1,6 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 
 import React, { useEffect, useState } from 'react';
@@ -47,10 +45,6 @@ const DepartmentPage = () => {
 	const [treeValue, setTreeValue] = React.useState(
 		TreeState.create(arrayToTree(department, { childrenField: 'children' })),
 	);
-
-	// useEffect(() => {
-	// 	setTreeValue(TreeState.create(arrayToTree(department, { childrenField: 'children' })));
-	// }, [department]);
 
 	useEffect(() => {
 		if (!isEmpty(department)) {
@@ -113,7 +107,7 @@ const DepartmentPage = () => {
 			col: 4,
 		},
 		{
-			title: 'Quan hệ cha con',
+			title: 'Thuộc cơ cấu tổ chức',
 			id: 'parentId',
 			key: 'parentId',
 			type: 'select',
@@ -285,7 +279,7 @@ const DepartmentPage = () => {
 									<div className='col-lg-3 col-md-6 pb-4'>
 										<Card className='h-100'>
 											<CardBody>
-												<div className='p-4' style={{height : '100%'}}>
+												<div className='p-4' style={{ height: '100%' }}>
 													<div className='d-flex align-items-center justify-content-start'>
 														<Button
 															color='info'
@@ -334,7 +328,7 @@ const DepartmentPage = () => {
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
+					label={itemEdit?.id ? 'Cập nhật cơ cấu tổ chức' : 'Thêm mới cơ cấu tổ chức'}
 					fields={columns}
 					validate={validate}
 				/>

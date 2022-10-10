@@ -102,7 +102,8 @@ const DailyWorkTracking = () => {
 												renderCell={renderIndexCell}
 												renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
 											/>
-											<TreeTable.Column id='department'
+											<TreeTable.Column
+												id='department'
 												renderCell={(row) => (
 													<span className='text-left'>
 														{row.data?.user?.department?.name ||

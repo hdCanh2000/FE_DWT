@@ -131,7 +131,7 @@ const DailyWorkTrackingMe = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-left'>
-														{row.data?.quantity || ''}
+														{row.data?.quantity || 'Không'}
 													</span>
 												)}
 												renderHeaderCell={() => (
@@ -141,9 +141,10 @@ const DailyWorkTrackingMe = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-left'>
-														{moment(`${row.data.deadline}`).format(
-															'DD-MM-YYYY',
-														) || ''}
+														{row.data.deadline &&
+															moment(`${row.data.deadline}`).format(
+																'DD-MM-YYYY',
+															)}
 													</span>
 												)}
 												renderHeaderCell={() => <span>Hạn hoàn thành</span>}
@@ -151,7 +152,7 @@ const DailyWorkTrackingMe = () => {
 											<TreeTable.Column
 												renderCell={(row) => (
 													<span className='expenses-cell text-right'>
-														{row.data?.kpiNorm?.manday || ''}
+														{row.data?.kpiNorm?.manday || 'Không'}
 													</span>
 												)}
 												renderHeaderCell={() => (

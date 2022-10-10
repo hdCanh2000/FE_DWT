@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useCallback, useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';

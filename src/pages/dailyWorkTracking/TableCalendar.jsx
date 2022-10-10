@@ -1,6 +1,4 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';

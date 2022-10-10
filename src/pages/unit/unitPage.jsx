@@ -25,7 +25,6 @@ const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const params = useParams();
-	// const navigate = useNavigate();
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [units, setUnits] = useState([]);
@@ -53,14 +52,17 @@ const UnitPage = () => {
 		});
 		set0penConfirm(true);
 	};
+
 	const handleCloseDeleteComfirm = () => {
 		setDeletes({});
 		set0penConfirm(false);
 	};
+
 	async function fetchUnits() {
 		const res = await getAllUnits();
 		setUnits(res.data.data);
 	}
+
 	const handleDelete = async (valueDelete) => {
 		try {
 			await deleteUnit(valueDelete?.id);
@@ -70,6 +72,7 @@ const UnitPage = () => {
 		}
 		fetchUnits(params?.id);
 	};
+
 	const columns = [
 		{
 			title: 'Mã đơn vị',
@@ -86,11 +89,6 @@ const UnitPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			// render: (item) => (
-			// 	<Link className='text-underline' to={`/phong-ban/${item.id}`}>
-			// 		{item.name}
-			// 	</Link>
-			// ),
 		},
 		{
 			title: 'Hành động',

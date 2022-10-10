@@ -1,16 +1,12 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
 import Card from '../../components/bootstrap/Card';
 import DailyWorktrackForm from './DailyWorktrackForm';
-import { addWorktrackLog, updateWorktrackLog } from './services';
-import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
+import { addWorktrackLog, getWorktrackById, updateWorktrackLog } from './services';
+import { fetchWorktrackList, fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
 
 const styleHead = {
 	border: '1px solid #c8c7c7',
@@ -45,22 +41,28 @@ const renderColor = (status) => {
 	}
 };
 
-// const formatDate = (date = '') => {
-// 	const tmp = date.split('-');
-// 	const year = tmp[2];
-// 	const month = tmp[1];
-// 	const d = tmp[0];
-// 	return `${month}/${d}/${year}`;
-// };
-
 const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 	const dispatch = useDispatch();
+	const [worktrack, setWorktrack] = useState({});
 	const [showForm, setShowForm] = useState(false);
 	const [dataShow, setDataShow] = useState({
 		row: {},
 		column: {},
 		valueForm: {},
 	});
+
+	async function getById(id) {
+		getWorktrackById(id)
+			.then((res) => setWorktrack(res.data.data))
+			// eslint-disable-next-line no-console
+			.catch((err) => console.log(err));
+	}
+
+	useEffect(() => {
+		if (!_.isEmpty(data)) {
+			getById(data.id);
+		}
+	}, [data, data.id]);
 
 	const handleCloseForm = () => {
 		setShowForm(false);
@@ -90,8 +92,9 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			updateWorktrackLog(dataSubmit)
 				.then(() => {
 					handleCloseForm();
-					dispatch(fetchWorktrackList(data.user_id));
-					window.location.reload();
+					dispatch(fetchWorktrackList(worktrack.user_id));
+					dispatch(fetchWorktrackListAll());
+					getById(worktrack.id);
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
@@ -101,8 +104,9 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			addWorktrackLog(dataSubmit)
 				.then(() => {
 					handleCloseForm();
-					dispatch(fetchWorktrackList(data.user_id));
-					window.location.reload();
+					dispatch(fetchWorktrackList(worktrack.user_id));
+					getById(worktrack.id);
+					dispatch(fetchWorktrackListAll());
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
@@ -116,13 +120,12 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			show={show}
 			onHide={handleClose}
 			aria-labelledby='contained-modal-title-vcenter'
-			backdrop='static'
 			size='xl'
 			keyboard={false}
 			centered>
 			<Modal.Header closeButton className='text-center pb-0'>
 				<Modal.Title className='text-center w-100'>
-					Báo cáo công việc: {data?.kpiNorm?.name}
+					Báo cáo công việc: {worktrack?.kpiNorm?.name}
 				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
@@ -142,39 +145,14 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 											style={{
 												border: '1px solid #c8c7c7',
 												backgroundColor: renderColor(
-													data?.workTrackLogs?.find(
+													worktrack?.workTrackLogs?.find(
 														(i) => i?.date === item?.date,
 													)?.status,
 												),
-												// background: renderColor(
-												// 	new Date(
-												// 		data?.workTrackLogs?.find(
-												// 			(i) =>
-												// 				new Date(i?.date).getTime() -
-												// 					new Date(
-												// 						formatDate(item?.date),
-												// 					).getTime() ===
-												// 				0,
-												// 		)?.date,
-												// 	).getTime() -
-												// 		new Date(
-												// 			formatDate(item?.date),
-												// 		).getTime() ===
-												// 		0
-												// 		? data?.workTrackLogs?.find(
-												// 				(i) =>
-												// 					new Date(i?.date).getTime() -
-												// 						new Date(
-												// 							formatDate(item?.date),
-												// 						).getTime() ===
-												// 					0,
-												// 		  ).status
-												// 		: '',
-												// ),
 											}}
 											onClick={() =>
 												handleShowForm(
-													data?.workTrackLogs?.find(
+													worktrack?.workTrackLogs?.find(
 														(i) => i?.date === item?.date,
 													),
 													item,

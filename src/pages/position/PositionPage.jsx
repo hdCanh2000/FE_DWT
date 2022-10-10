@@ -127,7 +127,7 @@ const PositionPage = () => {
 			key: 'action',
 			align: 'center',
 			render: (item) => (
-				<>
+				<div className='d-flex align-items-center'>
 					<Button
 						isOutline={!darkModeStatus}
 						color='success'
@@ -144,7 +144,7 @@ const PositionPage = () => {
 						icon='RemoveRedEye'
 						onClick={() => handleOpenDetail(item)}
 					/>
-				</>
+				</div>
 			),
 			isShow: false,
 		},

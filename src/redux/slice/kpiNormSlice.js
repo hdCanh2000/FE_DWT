@@ -37,7 +37,7 @@ export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () =
 			unit: {
 				...item.unit,
 				label: _.get(item, 'unit.name'),
-				value:  _.get(item, 'unit.value'),
+				value: _.get(item, 'unit.value'),
 			},
 		};
 	});
