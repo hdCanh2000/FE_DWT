@@ -10,10 +10,8 @@ const TASKBYUSER = {
 };
 const DAILYWORKTRACKING = {
 	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTracking')),
-	DAILYWORKTRACKING2: lazy(() => import('../pages/dailyWorkTracking/DailyWorktracking2')),
 	DAILYWORKTRACKINGUSER: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackingUser')),
 	DAILYWORKTRACKINGME: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTrackMe')),
-	DAILYWORKTRACKINGME2: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackMe2')),
 	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/orderTask')),
 };
 const TASK = {
@@ -64,7 +62,6 @@ const UNIT = {
 
 const KPINORM = {
 	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
-	KPINORM2: lazy(() => import('../pages/kpiNorm/KPINormPage2')),
 };
 
 const MISSION = {
@@ -83,11 +80,6 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: 'nhiem-vu-2',
-		element: <DAILYWORKTRACKING.DAILYWORKTRACKING2 />,
-		exact: true,
-	},
-	{
 		path: demoPages.jobsPage.subMenu.employee.path,
 		element: <TASKBYUSER.TASKBYUSER />,
 		exact: true,
@@ -95,11 +87,6 @@ const presentation = [
 	{
 		path: `${demoPages.taskPage.path}`,
 		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGME />,
-		exact: true,
-	},
-	{
-		path: 'cong-viec-hang-ngay-2',
-		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGME2 />,
 		exact: true,
 	},
 	{
@@ -163,11 +150,6 @@ const presentation = [
 	{
 		path: demoPages.taskAndAssign.subMenu.kpiNorm.path,
 		element: <KPINORM.KPINORM />,
-		exact: true,
-	},
-	{
-		path: 'dinh-muc-lao-dong-kpi-2',
-		element: <KPINORM.KPINORM2 />,
 		exact: true,
 	},
 	{
