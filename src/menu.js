@@ -69,7 +69,7 @@ export const demoPages = {
 			kpiNorm: {
 				id: 'kpiNorm',
 				text: 'Khai báo nhiệm vụ',
-				path: '/dinh-muc-lao-dong-kpi',
+				path: '/khai-bao-nhiem-vu',
 			},
 			assign: {
 				id: 'assign',
