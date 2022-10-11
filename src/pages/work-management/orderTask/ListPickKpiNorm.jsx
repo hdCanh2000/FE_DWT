@@ -4,15 +4,16 @@ import PropTypes from 'prop-types';
 import { arrayToTree } from 'performant-array-to-tree';
 import { Button, Form, Modal } from 'react-bootstrap';
 import Icon from '../../../components/icon/Icon';
+import './style.css';
 
 // eslint-disable-next-line no-unused-vars, prettier/prettier, react/prop-types
 const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem}) => {
-
 	const [dataValue, setDataValue] = React.useState([]);
 	const [quantity, setquantity] = React.useState([]);
 	const [treeValue, setTreeValue] = React.useState(TreeState.create([]));
 	useEffect(() => {
 		const newData = arrayToTree(data, { childrenField: 'children' });
+		// eslint-disable-next-line react/prop-types
 		// eslint-disable-next-line react/prop-types
 		setTreeValue(
 			TreeState.expandAll(
@@ -38,15 +39,19 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 
 	const handleSubmit = () => {
 		setDataSubMission(dataValue);
+		setDataValue([]);
 		handleClose();
 	};
-
+	const handleCloses = () => {
+		handleClose();
+		setDataValue([]);
+	};
 	const renderIndexCell = (row) => {
 		return (
 			<div
 				style={{
 					paddingLeft: `${row.metadata.depth * 30}px`,
-					minWidth: 360,
+					minWidth: '350px',
 				}}
 				className={
 					row.metadata.hasChildren
@@ -89,16 +94,15 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 		const newData = dataValue.filter((item) => item.id !== row.data.id);
 		setDataValue([...newData, { ...row.data, quantity: parseInt(e.target.value, 10) }]);
 	};
-
 	return (
-		<Modal show={show} size='xl' onHide={handleClose}>
+		<Modal show={show} size='lg' onHide={handleCloses}>
 			<Modal.Header closeButton>
 				<Modal.Title>Nhiệm vụ con</Modal.Title>
 			</Modal.Header>
 			<Modal.Body>
 				<TreeTable value={treeValue} onChange={handleOnChange}>
 					<TreeTable.Column
-						style={{ minWidth: 300 }}
+						style={{ minWidth: '300px' }}
 						renderCell={renderIndexCell}
 						renderHeaderCell={() => <span className='t-center'>Tên nhiệm vụ</span>}
 					/>
@@ -119,7 +123,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 					<TreeTable.Column
 						renderCell={(row) => (
 							<input
-								style={{ width: '100px' }}
+								style={{ width: '50px' }}
 								name='quantity'
 								disabled={
 									!dataValue.filter((items) => items.id === row.data.id).length
@@ -132,7 +136,7 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 				</TreeTable>
 			</Modal.Body>
 			<Modal.Footer>
-				<Button variant='secondary' onClick={handleClose}>
+				<Button variant='secondary' onClick={handleCloses}>
 					Đóng
 				</Button>
 				<Button variant='primary' onClick={handleSubmit}>
@@ -148,7 +152,6 @@ ListPickKpiNorm.propTypes = {
 	show: PropTypes.bool,
 	handleClose: PropTypes.func,
 	setDataSubMission: PropTypes.func,
-	// initData: PropTypes.array,
 };
 
 ListPickKpiNorm.defaultProps = {
@@ -156,6 +159,5 @@ ListPickKpiNorm.defaultProps = {
 	handleClose: null,
 	show: false,
 	setDataSubMission: null,
-	// initData: [],
 };
 export default ListPickKpiNorm;

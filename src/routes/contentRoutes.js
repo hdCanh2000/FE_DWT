@@ -162,10 +162,6 @@ const presentation = [
 		element: <MANAGEMENT.RECRUITMENT_REQUIREMENT />,
 	},
 	{
-		path: demoPages.cauHinh.subMenu.target.path,
-		element: <MISSION.MISSION />,
-	},
-	{
 		path: demoPages.mission.path,
 		element: <MISSION.MISSION />,
 	},

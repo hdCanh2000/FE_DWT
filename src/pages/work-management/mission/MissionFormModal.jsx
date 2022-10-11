@@ -4,58 +4,44 @@ import { Button, Modal } from 'react-bootstrap';
 import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import { useToasts } from 'react-toast-notifications';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
+import { addNewMission, updateMissionById } from './services';
+import { fetchMissionList, fetchMissionReport } from '../../../redux/slice/missionSlice';
+import Toasts from '../../../components/bootstrap/Toasts';
 
 const ErrorText = styled.span`
 	font-size: 14px;
 	color: #e22828;
 	margin-top: 5px;
 `;
-
-const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
+const MissionFormModal = ({ show, onClose, item }) => {
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const units = useSelector((state) => state.unit.units);
-
 	const [mission, setMission] = useState({});
 	const [unitOption, setUnitOption] = useState({ label: '', value: '' });
 	const [departmentOption, setDepartmentOption] = useState({ label: '', value: '' });
-	const [departmentReplatedOption, setDepartmentRelatedOption] = useState({});
+	const [departmentReplatedOption, setDepartmentRelatedOption] = useState({
+		label: '',
+		value: '',
+	});
 	const [errors, setErrors] = useState({
 		name: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
 	});
-
+	const { addToast } = useToasts();
 	const nameRef = useRef(null);
 	const departmentRef = useRef(null);
-
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 		dispatch(fetchUnitList());
 	}, [dispatch]);
-
-	const onValidate = (value, name) => {
-		setErrors((prev) => ({
-			...prev,
-			[name]: { ...prev[name], errorMsg: value },
-		}));
-	};
-
-	const validateFieldForm = (field, value) => {
-		if (!value) {
-			onValidate(true, field);
-		}
-	};
-
-	const validateForm = () => {
-		validateFieldForm('name', mission?.name);
-		validateFieldForm('departmentOption', departmentOption?.value);
-	};
 
 	const handleClearErrorMsgAfterChange = (name) => {
 		if (mission?.[name] || departmentOption?.value) {
@@ -71,21 +57,42 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		handleClearErrorMsgAfterChange('departmentOption');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mission?.name, departmentOption?.value]);
+	const isDepartment = () => {
+		const newDepartmentTrue = item?.departments?.filter(
+			(items) => items.missionDepartment.isResponsible === true,
+		);
+		const newDepartmentFalse = item?.departments?.filter(
+			(items) => items.missionDepartment.isResponsible === false,
+		);
+		if (newDepartmentTrue && newDepartmentTrue?.length !== 0) {
+			setDepartmentOption({
+				...newDepartmentTrue[0],
+				value: newDepartmentTrue[0].id,
+				label: newDepartmentTrue[0].name,
+			});
+		}
+		if (newDepartmentFalse && newDepartmentFalse.length !== 0) {
+			setDepartmentRelatedOption({
+				...newDepartmentFalse[0],
+				value: newDepartmentFalse[0].id,
+				label: newDepartmentFalse[0].name,
+			});
+		}
+	};
+	const valueUnit = () => {
+		const newUnit = units.filter((items) => items.id === item.unit_id);
+		if (newUnit && newUnit.length !== 0) {
+			setUnitOption({
+				...newUnit[0],
+				id: newUnit[0].id,
+				label: newUnit[0].name,
+				value: newUnit[0].id,
+			});
+		}
+	};
 
 	useEffect(() => {
 		setMission(item);
-		setDepartmentOption({
-			...item?.departments?.[0],
-			id: item?.departments?.[0].id,
-			label: item?.departments?.[0].name,
-			value: item?.departments?.[0].id,
-		});
-		setUnitOption({
-			...item?.unit,
-			id: item?.unit?.id,
-			label: item?.unit?.name,
-			value: item?.unit?.id,
-		});
 		if (!item?.id) {
 			setMission({
 				id: null,
@@ -104,6 +111,11 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [item?.id]);
+	useEffect(() => {
+		valueUnit();
+		isDepartment();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [item]);
 
 	const handleChange = (e) => {
 		const { value } = e.target;
@@ -132,51 +144,40 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 		setDepartmentRelatedOption({});
 		setErrors({});
 	};
-
-	const handleSubmit = () => {
-		if (!mission?.id) {
-			const data = { ...mission };
-			data.quantity = parseInt(data?.quantity, 10) || null;
-			data.manday = parseInt(data?.manday, 10) || null;
-			data.kpiValue = parseInt(data?.kpiValue, 10) || null;
-			data.responsibleDepartment_id = departmentOption.id;
-			data.relatedDepartment_id = departmentReplatedOption.id || null;
-			data.unit_id = unitOption.id || null;
-			validateForm();
-			if (!mission?.name) {
-				nameRef.current.focus();
-				return;
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+	const handleSubmitMissionForm = async () => {
+		if (item.id) {
+			try {
+				const response = await updateMissionById(item);
+				await response.data;
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
+				handleCloseForm();
+				handleShowToast(`Cập nhật mục tiêu!`, `Cập nhật mục tiêu thành công!`);
+			} catch (error) {
+				handleShowToast(`Cập nhật mục tiêu`, `Cập nhật mục tiêu không thành công!`);
 			}
-			onSubmit(data);
 		} else {
-			const data = { ...mission };
-			data.quantity = parseInt(data?.quantity, 10) || null;
-			data.manday = parseInt(data?.manday, 10) || null;
-			data.kpiValue = parseInt(data?.kpiValue, 10) || null;
-			data.responsibleDepartment_id = departmentOption.id;
-			data.relatedDepartment_id = departmentReplatedOption.id || null;
-			data.unit_id = unitOption.id || null;
-			validateForm();
-			if (!mission?.name) {
-				nameRef.current.focus();
-				return;
+			try {
+				const response = await addNewMission(item);
+				await response.data;
+				dispatch(fetchMissionList());
+				dispatch(fetchMissionReport());
+				handleCloseForm();
+				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu thành công!`);
+			} catch (error) {
+				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu không thành công!`);
 			}
-			onSubmit(data);
 		}
-		setMission({
-			id: null,
-			name: '',
-			description: '',
-			kpiValue: '',
-			quantity: '',
-			manday: '',
-			startTime: '',
-			endTime: '',
-			status: 0,
-		});
-		setDepartmentOption({});
-		setUnitOption({});
-		setDepartmentRelatedOption({});
 	};
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
@@ -341,7 +342,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 				<Button variant='secondary' onClick={handleCloseForm}>
 					Đóng
 				</Button>
-				<Button variant='primary' type='submit' onClick={handleSubmit}>
+				<Button variant='primary' type='submit' onClick={handleSubmitMissionForm}>
 					Lưu mục tiêu
 				</Button>
 			</Modal.Footer>

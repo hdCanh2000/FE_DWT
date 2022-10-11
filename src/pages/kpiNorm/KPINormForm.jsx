@@ -4,6 +4,7 @@ import { useFormik } from 'formik';
 import classNames from 'classnames';
 import Form from 'react-bootstrap/Form';
 import { Button, Modal } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
 import Textarea from '../../components/bootstrap/forms/Textarea';
@@ -25,8 +26,24 @@ const KPINormForm = ({
 	size,
 	...props
 }) => {
+	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+	const dataParent = (id) => {
+		const newParent = kpiNorm.filter((items) => items.id === id);
+		if (newParent.length !== 0) {
+			return newParent[0];
+		}
+		return { label: 'Không' };
+	};
 	const formik = useFormik({
-		initialValues: { ...item },
+		initialValues: {
+			...item,
+			tasktype: {
+				value: item.tasktype,
+				label: item.tasktype,
+			},
+			parent: dataParent(item.parent_id),
+		},
+
 		validationSchema: validate,
 		enableReinitialize: true,
 		onSubmit: (values, { resetForm }) => {
@@ -34,6 +51,7 @@ const KPINormForm = ({
 			resetForm();
 		},
 	});
+
 	const [showForm, setShowForm] = useState(1);
 
 	return (

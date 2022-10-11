@@ -175,11 +175,6 @@ export const demoPages = {
 				text: 'Cấu hình tổ chức',
 				path: '/cau-hinh-to-chuc',
 			},
-			target: {
-				id: 'target',
-				text: 'Cấu hình mục tiêu',
-				path: '/cau-hinh-muc-tieu',
-			},
 			report: {
 				id: 'report',
 				text: 'Cấu hình báo cáo',
