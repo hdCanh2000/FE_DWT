@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
-import styled from 'styled-components';
+// import styled from 'styled-components';
 import { Button, Modal } from 'react-bootstrap';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
@@ -11,15 +11,15 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Checks from '../../../components/bootstrap/forms/Checks';
 import CustomSelect from '../../../components/form/CustomSelect';
 import Select from '../../../components/bootstrap/forms/Select';
-import Option from '../../../components/bootstrap/Option';
-import Icon from '../../../components/icon/Icon';
-import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
+// import Option from '../../../components/bootstrap/Option';
+// import Icon from '../../../components/icon/Icon';
+// import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 
-const ErrorText = styled.span`
-	font-size: 14px;
-	color: #e22828;
-	margin-top: 5px;
-`;
+// const ErrorText = styled.span`
+// 	font-size: 14px;
+// 	color: #e22828;
+// 	margin-top: 5px;
+// `;
 
 const CommonForm = ({
 	className,
@@ -31,7 +31,7 @@ const CommonForm = ({
 	fields,
 	options,
 	validate,
-	nv,
+	// nv,
 	...props
 }) => {
 	const formik = useFormik({
@@ -41,57 +41,57 @@ const CommonForm = ({
 		onSubmit: (values, { resetForm }) => {
 			const result = {
 				...values,
-				kpiName: kpiNormId.map((key) => {
-					return {
-						kpiName: key.kpiName,
-					};
-				}),
+				// kpiName: kpiNormId.map((key) => {
+				// 	return {
+				// 		kpiName: key.kpiName,
+				// 	};
+				// }),
 			};
 			handleSubmit(result);
 			resetForm();
 		},
 	});
 
-	const dispatch = useDispatch();
-	const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
-	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
+	// const dispatch = useDispatch();
+	// const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
+	// const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 
-	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
+	// useEffect(() => {
+	// 	dispatch(fetchKpiNormList());
+	// }, [dispatch]);
 
 	// xoá các key theo index
-	const handleRemoveKeyField = (e, index) => {
-		setKpiNormId((prev) => prev.filter((state) => state !== prev[index]));
-	};
+	// const handleRemoveKeyField = (e, index) => {
+	// 	setKpiNormId((prev) => prev.filter((state) => state !== prev[index]));
+	// };
 
-	const handleChangeKeysState = (index, event) => {
-		event.preventDefault();
-		event.persist();
-		setKpiNormId((prev) => {
-			return prev?.map((key, i) => {
-				if (i !== index) return key;
-				return {
-					...key,
-					[event.target.name]: event.target.value,
-					error: {
-						...key.error,
-						[event.target.name]:
-							event.target.value.length > 0
-								? null
-								: `Vui lòng nhập đầy đủ thông tin!`,
-					},
-				};
-			});
-		});
-	};
+	// const handleChangeKeysState = (index, event) => {
+	// 	event.preventDefault();
+	// 	event.persist();
+	// 	setKpiNormId((prev) => {
+	// 		return prev?.map((key, i) => {
+	// 			if (i !== index) return key;
+	// 			return {
+	// 				...key,
+	// 				[event.target.name]: event.target.value,
+	// 				error: {
+	// 					...key.error,
+	// 					[event.target.name]:
+	// 						event.target.value.length > 0
+	// 							? null
+	// 							: `Vui lòng nhập đầy đủ thông tin!`,
+	// 				},
+	// 			};
+	// 		});
+	// 	});
+	// };
 
-	const handleAddFieldKey = () => {
-		const initState = {};
-		if (kpiNormId?.length <= 11) {
-			setKpiNormId((prev) => [...prev, initState]);
-		}
-	};
+	// const handleAddFieldKey = () => {
+	// 	const initState = {};
+	// 	if (kpiNormId?.length <= 11) {
+	// 		setKpiNormId((prev) => [...prev, initState]);
+	// 	}
+	// };
 
 	return (
 		<Modal
@@ -101,7 +101,7 @@ const CommonForm = ({
 			size='lg'
 			scrollable
 			centered
-			nv={nv}
+			// nv={nv}
 			{...props}>
 			<Modal.Header closeButton className='p-4'>
 				<Modal.Title>{label}</Modal.Title>
@@ -253,7 +253,7 @@ const CommonForm = ({
 								</div>
 							);
 						})}
-						<div>
+						{/* <div>
 							{nv && (
 								<>
 									<FormGroup>
@@ -321,7 +321,7 @@ const CommonForm = ({
 									})}
 								</>
 							)}
-						</div>
+						</div> */}
 					</div>
 				</form>
 			</Modal.Body>
@@ -353,7 +353,7 @@ CommonForm.propTypes = {
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
-	nv: PropTypes.bool,
+	// nv: PropTypes.bool,
 };
 CommonForm.defaultProps = {
 	className: null,
@@ -366,7 +366,7 @@ CommonForm.defaultProps = {
 	onClose: null,
 	handleSubmit: null,
 	label: '',
-	nv: false,
+	// nv: false,
 };
 
 export default CommonForm;
