@@ -232,7 +232,7 @@ const KpiNormPage = () => {
 		}
 		handleCloseDelete();
 	};
-
+	console.log(treeValue,'treeValue');
 	return (
 		<PageWrapper title='Khai báo nhiệm vụ'>
 			<Page container='fluid'>
@@ -289,7 +289,7 @@ const KpiNormPage = () => {
 															width='90'
 															textAlign='Right'
 														/>
-														<ColumnDirective
+														<ColumnDirective 
 															field='data.kpi_value'
 															headerText='Giá trị KPI'
 															width='90'
