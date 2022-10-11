@@ -1,7 +1,9 @@
 import React from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
+// import styled from 'styled-components';
 import { Button, Modal } from 'react-bootstrap';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
@@ -9,7 +11,14 @@ import Select from '../../components/bootstrap/forms/Select';
 import CustomSelect from '../../components/form/CustomSelect';
 import Checks from '../../components/bootstrap/forms/Checks';
 import Input from '../../components/bootstrap/forms/Input';
+// import Option from '../../components/bootstrap/Option';
 // import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
+
+// const ErrorText = styled.span`
+// 	font-size: 14px;
+// 	color: #e22828;
+// 	margin-top: 5px;
+// `;
 
 const PositionDetail = ({
 	className,
@@ -19,7 +28,7 @@ const PositionDetail = ({
 	label,
 	fields,
 	options,
-	nv,
+	// nv,
 	...props
 }) => {
 	const formik = useFormik({
@@ -27,9 +36,38 @@ const PositionDetail = ({
 		enableReinitialize: true,
 	});
 
+	// const dispatch = useDispatch();
+	// const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
+	// const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
+
+	// useEffect(() => {
+	// 	dispatch(fetchKpiNormList());
+	// }, [dispatch]);
+
 	// xoá các key theo index
 	// const handleRemoveKeyField = (e, index) => {
 	// 	setKpiNormId((prev) => prev.filter((state) => state !== prev[index]));
+	// };
+
+	// const handleChangeKeysState = (index, event) => {
+	// 	event.preventDefault();
+	// 	event.persist();
+	// 	setKpiNormId((prev) => {
+	// 		return prev?.map((key, i) => {
+	// 			if (i !== index) return key;
+	// 			return {
+	// 				...key,
+	// 				[event.target.name]: event.target.value,
+	// 				error: {
+	// 					...key.error,
+	// 					[event.target.name]:
+	// 						event.target.value.length > 0
+	// 							? null
+	// 							: `Vui lòng nhập đầy đủ thông tin!`,
+	// 				},
+	// 			};
+	// 		});
+	// 	});
 	// };
 
 	// const handleAddFieldKey = () => {
@@ -47,7 +85,7 @@ const PositionDetail = ({
 			size='lg'
 			scrollable
 			centered
-			nv={nv}
+			// nv={nv}
 			{...props}>
 			<Modal.Header closeButton className='p-4'>
 				<Modal.Title>{label}</Modal.Title>
@@ -166,6 +204,63 @@ const PositionDetail = ({
 										</React.Fragment>
 									);
 								})}
+								{/* <div>
+									{nv && (
+										<>
+											<hr />
+											<FormGroup
+												style={{ fontWeight: 500, color: '#6c757d' }}>
+												Danh sách nhiệm vụ
+											</FormGroup>
+											{kpiNormId?.map((element, index) => {
+												return (
+													<div
+														key={element.name}
+														className='mt-4 d-flex align-items-center justify-content-between'>
+														<div
+															style={{
+																width: '100%',
+																marginRight: 10,
+															}}>
+															<FormGroup
+																className='mr-2'
+																id='kpiName'
+																label='Tên nhiệm vụ'>
+																<Select
+																	disabled
+																	name='kpiName'
+																	required
+																	size='lg'
+																	className='border border-2 rounded-0 shadow-none'
+																	placeholder='Chọn nhiệm vụ'
+																	value={element?.kpiName}
+																	onChange={(e) =>
+																		handleChangeKeysState(
+																			index,
+																			e,
+																		)
+																	}>
+																	{kpiNorms.map((key) => (
+																		<Option
+																			key={`${key.name}`}
+																			value={`${key.name}`}>
+																			{`${key?.name}`}
+																		</Option>
+																	))}
+																</Select>
+															</FormGroup>
+															{element.error?.kpiName && (
+																<ErrorText>
+																	{element.error?.kpiName}
+																</ErrorText>
+															)}
+														</div>
+													</div>
+												);
+											})}
+										</>
+									)}
+								</div> */}
 							</div>
 						</div>
 					</div>
@@ -196,7 +291,7 @@ PositionDetail.propTypes = {
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
-	nv: PropTypes.bool,
+	// nv: PropTypes.bool,
 };
 PositionDetail.defaultProps = {
 	className: null,
@@ -209,7 +304,7 @@ PositionDetail.defaultProps = {
 	onClose: null,
 	handleSubmit: null,
 	label: '',
-	nv: false,
+	// nv: false,
 };
 
 export default PositionDetail;

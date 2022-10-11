@@ -9,7 +9,6 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
-import { getMissionById } from './services';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 
 const ErrorText = styled.span`
@@ -74,23 +73,20 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 	}, [mission?.name, departmentOption?.value]);
 
 	useEffect(() => {
-		if (item?.id) {
-			getMissionById(item?.id).then((res) => {
-				setMission(res.data?.data);
-				setDepartmentOption({
-					...res.data?.data?.departments?.[0],
-					id: res.data?.data?.departments?.[0].id,
-					label: res.data?.data?.departments?.[0].name,
-					value: res.data?.data?.departments?.[0].id,
-				});
-				setUnitOption({
-					...res.data?.data?.unit,
-					id: res.data?.data?.unit?.id,
-					label: res.data?.data?.unit?.name,
-					value: res.data?.data?.unit?.id,
-				});
-			});
-		} else {
+		setMission(item);
+		setDepartmentOption({
+			...item?.departments?.[0],
+			id: item?.departments?.[0].id,
+			label: item?.departments?.[0].name,
+			value: item?.departments?.[0].id,
+		});
+		setUnitOption({
+			...item?.unit,
+			id: item?.unit?.id,
+			label: item?.unit?.name,
+			value: item?.unit?.id,
+		});
+		if (!item?.id) {
 			setMission({
 				id: null,
 				name: '',
@@ -106,6 +102,7 @@ const MissionFormModal = ({ show, onClose, onSubmit, item }) => {
 			setDepartmentOption({});
 			setDepartmentRelatedOption({});
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [item?.id]);
 
 	const handleChange = (e) => {
