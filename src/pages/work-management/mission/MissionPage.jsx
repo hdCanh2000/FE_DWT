@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
-import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
@@ -12,26 +11,21 @@ import Card, {
 	CardLabel,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-import Toasts from '../../../components/bootstrap/Toasts';
 import Button from '../../../components/bootstrap/Button';
-import { addNewMission, updateMissionById } from './services';
-import MissionAlertConfirm from './MissionAlertConfirm';
 import MissionFormModal from './MissionFormModal';
 import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
-import { fetchMissionList, fetchMissionReport } from '../../../redux/slice/missionSlice';
+import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import NotPermission from '../../presentation/auth/NotPermission';
 
 const MissionPage = () => {
-	const { addToast } = useToasts();
 	const { darkModeStatus } = useDarkMode();
 	const dispatch = useDispatch();
 	const missions = useSelector((state) => state.mission?.missions);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
-	const toggleFormConfirm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	useEffect(() => {
@@ -51,8 +45,8 @@ const MissionPage = () => {
 		},
 		{
 			title: 'Phòng ban phụ trách',
-			id: 'quantity',
-			key: 'quantity',
+			id: 'department',
+			key: 'department',
 			type: 'number',
 			render: (item) =>
 				item.departments.filter((i) => i.missionDepartment.isResponsible)[0]?.name ||
@@ -108,57 +102,6 @@ const MissionPage = () => {
 		},
 	];
 
-	const handleCloseItem = async (data) => {
-		try {
-			const newData = { ...data };
-			newData.status = -1;
-			const response = await updateMissionById(newData);
-			dispatch(fetchMissionList());
-			dispatch(fetchMissionReport());
-			handleCloseForm();
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${response?.data?.name} thành công!`);
-		} catch (error) {
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
-		}
-	};
-
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
-	const handleSubmitMissionForm = async (data) => {
-		if (data.id) {
-			try {
-				const response = await updateMissionById(data);
-				await response.data;
-				dispatch(fetchMissionList());
-				dispatch(fetchMissionReport());
-				handleCloseForm();
-				handleShowToast(`Cập nhật mục tiêu!`, `Cập nhật mục tiêu thành công!`);
-			} catch (error) {
-				handleShowToast(`Cập nhật mục tiêu`, `Cập nhật mục tiêu không thành công!`);
-			}
-		} else {
-			try {
-				const response = await addNewMission(data);
-				await response.data;
-				dispatch(fetchMissionList());
-				dispatch(fetchMissionReport());
-				handleCloseForm();
-				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu thành công!`);
-			} catch (error) {
-				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu không thành công!`);
-			}
-		}
-	};
-
 	return (
 		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
@@ -213,21 +156,9 @@ const MissionPage = () => {
 									</Card>
 								</div>
 							</div>
-							<MissionAlertConfirm
-								openModal={toggleFormConfirm}
-								onCloseModal={handleCloseForm}
-								onConfirm={() => handleCloseItem(itemEdit)}
-								title={itemEdit?.status === 1 ? 'Đóng mục tiêu' : 'Mở mục tiêu'}
-								content={
-									itemEdit?.status === 1
-										? `Xác nhận đóng mục tiêu <strong>${itemEdit?.name}</strong> ?`
-										: `Xác nhận mở mục tiêu <strong>${itemEdit?.name}</strong> ?`
-								}
-							/>
 							<MissionFormModal
 								show={toggleFormEdit}
 								onClose={handleCloseForm}
-								onSubmit={handleSubmitMissionForm}
 								item={itemEdit}
 							/>
 						</>,
