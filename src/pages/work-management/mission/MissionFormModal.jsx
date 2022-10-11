@@ -79,14 +79,20 @@ const MissionFormModal = ({ show, onClose, item }) => {
 			});
 		}
 	};
+	const valueUnit = () => {
+		const newUnit = units.filter((items) => items.id === item.unit_id);
+		if (newUnit && newUnit.length !== 0) {
+			setUnitOption({
+				...newUnit[0],
+				id: newUnit[0].id,
+				label: newUnit[0].name,
+				value: newUnit[0].id,
+			});
+		}
+	};
+
 	useEffect(() => {
 		setMission(item);
-		setUnitOption({
-			...item?.unit,
-			id: item?.unit?.id,
-			label: item?.unit?.name,
-			value: item?.unit?.id,
-		});
 		if (!item?.id) {
 			setMission({
 				id: null,
@@ -106,6 +112,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [item?.id]);
 	useEffect(() => {
+		valueUnit();
 		isDepartment();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [item]);
