@@ -1,0 +1,16 @@
+.cp_tree-table_cell:first-child{
+    min-width: 350px;
+}
+.cp_tree-table_header-cell:first-child{
+    min-width: 350px;
+}
+.cp_tree-table_cell:nth-child(2){
+    min-width: 200px;
+}
+.cp_tree-table_header-cell:nth-child(2){
+    min-width: 200px;
+}
+.cp_tree-table{
+    border: 1px solid;
+    padding: 10px;
+}

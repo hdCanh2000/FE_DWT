@@ -23,7 +23,7 @@ import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { fetchPositionList } from '../../redux/slice/positionSlice'; 
+import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import './style.css';
@@ -232,7 +232,6 @@ const KpiNormPage = () => {
 		}
 		handleCloseDelete();
 	};
-	console.log(treeValue,'treeValue');
 	return (
 		<PageWrapper title='Khai báo nhiệm vụ'>
 			<Page container='fluid'>
@@ -289,7 +288,7 @@ const KpiNormPage = () => {
 															width='90'
 															textAlign='Right'
 														/>
-														<ColumnDirective 
+														<ColumnDirective
 															field='data.kpi_value'
 															headerText='Giá trị KPI'
 															width='90'
