@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import React from 'react';
 import { createUseStyles } from 'react-jss';
 import SusyDarkMode from './assets/img/wanna/susy/susy-dark-mode.png';

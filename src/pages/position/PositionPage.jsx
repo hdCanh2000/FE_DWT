@@ -149,11 +149,6 @@ const PositionPage = () => {
 			isShow: false,
 		},
 	];
-	// const handleDataRequirement = (data) => {
-	// 	const newData = data.map((item) => {
-	// 		return item.id,
-	// 	})
-	// };
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
