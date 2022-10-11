@@ -87,25 +87,6 @@ const RecruitmentRequirementPage = () => {
 		},
 	];
 
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
-	};
-	const handleCloseDelete = () => {
-		setIsDelete(false);
-	};
-
-	const handleDeleteRequirement = async (data) => {
-		// eslint-disable-next-line no-useless-catch
-		try {
-			await deleteRequirement(data);
-			dispatch(fetchRequirementList());
-		} catch (error) {
-			throw error;
-		}
-		handleCloseDelete();
-	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
@@ -133,6 +114,25 @@ const RecruitmentRequirementPage = () => {
 				throw error;
 			}
 		}
+	};
+
+	const handleOpenDelete = (item) => {
+		setIsDelete(true);
+		setItemDelete({ ...item });
+	};
+	const handleCloseDelete = () => {
+		setIsDelete(false);
+	};
+
+	const handleDeleteRequirement = async (data) => {
+		// eslint-disable-next-line no-useless-catch
+		try {
+			await deleteRequirement(data);
+			dispatch(fetchRequirementList());
+		} catch (error) {
+			throw error;
+		}
+		handleCloseDelete();
 	};
 
 	return (

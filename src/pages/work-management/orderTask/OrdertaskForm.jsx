@@ -212,7 +212,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											onChange={handleChange}
 											value={
 												mission.startDate ||
-												moment().add(1, 'days').format('YYYY-MM-DD')
+												moment().add(0, 'days').format('YYYY-MM-DD')
 											}
 											type='date'
 											ariaLabel='Ngày bắt đầu'
@@ -227,8 +227,8 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											placeholder='Hạn ngày hoàn thành'
 											onChange={handleChange}
 											value={
-												mission.deadlineDate ||
-												moment().add(1, 'days').format('YYYY-MM-DD')
+												mission.deadlineDate
+												// moment().add(1, 'days').format('YYYY-MM-DD')
 											}
 											type='date'
 											ariaLabel='Hạn ngày hoàn thành'
