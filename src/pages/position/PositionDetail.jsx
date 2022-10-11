@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
-import styled from 'styled-components';
+// import styled from 'styled-components';
 import { Button, Modal } from 'react-bootstrap';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
@@ -11,14 +11,14 @@ import Select from '../../components/bootstrap/forms/Select';
 import CustomSelect from '../../components/form/CustomSelect';
 import Checks from '../../components/bootstrap/forms/Checks';
 import Input from '../../components/bootstrap/forms/Input';
-import Option from '../../components/bootstrap/Option';
-import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
+// import Option from '../../components/bootstrap/Option';
+// import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 
-const ErrorText = styled.span`
-	font-size: 14px;
-	color: #e22828;
-	margin-top: 5px;
-`;
+// const ErrorText = styled.span`
+// 	font-size: 14px;
+// 	color: #e22828;
+// 	margin-top: 5px;
+// `;
 
 const PositionDetail = ({
 	className,
@@ -28,7 +28,7 @@ const PositionDetail = ({
 	label,
 	fields,
 	options,
-	nv,
+	// nv,
 	...props
 }) => {
 	const formik = useFormik({
@@ -36,39 +36,39 @@ const PositionDetail = ({
 		enableReinitialize: true,
 	});
 
-	const dispatch = useDispatch();
-	const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
-	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
+	// const dispatch = useDispatch();
+	// const [kpiNormId, setKpiNormId] = useState(item.kpiNormId || []);
+	// const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 
-	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
+	// useEffect(() => {
+	// 	dispatch(fetchKpiNormList());
+	// }, [dispatch]);
 
 	// xoá các key theo index
 	// const handleRemoveKeyField = (e, index) => {
 	// 	setKpiNormId((prev) => prev.filter((state) => state !== prev[index]));
 	// };
 
-	const handleChangeKeysState = (index, event) => {
-		event.preventDefault();
-		event.persist();
-		setKpiNormId((prev) => {
-			return prev?.map((key, i) => {
-				if (i !== index) return key;
-				return {
-					...key,
-					[event.target.name]: event.target.value,
-					error: {
-						...key.error,
-						[event.target.name]:
-							event.target.value.length > 0
-								? null
-								: `Vui lòng nhập đầy đủ thông tin!`,
-					},
-				};
-			});
-		});
-	};
+	// const handleChangeKeysState = (index, event) => {
+	// 	event.preventDefault();
+	// 	event.persist();
+	// 	setKpiNormId((prev) => {
+	// 		return prev?.map((key, i) => {
+	// 			if (i !== index) return key;
+	// 			return {
+	// 				...key,
+	// 				[event.target.name]: event.target.value,
+	// 				error: {
+	// 					...key.error,
+	// 					[event.target.name]:
+	// 						event.target.value.length > 0
+	// 							? null
+	// 							: `Vui lòng nhập đầy đủ thông tin!`,
+	// 				},
+	// 			};
+	// 		});
+	// 	});
+	// };
 
 	// const handleAddFieldKey = () => {
 	// 	const initState = {};
@@ -85,7 +85,7 @@ const PositionDetail = ({
 			size='lg'
 			scrollable
 			centered
-			nv={nv}
+			// nv={nv}
 			{...props}>
 			<Modal.Header closeButton className='p-4'>
 				<Modal.Title>{label}</Modal.Title>
@@ -204,7 +204,7 @@ const PositionDetail = ({
 										</React.Fragment>
 									);
 								})}
-								<div>
+								{/* <div>
 									{nv && (
 										<>
 											<hr />
@@ -260,7 +260,7 @@ const PositionDetail = ({
 											})}
 										</>
 									)}
-								</div>
+								</div> */}
 							</div>
 						</div>
 					</div>
@@ -291,7 +291,7 @@ PositionDetail.propTypes = {
 	onClose: PropTypes.func,
 	handleSubmit: PropTypes.func,
 	label: PropTypes.string,
-	nv: PropTypes.bool,
+	// nv: PropTypes.bool,
 };
 PositionDetail.defaultProps = {
 	className: null,
@@ -304,7 +304,7 @@ PositionDetail.defaultProps = {
 	onClose: null,
 	handleSubmit: null,
 	label: '',
-	nv: false,
+	// nv: false,
 };
 
 export default PositionDetail;
