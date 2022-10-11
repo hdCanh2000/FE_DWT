@@ -20,7 +20,7 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
-import { addEmployee, updateEmployee, deleteEmployee } from './services';
+import { addEmployee, updateEmployee } from './services';
 import { getAllDepartment } from '../department/services';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
@@ -246,25 +246,11 @@ const EmployeePage = () => {
 	const handleDelete = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			isDelete: data?.isDelete === true,
-			// name: data?.name,
-			// department_id: data?.department?.value,
-			// code: data?.code,
-			// email: data?.email,
-			// password: '123456',
-			// dateOfBirth: data?.dateOfBirth,
-			// dateOfJoin: data?.dateOfJoin,
-			// phone: data?.phone,
-			// address: data?.address,
-			// position_id: data?.position?.value,
-			// role:
-			// 	// eslint-disable-next-line no-nested-ternary
-			// 	data?.role === 'Nhân viên' ? 'user' : data?.role === 'Quản lý' ? 'manager' : null,
-			// status: Number(data?.status),
-			// roles: Number.parseInt(data?.role, 10) === 1 ? ['manager'] : ['user'],
+			isDelete: true,
 		};
 		try {
-			await deleteEmployee(dataSubmit);
+			const response = await updateEmployee(dataSubmit);
+			await response.data;
 			dispatch(fetchEmployeeList());
 			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
@@ -292,7 +278,7 @@ const EmployeePage = () => {
 			department_id: data?.department?.value,
 			code: data?.code,
 			email: data?.email,
-			password: '123456',
+			// password: '123456',
 			dateOfBirth: data?.dateOfBirth,
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,

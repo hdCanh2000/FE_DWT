@@ -34,16 +34,15 @@ const addEmployee = (data) => {
 const updateEmployee = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/api/users/profile/${data.id}`,
+		url: `/api/users/${data.id}`,
 		data,
 	});
 };
 
-const deleteEmployee = (data) => {
+const deleteEmployee = (id) => {
 	return axiosClient({
-		method: 'PUT',
-		url: `/api/users/${data.id}`,
-		data,
+		method: 'DELETE',
+		url: `/api/users/${id}`,
 	});
 };
 
