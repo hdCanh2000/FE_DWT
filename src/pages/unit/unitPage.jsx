@@ -162,7 +162,7 @@ const UnitPage = () => {
 				getUnit();
 				handleShowToast(
 					`Cập nhật đơn vị!`,
-					`Đơn vị ${result.name} được cập nhật thành công!`,
+					`Đơn vị ${result.data.name} được cập nhật thành công!`,
 				);
 			} catch (error) {
 				setUnits(units);

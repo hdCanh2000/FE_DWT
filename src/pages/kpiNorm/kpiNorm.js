@@ -174,16 +174,17 @@ const KpiNormPage = () => {
 		const dataSubmit = {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
-			description: data?.description || null,
-			descriptionkpivalue: data?.descriptionkpivalue || null,
-			department_id: parseInt(data?.position?.department?.id, 10) || null,
+			description: data?.description,
+			descriptionkpivalue: data?.descriptionkpivalue,
+			// department_id: parseInt(data?.position?.department?.id, 10),
 			position_id: parseInt(data?.position?.id, 10),
 			parent_id: parseInt(data?.parent?.id, 10),
 			kpi_value: parseInt(data?.kpivalue, 10),
 			quantity: parseInt(data?.quantity, 10),
-			unit_id: 1,
+			// hr: data?.hr,
+			// manday: parseInt(data?.manday, 10),
+			// unit_id: parseInt(data?.unit, 10),
 			tasktype: data?.tasktype.value,
-			type: 1,
 		};
 		if (data.id) {
 			try {
