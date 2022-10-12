@@ -249,7 +249,7 @@ const KpiNormPage = () => {
 							<Card className='w-100 h-100'>
 								<div style={{ margin: '24px 24px 0' }}>
 									<CardHeader>
-										<CardLabel icon='AccountCircle' iconColor='primary'>
+										<CardLabel icon='FormatListBulleted' iconColor='primary'>
 											<CardTitle>
 												<CardLabel>Danh sách nhiệm vụ</CardLabel>
 											</CardTitle>
@@ -257,7 +257,7 @@ const KpiNormPage = () => {
 										<CardActions>
 											<Button
 												color='info'
-												icon='PersonPlusFill'
+												icon='PlaylistAdd'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
 												Thêm mới

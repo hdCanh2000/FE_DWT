@@ -199,7 +199,7 @@ const PositionPage = () => {
 								<Card className='w-100'>
 									<div style={{ margin: '24px 24px 0' }}>
 										<CardHeader>
-											<CardLabel icon='AccountCircle' iconColor='primary'>
+											<CardLabel icon='Assignment' iconColor='primary'>
 												<CardTitle>
 													<CardLabel>Danh sách vị trí</CardLabel>
 												</CardTitle>
@@ -207,7 +207,7 @@ const PositionPage = () => {
 											<CardActions>
 												<Button
 													color='info'
-													icon='PersonPlusFill'
+													icon='PostAdd'
 													tag='button'
 													onClick={() => handleOpenForm(null)}>
 													Thêm mới

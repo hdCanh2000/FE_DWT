@@ -121,45 +121,53 @@ const OrderTask = () => {
 											</CardTitle>
 										</CardLabel>
 									</CardHeader>
-									<div className='p-4'>
+									<div>
 										<table className='table table-modern mb-0'>
 											<thead>
 												<tr>
-													<th>Tên nhiệm vụ</th>
-													<th>Loại nhiệm vụ</th>
-													<th>Vị trí đảm nhiệm</th>
+													<th style={{ width: '53%' }}>Tên nhiệm vụ</th>
+													<th style={{ width: '18%' }}>Loại nhiệm vụ</th>
+													<th style={{ width: '15%' }}>
+														Vị trí đảm nhiệm
+													</th>
 													<th>Giá trị KPI</th>
 												</tr>
 											</thead>
+										</table>
+									</div>
+									<div style={{ overflow: 'scroll', padding: '5px 5px 5px 5px' }}>
+										<table className='table table-modern mb-0'>
 											<tbody>
 												{items?.map((item) => (
 													<React.Fragment key={item.id}>
 														<tr
 															onClick={() => handleOpenForm(item)}
 															className='cursor-pointer'>
-															<td>{item?.name}</td>
-															<td>
+															<td style={{ width: '54%' }}>
+																{item?.name}
+															</td>
+															<td style={{ width: '18%' }}>
 																{item?.taskType || 'Thường xuyên'}
 															</td>
-															<td>{_.get(item, 'position.name')}</td>
+															<td style={{ width: '15%' }}>
+																{_.get(item, 'position.name')}
+															</td>
 															<td>{item?.kpiValue || 'Không'}</td>
 														</tr>
 													</React.Fragment>
 												))}
 											</tbody>
 										</table>
-										<div>
-											<hr />
-											<PaginationButtons
-												data={kpiNorm.filter(
-													(item) => item.parentId === null,
-												)}
-												setCurrentPage={setCurrentPage}
-												currentPage={currentPage}
-												perPage={perPage}
-												setPerPage={setPerPage}
-											/>
-										</div>
+									</div>
+									<div>
+										<hr />
+										<PaginationButtons
+											data={kpiNorm.filter((item) => item.parentId === null)}
+											setCurrentPage={setCurrentPage}
+											currentPage={currentPage}
+											perPage={perPage}
+											setPerPage={setPerPage}
+										/>
 									</div>
 								</Card>
 							</div>

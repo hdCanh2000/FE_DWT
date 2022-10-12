@@ -82,7 +82,7 @@ const DailyWorkTrackingMe = () => {
 							{' '}
 							<div style={{ margin: '24px 24px 0' }}>
 								<CardHeader>
-									<CardLabel icon='AccountCircle' iconColor='primary'>
+									<CardLabel icon='FormatListBulleted' iconColor='primary'>
 										<CardTitle>
 											<CardLabel>Danh sách nhiệm vụ</CardLabel>
 										</CardTitle>
