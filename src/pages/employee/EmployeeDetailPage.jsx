@@ -107,7 +107,7 @@ const EmployeePage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.nhanVien.text}>
+		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<SubHeaderCommon />
 			<Page>
 				<div className='row h-100'>
@@ -135,7 +135,7 @@ const EmployeePage = () => {
 					</div>
 					<div className='col-lg-8 col-md-6'>
 						{isEmpty(user) ? (
-							<h1>Loading...</h1>
+							<h1>zz.</h1>
 						) : (
 							<Formik initialValues={user} enableReinitialize>
 								<Card className='h-100'>

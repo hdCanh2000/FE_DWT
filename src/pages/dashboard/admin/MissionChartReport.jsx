@@ -1,7 +1,10 @@
 import React, { memo, useState } from 'react';
 import PropTypes from 'prop-types';
-// import Card, { CardBody } from '../../../components/bootstrap/Card';
 import Chart from '../../../components/extras/Chart';
+import styles from './circle.module.css';
+
+const calcTotal = (data) =>
+	data ? Object.values(data).reduce((accumulator, item) => accumulator + item) : 0;
 
 const MissionChartReport = ({ data }) => {
 	const chartOptions = {
@@ -59,14 +62,24 @@ const MissionChartReport = ({ data }) => {
 
 	return (
 		<div className='row align-items-start py-4'>
-			<div className='col-xl-7 col-md-12'>
-				<Chart
-					series={state.series}
-					options={state.options}
-					type={state.options.chart.type}
-					height={state.options.chart.height}
-				/>
-			</div>
+			{calcTotal(data) !== 0 ? (
+				<div className='col-xl-7 col-md-12'>
+					<Chart
+						series={state.series}
+						options={state.options}
+						type={state.options.chart.type}
+						height={state.options.chart.height}
+					/>
+				</div>
+			) : (
+				<div className='col-xl-7 col-md-12'>
+					<center>
+						<div className={styles.circle} />
+						<br />
+						<h5>Hiện chưa có mục tiêu</h5>
+					</center>
+				</div>
+			)}
 			<div className='col-xl-5 col-md-12'>
 				<div className='row'>
 					<div className='col-xl-12 col-md-4 col-sm-4 mt-2'>
@@ -119,7 +132,12 @@ MissionChartReport.propTypes = {
 	data: PropTypes.object,
 };
 MissionChartReport.defaultProps = {
-	data: { completed: 0, completedExpired: 0, inprogress: 0, inprogressExpired: 0, total: 0 },
+	data: null,
 };
 
-export default memo(MissionChartReport);
+export default memo(MissionChartReport, function areEqual(prevProps, nextProps) {
+	if (prevProps.data.inprogress === nextProps.data.inprogress) {
+		return false;
+	}
+	return true;
+});

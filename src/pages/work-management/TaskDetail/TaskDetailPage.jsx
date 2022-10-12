@@ -1,45 +1,45 @@
 // eslint-disable react/no-array-index-key
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import classNames from 'classnames';
 import moment from 'moment';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
 import { useToasts } from 'react-toast-notifications';
-import Dropdown, {
-	DropdownToggle,
-	DropdownMenu,
-	DropdownItem,
-} from '../../../components/bootstrap/Dropdown';
+// import Dropdown, {
+// 	DropdownToggle,
+// 	DropdownMenu,
+// 	DropdownItem,
+// } from '../../../components/bootstrap/Dropdown';
 import {
 	updateSubtask,
 	updateStatusPendingTask,
 	getAllSubtasksByTaskId,
 	addNewSubtask,
+	deleteSubtask,
 } from './services';
 import Chart from '../../../components/extras/Chart';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Card, {
-	CardActions,
+	// CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
-	CardSubTitle,
+	// CardSubTitle,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import {
 	FORMAT_TASK_STATUS,
-	formatColorStatus,
+	// formatColorStatus,
 	formatColorPriority,
-	renderStatusTask,
-	STATUS,
-	renderStatus,
+	// renderStatusTask,
+	// STATUS,
+	// renderStatus,
 } from '../../../utils/constants';
 import Button from '../../../components/bootstrap/Button';
-import Icon from '../../../components/icon/Icon';
+// import Icon from '../../../components/icon/Icon';
 import Progress from '../../../components/bootstrap/Progress';
 import TaskDetailForm from './TaskDetailForm/TaskDetailForm';
 import ComfirmSubtask from './TaskDetailForm/ComfirmSubtask';
@@ -61,6 +61,7 @@ import { formatDateFromMiliseconds } from '../../../utils/utils';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
 import { demoPages } from '../../../menu';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import styles from './circle.module.css';
 
 const TaskDetailPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -83,7 +84,6 @@ const TaskDetailPage = () => {
 	const [editModalTaskStatus, setEditModalTaskStatus] = useState(false);
 	const [taskEdit, setTaskEdit] = useState({});
 	const [openConfirmTaskModal, setOpenConfirmTaskModal] = useState(false);
-
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [openListInfoModal, setOpenListInfoModal] = useState(false); // note task
 
@@ -94,6 +94,7 @@ const TaskDetailPage = () => {
 		type: 1,
 		isShowNote: false,
 	});
+
 	const [state, setState] = React.useState({
 		series: [0, 0, 0, 0, 0, 0, 0],
 		options: chartOptions,
@@ -162,15 +163,17 @@ const TaskDetailPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item?.id}`}>
+				<Link
+					className='text-underline'
+					to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${item?.id}`}>
 					{item.name}
 				</Link>
 			),
 		},
 		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
+			title: 'Thời gian bắt đầu',
+			id: 'startDate',
+			key: 'startDate',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
@@ -210,6 +213,7 @@ const TaskDetailPage = () => {
 			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
+			format: (item) => item || 0,
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -231,55 +235,55 @@ const TaskDetailPage = () => {
 							'pt-2 pb-2 me-2',
 							`bg-${formatColorPriority(item.priority)}`,
 						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
+						<span className=''>{`Cấp ${item.priority ? item.priority : 1}`}</span>
 					</span>
 				</div>
 			),
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'text',
-			align: 'center',
-			render: (item) =>
-				verifyPermissionHOC(
-					<Dropdown>
-						<DropdownToggle hasIcon={false}>
-							<Button
-								isLink
-								color={formatColorStatus(item.status)}
-								icon='Circle'
-								className='text-nowrap'>
-								{FORMAT_TASK_STATUS(item.status)}
-							</Button>
-						</DropdownToggle>
-						<DropdownMenu>
-							{Object.keys(renderStatusTask(item.status)).map((key) => (
-								<DropdownItem
-									key={key}
-									onClick={() =>
-										handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
-									}>
-									<div>
-										<Icon icon='Circle' color={STATUS[key].color} />
-										{STATUS[key].name}
-									</div>
-								</DropdownItem>
-							))}
-						</DropdownMenu>
-					</Dropdown>,
-					['admin', 'manager'],
-					<Button
-						isLink
-						color={formatColorStatus(item.status)}
-						icon='Circle'
-						className='text-nowrap'>
-						{FORMAT_TASK_STATUS(item.status)}
-					</Button>,
-				),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'text',
+		// 	align: 'center',
+		// 	render: (item) =>
+		// 		verifyPermissionHOC(
+		// 			<Dropdown>
+		// 				<DropdownToggle hasIcon={false}>
+		// 					<Button
+		// 						isLink
+		// 						color={formatColorStatus(item.status)}
+		// 						icon='Circle'
+		// 						className='text-nowrap'>
+		// 						{FORMAT_TASK_STATUS(item.status)}
+		// 					</Button>
+		// 				</DropdownToggle>
+		// 				<DropdownMenu>
+		// 					{Object.keys(renderStatusTask(item.status)).map((key) => (
+		// 						<DropdownItem
+		// 							key={key}
+		// 							onClick={() =>
+		// 								handleOpenConfirmStatusTask(item, STATUS[key].value, 2)
+		// 							}>
+		// 							<div>
+		// 								<Icon icon='Circle' color={STATUS[key].color} />
+		// 								{STATUS[key].name}
+		// 							</div>
+		// 						</DropdownItem>
+		// 					))}
+		// 				</DropdownMenu>
+		// 			</Dropdown>,
+		// 			['admin', 'manager'],
+		// 			<Button
+		// 				isLink
+		// 				color={formatColorStatus(item.status)}
+		// 				icon='Circle'
+		// 				className='text-nowrap'>
+		// 				{FORMAT_TASK_STATUS(item.status)}
+		// 			</Button>,
+		// 		),
+		// },
 		{
 			title: '',
 			id: 'action',
@@ -290,13 +294,10 @@ const TaskDetailPage = () => {
 						<Button
 							isOutline={!darkModeStatus}
 							color='success'
-							isDisable={
-								item?.status === 4 || item?.status === 7 || item.status === 3
-							}
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2'
 							icon='Edit'
-							onClick={() => handleOpenModal(item, 'edit')}
+							onClick={() => handleOnClickToEditPage(params.id, item.id)}
 						/>
 						<Button
 							isOutline={!darkModeStatus}
@@ -319,15 +320,17 @@ const TaskDetailPage = () => {
 			key: 'name',
 			type: 'text',
 			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item.id}`}>
+				<Link
+					className='text-underline'
+					to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${item?.id}`}>
 					{item.name}
 				</Link>
 			),
 		},
 		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
+			title: 'Thời gian bắt đầu',
+			id: 'startDate',
+			key: 'startDate',
 			type: 'text',
 			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
 			align: 'center',
@@ -367,6 +370,7 @@ const TaskDetailPage = () => {
 			key: 'kpiValue',
 			type: 'number',
 			align: 'center',
+			format: (item) => item || 0,
 		},
 		{
 			title: 'Độ ưu tiên',
@@ -388,28 +392,28 @@ const TaskDetailPage = () => {
 							'pt-2 pb-2 me-2',
 							`bg-${formatColorPriority(item.priority)}`,
 						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
+						<span className=''>{`Cấp ${item.priority ? item.priority : 1}`}</span>
 					</span>
 				</div>
 			),
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
-			align: 'center',
-			render: (item) => (
-				<Button
-					isLink
-					color={formatColorStatus(item.status)}
-					icon='Circle'
-					className='text-nowrap'>
-					{FORMAT_TASK_STATUS(item.status)}
-				</Button>
-			),
-		},
+		// {
+		// 	title: 'Trạng thái',
+		// 	id: 'status',
+		// 	key: 'status',
+		// 	type: 'number',
+		// 	align: 'center',
+		// 	render: (item) => (
+		// 		<Button
+		// 			isLink
+		// 			color={formatColorStatus(item.status)}
+		// 			icon='Circle'
+		// 			className='text-nowrap'>
+		// 			{FORMAT_TASK_STATUS(item.status)}
+		// 		</Button>
+		// 	),
+		// },
 		{
 			title: '',
 			id: 'action',
@@ -446,6 +450,7 @@ const TaskDetailPage = () => {
 		setTask(res.data.data);
 		setTaskReport(res.data.report);
 	};
+
 	const fetchSubtasks = async (id) => {
 		const res = await getAllSubtasksByTaskId(id);
 		setSubtasks(res.data);
@@ -456,6 +461,17 @@ const TaskDetailPage = () => {
 		fetchTaskId(params?.id);
 		fetchSubtasks(params?.id);
 	}, [params?.id]);
+
+	const handleOnClickToActionPage = useCallback(
+		(missionId) => navigate(`${demoPages.jobsPage.subMenu.task.path}/${missionId}/them-moi`),
+		[navigate],
+	);
+
+	const handleOnClickToEditPage = useCallback(
+		(taskId, subTaskId) =>
+			navigate(`${demoPages.jobsPage.subMenu.task.path}/${taskId}/cap-nhat/${subTaskId}`),
+		[navigate],
+	);
 
 	// show toast
 	const handleShowToast = (titleToast, content, icon = 'Check2Circle', color = 'success') => {
@@ -471,22 +487,15 @@ const TaskDetailPage = () => {
 
 	// delete subtask
 	const handleDelete = async (valueDelete) => {
-		const newSubTasks = task?.subtasks.filter((item) => item.id !== valueDelete.id);
-		const taskValue = JSON.parse(JSON.stringify(task));
-		const newData = Object.assign(taskValue, {
-			subtasks: newSubTasks,
-		});
-
 		try {
-			const respose = await updateSubtask(params?.id, newData);
-			const result = await respose.data;
-			setTask(result);
-			navigate(`/cong-viec/${task?.id}`);
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thành công!`);
+			await deleteSubtask(valueDelete?.id);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 		} catch (error) {
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu ${valueDelete?.name} thất bại!`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thất bại!`);
 		}
+		fetchSubtasks(params?.id);
 	};
+
 	const handleOpenConfirm = (item) => {
 		setDeletes({
 			id: item.id,
@@ -494,6 +503,7 @@ const TaskDetailPage = () => {
 		});
 		set0penConfirm(true);
 	};
+
 	const handleCloseComfirm = () => {
 		setDeletes({});
 		set0penConfirm(false);
@@ -523,10 +533,10 @@ const TaskDetailPage = () => {
 
 	// ------------------	UPDATE AND DELETE TASK	-------------------
 	// form task modal
-	const handleOpenEditTaskForm = (item) => {
-		setEditModalTaskStatus(true);
-		setTaskEdit({ ...item });
-	};
+	// const handleOpenEditTaskForm = (item) => {
+	// 	setEditModalTaskStatus(true);
+	// 	setTaskEdit({ ...item });
+	// };
 
 	const handleCloseEditTaskForm = () => {
 		setEditModalTaskStatus(false);
@@ -647,25 +657,21 @@ const TaskDetailPage = () => {
 	};
 
 	// Modal hiển thị thông tin note
-	const handleOpenListInfoModal = () => {
-		setOpenListInfoModal(true);
-	};
+	// const handleOpenListInfoModal = () => {
+	// 	setOpenListInfoModal(true);
+	// };
 
 	const handleCloseListInfoModal = () => {
 		setOpenListInfoModal(false);
 	};
 
-	// update subtask
-	const handleOpenModal = (item) => {
-		setEditModalStatus(true);
-		setItemEdit({ ...item });
-	};
 	const handleCloseEditForm = () => {
 		setEditModalStatus(false);
 		setItemEdit(null);
 		fetchTaskId(params?.id);
 		fetchSubtasks(params?.id);
 	};
+
 	const handleSubmitSubTaskForm = async (data) => {
 		if (data.id) {
 			try {
@@ -688,7 +694,7 @@ const TaskDetailPage = () => {
 			try {
 				const response = await addNewSubtask({
 					...data,
-					taskId: params.id,
+					taskId: parseInt(params.id, 10),
 				});
 				const result = await response.data;
 				const newSubtasks = [...subtasks];
@@ -719,8 +725,11 @@ const TaskDetailPage = () => {
 										isLight={darkModeStatus}
 										className='text-nowrap mx-2'
 										icon='Edit'
-										isDisable={task?.status === 4 || task?.status === 7}
-										onClick={() => handleOpenEditTaskForm(task)}>
+										onClick={() =>
+											navigate(
+												`${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/${task.id}`,
+											)
+										}>
 										Sửa
 									</Button>
 									<Button
@@ -746,7 +755,7 @@ const TaskDetailPage = () => {
 											Tổng kết
 										</CardTitle>
 									</CardLabel>
-									{verifyPermissionHOC(
+									{/* {verifyPermissionHOC(
 										<CardActions className='d-flex'>
 											<Dropdown>
 												<DropdownToggle hasIcon={false}>
@@ -790,7 +799,7 @@ const TaskDetailPage = () => {
 											/>
 										</CardActions>,
 										['admin', 'manager'],
-									)}
+									)} */}
 								</CardHeader>
 								<CardBody className='py-2'>
 									<div className='row g-4'>
@@ -803,13 +812,13 @@ const TaskDetailPage = () => {
 														<CardTitle tag='h4' className='h5'>
 															Tiến độ thực hiện
 														</CardTitle>
-														<CardSubTitle
+														{/* <CardSubTitle
 															tag='h4'
 															className={`h5 text-${formatColorStatus(
 																task?.status,
 															)}`}>
 															{FORMAT_TASK_STATUS(task.status)}
-														</CardSubTitle>
+														</CardSubTitle> */}
 													</CardLabel>
 												</CardHeader>
 												<CardBody className='py-2'>
@@ -984,7 +993,7 @@ const TaskDetailPage = () => {
 															},
 														]}
 													/>
-													{subtasks?.length > 0 && (
+													{subtasks?.length > 0 ? (
 														<div className='row align-items-center'>
 															<div
 																className='col-xl-12 col-md-12'
@@ -998,6 +1007,23 @@ const TaskDetailPage = () => {
 																			?.height
 																	}
 																/>
+															</div>
+														</div>
+													) : (
+														<div
+															className='row align-items-center'
+															style={{ opacity: 0.5 }}>
+															<div className='col-xl-12 col-md-12'>
+																<center>
+																	<div
+																		className={styles.circle}
+																	/>
+																	<br />
+																	<h2>
+																		Chưa có công việc cho mục
+																		tiêu này
+																	</h2>
+																</center>
 															</div>
 														</div>
 													)}
@@ -1042,9 +1068,9 @@ const TaskDetailPage = () => {
 											color: 'primary',
 											children: (
 												<div className='fs-5'>
-													<span className='me-2'>Thời gian dự kiến:</span>
+													<span className='me-2'>Thời gian bắt đầu:</span>
 													{moment(
-														`${task?.estimateDate} ${task.estimateTime}`,
+														`${task?.startDate} ${task.startTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
 												</div>
 											),
@@ -1054,7 +1080,9 @@ const TaskDetailPage = () => {
 											color: 'primary',
 											children: (
 												<div className='fs-5'>
-													<span className='me-2'>Hạn hoàn thành:</span>
+													<span className='me-2'>
+														Thời hạn hoàn thành:
+													</span>
 													{moment(
 														`${task?.deadlineDate} ${task.deadlineTime}`,
 													).format('DD-MM-YYYY, HH:mm')}
@@ -1139,18 +1167,21 @@ const TaskDetailPage = () => {
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
 										<CardTitle>
-											<CardLabel>Danh sách đầu việc </CardLabel>
+											<CardLabel>Danh sách đầu việc</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									<Button
-										color='success'
-										size='lg'
-										isLight
-										className='w-30 h-100'
-										onClick={() => handleOpenModal(0, 'add')}
-										icon='AddCircle'>
-										Thêm đầu việc
-									</Button>
+									{verifyPermissionHOC(
+										<Button
+											color='success'
+											size='lg'
+											isLight
+											className='w-30 h-100'
+											onClick={() => handleOnClickToActionPage(task.id)}
+											icon='AddCircle'>
+											Thêm đầu việc
+										</Button>,
+										['admin', 'manager', 'user'],
+									)}
 								</CardHeader>
 								<div className='p-4'>
 									<TableCommon

@@ -1,4 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useState } from 'react';
 import { parseInt } from 'lodash';
@@ -6,7 +5,13 @@ import moment from 'moment';
 import styled from 'styled-components';
 import SelectComponent from 'react-select';
 import { Button, Modal } from 'react-bootstrap';
-import { getAllDepartments, getAllTasks, getAllUser, getSubTaskById } from '../services';
+import {
+	getAllDepartments,
+	getAllKeys,
+	getAllTasks,
+	getAllUser,
+	getSubTaskById,
+} from '../services';
 import Option from '../../../../components/bootstrap/Option';
 import FormGroup from '../../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../../components/bootstrap/forms/Input';
@@ -31,6 +36,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 	const [valueTask, setValueTask] = useState({});
 	const [usersRelated, setUsersRelated] = useState([]);
 	const [departmentRelated, setDepartmentRelated] = useState([]);
+	const [keyOption, setKeyOption] = useState([]);
 	const PRIORITIES = [5, 4, 3, 2, 1];
 	const initError = {
 		name: { errorMsg: '' },
@@ -51,10 +57,10 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		status: 0,
 		name: '',
 		description: '',
-		estimateDate: '2022-12-01',
-		estimateTime: '17:00',
-		deadlineDate: '2022-12-01',
-		deadlineTime: '17:00',
+		estimateDate: '',
+		estimateTime: '',
+		deadlineDate: '',
+		deadlineTime: '',
 		kpiValue: 0,
 		keys: [],
 		steps: [],
@@ -101,11 +107,6 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 					label: response.data?.departments[0]?.name,
 					value: response.data.departments[0].id,
 				});
-				// setValueTask({
-				// 	id: response.data?.departments[0]?.id,
-				// 	label: response.data?.departments[0]?.name,
-				// 	value: response.data.departments[0].id,
-				// });
 				setUsersRelated(
 					response.data?.users?.slice(1)?.map((user) => {
 						return {
@@ -150,6 +151,18 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		});
 	}, []);
 
+	useEffect(() => {
+		async function getKey() {
+			try {
+				const response = await getAllKeys();
+				const data = await response.data;
+				setKeyOption(data);
+			} catch (error) {
+				setKeyOption([]);
+			}
+		}
+		getKey();
+	}, []);
 	// valueDalite
 	const onValidate = (value, name) => {
 		setErrors((prev) => ({
@@ -173,17 +186,22 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		if (keysState?.length === 0 || !keysState) {
 			return true;
 		}
-		const someEmpty = keysState?.some((key) => key?.keyName === '' || key?.keyValue === '');
+		const someEmpty = keysState?.some(
+			(key) => key?.keyName === '' || key?.keyValue === '' || key.keyType === '',
+		);
 
 		if (someEmpty) {
 			// eslint-disable-next-line array-callback-return
 			keysState?.map((_key, index) => {
 				const allPrev = [...keysState] || [];
 				if (keysState[index]?.keyName === '') {
-					allPrev[index].error.keyName = 'Nhập tên chỉ số key!';
+					allPrev[index].error.keyName = 'Nhập Tên chỉ số đánh giá!';
 				}
 				if (keysState[index]?.keyValue === '') {
 					allPrev[index].error.keyValue = 'Nhập giá trị key!';
+				}
+				if (keysState[index].keyType === '') {
+					allPrev[index].error.keyType = 'Nhập loại key!';
 				}
 				setKeysState(allPrev);
 			});
@@ -217,9 +235,11 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		const initKeyState = {
 			keyName: '',
 			keyValue: '',
+			keyType: '',
 			error: {
 				keyName: null,
 				keyValue: null,
+				keyType: null,
 			},
 		};
 		if (prevIsValid()) {
@@ -303,10 +323,11 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 			return {
 				keyName: key.keyName,
 				keyValue: key.keyValue,
+				keyType: key.keyType,
 			};
 		});
 		dataSubmit.userId = valueUser.id;
-		dataSubmit.taskId = valueTask.id || null;
+		dataSubmit.taskId = parseInt(item.taskId, 10) || null;
 		dataSubmit.users = valueUsers;
 		dataSubmit.departmentId = valueDepartment.id;
 		dataSubmit.departments = valueDepartments;
@@ -327,7 +348,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 		setValueUser({});
 		setErrors({});
 	};
-
+	const compare = ['>', '=', '<', '<=', '>='];
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
@@ -338,7 +359,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 			<Modal.Body>
 				<div className='row g-4 px-2'>
 					<div className='col-12'>
-						<FormGroup id='name' label='Tên đầu việc' isFloating>
+						<FormGroup id='name' label='Tên đầu việc' color='red'>
 							<Input
 								onChange={handleChange}
 								placeholder='Tên đầu việc'
@@ -355,7 +376,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 					</div>
 					{isShowTask && (
 						<div className='col-12'>
-							<FormGroup id='task' label='Thuộc công việc'>
+							<FormGroup id='task' label='Thuộc công việc' color='red'>
 								<SelectComponent
 									placeholder='Thuộc công việc'
 									defaultValue={valueTask}
@@ -367,7 +388,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						</div>
 					)}
 					<div className='col-12'>
-						<FormGroup id='description' label='Mô tả đầu việc' isFloating>
+						<FormGroup id='description' label='Mô tả đầu việc'>
 							<Textarea
 								className='h-100 border border-2 rounded-0 shadow-none'
 								placeholder='note'
@@ -382,7 +403,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						)}
 					</div>
 					<div className='col-12'>
-						<FormGroup id='kpiValue' label='Giá trị KPI' isFloating>
+						<FormGroup id='kpiValue' label='Giá trị KPI' color='red'>
 							<Input
 								type='number'
 								placeholder='Giá trị KPI'
@@ -399,7 +420,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						)}
 					</div>
 					<div className='col-12'>
-						<FormGroup id='priority' label='Độ ưu tiên'>
+						<FormGroup id='priority' label='Độ ưu tiên' color='red'>
 							<Select
 								name='priority'
 								placeholder='Độ ưu tiên'
@@ -416,7 +437,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						</FormGroup>
 					</div>
 					<div className='col-6'>
-						<FormGroup id='department' label='Phòng ban phụ trách'>
+						<FormGroup id='department' label='Phòng ban phụ trách' color='red'>
 							<SelectComponent
 								placeholder='Phòng ban phụ trách'
 								defaultValue={valueDepartment}
@@ -431,7 +452,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 						)}
 					</div>
 					<div className='col-6'>
-						<FormGroup id='user' label='Nhân viên phụ trách'>
+						<FormGroup id='user' label='Nhân viên phụ trách' color='red'>
 							<SelectComponent
 								defaultValue={valueUser}
 								value={valueUser}
@@ -457,12 +478,9 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 								placeholder=''
 							/>
 						</FormGroup>
-						{errors?.department?.errorMsg && (
-							<ErrorText>Vui lòng chọn phòng ban liên quan</ErrorText>
-						)}
 					</div>
 					<div className='col-12'>
-						<FormGroup id='user' label='Nhân viên liên quan'>
+						<FormGroup id='user' label=''>
 							<SelectComponent
 								isMulti
 								defaultValue={usersRelated}
@@ -472,19 +490,13 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 								placeholder=''
 							/>
 						</FormGroup>
-						{errors?.user?.errorMsg && (
-							<ErrorText>Vui lòng chọn nhân viên liên quan</ErrorText>
-						)}
 					</div>
 					<div className='col-6'>
 						<FormGroup id='estimateDate' label='Ngày hoàn thành ước tính' isFloating>
 							<Input
 								placeholder='Ngày hoàn thành ước tính'
 								type='date'
-								value={
-									subtask.estimateDate ||
-									moment().add(0, 'days').format('YYYY/MM/DD')
-								}
+								value={subtask.estimateDate || ''}
 								name='estimateDate'
 								ariaLabel='estimateDate'
 								onChange={handleChange}
@@ -513,10 +525,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 							<Input
 								placeholder='Hạn ngày hoàn thành'
 								type='date'
-								value={
-									subtask.deadlineDate ||
-									moment().add(0, 'days').format('YYYY/MM/DD')
-								}
+								value={subtask.deadlineDate || ''}
 								name='deadlineDate'
 								ariaLabel='deadlineDate'
 								onChange={handleChange}
@@ -544,7 +553,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 								onClick={handleAddFieldKey}
 								icon='AddCircle'
 								color='success'>
-								Thêm chỉ số key
+								Thêm tiêu chí đánh giá
 							</Button>
 						</FormGroup>
 						{/* eslint-disable-next-line no-shadow */}
@@ -556,28 +565,57 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 									className='mt-4 d-flex align-items-center justify-content-between'>
 									<div
 										style={{
-											width: '45%',
+											width: '40%',
 											marginRight: 10,
 										}}>
 										<FormGroup
 											className='mr-2'
 											id='name'
-											label='Tên chỉ số key'>
-											<Input
-												onChange={(e) => handleChangeKeysState(index, e)}
-												value={item?.keyName || ''}
+											label={`Chỉ số key ${index + 1}`}>
+											<Select
 												name='keyName'
 												required
 												size='lg'
 												className='border border-2 rounded-0 shadow-none'
-												placeholder='VD: Doanh thu, đơn hàng, ...'
-											/>
+												placeholder='Chọn chỉ số Key'
+												value={item?.keyName}
+												onChange={(e) => handleChangeKeysState(index, e)}>
+												{keyOption.map((key) => (
+													<Option
+														key={`${key.name} (${key?.unit?.name})`}
+														value={`${key.name} (${key?.unit?.name})`}>
+														{`${key?.name} (${key?.unit?.name})`}
+													</Option>
+												))}
+											</Select>
 										</FormGroup>
 										{item.error?.keyName && (
 											<ErrorText>{item.error?.keyName}</ErrorText>
 										)}
 									</div>
-									<div style={{ width: '45%', marginLeft: 10 }}>
+									<div style={{ width: '15%' }}>
+										<FormGroup className='ml-2' id='type' label='So sánh'>
+											<Select
+												onChange={(e) => handleChangeKeysState(index, e)}
+												value={item?.keyType}
+												name='keyType'
+												size='lg'
+												required
+												ariaLabel='So sánh'
+												className='border border-2 rounded-0 shadow-none'
+												placeholder='> = <'>
+												{compare.map((element) => (
+													<Option key={`${element}`} value={`${element}`}>
+														{`${element}`}
+													</Option>
+												))}
+											</Select>
+										</FormGroup>
+										{item.error?.keyType && (
+											<ErrorText>{item.error?.keyType}</ErrorText>
+										)}
+									</div>
+									<div style={{ width: '30%', marginLeft: 10 }}>
 										<FormGroup className='ml-2' id='name' label='Giá trị key'>
 											<Input
 												onChange={(e) => handleChangeKeysState(index, e)}
@@ -586,7 +624,7 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 												size='lg'
 												required
 												className='border border-2 rounded-0 shadow-none'
-												placeholder='VD: 100 tỷ, 1000 đơn hàng, ..'
+												placeholder='VD: 100 , 1000 , ..'
 											/>
 										</FormGroup>
 										{item.error?.keyValue && (
@@ -613,8 +651,12 @@ const TaskDetailForm = ({ show, onClose, item, onSubmit, isShowTask = false }) =
 					</div>
 				</div>
 			</Modal.Body>
-			<Modal.Footer className='px-4 pb-4'>
-				<Button color='primary' className='w-100' type='submit' onClick={handleSubmit}>
+
+			<Modal.Footer>
+				<Button variant='secondary' onClick={handleCloseForm}>
+					Đóng
+				</Button>
+				<Button variant='primary' type='submit' onClick={handleSubmit}>
 					Lưu đầu việc
 				</Button>
 			</Modal.Footer>

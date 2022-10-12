@@ -102,7 +102,11 @@ export const Item = ({
 	const _Inner = (
 		<>
 			<span className='navigation-link-info'>
-				{icon && <Icon className='navigation-icon' icon={icon} />}
+				{icon ? (
+					<Icon className='navigation-icon' icon={icon} />
+				) : (
+					<div style={{ marginRight: '23px' }}> </div>
+				)}
 				<span className='navigation-text'>{t(title)}</span>
 			</span>
 			{(!!children || !!notification) && (
@@ -186,6 +190,8 @@ export const Item = ({
 									ref={(node) => setButtonRef(node, ref)}
 									id={`${rootId}__${id}--link`}
 									className={_LinkClass}
+									// data-bs-toggle='dropdown'
+									// data-bs-target={`#${rootId}__${id}`}
 									aria-expanded={dropdownStatus}
 									aria-controls={`${rootId}__${id}`}
 									role='button'
@@ -239,6 +245,8 @@ export const Item = ({
 				<span
 					id={`${rootId}__${id}--link`}
 					className={_LinkClass}
+					// data-bs-toggle='collapse'
+					// data-bs-target={`#${rootId}__${id}`}
 					aria-expanded={_active}
 					aria-controls={`${rootId}__${id}`}
 					role='button'
@@ -321,38 +329,32 @@ const Navigation = forwardRef(({ menu, horizontal, id, className, ...props }, re
 	const [activeItem, setActiveItem] = useState(null);
 
 	const { t } = useTranslation('menu');
-	const roles = JSON.parse(localStorage.getItem('roles'));
 
 	function fillMenu(data, parentId, rootId, isHorizontal, isMore) {
-		const res = [];
-		Object.keys(data).forEach((item) => {
-			data[item]?.roles?.forEach((e) => {
-				if (roles?.indexOf(e) !== -1) {
-					res.push(data[item]);
-				}
-			});
-		});
-		return Object.keys(res).map((item) => {
-			return res[item]?.path ? (
+		if (!data) return null;
+		return Object.keys(data).map((item) => {
+			if (!data[item]) return null;
+			const { path } = data[item];
+			return path ? (
 				<Item
-					key={res[item].id}
+					key={data[item].id}
 					rootId={rootId}
-					id={res[item].id}
-					title={res[item].text}
-					icon={res[item].icon}
-					to={`${res[item].path}`}
+					id={data[item].id}
+					title={data[item].text}
+					icon={data[item].icon}
+					to={`${data[item].path}`}
 					parentId={parentId}
 					isHorizontal={isHorizontal}
 					setActiveItem={setActiveItem}
 					activeItem={activeItem}
-					notification={res[item].notification}
-					hide={res[item].hide}>
-					{!!res[item].subMenu &&
-						fillMenu(res[item].subMenu, res[item].id, rootId, isHorizontal)}
+					notification={data[item].notification}
+					hide={data[item].hide}>
+					{!!data[item].subMenu &&
+						fillMenu(data[item].subMenu, data[item].id, rootId, isHorizontal)}
 				</Item>
 			) : (
 				!isMore && !isHorizontal && (
-					<NavigationTitle key={res[item]?.id}>{t(res[item]?.text)}</NavigationTitle>
+					<NavigationTitle key={data[item].id}>{t(data[item].text)}</NavigationTitle>
 				)
 			);
 		});

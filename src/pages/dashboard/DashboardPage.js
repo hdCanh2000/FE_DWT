@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
-import { Link, useNavigate } from 'react-router-dom';
-import classNames from 'classnames';
-import { useToasts } from 'react-toast-notifications';
-import { dashboardMenu, demoPages } from '../../menu';
+import { useDispatch, useSelector } from 'react-redux';
+import { arrayToTree } from 'performant-array-to-tree';
+import { TreeTable, TreeState } from 'cp-react-tree-table';
+import { isEmpty } from 'lodash';
+import { dashboardMenu } from '../../menu';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Page from '../../layout/Page/Page';
-import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
+import Button, { ButtonGroup } from '../../components/bootstrap/Button';
 import Card, {
 	CardActions,
 	CardBody,
@@ -18,748 +18,1108 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import useDarkMode from '../../hooks/useDarkMode';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import TableCommon from '../common/ComponentCommon/TableCommon';
-import Progress from '../../components/bootstrap/Progress';
-import {
-	addNewMission,
-	addNewTask,
-	getAllDepartments,
-	getAllMission,
-	updateMissionById,
-	updateTaskByID,
-} from '../work-management/mission/services';
-import { FORMAT_TASK_STATUS, formatColorStatus, formatColorPriority } from '../../utils/constants';
-import MissionFormModal from '../work-management/mission/MissionFormModal';
-import Alert from '../../components/bootstrap/Alert';
-import {
-	getAllSubTasksByStatus,
-	getAllSubTasksByUser,
-	getAllTasksByDepartment,
-	getAllTasksByStatus,
-	getReportMisson,
-	getReportSubTask,
-	getReportSubTaskDepartment,
-	getReportTask,
-} from './services';
-import MissionChartReport from './admin/MissionChartReport';
-import TaskChartReport from './admin/TaskChartReport';
+import Chart from '../../components/extras/Chart';
 import Dropdown, {
 	DropdownItem,
 	DropdownMenu,
 	DropdownToggle,
 } from '../../components/bootstrap/Dropdown';
-import TaskFormModal from '../work-management/mission/TaskFormModal';
-import TaskDetailForm from '../work-management/TaskDetail/TaskDetailForm/TaskDetailForm';
-import { addNewSubtask, updateSubtask } from '../work-management/TaskDetail/services';
-import ModalConfirmCommon from '../common/ComponentCommon/ModalConfirmCommon';
+import CommonSalePerformance from '../common/CRMDashboard/CommonSalePerformance';
+import CommonApprovedAppointmentChart from '../common/SubHeaders/CommonApprovedAppointmentChart';
+import OrderBarChart from '../common/SubHeaders/OrderBarChat';
+import { getAllWorktrackByUserId } from '../dailyWorkTracking/services';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import DailyWorktrackingModal from '../dailyWorkTracking/DailyWorktrackingModal';
+import Icon from '../../components/icon/Icon';
+import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 
 const DashboardPage = () => {
-	const { darkModeStatus, themeStatus } = useDarkMode();
-	const { addToast } = useToasts();
-	const navigate = useNavigate();
-	const handleOnClickToMissionListPage = useCallback(
-		() => navigate(`../${demoPages.mucTieu.path}`),
-		[navigate],
-	);
-	// departments
-	const [dataDepartments, setDataDepartments] = useState([]);
-	// mission
-	const [missions, setMissions] = useState([]);
-	const [missionReport, setMissionReport] = useState({});
-	const [editModalStatus, setEditModalStatus] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
+	const dispatch = useDispatch();
+	const { themeStatus } = useDarkMode();
+	const [worktrack, setWorktrack] = useState([]);
+	const [treeValue, setTreeValue] = React.useState([]);
 
-	// task
-	const [tasksSolved, setTasksSolved] = useState([]);
-	const [tasks, setTasks] = useState([]);
-	const [taskReport, setTaskReport] = useState({});
-	const [editModalStatusTask, setEditModalStatusTask] = useState(false);
-	const [taskEdit, setTaskEdit] = useState({});
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
-	// subtask
-	const [subtasks, setSubTasks] = useState([]);
-	const [subtasksSolved, setSubTasksSolved] = useState([]);
-	const [subTaskReport, setSubTaskReport] = useState({});
-	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState({});
-	const [editModalStatusSubTask, setEditModalStatusSubTask] = useState(false);
-	const [subtaskEdit, setSubTaskEdit] = useState({});
-
-	// select department
-	const [departmentSelect, setDepartmentSelect] = useState(1);
-	// confirm
-	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
-	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
-		title: '',
-		subTitle: '',
-		status: null,
-		type: 1,
-		isShowNote: false,
-	});
-
-	const columns = [
-		{
-			title: 'Tên mục tiêu',
-			id: 'name',
-			key: 'name',
-			type: 'text',
-			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.mucTieu.path}/${item.id}`}>
-					{item.name}
-				</Link>
-			),
-		},
-		{
-			title: 'Thời gian bắt đầu',
-			id: 'startTime',
-			key: 'startTime',
-			type: 'text',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
-		},
-		{
-			title: 'Thời gian kết thúc',
-			id: 'endTime',
-			key: 'endTime',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
-		},
-		{
-			title: 'Tiến độ',
-			id: 'progress',
-			key: 'progress',
-			type: 'text',
-			minWidth: 100,
-			render: (item) => (
-				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
-					<Progress
-						className='flex-grow-1'
-						isAutoColor
-						value={item.progress}
-						style={{
-							height: 10,
-							width: '100%',
-						}}
-					/>
-				</div>
-			),
-			align: 'center',
-		},
-		{
-			title: 'Giá trị KPI',
-			id: 'kpiValue',
-			key: 'kpiValue',
-			type: 'number',
-			align: 'center',
-		},
-		{
-			title: 'KPI thực tế',
-			id: 'currentKPI',
-			key: 'currentKPI',
-			type: 'number',
-			align: 'center',
-		},
-		{
-			title: 'KPI đã hoàn thành',
-			id: 'completeKPI',
-			key: 'completeKPI',
-			type: 'number',
-			align: 'center',
-		},
-		{
-			title: '',
-			id: 'action',
-			key: 'action',
-			render: (item) =>
-				verifyPermissionHOC(
-					<div className='d-flex align-items-center'>
-						<Button
-							isOutline={!darkModeStatus}
-							color='success'
-							isLight={darkModeStatus}
-							className='text-nowrap mx-2'
-							icon='Edit'
-							onClick={() => handleOpenEditForm(item)}
-						/>
-					</div>,
-					['admin'],
-				),
-		},
-	];
-
-	const columnTasks = [
-		{
-			title: 'Tên công việc',
-			id: 'name',
-			key: 'name',
-			type: 'text',
-			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.quanLyCongViec.path}/${item.id}`}>
-					{item.name}
-				</Link>
-			),
-		},
-		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
-			type: 'text',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
-		},
-		{
-			title: 'Hạn hoàn thành',
-			id: 'deadlineDate',
-			key: 'deadlineDate',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
-		},
-		{
-			title: 'Tiến độ',
-			id: 'progress',
-			key: 'progress',
-			type: 'text',
-			minWidth: 100,
-			render: (item) => (
-				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
-					<Progress
-						className='flex-grow-1'
-						isAutoColor
-						value={item.progress}
-						style={{
-							height: 10,
-							width: '100%',
-						}}
-					/>
-				</div>
-			),
-			align: 'center',
-		},
-		{
-			title: 'Giá trị KPI',
-			id: 'kpiValue',
-			key: 'kpiValue',
-			type: 'number',
-			align: 'center',
-		},
-		{
-			title: 'KPI thực tế',
-			id: 'currentKpi',
-			key: 'currentKpi',
-			type: 'number',
-			render: (item) => <span>{item.currentKPI}</span>,
-			align: 'center',
-		},
-		{
-			title: 'Độ ưu tiên',
-			id: 'priority',
-			key: 'priority',
-			type: 'text',
-			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<span
-						style={{
-							paddingRight: '1rem',
-							paddingLeft: '1rem',
-						}}
-						className={classNames(
-							'badge',
-							'border border-2',
-							[`border-${themeStatus}`],
-							'bg-success',
-							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`,
-						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
-					</span>
-				</div>
-			),
-			align: 'center',
-		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
-			render: (item) => (
-				<Button
-					isLink
-					color={formatColorStatus(item.status)}
-					icon='Circle'
-					className='text-nowrap'>
-					{FORMAT_TASK_STATUS(item.status)}
-				</Button>
-			),
-		},
-		{
-			title: '',
-			id: 'action',
-			key: 'action',
-			render: (item) =>
-				verifyPermissionHOC(
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='Edit'
-						isDisable={item.status === 4 || item.status === 7 || item.status === 3}
-						onClick={() => handleOpenEditTaskForm(item)}
-					/>,
-					['admin'],
-				),
-		},
-	];
-
-	const columnSubTasks = [
-		{
-			title: 'Tên đầu việc',
-			id: 'name',
-			key: 'name',
-			type: 'text',
-			render: (item) => (
-				<Link className='text-underline' to={`${demoPages.dauViec.path}/${item.id}`}>
-					{item.name}
-				</Link>
-			),
-		},
-		{
-			title: 'Thời gian dự kiến',
-			id: 'estimateDate',
-			key: 'estimateDate',
-			type: 'text',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
-		},
-		{
-			title: 'Hạn hoàn thành',
-			id: 'deadlineDate',
-			key: 'deadlineDate',
-			format: (value) => `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			align: 'center',
-		},
-		{
-			title: 'Tiến độ',
-			id: 'progress',
-			key: 'progress',
-			type: 'text',
-			minWidth: 100,
-			render: (item) => (
-				<div className='d-flex align-items-center flex-column'>
-					<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
-					<Progress
-						className='flex-grow-1'
-						isAutoColor
-						value={item.progress}
-						style={{
-							height: 10,
-							width: '100%',
-						}}
-					/>
-				</div>
-			),
-			align: 'center',
-		},
-		{
-			title: 'Giá trị KPI',
-			id: 'kpiValue',
-			key: 'kpiValue',
-			type: 'number',
-			align: 'center',
-		},
-		{
-			title: 'Độ ưu tiên',
-			id: 'priority',
-			key: 'priority',
-			type: 'text',
-			render: (item) => (
-				<div className='d-flex align-items-center'>
-					<span
-						style={{
-							paddingRight: '1rem',
-							paddingLeft: '1rem',
-						}}
-						className={classNames(
-							'badge',
-							'border border-2',
-							[`border-${themeStatus}`],
-							'bg-success',
-							'pt-2 pb-2 me-2',
-							`bg-${formatColorPriority(item.priority)}`,
-						)}>
-						<span className=''>{`Cấp ${item.priority}`}</span>
-					</span>
-				</div>
-			),
-			align: 'center',
-		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'number',
-			render: (item) => (
-				<Button
-					isLink
-					color={formatColorStatus(item.status)}
-					icon='Circle'
-					className='text-nowrap'>
-					{FORMAT_TASK_STATUS(item.status)}
-				</Button>
-			),
-		},
-		{
-			title: '',
-			id: 'action',
-			key: 'action',
-			render: (item) => (
-				<Button
-					isOutline={!darkModeStatus}
-					color='success'
-					isLight={darkModeStatus}
-					className='text-nowrap mx-2'
-					icon='Edit'
-					isDisable={item.status === 4 || item.status === 7 || item.status === 3}
-					onClick={() => handleOpenEditSubTaskForm(item)}
-				/>
-			),
-		},
-	];
-
-	// all department
+	const users = useSelector((state) => state.employee.employees);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const items = dataPagination(users, currentPage, perPage);
 	useEffect(() => {
-		const fetchData = async () => {
-			const response = await getAllDepartments();
-			const result = await response.data;
-			setDataDepartments(
-				result
-					.reverse()
-					.concat({
-						id: 1,
-						name: 'Tất cả',
-					})
-					.reverse(),
+		dispatch(fetchEmployeeList());
+	}, [dispatch]);
+
+	useEffect(() => {
+		if (!isEmpty(worktrack)) {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(arrayToTree(worktrack, { childrenField: 'children' })),
+					10,
+				),
 			);
-		};
+		}
+	}, [worktrack]);
+
+	const id = localStorage.getItem('userId');
+
+	useEffect(() => {
+		async function fetchData() {
+			getAllWorktrackByUserId(id).then((res) => {
+				setWorktrack(
+					res.data.data.map((item) => {
+						return {
+							...item,
+							label: item.name,
+							value: item.id,
+							text: item.name,
+							parentId: item.parent_id,
+						};
+					}),
+				);
+			});
+		}
 		fetchData();
-	}, []);
+	}, [dispatch, id]);
 
-	// get all misisons
-	useEffect(() => {
-		const fetchData = async () => {
-			const response = await getAllMission();
-			const result = await response.data;
-			setMissions(result);
-		};
-		const fetchDataReport = async () => {
-			const response = await getReportMisson();
-			const result = await response.data;
-			setMissionReport(result);
-		};
-		fetchDataReport();
-		fetchData();
-	}, []);
+	const renderIndexCell = (row) => {
+		return (
+			<div
+				style={{
+					paddingLeft: `${row.metadata.depth * 30}px`,
+					minWidth: 360,
+				}}
+				onDoubleClick={() =>
+					handleOpenForm({
+						...row.data,
+						parent: worktrack.find((item) => item.id === row.data.parentId),
+					})
+				}
+				className={
+					row.metadata.hasChildren
+						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
+						: 'without-children cursor-pointer user-select-none'
+				}>
+				{row.metadata.hasChildren ? (
+					<Icon
+						color='success'
+						type='button'
+						size='lg'
+						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
+						className='d-block bg-transparent'
+						style={{ fontSize: 25 }}
+						onClick={row.toggleChildren}
+					/>
+				) : (
+					''
+				)}
 
-	const fetchDataTaskSolved = async () => {
-		const response = await getAllTasksByStatus(3);
-		const result = await response.data;
-		setTasksSolved(result);
-	};
-	// task resolved
-	useEffect(() => {
-		fetchDataTaskSolved();
-	}, []);
-
-	// task by department
-	useEffect(() => {
-		const fetchDataTaskByDepartment = async () => {
-			const response = await getAllTasksByDepartment(departmentSelect, { type: 2 });
-			const result = await response.data;
-			setTasks(result);
-		};
-		const fetchDataReportTaskByDepartment = async () => {
-			const response = await getReportTask({ departmentId: departmentSelect });
-			const result = await response.data;
-			setTaskReport(result);
-		};
-		fetchDataReportTaskByDepartment();
-		fetchDataTaskByDepartment();
-	}, [departmentSelect]);
-
-	const fetchDataSubTaskSolved = async () => {
-		const response = await getAllSubTasksByStatus(3);
-		const result = await response.data;
-		setSubTasksSolved(result);
-	};
-	// task resolved
-	useEffect(() => {
-		fetchDataSubTaskSolved();
-	}, []);
-	// subtask
-	useEffect(() => {
-		const fetchDataSubtasks = async () => {
-			const response = await getAllSubTasksByUser();
-			const result = await response.data;
-			setSubTasks(result);
-		};
-		const fetchDataSubtasksReport = async () => {
-			const response = await getReportSubTask();
-			const result = await response.data;
-			setSubTaskReport(result);
-		};
-		const fetchDataSubtasksReportDepartment = async () => {
-			const response = await getReportSubTaskDepartment();
-			const result = await response.data;
-			setSubTaskReportDepartment(result);
-		};
-		fetchDataSubtasks();
-		fetchDataSubtasksReport();
-		fetchDataSubtasksReportDepartment();
-	}, []);
-
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
+				<span>{row.data?.kpiNorm?.name || ''}</span>
+			</div>
 		);
 	};
 
-	// form mission modal
-	const handleOpenEditForm = (item) => {
-		setEditModalStatus(true);
-		setItemEdit({ ...item });
+	const handleOnChange = (newValue) => {
+		setTreeValue(newValue);
 	};
 
-	const handleCloseEditForm = () => {
-		setEditModalStatus(false);
-		setItemEdit(null);
+	const [year, setYear] = useState(Number(moment().format('YYYY')));
+	const companies = ['Tổng Công Ty', 'Kênh OTC', 'Kênh ETC', 'Kênh MT', 'Kênh Online'];
+	const COMPANIES_TAB = {
+		COMP1: companies[0],
+		COMP2: companies[1],
+		COMP3: companies[2],
+		COMP4: companies[3],
+		COMP5: companies[4],
 	};
+	const [activeCompanyTab, setActiveCompanyTab] = useState(COMPANIES_TAB.COMP1);
+	const search = [
+		// { name: 'Tuần' },
+		{ name: 'Ngày' },
+		{ name: 'Tháng' },
+		{ name: 'Quý' },
+		{ name: 'Năm' },
+	];
+	const SEARCH_TAB = {
+		COMP1: search[0].name,
+		COMP2: search[1].name,
+		COMP3: search[2].name,
+		COMP4: search[3].name,
+	};
+	const [searchTab, setSearchTab] = useState(SEARCH_TAB.COMP1);
 
-	const handleSubmitMissionForm = async (data) => {
-		if (data.id) {
-			try {
-				const response = await updateMissionById(data);
-				const result = await response.data;
-				const newMissions = [...missions];
-				setMissions(
-					newMissions.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
-				handleCloseEditForm();
-				handleShowToast(
-					`Cập nhật mục tiêu!`,
-					`mục tiêu ${result.name} được cập nhật thành công!`,
-				);
-			} catch (error) {
-				setMissions(missions);
-				handleShowToast(`Cập nhật mục tiêu`, `Cập nhật mục tiêu không thành công!`);
-			}
-		} else {
-			try {
-				const response = await addNewMission(data);
-				const result = await response.data;
-				const newMissions = [...missions];
-				newMissions.push(result);
-				setMissions(newMissions);
-				handleCloseEditForm();
-				handleShowToast(`Thêm mục tiêu`, `mục tiêu ${result.name} được thêm thành công!`);
-			} catch (error) {
-				setMissions(missions);
-				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu không thành công!`);
-			}
+	function randomize(value, x = year) {
+		if (x === 2019) {
+			// if (value.toFixed(0) % 2) {
+			// 	return (value * 1.5).toFixed(2);
+			// }
+			// return (value / 1.4).toFixed(2);
+			return 0;
 		}
-	};
-
-	// form task modal
-	const handleOpenEditTaskForm = (item) => {
-		setEditModalStatusTask(true);
-		setTaskEdit({ ...item });
-	};
-
-	const handleCloseEditTaskForm = () => {
-		setEditModalStatusTask(false);
-		setTaskEdit(null);
-	};
-	const handleSubmitTaskForm = async (data) => {
-		if (data.id) {
-			try {
-				const response = await updateTaskByID(data);
-				const result = await response.data;
-				const newTasks = [...tasks];
-				setTasks(newTasks.map((item) => (item.id === data.id ? { ...result } : item)));
-				handleCloseEditForm();
-				handleShowToast(
-					`Cập nhật công việc!`,
-					`Công việc ${result.name} được cập nhật thành công!`,
-				);
-			} catch (error) {
-				setTasks(tasks);
-				handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
-			}
-		} else {
-			try {
-				const response = await addNewTask({ ...data });
-				const result = await response.data;
-				const newTasks = [...tasks];
-				newTasks.push(result);
-				setTasks(newTasks);
-				handleCloseEditForm();
-				handleShowToast(`Thêm công việc`, `Công việc ${result.name} được thêm thành công!`);
-			} catch (error) {
-				setTasks(tasks);
-				handleShowToast(`Thêm công việc`, `Thêm công việc không thành công!`);
-			}
+		if (x === 2020) {
+			// if (value.toFixed(0) % 2) {
+			// 	return (value / 1.5).toFixed(2);
+			// }
+			// return (value * 1.4).toFixed(2);
+			return 0;
 		}
-	};
-
-	// subtask form modal
-	const handleOpenEditSubTaskForm = (item) => {
-		setEditModalStatusSubTask(true);
-		setSubTaskEdit({ ...item });
-	};
-
-	const handleCloseEditSubtaskForm = () => {
-		setEditModalStatusSubTask(false);
-		setSubTaskEdit(null);
-	};
-
-	const handleSubmitSubTaskForm = async (data) => {
-		if (data.id) {
-			try {
-				const response = await updateSubtask(data);
-				const result = await response.data;
-				const newSubtasks = [...subtasks];
-				setSubTasks(
-					newSubtasks.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
-				handleCloseEditForm();
-				handleShowToast(
-					`Cập nhật đầu việc!`,
-					`Đầu việc ${result.name} được cập nhật thành công!`,
-				);
-			} catch (error) {
-				setSubTasks(subtasks);
-				handleShowToast(`Cập nhật đầu việc`, `Cập nhật đầu việc không thành công!`);
-			}
-		} else {
-			try {
-				const response = await addNewSubtask({ ...data });
-				const result = await response.data;
-				const newSubtasks = [...subtasks];
-				newSubtasks.push(result);
-				setSubTasks(newSubtasks);
-				handleCloseEditForm();
-				handleShowToast(`Thêm đầu việc`, `Đầu việc ${result.name} được thêm thành công!`);
-			} catch (error) {
-				setSubTasks(subtasks);
-				handleShowToast(`Thêm đầu việc`, `Thêm đầu việc không thành công!`);
-			}
+		if (x === 2021) {
+			// if (value.toFixed(0) % 2) {
+			// 	return (value / 2).toFixed(2);
+			// }
+			// return (value * 1.4).toFixed(2);
+			return 0;
 		}
-	};
-
-	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
-	// ------------			Moal Confirm when change status task		----------------------
-
-	const handleOpenConfirmStatusTask = (item, nextStatus, type = 1, isShowNote = false) => {
-		setOpenConfirmModalStatus(true);
-		setItemEdit({ ...item });
-		setInfoConfirmModalStatus({
-			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
-			subTitle: item?.name,
-			status: nextStatus,
-			type,
-			isShowNote,
-		});
-	};
-
-	const handleCloseConfirmStatusTask = () => {
-		setOpenConfirmModalStatus(false);
-		setItemEdit(null);
-	};
-
-	const handleUpdateStatus = async (status, data) => {
-		try {
-			const newData = { ...data };
-			newData.status = status;
-			const response = await updateTaskByID(newData);
-			const result = await response.data;
-			setTasks(tasks.map((item) => (item.id === data.id ? { ...result } : item)));
-			handleCloseEditForm();
-			fetchDataTaskSolved();
-			handleCloseConfirmStatusTask();
-			handleShowToast(
-				`Cập nhật công việc!`,
-				`Công việc ${result.name} được cập nhật thành công!`,
-			);
-		} catch (error) {
-			setTasks(tasks);
-			handleShowToast(`Cập nhật công việc`, `Cập nhật công việc không thành công!`);
-		}
-	};
-
-	// ------------			Modal confirm khi thay đổi trạng thái subtask		----------------------
-	// ------------			Moal Confirm when change status task		----------------------
-
-	// change status
-	const handleUpdateStatusSubtask = async (status, data) => {
-		try {
-			const subtaskClone = { ...data };
-			subtaskClone.status = status;
-			const respose = await updateSubtask(subtaskClone);
-			const result = await respose.data;
-			fetchDataSubTaskSolved();
-			setSubTasks(subtasks.map((item) => (item.id === data.id ? { ...result } : item)));
-			handleCloseEditForm();
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Cập nhật trạng thái đầu việc ${result.name} thành công!`,
-			);
-			handleCloseConfirmStatusTask();
-		} catch (error) {
-			handleShowToast(
-				`Cập nhật trạng thái!`,
-				`Thao tác không thành công. Xin vui lòng thử lại!`,
-				'Error',
-				'danger',
+		// return value.toFixed(2);
+		return 0;
+	}
+	function getDate(day) {
+		const arr = [];
+		for (let i = 0; i < day; i += 1) {
+			arr.push(
+				moment()
+					.add(-1 * i, 'day')
+					.format('ll'),
 			);
 		}
+		return arr.reverse();
+	}
+	function getYear(day) {
+		const arr = [];
+		for (let i = 0; i < day; i += 1) {
+			arr.push(
+				moment()
+					.add(-1 * i, 'year')
+					.format('YYYY'),
+			);
+		}
+		arr.sort();
+		return arr;
+	}
+	const guestChart = {
+		series: [
+			{
+				name: 'Nữ',
+				data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			},
+			{
+				name: 'Nam',
+				data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			},
+		],
+		options: {
+			chart: {
+				type: 'bar',
+				height: 370,
+				stacked: true,
+			},
+			colors: [process.env.REACT_APP_DANGER_COLOR, process.env.REACT_APP_INFO_COLOR],
+			plotOptions: {
+				bar: {
+					horizontal: true,
+					barHeight: '80%',
+				},
+			},
+			dataLabels: {
+				enabled: false,
+			},
+			stroke: {
+				width: 1,
+				colors: ['#fff'],
+			},
+			grid: {
+				xaxis: {
+					lines: {
+						show: false,
+					},
+				},
+			},
+			yaxis: {
+				min: -5,
+				max: 5,
+				title: {
+					text: 'Age',
+				},
+			},
+			tooltip: {
+				shared: false,
+				x: {
+					formatter(val) {
+						return val;
+					},
+				},
+				y: {
+					formatter(val) {
+						return `${Math.abs(val)}%`;
+					},
+				},
+			},
+			title: {
+				text: 'Báo cáo người dùng sản phẩm năm 2022',
+			},
+			xaxis: {
+				categories: [
+					'85+',
+					'80-84',
+					'75-79',
+					'70-74',
+					'65-69',
+					'60-64',
+					'55-59',
+					'50-54',
+					'45-49',
+					'40-44',
+					'35-39',
+					'30-34',
+					'25-29',
+					'20-24',
+					'15-19',
+					'10-14',
+					'5-9',
+					'0-4',
+				],
+				title: {
+					text: 'Percent',
+				},
+				labels: {
+					formatter(val) {
+						return `${Math.abs(Math.round(val))}%`;
+					},
+				},
+			},
+		},
 	};
+	const salesByStoreOptions = {
+		chart: {
+			height: 335.5,
+			type: 'line',
+			stacked: false,
+			toolbar: { show: false },
+		},
+		colors: [
+			process.env.REACT_APP_INFO_COLOR,
+			process.env.REACT_APP_SUCCESS_COLOR,
+			process.env.REACT_APP_WARNING_COLOR,
+		],
+		dataLabels: {
+			enabled: false,
+		},
+		stroke: {
+			width: [1, 1, 4],
+			curve: 'smooth',
+		},
+		plotOptions: {
+			bar: {
+				borderRadius: 5,
+				columnWidth: '20px',
+			},
+		},
+		xaxis: {
+			categories: [
+				'Jan',
+				'Feb',
+				'Mar',
+				'Apr',
+				'May',
+				'Jun',
+				'Jul',
+				'Aug',
+				'Sep',
+				'Oct',
+				'Nov',
+				'Dec',
+			],
+		},
+		yaxis: [
+			{
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_INFO_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập ( Triệu )',
+					style: {
+						color: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				tooltip: {
+					enabled: true,
+				},
+			},
+			{
+				seriesName: 'Thu Nhập Năm Ngoái',
+				opposite: true,
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_SUCCESS_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập Năm Ngoái',
+					style: {
+						color: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+			},
+		],
+		tooltip: {
+			theme: 'dark',
+			fixed: {
+				enabled: true,
+				position: 'topLeft',
+				offsetY: 30,
+				offsetX: 60,
+			},
+		},
+		legend: {
+			horizontalAlign: 'left',
+			offsetX: 40,
+		},
+	};
+
+	const dayOptions = {
+		chart: {
+			height: 335.5,
+			type: 'line',
+			stacked: false,
+			toolbar: { show: false },
+		},
+		colors: [
+			process.env.REACT_APP_INFO_COLOR,
+			process.env.REACT_APP_SUCCESS_COLOR,
+			process.env.REACT_APP_WARNING_COLOR,
+		],
+		dataLabels: {
+			enabled: false,
+		},
+		stroke: {
+			width: [1, 1, 4],
+			curve: 'smooth',
+		},
+		plotOptions: {
+			bar: {
+				borderRadius: 5,
+				columnWidth: '20px',
+			},
+		},
+		xaxis: {
+			categories: getDate(30),
+		},
+		yaxis: [
+			{
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_INFO_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập ( Triệu )',
+					style: {
+						color: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				tooltip: {
+					enabled: true,
+				},
+			},
+		],
+		tooltip: {
+			theme: 'dark',
+			fixed: {
+				enabled: true,
+				position: 'topLeft',
+				offsetY: 30,
+				offsetX: 60,
+			},
+		},
+		legend: {
+			horizontalAlign: 'left',
+			offsetX: 40,
+		},
+	};
+	const dayStoreSeries = [
+		{
+			name: 'Thu Nhập Tháng Này',
+			type: 'column',
+			data: [
+				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0,
+			],
+		},
+	];
+	const monthOptions = {
+		chart: {
+			height: 335.5,
+			type: 'line',
+			stacked: false,
+			toolbar: { show: false },
+		},
+		colors: [
+			process.env.REACT_APP_INFO_COLOR,
+			process.env.REACT_APP_SUCCESS_COLOR,
+			process.env.REACT_APP_WARNING_COLOR,
+		],
+		dataLabels: {
+			enabled: false,
+		},
+		stroke: {
+			width: [1, 1, 4],
+			curve: 'smooth',
+		},
+		plotOptions: {
+			bar: {
+				borderRadius: 5,
+				columnWidth: '20px',
+			},
+		},
+		xaxis: {
+			categories: [
+				'Jan',
+				'Feb',
+				'Mar',
+				'Apr',
+				'May',
+				'Jun',
+				'Jul',
+				'Aug',
+				'Sep',
+				'Oct',
+				'Nov',
+				'Dec',
+			],
+		},
+		yaxis: [
+			{
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_INFO_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập ( Triệu )',
+					style: {
+						color: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				tooltip: {
+					enabled: true,
+				},
+			},
+			{
+				seriesName: 'Thu Nhập Năm Ngoái',
+				opposite: true,
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_SUCCESS_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập Năm Ngoái',
+					style: {
+						color: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+			},
+		],
+		tooltip: {
+			theme: 'dark',
+			fixed: {
+				enabled: true,
+				position: 'topLeft',
+				offsetY: 30,
+				offsetX: 60,
+			},
+		},
+		legend: {
+			horizontalAlign: 'left',
+			offsetX: 40,
+		},
+	};
+	const monthStoreSeries = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Trước',
+			type: 'column',
+			data: [
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+			],
+		},
+	];
+	const quarterOptions = {
+		chart: {
+			height: 335.5,
+			type: 'line',
+			stacked: false,
+			toolbar: { show: false },
+		},
+		colors: [
+			process.env.REACT_APP_INFO_COLOR,
+			process.env.REACT_APP_SUCCESS_COLOR,
+			process.env.REACT_APP_WARNING_COLOR,
+		],
+		dataLabels: {
+			enabled: false,
+		},
+		stroke: {
+			width: [1, 1, 4],
+			curve: 'smooth',
+		},
+		plotOptions: {
+			bar: {
+				borderRadius: 5,
+				columnWidth: '20px',
+			},
+		},
+		xaxis: {
+			categories: ['Quý 1', 'Quý 2', 'Quý 3', 'Quý 4'],
+		},
+		yaxis: [
+			{
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_INFO_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập ( Triệu )',
+					style: {
+						color: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				tooltip: {
+					enabled: true,
+				},
+			},
+			{
+				seriesName: 'Thu Nhập Năm Ngoái',
+				opposite: true,
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_SUCCESS_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập Năm Ngoái',
+					style: {
+						color: process.env.REACT_APP_SUCCESS_COLOR,
+					},
+				},
+			},
+		],
+		tooltip: {
+			theme: 'dark',
+			fixed: {
+				enabled: true,
+				position: 'topLeft',
+				offsetY: 30,
+				offsetX: 60,
+			},
+		},
+		legend: {
+			horizontalAlign: 'left',
+			offsetX: 40,
+		},
+	};
+	const quarterStoreSeries = [
+		{
+			name: 'Thu Nhập Quý Năm Nay',
+			type: 'column',
+			data: [0, 0, 0, 0],
+		},
+		{
+			name: 'Thu Nhập Quý Năm Trước',
+			type: 'column',
+			data: [0, 0, 0, 0],
+		},
+	];
+	const yearOptions = {
+		chart: {
+			height: 335.5,
+			type: 'line',
+			stacked: false,
+			toolbar: { show: false },
+		},
+		colors: [
+			process.env.REACT_APP_INFO_COLOR,
+			process.env.REACT_APP_SUCCESS_COLOR,
+			process.env.REACT_APP_WARNING_COLOR,
+		],
+		dataLabels: {
+			enabled: false,
+		},
+		stroke: {
+			width: [1, 1, 4],
+			curve: 'smooth',
+		},
+		plotOptions: {
+			bar: {
+				borderRadius: 5,
+				columnWidth: '20px',
+			},
+		},
+		xaxis: {
+			categories: getYear(6),
+		},
+		yaxis: [
+			{
+				axisTicks: {
+					show: true,
+				},
+				axisBorder: {
+					show: true,
+					color: process.env.REACT_APP_INFO_COLOR,
+				},
+				labels: {
+					style: {
+						colors: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				title: {
+					text: 'Thu Nhập ( Triệu )',
+					style: {
+						color: process.env.REACT_APP_INFO_COLOR,
+					},
+				},
+				tooltip: {
+					enabled: true,
+				},
+			},
+		],
+		tooltip: {
+			theme: 'dark',
+			fixed: {
+				enabled: true,
+				position: 'topLeft',
+				offsetY: 30,
+				offsetX: 60,
+			},
+		},
+		legend: {
+			horizontalAlign: 'left',
+			offsetX: 40,
+		},
+	};
+	const yearStoreSeries = [
+		{
+			// name: 'Thu Nhập Quý Năm Nay',
+			type: 'column',
+			data: [0, 0, 0, 0, 0, 0],
+		},
+	];
+
+	const salesByStoreSeries1 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+				randomize(0),
+			],
+		},
+	];
+	const salesByStoreSeries2 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(234),
+				randomize(456),
+				randomize(371),
+				randomize(499),
+				randomize(378),
+				randomize(678),
+				randomize(567),
+				randomize(789),
+				randomize(460),
+				randomize(575),
+				randomize(661),
+				randomize(515),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(150),
+				randomize(200),
+				randomize(200),
+				randomize(200),
+				randomize(250),
+				randomize(300),
+				randomize(300),
+				randomize(400),
+				randomize(300),
+				randomize(400),
+				randomize(444),
+			],
+		},
+	];
+	const salesByStoreSeries3 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(477),
+				randomize(323),
+				randomize(241),
+				randomize(478),
+				randomize(268),
+				randomize(379),
+				randomize(344),
+				randomize(486),
+				randomize(580),
+				randomize(680),
+				randomize(480),
+				randomize(370),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(155),
+				randomize(200),
+				randomize(200),
+				randomize(200),
+				randomize(300),
+				randomize(300),
+				randomize(355),
+				randomize(356),
+				randomize(299),
+				randomize(400),
+				randomize(499),
+			],
+		},
+	];
+	const salesByStoreSeries4 = [
+		{
+			name: 'Thu Nhập Năm Nay',
+			type: 'column',
+			data: [
+				randomize(354),
+				randomize(366),
+				randomize(264),
+				randomize(575),
+				randomize(313),
+				randomize(278),
+				randomize(470),
+				randomize(420),
+				randomize(579),
+				randomize(615),
+				randomize(311),
+				randomize(692),
+			],
+		},
+		{
+			name: 'Thu Nhập Năm Ngoái',
+			type: 'column',
+			data: [
+				randomize(100),
+				randomize(180),
+				randomize(200),
+				randomize(200),
+				randomize(200),
+				randomize(300),
+				randomize(300),
+				randomize(388),
+				randomize(377),
+				randomize(300),
+				randomize(400),
+				randomize(478),
+			],
+		},
+	];
 
 	return (
 		<PageWrapper title={dashboardMenu.dashboard.text}>
 			<Page container='fluid overflow-hidden'>
 				<div className='row'>
 					{verifyPermissionHOC(
-						<div className='col-xxl-6'>
+						<div className='col-md-6'>
 							<Card className='mb-0'>
-								<CardHeader className='py-0'>
+								<CardHeader>
 									<CardLabel icon='ReceiptLong'>
 										<CardTitle tag='h4' className='h5'>
-											Thống kê mục tiêu
+											Thống Kê Doanh Thu
 										</CardTitle>
 										<CardSubTitle tag='h5' className='h6'>
 											Báo cáo
 										</CardSubTitle>
 									</CardLabel>
-									<CardActions>
-										<Button
-											icon='ArrowForwardIos'
-											aria-label='Read More'
-											hoverShadow='default'
-											rounded={1}
-											color={darkModeStatus ? 'dark' : null}
-											onClick={handleOnClickToMissionListPage}
-										/>
-									</CardActions>
 								</CardHeader>
-								<CardBody className='py-0'>
+								<CardActions
+									style={{
+										textAlign: 'right',
+										marginRight: '19.5px',
+										marginLeft: '19.5px',
+									}}>
+									<Dropdown isButtonGroup>
+										<DropdownToggle>
+											<Button color='success' isLight>
+												{activeCompanyTab}
+											</Button>
+										</DropdownToggle>
+										<DropdownMenu isAlignmentEnd>
+											<DropdownItem>
+												<Button
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP1)
+													}>
+													Tổng công ty
+												</Button>
+											</DropdownItem>
+											<DropdownItem>
+												<Button
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP2)
+													}>
+													Kênh OTC
+												</Button>
+											</DropdownItem>
+											<DropdownItem>
+												<Button
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP3)
+													}>
+													Kênh ETC
+												</Button>
+											</DropdownItem>
+											<DropdownItem>
+												<Button
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP4)
+													}>
+													Kênh MT
+												</Button>
+											</DropdownItem>
+											<DropdownItem>
+												<Button
+													onClick={() =>
+														setActiveCompanyTab(COMPANIES_TAB.COMP5)
+													}>
+													Kênh Online
+												</Button>
+											</DropdownItem>
+										</DropdownMenu>
+									</Dropdown>
+									<ButtonGroup style={{ marginRight: '0' }}>
+										{search.map((element) => (
+											<div key={element.name}>
+												<Button
+													isLight={searchTab !== element.name}
+													onClick={() => setSearchTab(element.name)}
+													color={themeStatus}>
+													{element.name}
+												</Button>
+											</div>
+										))}
+									</ButtonGroup>
+									{searchTab === '30 Ngày' || searchTab === 'Năm' ? null : (
+										<Dropdown isButtonGroup>
+											<DropdownToggle>
+												<Button color='success' isLight>
+													{year}
+												</Button>
+											</DropdownToggle>
+											<DropdownMenu isAlignmentEnd>
+												<DropdownItem>
+													<Button
+														color='primary'
+														isLight
+														isDisable={year === 2019}
+														onClick={() => {
+															setYear(2019);
+															setSearchTab('');
+														}}>
+														2019
+													</Button>
+												</DropdownItem>
+												<DropdownItem>
+													<Button
+														color='primary'
+														isLight
+														isDisable={year === 2020}
+														onClick={() => {
+															setYear(2020);
+															setSearchTab('');
+														}}>
+														2020
+													</Button>
+												</DropdownItem>
+												<DropdownItem>
+													<Button
+														color='primary'
+														isLight
+														isDisable={year === 2021}
+														onClick={() => {
+															setYear(2021);
+															setSearchTab('');
+														}}>
+														2021
+													</Button>
+												</DropdownItem>
+												<DropdownItem>
+													<Button
+														color='primary'
+														isLight
+														isDisable={year === 2022}
+														onClick={() => {
+															setYear(2022);
+															setSearchTab('');
+														}}>
+														2022
+													</Button>
+												</DropdownItem>
+											</DropdownMenu>
+										</Dropdown>
+									)}
+								</CardActions>
+								<CardBody>
 									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											<MissionChartReport data={missionReport} />
+										<div className='col-md-12'>
+											<Chart
+												series={
+													(searchTab === SEARCH_TAB.COMP1 &&
+														dayStoreSeries) ||
+													(searchTab === SEARCH_TAB.COMP2 &&
+														monthStoreSeries) ||
+													(searchTab === SEARCH_TAB.COMP3 &&
+														quarterStoreSeries) ||
+													(searchTab === SEARCH_TAB.COMP4 &&
+														yearStoreSeries) ||
+													(activeCompanyTab === COMPANIES_TAB.COMP2 &&
+														salesByStoreSeries1) ||
+													(activeCompanyTab === COMPANIES_TAB.COMP3 &&
+														salesByStoreSeries2) ||
+													(activeCompanyTab === COMPANIES_TAB.COMP4 &&
+														salesByStoreSeries3) ||
+													salesByStoreSeries4
+												}
+												options={
+													(searchTab === SEARCH_TAB.COMP1 &&
+														dayOptions) ||
+													(searchTab === SEARCH_TAB.COMP2 &&
+														monthOptions) ||
+													(searchTab === SEARCH_TAB.COMP3 &&
+														quarterOptions) ||
+													(searchTab === SEARCH_TAB.COMP4 &&
+														yearOptions) ||
+													salesByStoreOptions
+												}
+												type={salesByStoreOptions.chart.type}
+												height={salesByStoreOptions.chart.height}
+											/>
 										</div>
 									</div>
 								</CardBody>
@@ -767,469 +1127,186 @@ const DashboardPage = () => {
 						</div>,
 						['admin'],
 					)}
-					{verifyPermissionHOC(
-						<div className='col-xxl-6'>
-							<Card className='mb-0'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê công việc
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-									{verifyPermissionHOC(
-										<CardActions>
-											<Dropdown>
-												<DropdownToggle hasIcon={false}>
-													<Button
-														color='primary'
-														icon='Circle'
-														className='text-nowrap'>
-														{
-															dataDepartments.filter(
-																(item) =>
-																	item.id === departmentSelect,
-															)[0]?.name
-														}
-													</Button>
-												</DropdownToggle>
-												<DropdownMenu>
-													{dataDepartments?.map((item) => (
-														<DropdownItem
-															key={item?.id}
-															onClick={() =>
-																setDepartmentSelect(item.id)
-															}>
-															<div>{item?.name}</div>
-														</DropdownItem>
-													))}
-												</DropdownMenu>
-											</Dropdown>
-										</CardActions>,
-										['admin'],
-									)}
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={taskReport} />
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['admin', 'manager'],
-					)}
-					{verifyPermissionHOC(
-						<div className='col-xxl-6'>
-							<Card className='mb-0'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê đầu việc của phòng
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
+					<div className='col-md-6'>
+						{verifyPermissionHOC(
+							<Card stretch>
+								<CardHeader>
+									<CardLabel icon='StackedBarChart'>
+										<CardTitle>Thống kê người dùng</CardTitle>
+										<CardSubTitle>Báo cáo</CardSubTitle>
 									</CardLabel>
 								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={subTaskReportDepartment} />
-										</div>
-									</div>
+								<CardBody>
+									<Chart
+										series={guestChart.series}
+										options={guestChart.options}
+										type='bar'
+										height={370}
+									/>
 								</CardBody>
-							</Card>
-						</div>,
-						['manager'],
-					)}
+							</Card>,
+							['admin'],
+						)}
+					</div>
 				</div>
-				<div className='row mt-4'>
+				<div className='row mt-0'>
 					{verifyPermissionHOC(
 						<>
-							<div className='col-xxl-6'>
-								<Card className='mb-0'>
-									<CardHeader className='py-0'>
-										<CardLabel icon='ReceiptLong'>
-											<CardTitle tag='h4' className='h5'>
-												Thống kê đầu việc cá nhân
-											</CardTitle>
-											<CardSubTitle tag='h5' className='h6'>
-												Báo cáo
-											</CardSubTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody className='py-0'>
-										<div className='row'>
-											<div className='col-xl-12 col-xxl-12'>
-												<TaskChartReport data={subTaskReport} />
-											</div>
-										</div>
-									</CardBody>
-								</Card>
+							<div className='col-md-6' style={{ marginTop: '1%' }}>
+								<CommonSalePerformance />
 							</div>
-							{verifyPermissionHOC(
-								<div className='col-xxl-6'>
-									<Card className='h-100'>
-										<CardHeader>
-											<CardLabel icon='ContactSupport' iconColor='secondary'>
-												<CardTitle tag='h4' className='h5'>
-													Đầu việc chờ duyệt
-												</CardTitle>
-												<CardSubTitle tag='h5' className='h6'>
-													Chờ duyệt
-												</CardSubTitle>
-											</CardLabel>
-										</CardHeader>
-										<CardBody>
-											<div className='row g-3'>
-												{subtasksSolved.map((task) => (
-													<div className='col-12' key={task.id}>
-														<div className='row g-2'>
-															<div className='col-8'>
-																<div className='flex-grow-1 ms-3 d-flex justify-content-between align-items-center'>
-																	<div>
-																		<Link
-																			to={`${demoPages.dauViec.path}/${task.id}`}
-																			className='fs-5'>
-																			{task.name}
-																		</Link>
-																		<div className='text-muted mt-n1'>
-																			<small
-																				style={{
-																					fontSize: 13,
-																				}}>{`${task.departments[0]?.name} - ${task.users[0]?.name}`}</small>
-																		</div>
-																	</div>
-																</div>
-															</div>
-															<div className='col-4'>
-																<div className='d-flex align-items-center'>
-																	<div className='d-flex flex-column align-items-center w-75 me-3'>
-																		<span className='me-3'>
-																			{task.progress}%
-																		</span>
-																		<Progress
-																			className='flex-grow-1'
-																			isAutoColor
-																			value={task.progress}
-																			style={{
-																				height: 10,
-																				width: '100%',
-																			}}
-																		/>
-																	</div>
-																	<Button
-																		color='info'
-																		isLight
-																		icon='Check2All'
-																		size='lg'
-																		className='text-nowrap'
-																		onClick={() =>
-																			handleOpenConfirmStatusTask(
-																				task,
-																				4,
-																				2,
-																			)
-																		}>
-																		Duyệt
-																	</Button>
-																</div>
-															</div>
-														</div>
-													</div>
-												))}
-											</div>
-										</CardBody>
-									</Card>
-								</div>,
-								['manager'],
-							)}
-							{verifyPermissionHOC(
-								<div className='col-xxl-6'>
-									<Card className='h-100'>
-										<CardHeader>
-											<CardLabel icon='ContactSupport' iconColor='secondary'>
-												<CardTitle tag='h4' className='h5'>
-													Công việc chờ duyệt
-												</CardTitle>
-												<CardSubTitle tag='h5' className='h6'>
-													Chờ duyệt
-												</CardSubTitle>
-											</CardLabel>
-										</CardHeader>
-										<CardBody>
-											<div className='row g-3'>
-												{tasksSolved.map((task) => (
-													<div className='col-12' key={task.id}>
-														<div className='row g-2'>
-															<div className='col-8'>
-																<div className='flex-grow-1 ms-3 d-flex justify-content-between align-items-center'>
-																	<div>
-																		<Link
-																			to={`${demoPages.quanLyCongViec.path}/${task.id}`}
-																			className='fs-5'>
-																			{task.name}
-																		</Link>
-																		<div className='text-muted mt-n1'>
-																			<small
-																				style={{
-																					fontSize: 13,
-																				}}>{`${task.departments[0]?.name} - ${task.users[0]?.name}`}</small>
-																		</div>
-																	</div>
-																</div>
-															</div>
-															<div className='col-4'>
-																<div className='d-flex align-items-center'>
-																	<div className='d-flex flex-column align-items-center w-75 me-3'>
-																		<span className='me-3'>
-																			{task.progress}%
-																		</span>
-																		<Progress
-																			className='flex-grow-1'
-																			isAutoColor
-																			value={task.progress}
-																			style={{
-																				height: 10,
-																				width: '100%',
-																			}}
-																		/>
-																	</div>
-																	<Button
-																		color='info'
-																		isLight
-																		icon='Check2All'
-																		size='lg'
-																		className='text-nowrap'
-																		onClick={() =>
-																			handleOpenConfirmStatusTask(
-																				task,
-																				4,
-																			)
-																		}>
-																		Duyệt
-																	</Button>
-																</div>
-															</div>
-														</div>
-													</div>
-												))}
-											</div>
-										</CardBody>
-									</Card>
-								</div>,
-								['admin'],
-							)}
+							<div className='col-md-6' style={{ marginTop: '1%' }}>
+								<CommonApprovedAppointmentChart />
+							</div>
 						</>,
-						['manager', 'admin'],
-					)}
-					{verifyPermissionHOC(
-						<div className='col-xxl-12'>
-							<Card className='mb-0'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê đầu việc cá nhân
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={subTaskReport} />
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['user'],
+						['admin', 'manager'],
 					)}
 				</div>
 				{verifyPermissionHOC(
+					<div className='row my-4'>
+						<div className='col-md-12'>
+							<Card>
+								<CardHeader>
+									<CardLabel icon='Task' iconColor='danger'>
+										<CardTitle>
+											<CardLabel>Thống kê công việc theo nhân viên</CardLabel>
+										</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<div className='p-4'>
+									<table
+										className='table table-modern mb-0'
+										style={{ fontSize: 14 }}>
+										<thead>
+											<tr>
+												<th>Họ và tên</th>
+												<th>Phòng ban</th>
+												<th>Vị trí</th>
+												<th className='text-center'>Số nhiệm vụ đang có</th>
+												<th>Chức vụ</th>
+											</tr>
+										</thead>
+										<tbody>
+											{items?.map((item) => (
+												<React.Fragment key={item.id}>
+													<tr>
+														<td>
+															<a
+																className='text-underline'
+																href={`/cong-viec-hang-ngay/${item.id}`}>
+																{item.name}
+															</a>
+														</td>
+														<td>{item?.department?.name}</td>
+														<td>{item?.position?.name}</td>
+														<td className='text-center'>
+															{item?.workTracks?.length || 0}
+														</td>
+														<td>
+															{item?.role === 'manager'
+																? 'Quản lý '
+																: 'Nhân viên'}
+														</td>
+													</tr>
+												</React.Fragment>
+											))}
+										</tbody>
+									</table>
+									<hr />
+									<footer>
+										<PaginationButtons
+											data={users}
+											setCurrentPage={setCurrentPage}
+											currentPage={currentPage}
+											perPage={perPage}
+											setPerPage={setPerPage}
+										/>
+									</footer>
+								</div>
+							</Card>
+						</div>
+					</div>,
+					['manager'],
+				)}
+				{verifyPermissionHOC(
 					<div className='row mt-4'>
-						<div className='col-xxl-12'>
+						<div className='col-md-12 h-100'>
 							<Card className='h-100'>
 								<CardHeader>
 									<CardLabel icon='Task' iconColor='danger'>
 										<CardTitle>
-											<CardLabel>Danh sách mục tiêu</CardLabel>
+											<CardLabel>
+												Danh sách công việc đang thực hiện
+											</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									{verifyPermissionHOC(
-										<CardActions>
-											<Button
-												color='info'
-												icon='Plus'
-												tag='button'
-												onClick={() => handleOpenEditForm(null)}>
-												Thêm mục tiêu
-											</Button>
-										</CardActions>,
-										['admin'],
-									)}
 								</CardHeader>
 								<div className='p-4'>
-									<TableCommon
-										className='table table-modern mb-0'
-										columns={columns}
-										data={missions}
-									/>
+									<TreeTable value={treeValue} onChange={handleOnChange}>
+										<TreeTable.Column
+											style={{ minWidth: 300 }}
+											renderCell={renderIndexCell}
+											renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-left'>
+													{row.data?.mission?.name || 'Không'}
+												</span>
+											)}
+											renderHeaderCell={() => <span>Thuộc mục tiêu</span>}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-left'>
+													{row.data?.quantity || ''}
+												</span>
+											)}
+											renderHeaderCell={() => (
+												<span className='t-right'>Số lượng</span>
+											)}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-right'>
+													{moment(`${row.data.deadline}`).format(
+														'DD-MM-YYYY',
+													) || ''}
+												</span>
+											)}
+											renderHeaderCell={() => <span>Hạn hoàn thành</span>}
+										/>
+										<TreeTable.Column
+											renderCell={(row) => (
+												<span className='expenses-cell text-right'>
+													{row.data?.kpiNorm?.manday || ''}
+												</span>
+											)}
+											renderHeaderCell={() => (
+												<span className='t-right'>Số ngày công</span>
+											)}
+										/>
+									</TreeTable>
 								</div>
-								{!missions?.length && (
-									<Alert color='warning' isLight icon='Report' className='mt-3'>
-										Không có mục tiêu!
-									</Alert>
-								)}
 							</Card>
+						</div>
+						<DailyWorktrackingModal
+							data={itemEdit}
+							worktrack={worktrack}
+							handleClose={handleCloseForm}
+							show={toggleForm}
+						/>
+					</div>,
+					['user', 'manager'],
+				)}
+				{verifyPermissionHOC(
+					<div className='row'>
+						<div className='col-md-6'>
+							<OrderBarChart />
 						</div>
 					</div>,
 					['admin'],
 				)}
-				<div className='row mt-4'>
-					<div className='col-xxl-12 col-xl-12 h-100'>
-						<Card className='h-100'>
-							<CardHeader>
-								<CardLabel icon='Task' iconColor='danger'>
-									<CardTitle>
-										<CardLabel>Danh sách công việc đang thực hiện</CardLabel>
-									</CardTitle>
-								</CardLabel>
-								{verifyPermissionHOC(
-									<CardActions className='d-flex align-items-center'>
-										<Button
-											color='info'
-											icon='Plus'
-											tag='button'
-											onClick={() => handleOpenEditTaskForm(null)}>
-											Thêm công việc
-										</Button>
-										{verifyPermissionHOC(
-											<Dropdown>
-												<DropdownToggle hasIcon={false}>
-													<Button
-														color='primary'
-														icon='Circle'
-														className='text-nowrap'>
-														{
-															dataDepartments.filter(
-																(item) =>
-																	item.id === departmentSelect,
-															)[0]?.name
-														}
-													</Button>
-												</DropdownToggle>
-												<DropdownMenu>
-													{dataDepartments.map((item) => (
-														<DropdownItem
-															key={item?.id}
-															onClick={() =>
-																setDepartmentSelect(item.id)
-															}>
-															<div>{item?.name}</div>
-														</DropdownItem>
-													))}
-												</DropdownMenu>
-											</Dropdown>,
-											['admin'],
-										)}
-									</CardActions>,
-									['admin', 'manager'],
-								)}
-							</CardHeader>
-							<div className='p-4'>
-								<TableCommon
-									className='table table-modern mb-0'
-									columns={columnTasks}
-									data={tasks}
-								/>
-							</div>
-							{!tasks?.length && (
-								<Alert color='warning' isLight icon='Report' className='mt-3'>
-									Không có công việc!
-								</Alert>
-							)}
-						</Card>
-					</div>
-				</div>
-				<div className='row mt-4'>
-					<div className='col-xxl-12 col-xl-12 h-100'>
-						<Card className='h-100'>
-							<CardHeader>
-								<CardLabel icon='Task' iconColor='danger'>
-									<CardTitle>
-										<CardLabel>Đầu việc của tôi</CardLabel>
-									</CardTitle>
-								</CardLabel>
-								{verifyPermissionHOC(
-									<CardActions className='d-flex align-items-center'>
-										<Button
-											color='info'
-											icon='Plus'
-											tag='button'
-											onClick={() => handleOpenEditSubTaskForm(null)}>
-											Thêm đầu việc
-										</Button>
-									</CardActions>,
-									['admin'],
-								)}
-							</CardHeader>
-							<div className='p-4'>
-								<TableCommon
-									className='table table-modern mb-0'
-									columns={columnSubTasks}
-									data={subtasks}
-								/>
-							</div>
-							{!tasks?.length && (
-								<Alert color='warning' isLight icon='Report' className='mt-3'>
-									Không có đầu việc!
-								</Alert>
-							)}
-						</Card>
-					</div>
-				</div>
-				<MissionFormModal
-					show={editModalStatus}
-					onClose={handleCloseEditForm}
-					onSubmit={handleSubmitMissionForm}
-					item={itemEdit}
-				/>
-				<TaskFormModal
-					show={editModalStatusTask}
-					onClose={handleCloseEditTaskForm}
-					onSubmit={handleSubmitTaskForm}
-					item={taskEdit}
-					isShowMission={!taskEdit?.id}
-				/>
-				<TaskDetailForm
-					show={editModalStatusSubTask}
-					item={subtaskEdit}
-					onClose={handleCloseEditSubtaskForm}
-					onSubmit={handleSubmitSubTaskForm}
-					isShowTask={!subtaskEdit?.id}
-				/>
-				<ModalConfirmCommon
-					show={openConfirmModalStatus}
-					onClose={handleCloseConfirmStatusTask}
-					// onSubmit={handleUpdateStatus}
-					onSubmit={
-						infoConfirmModalStatus.type === 1
-							? handleUpdateStatus
-							: handleUpdateStatusSubtask
-					}
-					item={itemEdit}
-					isShowNote={infoConfirmModalStatus.isShowNote}
-					title={infoConfirmModalStatus.title}
-					subTitle={infoConfirmModalStatus.subTitle}
-					status={infoConfirmModalStatus.status}
-				/>
 			</Page>
 		</PageWrapper>
 	);

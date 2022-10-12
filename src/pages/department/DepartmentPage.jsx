@@ -1,43 +1,91 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { isEmpty } from 'lodash';
+import { useDispatch, useSelector } from 'react-redux';
+import { arrayToTree } from 'performant-array-to-tree';
+import { TreeTable, TreeState } from 'cp-react-tree-table';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
+	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
-import useDarkMode from '../../hooks/useDarkMode';
-import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addDepartment, getAllDepartmentWithUser, updateDepartment } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
+import CommonForm from '../common/ComponentCommon/CommonForm';
+import { addDepartment, updateDepartment } from './services';
+import Toasts from '../../components/bootstrap/Toasts';
+import Employee from './Employee';
+import NotPermission from '../presentation/auth/NotPermission';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import Icon from '../../components/icon/Icon';
+import './style.scss';
 
 const DepartmentPage = () => {
-	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
-	const navigate = useNavigate();
-	const [openForm, setOpenForm] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
-	const [departments, setDepartments] = useState([]);
+	const dispatch = useDispatch();
+	const department = useSelector((state) => state.department.departments);
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const [toggle, setToggle] = useState(true);
+	const [dataDepartment, setDepartmentId] = useState(true);
+
+	const [treeValue, setTreeValue] = React.useState(
+		TreeState.create(arrayToTree(department, { childrenField: 'children' })),
+	);
+
 	useEffect(() => {
-		async function getDepartments() {
-			try {
-				const response = await getAllDepartmentWithUser();
-				const data = await response.data;
-				setDepartments(data);
-			} catch (error) {
-				setDepartments([]);
-			}
+		if (!isEmpty(department)) {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(arrayToTree(department, { childrenField: 'children' })),
+				),
+			);
 		}
-		getDepartments();
-	}, []);
+	}, [department]);
+
+	useEffect(() => {
+		dispatch(fetchDepartmentList());
+	}, [dispatch]);
+
+	const departmentList = department?.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+		};
+	});
+
+	const organizationLevelOptions = [
+		{
+			label: 'Khối',
+			value: 1,
+		},
+		{
+			label: 'Công ty',
+			value: 4,
+		},
+		{
+			label: 'Phòng ban',
+			value: 2,
+		},
+		{
+			label: 'Đội nhóm',
+			value: 3,
+		},
+	];
 
 	const columns = [
 		{
@@ -47,25 +95,44 @@ const DepartmentPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			render: (item) => (
-				<Link className='text-underline' to={`/phong-ban/${item.id}`}>
-					{item.name}
-				</Link>
-			),
+			col: 8,
+		},
+		{
+			title: 'Mã',
+			id: 'code',
+			key: 'code',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+			col: 4,
+		},
+		{
+			title: 'Thuộc cơ cấu tổ chức',
+			id: 'parentId',
+			key: 'parentId',
+			type: 'select',
+			align: 'center',
+			options: departmentList,
+			isShow: true,
+			isMulti: false,
+			col: 8,
+		},
+		{
+			title: 'Cấp tổ chức',
+			id: 'organizationLevel',
+			key: 'organizationLevel',
+			type: 'select',
+			align: 'center',
+			options: organizationLevelOptions,
+			isShow: true,
+			isMulti: false,
+			col: 4,
 		},
 		{
 			title: 'Mô tả',
 			id: 'description',
 			key: 'description',
 			type: 'textarea',
-			align: 'left',
-			isShow: true,
-		},
-		{
-			title: 'Code',
-			id: 'slug',
-			key: 'slug',
-			type: 'text',
 			align: 'left',
 			isShow: true,
 		},
@@ -77,62 +144,7 @@ const DepartmentPage = () => {
 			align: 'left',
 			isShow: true,
 		},
-		{
-			title: 'Số nhân viên',
-			id: 'totalEmployee',
-			key: 'totalEmployee',
-			type: 'number',
-			align: 'center',
-			isShow: false,
-			render: (item) => item?.users?.length || 0,
-		},
-		{
-			title: 'Trạng thái',
-			id: 'status',
-			key: 'status',
-			type: 'switch',
-			align: 'center',
-			isShow: true,
-			format: (value) => (value === 1 ? 'Đang hoạt động' : 'Không hoạt động'),
-		},
-		{
-			title: 'Hành động',
-			id: 'action',
-			key: 'action',
-			align: 'center',
-			render: (item) => (
-				<>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='Edit'
-						onClick={() => handleOpenActionForm(item)}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
-						color='primary'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='ArrowForward'
-						onClick={() => navigate(`/phong-ban/${item.id}`)}
-					/>
-				</>
-			),
-			isShow: false,
-		},
 	];
-
-	const handleOpenActionForm = (item) => {
-		setOpenForm(true);
-		setItemEdit({ ...item });
-	};
-
-	const hanleCloseForm = () => {
-		setOpenForm(false);
-		setItemEdit(null);
-	};
 
 	const handleShowToast = (title, content) => {
 		addToast(
@@ -145,112 +157,183 @@ const DepartmentPage = () => {
 		);
 	};
 
-	const handleClearValueForm = () => {
-		setItemEdit(null);
-	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
-			name: data.name,
-			description: data.description,
-			slug: data.slug,
-			address: data.address,
-			status: Number(data.status),
+			organizationLevel: data?.organizationLevel?.value,
+			parent_id: data?.parentId?.value,
+			name: data?.name,
+			description: data?.description,
+			code: data?.code,
+			address: data?.address,
 		};
-		if (data.id) {
+		if (data?.id) {
 			try {
 				const response = await updateDepartment(dataSubmit);
-				const result = await response.data;
-				const newDepartments = [...departments];
-				setDepartments(
-					newDepartments.map((item) => (item.id === data.id ? { ...result } : item)),
-				);
-				handleClearValueForm();
-				hanleCloseForm();
-				handleShowToast(
-					`Cập nhật phòng ban!`,
-					`Phòng ban ${result.name} được cập nhật thành công!`,
-				);
+				await response.data;
+				dispatch(fetchDepartmentList());
+				handleCloseForm();
+				handleShowToast(`Cập nhật phòng ban!`, `Cập nhật phòng ban thành công!`);
 			} catch (error) {
-				setDepartments(departments);
 				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+				throw error;
 			}
 		} else {
 			try {
 				const response = await addDepartment(dataSubmit);
 				const result = await response.data;
-				const newDepartments = [...departments];
-				newDepartments.push(result);
-				setDepartments(newDepartments);
-				handleClearValueForm();
-				hanleCloseForm();
-				handleShowToast(`Thêm phòng ban`, `Phòng ban ${result.name} được thêm thành công!`);
+				dispatch(fetchDepartmentList());
+				handleCloseForm();
+				handleShowToast(
+					`Thêm phòng ban`,
+					`Phòng ban ${result.data.name} được thêm thành công!`,
+				);
+				setTreeValue(TreeState.expandAll(treeValue));
 			} catch (error) {
-				setDepartments(departments);
 				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+				setTreeValue(TreeState.expandAll(treeValue));
 			}
 		}
 	};
 
+	const handleOnChange = (newValue) => {
+		setTreeValue(newValue);
+	};
+
+	const renderIndexCell = (row) => {
+		return (
+			<div
+				style={{
+					paddingLeft: `${row.metadata.depth * 30}px`,
+					minWidth: 360,
+					fontSize: 14,
+				}}
+				onClick={() => setDepartmentId(row.data)}
+				onDoubleClick={() =>
+					handleOpenForm({
+						...row.data,
+						parentId: department.find((item) => item.id === row.data.parentId),
+						organizationLevel: organizationLevelOptions.find(
+							(item) => item.value === row.data.organizationLevel,
+						),
+					})
+				}
+				className={
+					row.metadata.hasChildren
+						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
+						: 'without-children cursor-pointer user-select-none'
+				}>
+				{row.metadata.hasChildren ? (
+					<Icon
+						color='success'
+						type='button'
+						size='lg'
+						icon={row?.$state?.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
+						className='d-block bg-transparent'
+						style={{ fontSize: 25 }}
+						onClick={row.toggleChildren}
+					/>
+				) : (
+					''
+				)}
+
+				<span>{row.data.name || ''}</span>
+			</div>
+		);
+	};
+
+	const toggleExpand = () => {
+		if (!toggle) {
+			setToggle(!toggle);
+			setTreeValue(TreeState.expandAll(treeValue));
+		} else {
+			setToggle(!toggle);
+			setTreeValue(TreeState.collapseAll(treeValue));
+		}
+	};
+
 	return (
-		<PageWrapper title={demoPages.phongBan.text}>
+		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
-					<>
-						<div className='row mb-4'>
-							<div className='col-12'>
-								<div className='d-flex justify-content-between align-items-center'>
-									<div className='display-6 fw-bold py-3'>
-										Danh sách phòng ban
+					<div className='row mb-0'>
+						<div className='col-12'>
+							<Card className='w-100 '>
+								<CardHeader>
+									<CardLabel icon='Sort' iconColor='primary'>
+										<CardTitle>
+											<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
+										</CardTitle>
+									</CardLabel>
+									<CardActions>
+										<Button
+											color='info'
+											icon='AddCircleOutline'
+											tag='button'
+											onClick={() => handleOpenForm(null)}>
+											Thêm mới
+										</Button>
+									</CardActions>
+								</CardHeader>
+								<div className='row h-100 w-100'>
+									<div className='col-lg-4 col-md-6 pb-4'>
+										<Card className='h-100'>
+											<CardBody>
+												<div className='p-4' style={{ height: '100%' }}>
+													<div className='d-flex align-items-center justify-content-start'>
+														<Button
+															color='info'
+															icon={
+																!toggle
+																	? 'ExpandMore'
+																	: 'ExpandLess'
+															}
+															tag='button'
+															onClick={toggleExpand}>
+															{!toggle
+																? 'Hiển thị tất cả'
+																: 'Thu gọn'}
+														</Button>
+													</div>
+													<TreeTable
+														value={treeValue}
+														height={400}
+														onChange={handleOnChange}>
+														<TreeTable.Column
+															style={{ minWidth: 300 }}
+															renderCell={renderIndexCell}
+															renderHeaderCell={() => <span />}
+														/>
+													</TreeTable>
+												</div>
+											</CardBody>
+										</Card>
+									</div>
+									<div className='col-lg-8 col-md-6'>
+										<Card>
+											<CardBody>
+												<Employee dataDepartment={dataDepartment} />
+											</CardBody>
+										</Card>
 									</div>
 								</div>
-							</div>
+							</Card>
 						</div>
-						<div className='row mb-0'>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<CardHeader>
-										<CardLabel icon='AccountCircle' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách phòng ban</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='PersonPlusFill'
-												tag='button'
-												onClick={() => handleOpenActionForm(null)}>
-												Thêm phòng ban
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={columns}
-											data={departments}
-										/>
-									</div>
-								</Card>
-							</div>
-						</div>
-						<CommonForm
-							show={openForm}
-							onClose={hanleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật phòng ban' : 'Thêm mới phòng ban'}
-							fields={columns}
-							validate={validate}
-						/>
-					</>,
-					['admin', 'manager'],
+					</div>,
+					['admin'],
+					<NotPermission />,
 				)}
+				<CommonForm
+					show={toggleForm}
+					onClose={handleCloseForm}
+					handleSubmit={handleSubmitForm}
+					item={itemEdit}
+					label={itemEdit?.id ? 'Cập nhật cơ cấu tổ chức' : 'Thêm mới cơ cấu tổ chức'}
+					fields={columns}
+					validate={validate}
+				/>
 			</Page>
 		</PageWrapper>
 	);
 };
-
 export default DepartmentPage;

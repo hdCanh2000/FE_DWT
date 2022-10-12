@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import { Button, Modal } from 'react-bootstrap';
+// import moment from 'moment';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -11,6 +12,7 @@ import Card, {
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
+// import { FORMAT_TASK_STATUS } from '../../../utils/constants';
 
 const ModalConfirmCommon = ({
 	type,
@@ -21,7 +23,6 @@ const ModalConfirmCommon = ({
 	onClose,
 	onSubmit,
 	item,
-	isShowNote,
 	...props
 }) => {
 	const formik = useFormik({
@@ -131,7 +132,6 @@ ModalConfirmCommon.propTypes = {
 	item: PropTypes.object,
 	onClose: PropTypes.func,
 	onSubmit: PropTypes.func,
-	isShowNote: PropTypes.bool,
 };
 ModalConfirmCommon.defaultProps = {
 	className: null,
@@ -144,7 +144,6 @@ ModalConfirmCommon.defaultProps = {
 	item: null,
 	onClose: null,
 	onSubmit: null,
-	isShowNote: false,
 };
 
 export default ModalConfirmCommon;

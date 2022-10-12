@@ -13,18 +13,20 @@ const ProtectedRoute = ({ element }) => {
 
 const ContentRoutes = () => {
 	return (
-		<Routes>
-			{contents.map((page) => (
-				<Route
-					key={page.path}
-					path={page.path}
-					exact={page.exact}
-					element={<ProtectedRoute element={page.element} />}
-				/>
-			))}
-			<Route path='/dang-nhap' element={<Login />} />
-			<Route path='*' element={<PAGE_404 />} />
-		</Routes>
+		<div style={{ width: '100%' }}>
+			<Routes>
+				{contents.map((page) => (
+					<Route
+						key={page.path}
+						path={page.path}
+						exact={page.exact}
+						element={<ProtectedRoute element={page.element} />}
+					/>
+				))}
+				<Route path='/dang-nhap' element={<Login />} />
+				<Route path='*' element={<PAGE_404 />} />
+			</Routes>
+		</div>
 	);
 };
 

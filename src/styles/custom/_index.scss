@@ -12,3 +12,73 @@
 .sticky-top-size {
 	top: map.get($header, height) + map.get($subheader, height) + map.get($page, padding-y);
 }
+.treeview > div {
+	border-left: 1px dashed black !important;
+}
+
+.card,
+.modal-content,
+.btn,
+.modern-design .header,
+.navigation .navigation-link-pill {
+	border-radius: 0.5rem !important;
+}
+
+.modern-design .header {
+	margin: 1rem 0 1rem 0.75rem;
+}
+
+.table-modern > tbody > tr > :first-child,
+.table-modern > thead > tr > :first-child,
+.table-modern > tbody > tr > :last-child,
+.table-modern > thead > tr > :last-child {
+	border-radius: 0.5rem !important;
+}
+
+.react-checkbox-tree ol {
+	list-style: none;
+}
+
+.rct-node button {
+	border: 0;
+	background: transparent;
+	font-size: 2.6rem;
+	color: #888;
+}
+
+.rct-text input {
+	padding: 5px;
+}
+.rct-node-leaf {
+	margin-left: 30px;
+	font-weight: normal;
+}
+.rct-title {
+	font-size: 1.4rem;
+	margin-left: 5px;
+	font-weight: normal;
+}
+
+.css-oalq6z:first-of-type::after {
+	border-top-left-radius: 10px !important;
+}
+.css-oalq6z:last-of-type::before {
+	border-top-right-radius: 10px !important;
+}
+
+.form-control,
+.form-select {
+	background-color: transparent;
+	padding-top: 7px;
+	padding-bottom: 7px;
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+	background: hsl(0, 0%, 95%) !important;
+}
+
+[contenteditable] {
+	outline: 0px solid transparent;
+	border: 1px solid #c8c7c7 !important;
+}

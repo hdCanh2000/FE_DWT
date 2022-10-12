@@ -4,7 +4,7 @@ const getAllMission = () => {
 	// lấy toàn bộ danh sách mục tiêu
 	return axiosClient({
 		method: 'GET',
-		url: '/missions?_embed=tasks',
+		url: '/api/mission',
 	});
 };
 
@@ -12,7 +12,7 @@ const getLatestTasks = () => {
 	// lấy danh sách các task mới nhất
 	return axiosClient({
 		method: 'GET',
-		url: '/tasks?_order=desc&_limit=6',
+		url: '/api/tasks?_order=desc&_limit=6',
 	});
 };
 
@@ -20,7 +20,7 @@ const getAllTasks = () => {
 	// lấy danh sách các task mới nhất
 	return axiosClient({
 		method: 'GET',
-		url: '/tasks',
+		url: '/api/tasks',
 	});
 };
 
@@ -28,7 +28,7 @@ const getMissionById = (id) => {
 	// lấy thông tin mục tiêu theo id
 	return axiosClient({
 		method: 'GET',
-		url: `/missions/${id}`,
+		url: `/api/mission/${id}`,
 	});
 };
 
@@ -36,7 +36,7 @@ const addNewMission = (data) => {
 	// thêm mục tiêu mới
 	return axiosClient({
 		method: 'POST',
-		url: '/missions',
+		url: '/api/mission',
 		data,
 	});
 };
@@ -45,7 +45,7 @@ const updateMissionById = (data) => {
 	// cập nhật mục tiêu
 	return axiosClient({
 		method: 'PUT',
-		url: `/missions/${data.id}`,
+		url: `/api/mission/${data.id}`,
 		data,
 	});
 };
@@ -54,7 +54,7 @@ const deleteMissionById = (id) => {
 	// xoá mục tiêu
 	return axiosClient({
 		method: 'DELETE',
-		url: `/missions/${id}`,
+		url: `/api/mission/${id}`,
 	});
 };
 
@@ -62,7 +62,23 @@ const getAllDepartments = () => {
 	// lấy danh sách phòng ban
 	return axiosClient({
 		method: 'GET',
-		url: '/departments',
+		url: '/api/departments',
+	});
+};
+
+const getAllPositions = () => {
+	// lấy danh sách positions
+	return axiosClient({
+		method: 'GET',
+		url: '/api/positions',
+	});
+};
+
+const getPositionById = (id) => {
+	// lấy danh sách positions
+	return axiosClient({
+		method: 'GET',
+		url: `/api/positions/${id}`,
 	});
 };
 
@@ -72,7 +88,7 @@ const getAllTaksByMissionID = (id) => {
 	// lấy tất cả task của nhiệm vụ theo id
 	return axiosClient({
 		method: 'GET',
-		url: `/tasks/mission/${id}`,
+		url: `/api/tasks/mission/${id}`,
 	});
 };
 
@@ -80,15 +96,14 @@ const deleteTaskById = (id) => {
 	// xoá task thuộc mục tiêu
 	return axiosClient({
 		method: 'DELETE',
-		url: `/tasks/${id}`,
+		url: `/api/tasks/${id}`,
 	});
 };
 
 const getTaskById = (id) => {
-	// xoá task thuộc mục tiêu
 	return axiosClient({
 		method: 'GET',
-		url: `/tasks/${id}`,
+		url: `/api/tasks/${id}`,
 	});
 };
 
@@ -96,7 +111,7 @@ const addNewTask = (data) => {
 	// thêm nhiệm vụ mới
 	return axiosClient({
 		method: 'POST',
-		url: '/tasks',
+		url: '/api/tasks',
 		data,
 	});
 };
@@ -105,7 +120,7 @@ const updateTaskByID = (data) => {
 	// cập nhật công việc
 	return axiosClient({
 		method: 'PUT',
-		url: `/tasks/${data.id}`,
+		url: `/api/tasks/${data.id}`,
 		data,
 	});
 };
@@ -114,14 +129,41 @@ const getAllUser = () => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
-		url: `/users`,
+		url: `/api/users`,
+	});
+};
+
+const getAllKeys = () => {
+	return axiosClient({
+		method: 'GET',
+		url: '/api/keys?_expand=unit',
+	});
+};
+
+const addKey = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/api/keys`,
+		data,
+	});
+};
+
+const updateKey = (data) => {
+	return axiosClient({
+		method: 'PUT',
+		url: `/api/keys/${data.id}`,
+		data,
 	});
 };
 
 export {
+	addKey,
+	updateKey,
+	getAllKeys,
 	getAllMission,
 	getLatestTasks,
 	getAllDepartments,
+	getAllPositions,
 	getMissionById,
 	addNewMission,
 	updateMissionById,
@@ -133,4 +175,5 @@ export {
 	updateTaskByID,
 	getAllUser,
 	getAllTasks,
+	getPositionById,
 };

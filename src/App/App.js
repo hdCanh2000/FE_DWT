@@ -5,7 +5,6 @@ import { useFullscreen } from 'react-use';
 import jwtDecode from 'jwt-decode';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { ToastProvider } from 'react-toast-notifications';
-import { TourProvider } from '@reactour/tour';
 import ThemeContext from '../contexts/themeContext';
 import Aside from '../layout/Aside/Aside';
 import Wrapper from '../layout/Wrapper/Wrapper';
@@ -90,39 +89,37 @@ const App = () => {
 	return (
 		<ThemeProvider theme={theme}>
 			<ToastProvider components={{ ToastContainer, Toast }}>
-				<TourProvider showNavigation={false} showBadge={false}>
-					<div
-						ref={ref}
-						className='app'
-						style={{
-							backgroundColor: fullScreenStatus && 'var(--bs-body-bg)',
-							zIndex: fullScreenStatus && 1,
-							overflow: fullScreenStatus && 'scroll',
-						}}>
-						<div className='main w-100 p-0'>
-							<div className='main__wrapper w-100'>
-								{!checkCurentPath('/dang-nhap') && (
-									<div className='main__sidebar'>
-										<Routes>
-											<Route path='*' element={<Aside />} />
-										</Routes>
-									</div>
-								)}
-								<div
-									className={
-										checkCurentPath('/dang-nhap')
-											? 'main__content w-100'
-											: 'main__content'
-									}>
-									<Wrapper />
+				<div
+					ref={ref}
+					className='app'
+					style={{
+						backgroundColor: fullScreenStatus && 'var(--bs-body-bg)',
+						zIndex: fullScreenStatus && 1,
+						overflow: fullScreenStatus && 'scroll',
+					}}>
+					<div className='main w-100 p-0'>
+						<div className='main__wrapper w-100'>
+							{!checkCurentPath('/dang-nhap') && (
+								<div className='main__sidebar'>
+									<Routes>
+										<Route path='*' element={<Aside />} />
+									</Routes>
 								</div>
+							)}
+							<div
+								className={
+									checkCurentPath('/dang-nhap')
+										? 'main__content w-100'
+										: 'main__content'
+								}>
+								<Wrapper />
 							</div>
 						</div>
 					</div>
-					<Portal id='portal-notification'>
-						<ReactNotifications />
-					</Portal>
-				</TourProvider>
+				</div>
+				<Portal id='portal-notification'>
+					<ReactNotifications />
+				</Portal>
 			</ToastProvider>
 		</ThemeProvider>
 	);

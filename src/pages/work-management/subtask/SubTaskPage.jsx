@@ -1,35 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../../../components/bootstrap/Alert';
 import Button from '../../../components/bootstrap/Button';
 import Card, {
 	CardActions,
-	CardBody,
 	CardHeader,
 	CardLabel,
-	CardSubTitle,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-import Dropdown, {
-	DropdownItem,
-	DropdownMenu,
-	DropdownToggle,
-} from '../../../components/bootstrap/Dropdown';
+// import Dropdown, {
+// 	DropdownItem,
+// 	DropdownMenu,
+// 	DropdownToggle,
+// } from '../../../components/bootstrap/Dropdown';
 import Progress from '../../../components/bootstrap/Progress';
-import Icon from '../../../components/icon/Icon';
+// import Icon from '../../../components/icon/Icon';
 import useDarkMode from '../../../hooks/useDarkMode';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
 import {
 	formatColorPriority,
-	formatColorStatus,
-	FORMAT_TASK_STATUS,
-	renderStatus,
-	STATUS,
+	// formatColorStatus,
+	// FORMAT_TASK_STATUS,
+	// renderStatus,
+	// STATUS,
 } from '../../../utils/constants';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import { addNewSubtask, updateSubtask } from '../TaskDetail/services';
@@ -37,29 +35,24 @@ import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
 import Toasts from '../../../components/bootstrap/Toasts';
 import { deleteSubtaskById, getAllSubTasks } from './services';
 import ComfirmSubtask from '../TaskDetail/TaskDetailForm/ComfirmSubtask';
-import TaskChartReport from '../../dashboard/admin/TaskChartReport';
-import { getReportSubTask, getReportSubTaskDepartment } from '../../dashboard/services';
-import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import Search from '../../common/ComponentCommon/Search';
 
 const SubTaskPage = () => {
 	const { themeStatus, darkModeStatus } = useDarkMode();
+	const navigate = useNavigate();
 	const { addToast } = useToasts();
 	const [subtasks, setSubtasks] = useState([]);
-	const [subTaskReport, setSubTaskReport] = useState({});
-	const [subTaskReportDepartment, setSubTaskReportDepartment] = useState({});
 	const [itemEdit, setItemEdit] = useState({});
 	const [editModalStatus, setEditModalStatus] = useState(false);
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [deletes, setDeletes] = React.useState({});
-
-	// const [openConfirmModal, setOpenConfirmModal] = useState(false);
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
-	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
-		title: '',
-		subTitle: '',
-		status: null,
-		isShowNote: false,
-	});
+	// const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+	// 	title: '',
+	// 	subTitle: '',
+	// 	status: null,
+	// 	isShowNote: false,
+	// });
 
 	async function fetchDataAllSubTasks() {
 		const response = await getAllSubTasks();
@@ -71,26 +64,15 @@ const SubTaskPage = () => {
 		fetchDataAllSubTasks();
 	}, []);
 
-	useEffect(() => {
-		const fetchDataSubtasksReport = async () => {
-			const response = await getReportSubTask();
-			const result = await response.data;
-			setSubTaskReport(result);
-		};
-		const fetchDataSubtasksReportDepartment = async () => {
-			const response = await getReportSubTaskDepartment();
-			const result = await response.data;
-			setSubTaskReportDepartment(result);
-		};
-		fetchDataSubtasksReportDepartment();
-		fetchDataSubtasksReport();
-	}, []);
+	const handleOnClickToActionPage = useCallback(
+		() => navigate(`${demoPages.jobsPage.subMenu.task.path}/them-moi`),
+		[navigate],
+	);
 
-	// form modal
-	const handleOpenEditForm = (item) => {
-		setEditModalStatus(true);
-		setItemEdit({ ...item });
-	};
+	const handleOnClickToEditPage = useCallback(
+		(subtaskId) => navigate(`${demoPages.jobsPage.subMenu.task.path}/cap-nhat/${subtaskId}`),
+		[navigate],
+	);
 
 	const handleCloseEditForm = () => {
 		setEditModalStatus(false);
@@ -127,26 +109,27 @@ const SubTaskPage = () => {
 	// delete subtask
 	const handleDelete = async (id) => {
 		try {
-			await deleteSubtaskById(id);
+			await deleteSubtaskById(id.id);
 			handleShowToast(`Xoá đầu việc`, `Xoá đầu việc thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá đầu việc`, `Xoá đầu việc thất bại!`);
 		}
+		fetchDataAllSubTasks();
 	};
 
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
 
-	const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
-		setOpenConfirmModalStatus(true);
-		setItemEdit({ ...item });
-		setInfoConfirmModalStatus({
-			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
-			subTitle: item?.name,
-			status: nextStatus,
-			isShowNote,
-		});
-	};
+	// const handleOpenConfirmStatusTask = (item, nextStatus, isShowNote = false) => {
+	// 	setOpenConfirmModalStatus(true);
+	// 	setItemEdit({ ...item });
+	// 	setInfoConfirmModalStatus({
+	// 		title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+	// 		subTitle: item?.name,
+	// 		status: nextStatus,
+	// 		isShowNote,
+	// 	});
+	// };
 
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
@@ -216,7 +199,7 @@ const SubTaskPage = () => {
 	};
 
 	return (
-		<PageWrapper title={demoPages.dauViec.text}>
+		<PageWrapper title={demoPages?.dauViec?.text}>
 			<Page container='fluid'>
 				<div className='row'>
 					<div className='col-12'>
@@ -226,80 +209,7 @@ const SubTaskPage = () => {
 					</div>
 				</div>
 				<div className='row'>
-					{verifyPermissionHOC(
-						<>
-							<div className='col-xxl-6'>
-								<Card className='mb-4'>
-									<CardHeader className='py-0'>
-										<CardLabel icon='ReceiptLong'>
-											<CardTitle tag='h4' className='h5'>
-												Thống kê đầu việc tổng quan
-											</CardTitle>
-											<CardSubTitle tag='h5' className='h6'>
-												Báo cáo
-											</CardSubTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody className='py-0'>
-										<div className='row'>
-											<div className='col-xl-12 col-xxl-12'>
-												<TaskChartReport data={subTaskReportDepartment} />
-											</div>
-										</div>
-									</CardBody>
-								</Card>
-							</div>
-							<div className='col-xxl-6'>
-								<Card className='mb-4'>
-									<CardHeader className='py-0'>
-										<CardLabel icon='ReceiptLong'>
-											<CardTitle tag='h4' className='h5'>
-												Thống kê đầu việc cá nhân
-											</CardTitle>
-											<CardSubTitle tag='h5' className='h6'>
-												Báo cáo
-											</CardSubTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody className='py-0'>
-										<div className='row'>
-											<div className='col-xl-12 col-xxl-12'>
-												<TaskChartReport data={subTaskReport} />
-											</div>
-										</div>
-									</CardBody>
-								</Card>
-							</div>
-						</>,
-						['manager', 'admin'],
-					)}
-					{verifyPermissionHOC(
-						<div className='col-xxl-12'>
-							<Card className='mb-4'>
-								<CardHeader className='py-0'>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống kê đầu việc cá nhân
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='py-0'>
-									<div className='row'>
-										<div className='col-xl-12 col-xxl-12'>
-											<TaskChartReport data={subTaskReport} />
-										</div>
-									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['user'],
-					)}
-				</div>
-				<div className='row'>
-					<div className='col-md-12'>
+					<div className='col-md-12' style={{ marginTop: 50 }}>
 						<Card>
 							<CardHeader>
 								<CardLabel icon='Task' iconColor='danger'>
@@ -312,22 +222,25 @@ const SubTaskPage = () => {
 										color='info'
 										icon='Plus'
 										tag='button'
-										onClick={() => handleOpenEditForm(null)}>
+										onClick={handleOnClickToActionPage}>
 										Thêm đầu việc
 									</Button>
 								</CardActions>
 							</CardHeader>
 							<div className='p-4'>
+								<div style={{ maxWidth: '25%' }}>
+									<Search />
+								</div>
 								<table className='table table-modern mb-0' style={{ fontSize: 14 }}>
 									<thead>
 										<tr>
-											<th className='text-center'>STT</th>
+											<th>STT</th>
 											<th>Tên đầu việc</th>
 											<th>Nhân viên phụ trách</th>
 											<th className='text-center'>Hạn hoàn thành</th>
 											<th className='text-center'>Điểm KPI</th>
 											<th className='text-center'>Độ ưu tiên</th>
-											<th className='text-center'>Trạng thái</th>
+											{/* <th className='text-center'>Trạng thái</th> */}
 											<th className='text-center'>Tiến độ</th>
 											<td />
 										</tr>
@@ -340,7 +253,7 @@ const SubTaskPage = () => {
 													<td className='cursor-pointer'>
 														<Link
 															className='text-underline'
-															to={`/dau-viec/${item?.id}`}>
+															to={`${demoPages.jobsPage.subMenu.mission.path}/dau-viec/${item?.id}`}>
 															{item?.name}
 														</Link>
 													</td>
@@ -351,28 +264,26 @@ const SubTaskPage = () => {
 														)}
 													</td>
 													<td align='center'>{item?.kpiValue}</td>
-													<td>
-														<div className='d-flex align-items-center'>
-															<span
-																style={{
-																	paddingRight: '1rem',
-																	paddingLeft: '1rem',
-																}}
-																className={classNames(
-																	'badge',
-																	'border border-2',
-																	[`border-${themeStatus}`],
-																	'bg-success',
-																	'pt-2 pb-2 me-2',
-																	`bg-${formatColorPriority(
-																		item.priority,
-																	)}`,
-																)}>
-																<span className=''>{`Cấp ${item.priority}`}</span>
-															</span>
-														</div>
-													</td>
 													<td className='text-center'>
+														<span
+															style={{
+																paddingRight: '1rem',
+																paddingLeft: '1rem',
+															}}
+															className={classNames(
+																'badge',
+																'border border-2',
+																[`border-${themeStatus}`],
+																'bg-success',
+																'pt-2 pb-2 me-2',
+																`bg-${formatColorPriority(
+																	item.priority,
+																)}`,
+															)}>
+															<span className=''>{`Cấp ${item.priority}`}</span>
+														</span>
+													</td>
+													{/* <td className='text-center'>
 														<Dropdown>
 															<DropdownToggle hasIcon={false}>
 																<Button
@@ -413,7 +324,7 @@ const SubTaskPage = () => {
 																))}
 															</DropdownMenu>
 														</Dropdown>
-													</td>
+													</td> */}
 													<td className='text-center'>
 														<div className='d-flex align-items-center justify-content-center flex-column'>
 															<div className='flex-shrink-0 me-3'>{`${item.progress}%`}</div>
@@ -435,12 +346,9 @@ const SubTaskPage = () => {
 															isLight={darkModeStatus}
 															className='text-nowrap mx-2'
 															icon='Edit'
-															isDisable={
-																item.status === 4 ||
-																item.status === 7 ||
-																item.status === 3
+															onClick={() =>
+																handleOnClickToEditPage(item.id)
 															}
-															onClick={() => handleOpenEditForm(item)}
 														/>
 														<Button
 															isOutline={!darkModeStatus}
@@ -477,10 +385,10 @@ const SubTaskPage = () => {
 					onClose={handleCloseConfirmStatusTask}
 					onSubmit={handleUpdateStatus}
 					item={itemEdit}
-					isShowNote={infoConfirmModalStatus.isShowNote}
-					title={infoConfirmModalStatus.title}
-					subTitle={infoConfirmModalStatus.subTitle}
-					status={infoConfirmModalStatus.status}
+					// isShowNote={infoConfirmModalStatus.isShowNote}
+					// title={infoConfirmModalStatus.title}
+					// subTitle={infoConfirmModalStatus.subTitle}
+					// status={infoConfirmModalStatus.status}
 				/>
 				<ComfirmSubtask
 					openModal={openConfirm}

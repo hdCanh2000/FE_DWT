@@ -32,11 +32,11 @@ const Login = () => {
 		try {
 			const response = await login(account);
 			const result = await response.data;
-			localStorage.setItem('token', result.accessToken);
-			localStorage.setItem('email', result.email);
-			localStorage.setItem('name', result.name);
-			localStorage.setItem('roles', JSON.stringify(result.roles));
-			// navigate('/');
+			localStorage.setItem('token', result.data.accessToken);
+			localStorage.setItem('email', result.data.email);
+			localStorage.setItem('name', result.data.name);
+			localStorage.setItem('userId', result.data.userId);
+			localStorage.setItem('roles', JSON.stringify(result.data.role));
 			window.location.href = '/';
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
@@ -47,7 +47,9 @@ const Login = () => {
 		<PageWrapper title='Đăng nhập'>
 			<Page className='p-0'>
 				<div className='row h-100 align-items-center justify-content-center'>
-					<div className='col-xl-4 col-lg-6 col-md-8 shadow-3d-container'>
+					<div
+						className='col-xl-4 col-lg-6 col-md-8 shadow-3d-container'
+						style={{ marginTop: '10%' }}>
 						<Card className='shadow-3d-dark' data-tour='login-page'>
 							<CardBody>
 								<div className='text-center my-5'>

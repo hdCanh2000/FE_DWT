@@ -41,74 +41,151 @@ export const dashboardMenu = {
 };
 
 export const demoPages = {
-	mucTieu: {
+	dashboard: {
+		id: 'dashboard',
+		text: 'Dashboard',
+		path: '/',
+		icon: 'Dashboard',
+		subMenu: null,
+	},
+	companyPage: {
+		id: 'companyPage',
+		text: 'Cơ cấu tổ chức',
+		path: '/co-cau-to-chuc',
+		icon: 'CustomCompany',
+	},
+	taskPage: {
+		id: 'taskPage',
+		text: 'Nhiệm vụ của tôi',
+		path: '/cong-viec-hang-ngay',
+		icon: 'AssignmentInd',
+	},
+	taskAndAssign: {
+		id: 'taskAndAssign',
+		text: 'Khai báo nhiệm vụ & Giao việc',
+		path: '/giao-viec',
+		icon: 'CustomBriefCase',
+		subMenu: {
+			kpiNorm: {
+				id: 'kpiNorm',
+				text: 'Khai báo nhiệm vụ',
+				path: '/khai-bao-nhiem-vu',
+			},
+			assign: {
+				id: 'assign',
+				text: 'Giao việc',
+				path: '/giao-viec',
+			},
+		},
+	},
+	mission: {
 		id: 'mission',
-		text: 'Mission',
+		text: 'Mục tiêu',
 		path: '/muc-tieu',
-		roles: ['admin', 'manager'],
+		icon: 'TaskAlt',
 	},
-	quanLyCongViec: {
-		id: 'quanlycongviec',
-		text: 'Tasks',
-		path: '/cong-viec',
-		roles: ['admin', 'manager', 'user'],
-		// subMenu: {
-		// 	congViec: {
-		// 		id: 'congViec',
-		// 		text: 'Tổng quan',
-		// 		path: '/cong-viec/cong-viec',
-		// 	},
-		// 	danhSach: {
-		// 		id: 'danhSach',
-		// 		text: 'Danh sách',
-		// 		path: '/cong-viec/danh-sach',
-		// 	},
-		// 	dauViec: {
-		// 		id: 'dauViec',
-		// 		text: 'Đầu việc',
-		// 		path: '/cong-viec/dau-viec',
-		// 	},
-		// 	danhSachCongViecPhongBan: {
-		// 		id: 'danhSachCongViecPhongBan',
-		// 		text: 'DSCV phòng ban',
-		// 		path: '/cong-viec/tong-quan-phong-ban',
-		// 	},
-		// 	chiTietCongViecPhongBan: {
-		// 		id: 'chiTietCongViecPhongBan',
-		// 		text: 'CTCV phòng ban',
-		// 		path: '/cong-viec/chi-tiet-phong-ban',
-		// 	},
-		// },
+	jobsPage: {
+		id: 'supervision',
+		text: 'Giám sát công việc',
+		path: '/giam-sat',
+		icon: 'Monitor',
+		subMenu: {
+			mission: {
+				id: 'mission',
+				text: 'Danh sách nhiệm vụ',
+				path: '/nhiem-vu',
+			},
+			employee: {
+				id: 'employee',
+				text: 'Theo nhân viên',
+				path: '/cong-viec-cua-nhan-vien',
+			},
+		},
 	},
-	dauViec: {
-		id: 'dauViec',
-		text: 'Subtasks',
-		path: '/dau-viec',
-		roles: ['admin', 'manager', 'user'],
+	hrRecords: {
+		id: 'hrRecords',
+		text: 'Nhân sự',
+		path: '/ho-so-nhan-su',
+		icon: 'PersonOutline',
+		subMenu: {
+			hrList: {
+				id: 'hrList',
+				text: 'Danh sách nhân sự',
+				path: '/danh-sach-nhan-su',
+			},
+			position: {
+				id: 'position',
+				text: 'Vị trí công việc',
+				path: '/vi-tri-cong-viec',
+			},
+			positionLevelConfig: {
+				id: 'positionLevelConfig',
+				text: 'Cấp nhân sự',
+				path: '/cauhinh-cap-nhan-su',
+			},
+		},
 	},
-	phongBan: {
-		id: 'phongBan',
-		text: 'Department',
-		path: '/phong-ban',
-		roles: ['admin'],
-	},
-	nhanVien: {
-		id: 'nhanVien',
-		text: 'Employee',
-		path: '/nhan-vien',
-		roles: ['admin', 'manager'],
+	reportPage: {
+		// báo cáo
+		id: 'reportPage',
+		text: 'Báo cáo',
+		path: 'report-page',
+		icon: 'CustomPages',
+		subMenu: {
+			reportList: {
+				id: 'reportList',
+				text: 'Xuất báo cáo',
+				path: '/danh-sach-bao-cao',
+			},
+			reportCriteria: {
+				id: 'reportCriteria',
+				text: 'Duyệt báo cáo',
+				path: '/tieu-chi-bao-cao',
+			},
+			sampleReport: {
+				id: 'sampleReport',
+				text: 'Báo cáo lưu',
+				path: '/mau-bao-cao',
+			},
+		},
 	},
 	cauHinh: {
 		id: 'cauHinh',
-		text: 'Configure',
-		path: '/cau-hinh',
-		roles: ['admin'],
-	},
-	baoCao: {
-		id: 'baoCao',
-		text: 'Report',
-		path: '/bao-cao',
-		roles: ['admin'],
+		text: 'Cấu hình',
+		path: 'cau-hinh',
+		icon: 'Settings',
+		subMenu: {
+			unit: {
+				id: 'unit',
+				text: 'Đơn vị tính',
+				path: '/don-vi-tinh',
+			},
+			recruitmentRequirements: {
+				id: 'recruitmentRequirements',
+				text: 'Yêu cầu tuyển dụng',
+				path: '/yeu-cau-tuyen-dung',
+			},
+			overall: {
+				id: 'overall',
+				text: 'Cấu hình chung',
+				path: '/cau-hinh-chung',
+			},
+			organization: {
+				id: 'organization',
+				text: 'Cấu hình tổ chức',
+				path: '/cau-hinh-to-chuc',
+			},
+			report: {
+				id: 'report',
+				text: 'Cấu hình báo cáo',
+				path: '/cau-hinh-bao-cao',
+			},
+			table: {
+				id: 'table',
+				text: 'Cấu hình bảng số liệu',
+				path: '/cau-hinh-bang-so-lieu',
+			},
+		},
 	},
 };
 

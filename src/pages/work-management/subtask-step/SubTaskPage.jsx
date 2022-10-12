@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { useToasts } from 'react-toast-notifications';
@@ -7,20 +7,19 @@ import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import Board from './board/Board';
 import Card, {
-	CardActions,
+	// CardActions,
 	CardBody,
 	CardHeader,
 	CardLabel,
-	CardSubTitle,
+	// CardSubTitle,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Toasts from '../../../components/bootstrap/Toasts';
-import {
-	formatColorStatus,
-	FORMAT_TASK_STATUS,
-	renderStatus,
-	STATUS,
-} from '../../../utils/constants';
+import // formatColorStatus,
+// FORMAT_TASK_STATUS,
+// renderStatus,
+// STATUS,
+'../../../utils/constants';
 import { getSubTaskById, updateSubtask } from './services';
 import Progress from '../../../components/bootstrap/Progress';
 import Button from '../../../components/bootstrap/Button';
@@ -33,15 +32,16 @@ import ReportCommon from '../../common/ComponentCommon/ReportCommon';
 import CardInfoCommon from '../../common/ComponentCommon/CardInfoCommon';
 import Popovers from '../../../components/bootstrap/Popovers';
 import RelatedActionCommonItem from '../../common/ComponentCommon/RelatedActionCommon';
-import Icon from '../../../components/icon/Icon';
-import Dropdown, {
-	DropdownItem,
-	DropdownMenu,
-	DropdownToggle,
-} from '../../../components/bootstrap/Dropdown';
+// import Icon from '../../../components/icon/Icon';
+// import Dropdown, {
+// 	DropdownItem,
+// 	DropdownMenu,
+// 	DropdownToggle,
+// } from '../../../components/bootstrap/Dropdown';
 import ModalConfirmCommon from '../../common/ComponentCommon/ModalConfirmCommon';
 import ModalShowListCommon from '../../common/ComponentCommon/ModalShowListCommon';
 import TaskDetailForm from '../TaskDetail/TaskDetailForm/TaskDetailForm';
+import { demoPages } from '../../../menu';
 
 const chartOptions = {
 	chart: {
@@ -140,11 +140,17 @@ const SubTaskPage = () => {
 	const [subtaskEdit, setSubtaskEdit] = useState({});
 	const [openConfirmModalStatus, setOpenConfirmModalStatus] = useState(false);
 	const [openListInfoModal, setOpenListInfoModal] = useState(false);
-	const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
-		title: '',
-		subTitle: '',
-		status: null,
-	});
+	// const [infoConfirmModalStatus, setInfoConfirmModalStatus] = useState({
+	// 	title: '',
+	// 	subTitle: '',
+	// 	status: null,
+	// });
+
+	const handleOnClickToEditPage = useCallback(
+		(taskId, subTaskId) =>
+			navigate(`${demoPages.jobsPage.subMenu.task.path}/${taskId}/cap-nhat/${subTaskId}`),
+		[navigate],
+	);
 
 	async function fetchDataSubTaskById() {
 		const reponse = await getSubTaskById(id);
@@ -240,9 +246,9 @@ const SubTaskPage = () => {
 	};
 
 	// Modal hiển thị thông tin note
-	const handleOpenListInfoModal = () => {
-		setOpenListInfoModal(true);
-	};
+	// const handleOpenListInfoModal = () => {
+	// 	setOpenListInfoModal(true);
+	// };
 
 	const handleCloseListInfoModal = () => {
 		setOpenListInfoModal(false);
@@ -251,15 +257,15 @@ const SubTaskPage = () => {
 	// ------------			Modal confirm khi thay đổi trạng thái		----------------------
 	// ------------			Moal Confirm when change status task		----------------------
 
-	const handleOpenConfirmStatusTask = (item, nextStatus) => {
-		setOpenConfirmModalStatus(true);
-		setSubTaskEdit({ ...item });
-		setInfoConfirmModalStatus({
-			title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
-			subTitle: item?.name,
-			status: nextStatus,
-		});
-	};
+	// const handleOpenConfirmStatusTask = (item, nextStatus) => {
+	// 	setOpenConfirmModalStatus(true);
+	// 	setSubTaskEdit({ ...item });
+	// 	setInfoConfirmModalStatus({
+	// 		title: `Xác nhận ${FORMAT_TASK_STATUS(nextStatus)} công việc`.toUpperCase(),
+	// 		subTitle: item?.name,
+	// 		status: nextStatus,
+	// 	});
+	// };
 
 	const handleCloseConfirmStatusTask = () => {
 		setOpenConfirmModalStatus(false);
@@ -267,10 +273,10 @@ const SubTaskPage = () => {
 	};
 
 	// edit task
-	const handleOpenEditTask = (item) => {
-		setEditModalSubtaskStatus(true);
-		setSubtaskEdit({ ...item });
-	};
+	// const handleOpenEditTask = (item) => {
+	// 	setEditModalSubtaskStatus(true);
+	// 	setSubtaskEdit({ ...item });
+	// };
 	const handleCloseEditSubtaskForm = () => {
 		setEditModalSubtaskStatus(false);
 		setSubtaskEdit(null);
@@ -323,7 +329,7 @@ const SubTaskPage = () => {
 								className='text-nowrap mx-2'
 								icon='Edit'
 								isDisable={subtask?.status === 4 || subtask?.status === 7}
-								onClick={() => handleOpenEditTask(subtask)}>
+								onClick={() => handleOnClickToEditPage(subtask.taskId, params.id)}>
 								Sửa
 							</Button>
 							<Button
@@ -347,7 +353,7 @@ const SubTaskPage = () => {
 										Tổng kết
 									</CardTitle>
 								</CardLabel>
-								<CardActions className='d-flex'>
+								{/* <CardActions className='d-flex'>
 									<Dropdown>
 										<DropdownToggle hasIcon={false}>
 											<Button
@@ -388,7 +394,7 @@ const SubTaskPage = () => {
 										icon='Info'
 										onClick={() => handleOpenListInfoModal()}
 									/>
-								</CardActions>
+								</CardActions> */}
 							</CardHeader>
 							<CardBody className='py-2'>
 								<div className='row h-100'>
@@ -401,13 +407,13 @@ const SubTaskPage = () => {
 													<CardTitle tag='h4' className='h5'>
 														Tiến độ thực hiện
 													</CardTitle>
-													<CardSubTitle
+													{/* <CardSubTitle
 														tag='h4'
 														className={`h5 text-${formatColorStatus(
 															subtask?.status,
 														)}`}>
 														{FORMAT_TASK_STATUS(subtask?.status)}
-													</CardSubTitle>
+													</CardSubTitle> */}
 												</CardLabel>
 											</CardHeader>
 											<CardBody className='py-2'>
@@ -607,9 +613,9 @@ const SubTaskPage = () => {
 										color: 'primary',
 										children: (
 											<div className='fs-5'>
-												<span className='me-2'>Thời gian dự kiến:</span>
+												<span className='me-2'>Thời gian bắt đầu:</span>
 												{moment(
-													`${subtask?.estimateDate} ${subtask.estimateTime}`,
+													`${subtask?.startDate} ${subtask.startTime}`,
 												).format('DD-MM-YYYY, HH:mm')}
 											</div>
 										),
@@ -619,7 +625,7 @@ const SubTaskPage = () => {
 										color: 'primary',
 										children: (
 											<div className='fs-5'>
-												<span className='me-2'>Hạn hoàn thành:</span>
+												<span className='me-2'>Thời hạn hoàn thành:</span>
 												{moment(
 													`${subtask?.deadlineDate} ${subtask.deadlineTime}`,
 												).format('DD-MM-YYYY, HH:mm')}
@@ -719,9 +725,9 @@ const SubTaskPage = () => {
 					onClose={handleCloseConfirmStatusTask}
 					onSubmit={handleClickChangeStatusSubtask}
 					item={subTaskEdit}
-					title={infoConfirmModalStatus.title}
-					subTitle={infoConfirmModalStatus.subTitle}
-					status={infoConfirmModalStatus.status}
+					// title={infoConfirmModalStatus.title}
+					// subTitle={infoConfirmModalStatus.subTitle}
+					// status={infoConfirmModalStatus.status}
 				/>
 				<ModalShowListCommon
 					show={openListInfoModal}

@@ -73,8 +73,14 @@ const getAllTasks = () => {
 		url: '/tasks',
 	});
 };
-
+const getAllKeys = () => {
+	return axiosClient({
+		method: 'GET',
+		url: '/keys?_expand=unit',
+	});
+};
 export {
+	getAllKeys,
 	getAllDepartments,
 	getTaskById,
 	getAllSubtasksByTaskId,
