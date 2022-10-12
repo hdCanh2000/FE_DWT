@@ -5,7 +5,7 @@ import {
 	ColumnsDirective,
 	ColumnDirective,
 } from '@syncfusion/ej2-react-treegrid';
-import  { isEmpty } from 'lodash';
+import _, { isEmpty } from 'lodash';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, {
@@ -66,12 +66,19 @@ const KpiNormPage = () => {
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
 	const [treeValue, setTreeValue] = React.useState([]);
+	const fixForm = () => {
+		return kpiNorm.map((item) => ({
+			...item,
+			quantity: _.isEmpty(item.quantity) ? '--' : item.quantity,
+			kpi_value: _.isEmpty(item.kpi_value) ? '--' : item.kpi_value,
+		}));
+	};
 	useEffect(() => {
 		if (!isEmpty(kpiNorm)) {
-			const treeData = createDataTree(kpiNorm);
+			const treeData = createDataTree(fixForm());
 			setTreeValue(treeData);
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [kpiNorm]);
 
 	const columns = [
@@ -285,13 +292,13 @@ const KpiNormPage = () => {
 															field='data.quantity'
 															headerText='Số lượng'
 															width='90'
-															textAlign='Right'
+															textAlign='Center'
 														/>
 														<ColumnDirective
 															field='data.kpi_value'
 															headerText='Giá trị KPI'
 															width='90'
-															textAlign='Right'
+															textAlign='Center'
 														/>
 													</ColumnsDirective>
 												</TreeGridComponent>

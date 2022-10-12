@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { isEmpty } from 'lodash';
+import _, { isEmpty } from 'lodash';
 import {
 	TreeGridComponent,
 	ColumnsDirective,
@@ -41,12 +41,18 @@ const DailyWorkTracking = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = React.useState([]);
-
+	const fixForm = () => {
+		return worktrack.map((item) => ({
+			...item,
+			missionValue: _.isEmpty(item.mission) ? '--' : item.mission.name,
+		}));
+	};
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
-			const treeData = createDataTree(worktrack);
+			const treeData = createDataTree(fixForm());
 			setTreeValue(treeData);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [worktrack]);
 
 	useEffect(() => {
@@ -103,10 +109,10 @@ const DailyWorkTracking = () => {
 														width='150'
 													/>
 													<ColumnDirective
-														field='data.mission.name'
+														field='data.missionValue'
 														headerText='Thuộc mục tiêu'
 														width='150'
-														textAlign='Left'
+														textAlign='Center'
 													/>
 													{/* <ColumnDirective
 														field='data.deadline'
