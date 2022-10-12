@@ -38,9 +38,23 @@ const PositionPage = () => {
 	const requirements = useSelector((state) => state.requirement.requirements);
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
-
 	// const [nvs] = React.useState(true);
-
+	const fetchRequirement = () => {
+		const newItem = itemEdit?.requirements?.map((items) => ({
+			...items,
+			label: items.name,
+			value: items.id,
+		}));
+		return { ...itemEdit, requirements: newItem };
+	};
+	const fetchRequirementDetail = () => {
+		const newItem = dataDetail?.requirements?.map((items) => ({
+			...items,
+			label: items.name,
+			value: items.id,
+		}));
+		return { ...dataDetail, requirements: newItem };
+	};
 	useEffect(() => {
 		dispatch(fetchPositionList());
 		dispatch(fetchPositionLevelList());
@@ -112,8 +126,8 @@ const PositionPage = () => {
 		},
 		{
 			title: 'Yêu cầu năng lực',
-			id: 'requirement',
-			key: 'requirement',
+			id: 'requirements',
+			key: 'requirements',
 			type: 'select',
 			align: 'left',
 			isShow: false,
@@ -159,7 +173,7 @@ const PositionPage = () => {
 			position_levels_id: parseInt(data.position_levels_id, 10),
 			manager: parseInt(data.manager, 10),
 			// kpiNormId: data?.kpiName,
-			requirements: data?.requirement,
+			requirement_id: data?.requirements?.map((item) => item.id),
 		};
 		if (data?.id) {
 			try {
@@ -229,7 +243,7 @@ const PositionPage = () => {
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
-							item={itemEdit}
+							item={fetchRequirement()}
 							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
 							// nv={nvs}
@@ -238,7 +252,7 @@ const PositionPage = () => {
 						<PositionDetail
 							show={openDetail}
 							onClose={handleCloseDetail}
-							item={dataDetail}
+							item={fetchRequirementDetail()}
 							label={`Chi tiết vị trí: ${dataDetail?.name}`}
 							fields={columns}
 							// nv
