@@ -1,168 +1,159 @@
 import React, { useEffect } from 'react';
-import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
+import _, { isEmpty } from 'lodash';
+import {
+	TreeGridComponent,
+	ColumnsDirective,
+	ColumnDirective,
+} from '@syncfusion/ej2-react-treegrid';
 import { useParams } from 'react-router-dom';
-import { arrayToTree } from 'performant-array-to-tree';
-import { TreeTable, TreeState } from 'cp-react-tree-table';
-import { isEmpty } from 'lodash';
+import moment from 'moment';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
-import Icon from '../../components/icon/Icon';
 import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
+import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
+import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
+
+const createDataTree = (dataset) => {
+	const hashTable = Object.create(null);
+	dataset.forEach((aData) => {
+		hashTable[aData.id] = { data: aData, children: [] };
+	});
+	const dataTree = [];
+	dataset.forEach((aData) => {
+		if (aData.parentId) {
+			hashTable[aData.parentId].children.push(hashTable[aData.id]);
+			// hashTable[aData.parentId]
+		} else {
+			dataTree.push(hashTable[aData.id]);
+		}
+	});
+	return dataTree;
+};
 
 const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
-	const params = useParams();
-
-	const { id } = params;
-
 	const worktrack = useSelector((state) => state.worktrack.worktracks);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const department = useSelector((state) => state.department.departments);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const users = useSelector((state) => state.employee.employees);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-
 	const [treeValue, setTreeValue] = React.useState([]);
-
+	const params = useParams();
+	const { id } = params;
+	const showDepartment = () => {
+		return worktrack.map((item) => {
+			const newItem = department.filter((items) => items.id === item.kpiNorm.department_id);
+			return {
+				...item,
+				department: {
+					name: _.get(newItem, '0.name', '--'),
+				},
+				deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+				missionValue: _.get(item, 'mission.name', '--'),
+			};
+		});
+	};
+	const showUser = () => {
+		const user = users.filter((e) => e.id === parseInt(params.id, 10));
+		return `${_.get(user, '0.name')} (${_.get(user, '0.position.name')})`;
+	};
 	useEffect(() => {
-		if (!isEmpty(worktrack)) {
-			setTreeValue(
-				TreeState.expandAll(
-					TreeState.create(arrayToTree(worktrack, { childrenField: 'children' })),
-				),
-			);
-		}
-	}, [worktrack]);
-
+		dispatch(fetchEmployeeList());
+	}, [dispatch]);
+	useEffect(() => {
+		dispatch(fetchDepartmentList());
+	}, [dispatch]);
 	useEffect(() => {
 		dispatch(fetchWorktrackList(id));
 	}, [dispatch, id]);
-
-	const renderIndexCell = (row) => {
-		return (
-			<div
-				style={{
-					paddingLeft: `${row.metadata.depth * 30}px`,
-					minWidth: 360,
-				}}
-				onDoubleClick={() =>
-					handleOpenForm({
-						...row.data,
-						parent: worktrack.find((item) => item.id === row.data.parentId),
-					})
-				}
-				className={
-					row.metadata.hasChildren
-						? 'with-children d-flex align-items-center cursor-pointer user-select-none'
-						: 'without-children cursor-pointer user-select-none'
-				}>
-				{row.metadata.hasChildren ? (
-					<Icon
-						color='success'
-						type='button'
-						size='lg'
-						icon={row.$state.isExpanded ? 'ArrowDropDown' : 'ArrowRight'}
-						className='d-block bg-transparent'
-						style={{ fontSize: 25 }}
-						onClick={row.toggleChildren}
-					/>
-				) : (
-					''
-				)}
-
-				<span>{row.data?.kpiNorm?.name || ''}</span>
-			</div>
-		);
-	};
-
-	const handleOnChange = (newValue) => {
-		setTreeValue(newValue);
-	};
-
+	showDepartment();
+	useEffect(() => {
+		if (!isEmpty(worktrack)) {
+			const newWorktrack = showDepartment();
+			const treeData = createDataTree(newWorktrack);
+			setTreeValue(treeData);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [worktrack]);
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
-				<div className='row mb-0 h-100'>
+				<div
+					className='row mb-0'
+					style={{ maxWidth: '90%', minWidth: '60%', margin: '0 auto' }}>
 					<div className='col-12'>
 						<Card className='w-100'>
-							<CardHeader>
-								<CardLabel icon='TaskAlt' iconColor='primary'>
-									<CardTitle>
-										<CardLabel>Danh sách nhiệm vụ</CardLabel>
-									</CardTitle>
-								</CardLabel>
-							</CardHeader>
-							<CardBody>
-								{worktrack?.length > 0 ? (
-									<TreeTable value={treeValue} onChange={handleOnChange}>
-										<TreeTable.Column
-											style={{ minWidth: 300 }}
-											renderCell={renderIndexCell}
-											renderHeaderCell={() => <span>Tên nhiệm vụ</span>}
-										/>
-										<TreeTable.Column
-											renderCell={(row) => (
-												<span className='expenses-cell text-left'>
-													{row.data?.user?.department?.name || 'Không'}
-												</span>
-											)}
-											renderHeaderCell={() => (
-												<span>Phòng ban phụ trách</span>
-											)}
-										/>
-										<TreeTable.Column
-											renderCell={(row) => (
-												<span className='expenses-cell text-left'>
-													{row.data?.user?.name || 'Không'}
-												</span>
-											)}
-											renderHeaderCell={() => (
-												<span>Nhân viên phụ trách</span>
-											)}
-										/>
-										<TreeTable.Column
-											renderCell={(row) => (
-												<span className='expenses-cell text-left'>
-													{row.data?.quantity || ''}
-												</span>
-											)}
-											renderHeaderCell={() => (
-												<span className='t-left'>Số lượng</span>
-											)}
-										/>
-										<TreeTable.Column
-											renderCell={(row) => (
-												<span className='expenses-cell text-left'>
-													{row.data.deadline
-														? moment(`${row.data.deadline}`).format(
-																'DD-MM-YYYY',
-														  )
-														: ''}
-												</span>
-											)}
-											renderHeaderCell={() => <span>Hạn hoàn thành</span>}
-										/>
-										<TreeTable.Column
-											renderCell={(row) => (
-												<span className='expenses-cell text-right'>
-													{row.data?.kpiNorm?.manday || ''}
-												</span>
-											)}
-											renderHeaderCell={() => (
-												<span className='t-left'>Số ngày công</span>
-											)}
-										/>
-									</TreeTable>
-								) : (
-									<h1 className='text-center py-4'>
-										Hiện chưa có công việc nào!
-									</h1>
-								)}
-							</CardBody>
+							<div style={{ margin: '24px 24px 0' }}>
+								<CardHeader>
+									<CardLabel icon='TaskAlt' iconColor='primary'>
+										<CardTitle>
+											<CardLabel>
+												Danh sách nhiệm vụ của {showUser()}
+											</CardLabel>
+										</CardTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardBody>
+									<div className='control-pane'>
+										<div className='control-section'>
+											<TreeGridComponent
+												dataSource={treeValue}
+												treeColumnIndex={0}
+												className='cursor-pointer user-select-none'
+												rowSelected={(item) => {
+													handleOpenForm({
+														...item.data.data,
+														parent: worktrack.find(
+															(i) => i.id === item.data.data.parentId,
+														),
+													});
+												}}
+												childMapping='children'
+												height='500'>
+												<ColumnsDirective>
+													<ColumnDirective
+														field='data.kpiNorm.name'
+														headerText='Tên nhiệm vụ'
+														width='200'
+													/>
+													<ColumnDirective
+														field='data.department.name'
+														headerText='Phòng ban phụ trách'
+														width='200'
+														textAlign='Center'
+													/>
+													<ColumnDirective
+														field='data.missionValue'
+														headerText='Thuộc mục tiêu'
+														width='150'
+														textAlign='Center'
+													/>
+													<ColumnDirective
+														field='data.deadline'
+														headerText='Hạn hoàn thành'
+														format='dMy'
+														width='90'
+														textAlign='Center'
+													/>
+													<ColumnDirective
+														field='data.quantity'
+														headerText='Số lượng'
+														width='90'
+														textAlign='Right'
+													/>
+												</ColumnsDirective>
+											</TreeGridComponent>
+										</div>
+									</div>
+								</CardBody>
+							</div>
 						</Card>
 					</div>
 				</div>
