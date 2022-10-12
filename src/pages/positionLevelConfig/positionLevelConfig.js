@@ -166,7 +166,7 @@ const KeyPage = () => {
 											<CardActions>
 												<Button
 													color='info'
-													icon='VpnKey'
+													icon='GroupAdd'
 													tag='button'
 													onClick={() => handleOpenForm(null)}>
 													Thêm mới
