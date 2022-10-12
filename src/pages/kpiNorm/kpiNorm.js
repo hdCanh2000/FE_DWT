@@ -5,7 +5,7 @@ import {
 	ColumnsDirective,
 	ColumnDirective,
 } from '@syncfusion/ej2-react-treegrid';
-import { isEmpty } from 'lodash';
+import _, { isEmpty } from 'lodash';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, {
@@ -55,7 +55,6 @@ const KpiNormPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [openDetail, setOpenDetail] = useState(false);
 	const [dataDetail, setDataDetail] = useState(false);
-
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
@@ -66,14 +65,20 @@ const KpiNormPage = () => {
 
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
-
 	const [treeValue, setTreeValue] = React.useState([]);
-
+	const fixForm = () => {
+		return kpiNorm.map((item) => ({
+			...item,
+			quantity: _.isEmpty(item.quantity) ? '--' : item.quantity,
+			kpi_value: _.isEmpty(item.kpi_value) ? '--' : item.kpi_value,
+		}));
+	};
 	useEffect(() => {
 		if (!isEmpty(kpiNorm)) {
-			const treeData = createDataTree(kpiNorm);
+			const treeData = createDataTree(fixForm());
 			setTreeValue(treeData);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [kpiNorm]);
 
 	const columns = [
@@ -244,7 +249,7 @@ const KpiNormPage = () => {
 							<Card className='w-100 h-100'>
 								<div style={{ margin: '24px 24px 0' }}>
 									<CardHeader>
-										<CardLabel icon='AccountCircle' iconColor='primary'>
+										<CardLabel icon='FormatListBulleted' iconColor='primary'>
 											<CardTitle>
 												<CardLabel>Danh sách nhiệm vụ</CardLabel>
 											</CardTitle>
@@ -252,7 +257,7 @@ const KpiNormPage = () => {
 										<CardActions>
 											<Button
 												color='info'
-												icon='PersonPlusFill'
+												icon='PlaylistAdd'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
 												Thêm mới
@@ -287,13 +292,13 @@ const KpiNormPage = () => {
 															field='data.quantity'
 															headerText='Số lượng'
 															width='90'
-															textAlign='Right'
+															textAlign='Center'
 														/>
 														<ColumnDirective
 															field='data.kpi_value'
 															headerText='Giá trị KPI'
 															width='90'
-															textAlign='Right'
+															textAlign='Center'
 														/>
 													</ColumnsDirective>
 												</TreeGridComponent>

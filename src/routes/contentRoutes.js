@@ -91,7 +91,7 @@ const presentation = [
 	},
 	{
 		path: `${demoPages.jobsPage.subMenu.employee.path}/:id`,
-		element: <DAILYWORKTRACKING.DAILYWORKTRACKING />,
+		element: <DAILYWORKTRACKING.DAILYWORKTRACKINGUSER />,
 		exact: true,
 	},
 	{

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
+import _ from 'lodash';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -43,6 +44,9 @@ const EmployeePage = () => {
 	const [positions, setPositions] = React.useState([]);
 	const [openDelete, setOpenDelete] = React.useState(false);
 	const [dataDelete, setDataDelete] = React.useState({});
+	const fetchUser = () => {
+		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+	};
 	useEffect(() => {
 		const fecth = async () => {
 			const response = await getAllDepartment();
@@ -93,7 +97,7 @@ const EmployeePage = () => {
 			id: 'code',
 			key: 'code',
 			type: 'text',
-			align: 'left',
+			align: 'center',
 			isShow: true,
 		},
 		{
@@ -355,7 +359,7 @@ const EmployeePage = () => {
 													<TableCommon
 														className='table table-modern mb-0'
 														columns={columns}
-														data={users}
+														data={fetchUser()}
 													/>
 												</div>
 											</div>

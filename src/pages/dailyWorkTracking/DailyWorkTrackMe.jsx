@@ -5,7 +5,7 @@ import {
 	ColumnsDirective,
 	ColumnDirective,
 } from '@syncfusion/ej2-react-treegrid';
-import { isEmpty } from 'lodash';
+import _, { isEmpty } from 'lodash';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -21,7 +21,7 @@ const createDataTree = (dataset) => {
 	});
 	const dataTree = [];
 	dataset.forEach((aData) => {
-		if (aData.parentId) {
+		if (!_.isEmpty(aData.parentId)) {
 			hashTable[aData.parentId].children.push(hashTable[aData.id]);
 			// hashTable[aData.parentId]
 		} else {
@@ -33,15 +33,12 @@ const createDataTree = (dataset) => {
 
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
-
 	const [worktrack, setWorktrack] = useState([]);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-
 	const [treeValue, setTreeValue] = React.useState([]);
-
 	const id = localStorage.getItem('userId');
 	useEffect(() => {
 		async function fetchData() {
@@ -61,14 +58,19 @@ const DailyWorkTrackingMe = () => {
 		}
 		fetchData();
 	}, [dispatch, id]);
-
+	const fixForm = () => {
+		return worktrack.map((item) => ({
+			...item,
+			deadline: _.isEmpty(item.deadline) ? '--' : item.deadline,
+		}));
+	};
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
-			const treeData = createDataTree(worktrack);
+			const treeData = createDataTree(fixForm());
 			setTreeValue(treeData);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [worktrack]);
-
 	return (
 		<PageWrapper title='Công việc hàng ngày'>
 			<Page container='fluid'>
@@ -80,7 +82,7 @@ const DailyWorkTrackingMe = () => {
 							{' '}
 							<div style={{ margin: '24px 24px 0' }}>
 								<CardHeader>
-									<CardLabel icon='AccountCircle' iconColor='primary'>
+									<CardLabel icon='FormatListBulleted' iconColor='primary'>
 										<CardTitle>
 											<CardLabel>Danh sách nhiệm vụ</CardLabel>
 										</CardTitle>
