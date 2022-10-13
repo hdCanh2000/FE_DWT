@@ -3,7 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 import _ from 'lodash';
-import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import Card, {
+	CardActions,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../../components/bootstrap/Card';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
@@ -12,20 +18,41 @@ import PaginationButtons, {
 	dataPagination,
 	PER_COUNT,
 } from '../../../components/PaginationButtons';
-import { getAllWorktrackByUser } from '../../dailyWorkTracking/services';
+import { deleteWorkTrack, getAllWorktrackByUser } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
+import FormGroup from '../../../components/bootstrap/forms/FormGroup';
+import Button from '../../../components/bootstrap/Button';
 
-const Item = ({ data, showKpiNorm }) => {
+const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadlineDate } = data;
+	const handlDeleteItem = async (ele) => {
+		await deleteWorkTrack(ele.id);
+		fetch();
+	};
 	return (
 		<Card>
 			<CardHeader>
-				<CardLabel style={{ cursor: 'pointer' }}>
+				<CardLabel style={{ cursor: 'pointer' }} onClick={() => onOpen(data)}>
 					<CardTitle>
 						<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
 					</CardTitle>
 				</CardLabel>
+				<CardActions
+					style={{ border: '1px solid', borderRadius: '6px' }}
+					onClick={() => handlDeleteItem(data)}>
+					<FormGroup>
+						<OverlayTrigger
+							overlay={<Tooltip id='addSubMission'>Xóa nhiệm vụ đã giao</Tooltip>}>
+							<Button
+								type='button'
+								className='d-block w-10'
+								icon='Close'
+								// onClick={handleShowPickListKpiNorm}
+							/>
+						</OverlayTrigger>
+					</FormGroup>
+				</CardActions>
 			</CardHeader>
 			<div className='row px-4 pb-2'>
 				<div className='col-12'>Người phụ trách: {_.get(data, 'user.name')}</div>
@@ -102,6 +129,7 @@ const OrderTask = () => {
 											</div>
 											{tasks?.map((item) => (
 												<Item
+													fetch={fetch}
 													key={item.id}
 													showKpiNorm={showKpiNorm}
 													data={item}

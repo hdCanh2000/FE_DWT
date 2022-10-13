@@ -26,7 +26,6 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
-
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -141,7 +140,7 @@ const PositionPage = () => {
 			type: 'select',
 			align: 'left',
 			isShow: false,
-			render: (item) => <span>{item?.requirement?.name || 'No data'}</span>,
+			render: fetchRequirement().requirements,
 			options: requirements,
 			isMulti: true,
 		},
