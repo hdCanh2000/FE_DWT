@@ -25,7 +25,6 @@ import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import ListPickKpiNorm from './ListPickKpiNorm';
-import Icon from '../../../components/icon/Icon';
 import { addWorktrack } from '../../dailyWorkTracking/services';
 
 const customStyles = {
@@ -44,7 +43,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 	const missions = useSelector((state) => state.mission.missions);
 	const [missionOption, setMissionOption] = useState({});
-	const [userOption, setUserOption] = useState({ label: '', value: '' });
+	const [userOption, setUserOption] = useState({});
 	const [mission, setMission] = React.useState({
 		quantity: '',
 		startDate: '',
@@ -68,9 +67,8 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	useEffect(() => {
 		setMission({ ...item });
 		setMissionOption({ ..._.get(item, 'parent') });
-		setUserOption({ ...item?.user });
+		setUserOption({ label: item?.user?.name, value: item?.user?.id });
 	}, [item]);
-
 	// show toast
 	const handleChange = (e) => {
 		const { value, name } = e.target;
@@ -89,7 +87,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			priority: parseInt(mission?.priority, 10),
 			note: mission?.note,
 			description: item?.description,
-			deadline: mission?.deadlineDate,
+			deadlineDate: mission?.deadlineDate,
 			startDate: mission?.startDate,
 		};
 		addWorktrack(dataValue).then((res) => {
@@ -268,65 +266,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											className='border border-2 rounded-0 shadow-none'
 										/>
 									</FormGroup>
-								</div>
-							</div>
-							<div className='row g-2'>
-								<div className='col-12'>
-									{dataSubMission?.length > 0 && (
-										<>
-											<h3 className='fs-6'>Danh sách nhiệm vụ con đã chọn</h3>
-											<table className='w-100'>
-												<thead className='border'>
-													<th
-														className='border p-2 text-center'
-														style={{ width: '20px' }}>
-														STT
-													</th>
-													<th className='border p-2'>Tên nhiệm vụ</th>
-													<th className='border p-2 text-center'>
-														Số lượng
-													</th>
-													<td style={{ width: '20px' }} />
-												</thead>
-												{dataSubMission?.map((item, index) => {
-													return (
-														<tr key={item.id} className='border'>
-															<td
-																className='border p-2 text-center'
-																style={{ width: '20px' }}>
-																{index + 1}
-															</td>
-															<td className='border p-2'>
-																{item.name}
-															</td>
-															<td className='border p-2 text-center'>
-																{item.quantity}
-															</td>
-															<td className='border p-2 text-center'>
-																<Button
-																	color='light'
-																	variant='light'
-																	size='lg'
-																	style={{ width: '20px' }}
-																	className='bg-transparent border-0 p-0'
-																	onClick={() =>
-																		setDataSubMission(
-																			dataSubMission.filter(
-																				(i) =>
-																					i.id !==
-																					item.id,
-																			),
-																		)
-																	}>
-																	<Icon icon='Trash' size='lg' />
-																</Button>
-															</td>
-														</tr>
-													);
-												})}
-											</table>
-										</>
-									)}
 								</div>
 							</div>
 						</div>
