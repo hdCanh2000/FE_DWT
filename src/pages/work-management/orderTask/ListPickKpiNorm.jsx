@@ -3,6 +3,7 @@ import { TreeTable, TreeState } from 'cp-react-tree-table';
 import PropTypes from 'prop-types';
 import { arrayToTree } from 'performant-array-to-tree';
 import { Button, Form, Modal } from 'react-bootstrap';
+import _ from 'lodash';
 import Icon from '../../../components/icon/Icon';
 import './style.css';
 
@@ -14,13 +15,23 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 	useEffect(() => {
 		const newData = arrayToTree(data, { childrenField: 'children' });
 		// eslint-disable-next-line react/prop-types
-		// eslint-disable-next-line react/prop-types
-		setTreeValue(
-			TreeState.expandAll(
-				// eslint-disable-next-line react/prop-types
-				TreeState.create(newData.filter((item) => item.data.id === initItem.id)),
-			),
-		);
+		if (!_.isEmpty(newData.filter((item) => item.data.id === initItem.id))) {
+			setTreeValue(
+				TreeState.expandAll(
+					// eslint-disable-next-line react/prop-types
+					TreeState.create(newData.filter((item) => item.data.id === initItem.id)),
+				),
+			);
+		} else {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(
+						// eslint-disable-next-line react/prop-types
+						newData.filter((item) => item.data.id === initItem.kpiNorm_id),
+					),
+				),
+			);
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data]);
 

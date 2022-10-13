@@ -6,6 +6,12 @@ const getAllWorktrackByUserId = (id) => {
 		url: `/api/worktracks/user/${id}`,
 	});
 };
+const deleteWorkTrack = (id) => {
+	return axiosClient({
+		method: 'DELETE',
+		url: `/api/worktracks/${id}`,
+	});
+};
 
 const getAllWorktrack = () => {
 	return axiosClient({
@@ -69,4 +75,5 @@ export {
 	updateWorktrackLog,
 	getAllWorktrack,
 	getWorktrackById,
+	deleteWorkTrack,
 };
