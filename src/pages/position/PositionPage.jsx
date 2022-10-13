@@ -26,7 +26,6 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
-
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -38,8 +37,16 @@ const PositionPage = () => {
 	const requirements = useSelector((state) => state.requirement.requirements);
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
-
+	console.log(positions,'positions');
 	// const [nvs] = React.useState(true);
+	const fetchRequirement = () => {
+		const newItem = itemEdit?.requirements?.map((items) => ({
+		  ...items,
+		  label: items.name,
+		  value: items.id,
+		}));
+		return { ...itemEdit, requirements: newItem };
+	  };
 
 	useEffect(() => {
 		dispatch(fetchPositionList());
@@ -117,7 +124,7 @@ const PositionPage = () => {
 			type: 'select',
 			align: 'left',
 			isShow: false,
-			render: (item) => <span>{item?.requirement?.name || 'No data'}</span>,
+			render: fetchRequirement().requirements,
 			options: requirements,
 			isMulti: true,
 		},
@@ -229,7 +236,7 @@ const PositionPage = () => {
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
-							item={itemEdit}
+							item={fetchRequirement()}
 							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
 							// nv={nvs}
