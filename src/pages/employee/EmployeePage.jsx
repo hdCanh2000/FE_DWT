@@ -282,7 +282,7 @@ const EmployeePage = () => {
 			department_id: data?.department?.value,
 			code: data?.code,
 			email: data?.email,
-			// password: '123456',
+			password: '123456',
 			dateOfBirth: data?.dateOfBirth,
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
