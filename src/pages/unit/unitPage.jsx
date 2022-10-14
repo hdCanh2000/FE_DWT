@@ -75,17 +75,17 @@ const UnitPage = () => {
 
 	const columns = [
 		{
-			title: 'Tên đơn vị',
-			id: 'name',
-			key: 'name',
+			title: 'Mã đơn vị',
+			id: 'code',
+			key: 'code',
 			type: 'text',
 			align: 'left',
 			isShow: true,
 		},
 		{
-			title: 'Mã đơn vị',
-			id: 'code',
-			key: 'code',
+			title: 'Tên đơn vị',
+			id: 'name',
+			key: 'name',
 			type: 'text',
 			align: 'left',
 			isShow: true,
