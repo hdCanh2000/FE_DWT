@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useState, memo } from 'react';
+import _ from 'lodash';
 import { Button, Modal } from 'react-bootstrap';
 import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,7 +13,7 @@ import Textarea from '../../../components/bootstrap/forms/Textarea';
 import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import { addNewMission, updateMissionById } from './services';
-import { fetchMissionList, fetchMissionReport } from '../../../redux/slice/missionSlice';
+import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import Toasts from '../../../components/bootstrap/Toasts';
 
 const ErrorText = styled.span`
@@ -38,6 +39,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 	const { addToast } = useToasts();
 	const nameRef = useRef(null);
 	const departmentRef = useRef(null);
+
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 		dispatch(fetchUnitList());
@@ -57,43 +59,10 @@ const MissionFormModal = ({ show, onClose, item }) => {
 		handleClearErrorMsgAfterChange('departmentOption');
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mission?.name, departmentOption?.value]);
-	const isDepartment = () => {
-		const newDepartmentTrue = item?.departments?.filter(
-			(items) => items.missionDepartment.isResponsible === true,
-		);
-		const newDepartmentFalse = item?.departments?.filter(
-			(items) => items.missionDepartment.isResponsible === false,
-		);
-		if (newDepartmentTrue && newDepartmentTrue?.length !== 0) {
-			setDepartmentOption({
-				...newDepartmentTrue[0],
-				value: newDepartmentTrue[0].id,
-				label: newDepartmentTrue[0].name,
-			});
-		}
-		if (newDepartmentFalse && newDepartmentFalse.length !== 0) {
-			setDepartmentRelatedOption({
-				...newDepartmentFalse[0],
-				value: newDepartmentFalse[0].id,
-				label: newDepartmentFalse[0].name,
-			});
-		}
-	};
-	const valueUnit = () => {
-		const newUnit = units.filter((items) => items.id === item.unit_id);
-		if (newUnit && newUnit.length !== 0) {
-			setUnitOption({
-				...newUnit[0],
-				id: newUnit[0].id,
-				label: newUnit[0].name,
-				value: newUnit[0].id,
-			});
-		}
-	};
 
 	useEffect(() => {
 		setMission(item);
-		if (!item?.id) {
+		if (!item.id) {
 			setMission({
 				id: null,
 				name: '',
@@ -108,14 +77,27 @@ const MissionFormModal = ({ show, onClose, item }) => {
 			setUnitOption({});
 			setDepartmentOption({});
 			setDepartmentRelatedOption({});
+		} else {
+			setMission({ ...item });
+			setUnitOption({
+				...item.unit,
+				label: _.get(item, 'unit.name'),
+				value: _.get(item, 'unit.id'),
+			});
+			setDepartmentOption({
+				...item.departments.filter((i) => i.missionDepartments?.isResponsible)[0],
+				label: item.departments.filter((i) => i.missionDepartments?.isResponsible)[0]?.name,
+				value: item.departments.filter((i) => i.missionDepartments?.isResponsible)[0]?.id,
+			});
+			setDepartmentRelatedOption({
+				...item.departments.filter((i) => !i.missionDepartments?.isResponsible)[0],
+				label: item.departments.filter((i) => !i.missionDepartments?.isResponsible)[0]
+					?.name,
+				value: item.departments.filter((i) => !i.missionDepartments?.isResponsible)[0]?.id,
+			});
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [item?.id]);
-	useEffect(() => {
-		valueUnit();
-		isDepartment();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [item]);
 
 	const handleChange = (e) => {
 		const { value } = e.target;
@@ -155,12 +137,18 @@ const MissionFormModal = ({ show, onClose, item }) => {
 		);
 	};
 	const handleSubmitMissionForm = async () => {
-		if (item.id) {
+		const data = { ...mission };
+		data.quantity = parseInt(mission.quantity, 10) || null;
+		data.manday = parseInt(mission.manday, 10) || null;
+		data.kpiValue = parseInt(mission.kpiValue, 10) || null;
+		data.responsibleDepartment_id = departmentOption.id;
+		data.relatedDepartment_id = departmentReplatedOption.id || null;
+		data.unit_id = unitOption.id || null;
+		if (data.id) {
 			try {
-				const response = await updateMissionById(item);
+				const response = await updateMissionById(data);
 				await response.data;
 				dispatch(fetchMissionList());
-				dispatch(fetchMissionReport());
 				handleCloseForm();
 				handleShowToast(`Cập nhật mục tiêu!`, `Cập nhật mục tiêu thành công!`);
 			} catch (error) {
@@ -168,10 +156,9 @@ const MissionFormModal = ({ show, onClose, item }) => {
 			}
 		} else {
 			try {
-				const response = await addNewMission(item);
+				const response = await addNewMission(data);
 				await response.data;
 				dispatch(fetchMissionList());
-				dispatch(fetchMissionReport());
 				handleCloseForm();
 				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu thành công!`);
 			} catch (error) {
