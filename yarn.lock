@@ -2071,12 +2071,26 @@
   dependencies:
     "@syncfusion/ej2-icons" "~20.3.47"
 
+"@syncfusion/ej2-base@~20.3.49":
+  version "20.3.49"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-base/-/ej2-base-20.3.49.tgz#3e697bc4da2ebedebc53d436201271be9e36413b"
+  integrity sha512-Sv1iPsF0CjKi77YSLHmp1S7fIXxC/vw/zthvc0H2riRed4YY6dBf2cgk5u5vX5ciVUfmHhehXlzV74wRwJFTlw==
+  dependencies:
+    "@syncfusion/ej2-icons" "~20.3.47"
+
 "@syncfusion/ej2-buttons@~20.3.47", "@syncfusion/ej2-buttons@~20.3.48":
   version "20.3.48"
   resolved "https://registry.npmjs.org/@syncfusion/ej2-buttons/-/ej2-buttons-20.3.48.tgz"
   integrity sha512-GiM+xbkiTvA4hA0bn8yZgxe/8ZywCycXg3iBqyFWEzmcAfvOGacEHjEct29ogQWGEhdILIPx4/E+Y+GoyMKTBA==
   dependencies:
     "@syncfusion/ej2-base" "~20.3.48"
+
+"@syncfusion/ej2-buttons@~20.3.49":
+  version "20.3.49"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-buttons/-/ej2-buttons-20.3.49.tgz#49df58c5602e8f1523289923fa4760c975a7a605"
+  integrity sha512-4BuVdLEJpTNAWPwISMaqhyn9t344Gy33+2X0yKJfIEwP4UixJ1Vh7mjdKeQbIhwgjyLQYVW16sADjgGagrsqeQ==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.3.49"
 
 "@syncfusion/ej2-calendars@~20.3.48":
   version "20.3.48"
@@ -2164,6 +2178,16 @@
     "@syncfusion/ej2-popups" "~20.3.47"
     "@syncfusion/ej2-splitbuttons" "~20.3.47"
 
+"@syncfusion/ej2-inputs@~20.3.49":
+  version "20.3.49"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-inputs/-/ej2-inputs-20.3.49.tgz#438b3a91d95f0af01617f186eb273be777a18eca"
+  integrity sha512-WyCe8AQy7kxMiNRNad7xD/kBTJSaf/fqLrUcXeTJpUq4nySTBgQGQ8lrxca6nxp030rnNjIjI2vgM1hI8nKaVw==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.3.49"
+    "@syncfusion/ej2-buttons" "~20.3.49"
+    "@syncfusion/ej2-popups" "~20.3.49"
+    "@syncfusion/ej2-splitbuttons" "~20.3.47"
+
 "@syncfusion/ej2-lists@~20.3.47":
   version "20.3.47"
   resolved "https://registry.npmjs.org/@syncfusion/ej2-lists/-/ej2-lists-20.3.47.tgz"
@@ -2172,6 +2196,18 @@
     "@syncfusion/ej2-base" "~20.3.47"
     "@syncfusion/ej2-buttons" "~20.3.47"
     "@syncfusion/ej2-data" "~20.3.47"
+
+"@syncfusion/ej2-navigations@20.3.49", "@syncfusion/ej2-navigations@^20.3.49":
+  version "20.3.49"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-navigations/-/ej2-navigations-20.3.49.tgz#34e5dbd4ac571fa78988c97c3e5da16595597935"
+  integrity sha512-+oHT2XPYCzjCpIscyooVBYTBNhcNTJO2073Q4KMvG/itjGDntqBc5JMG2Svrf1U9xty17QbemTHvHTcEKxhP5Q==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.3.49"
+    "@syncfusion/ej2-buttons" "~20.3.49"
+    "@syncfusion/ej2-data" "~20.3.47"
+    "@syncfusion/ej2-inputs" "~20.3.49"
+    "@syncfusion/ej2-lists" "~20.3.47"
+    "@syncfusion/ej2-popups" "~20.3.49"
 
 "@syncfusion/ej2-navigations@~20.3.48":
   version "20.3.48"
@@ -2209,12 +2245,29 @@
     "@syncfusion/ej2-base" "~20.3.48"
     "@syncfusion/ej2-buttons" "~20.3.48"
 
+"@syncfusion/ej2-popups@~20.3.49":
+  version "20.3.49"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-popups/-/ej2-popups-20.3.49.tgz#06725cf90d1283fe755e3add1aa1ff09a719d7fb"
+  integrity sha512-ik4Ig+ABlrKM5+7j5s2FH5EkxZCfxza7cy9XJr01SNrjPYtXnW2HMvgQMfSvyJgg5WAQiTaHkAeM8tRtxBAJKQ==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.3.49"
+    "@syncfusion/ej2-buttons" "~20.3.49"
+
 "@syncfusion/ej2-react-base@~20.3.47":
   version "20.3.47"
   resolved "https://registry.npmjs.org/@syncfusion/ej2-react-base/-/ej2-react-base-20.3.47.tgz"
   integrity sha512-x1FNcohhHNvUfvoDVP/jvwmXz65LHP3hKRQIwPxaPby5lM1OzHUecWuIT+6JTc4dat++14c35EAbC6sqr1PrhA==
   dependencies:
     "@syncfusion/ej2-base" "~20.3.47"
+
+"@syncfusion/ej2-react-navigations@^20.3.49":
+  version "20.3.49"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-react-navigations/-/ej2-react-navigations-20.3.49.tgz#3162a1b2298879669136dc85115ac2c6eda56fd6"
+  integrity sha512-TTv0eSCEubsqaqoEoY1pK5uJdquvKvIP+yNFIMq4PFiqYj3Lr4zYv2ofsCta1xplESpXv9yAWMKp80DnEMGDag==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.3.49"
+    "@syncfusion/ej2-navigations" "20.3.49"
+    "@syncfusion/ej2-react-base" "~20.3.47"
 
 "@syncfusion/ej2-react-treegrid@^20.3.48":
   version "20.3.48"

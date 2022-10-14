@@ -37,7 +37,7 @@ const createDataTree = (dataset) => {
 	const dataTree = [];
 	dataset.forEach((aData) => {
 		if (aData.parentId) {
-			hashTable[aData.parentId].children.push(hashTable[aData.id]);
+			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
 			// hashTable[aData.parentId]
 		} else {
 			dataTree.push(hashTable[aData.id]);
