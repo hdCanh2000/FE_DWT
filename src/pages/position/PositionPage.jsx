@@ -73,6 +73,16 @@ const PositionPage = () => {
 			col: 6,
 		},
 		{
+			title: 'Mã Vị Trí',
+			placeholder: 'mã vị trí',
+			id: 'code',
+			key: 'code',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+			col: 6,
+		},
+		{
 			title: 'Phòng Ban',
 			id: 'department_id',
 			key: 'department_id',
@@ -164,13 +174,14 @@ const PositionPage = () => {
 	];
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: parseInt(data?.id, 10),
-			name: data?.name,
+			id: parseInt(data.id, 10),
+			name: data.name,
+			code: data?.code,
 			address: data?.address,
 			description: data?.description,
-			department_id: parseInt(data.department_id, 10),
-			position_levels_id: parseInt(data.position_levels_id, 10),
-			manager: parseInt(data.manager, 10),
+			department_id: parseInt(data?.department_id, 10),
+			position_levels_id: parseInt(data?.position_levels_id, 10),
+			manager: parseInt(data?.manager, 10),
 			// kpiNormId: data?.kpiName,
 			requirement_id: data?.requirements?.map((item) => item.id),
 		};
