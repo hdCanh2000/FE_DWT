@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
@@ -14,18 +15,23 @@ import Card, {
 import Button from '../../../components/bootstrap/Button';
 import MissionFormModal from './MissionFormModal';
 import Alert from '../../../components/bootstrap/Alert';
+import Toasts from '../../../components/bootstrap/Toasts';
 import useDarkMode from '../../../hooks/useDarkMode';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import NotPermission from '../../presentation/auth/NotPermission';
+import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
+import { deleteMissionById } from './services';
 
 const MissionPage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const missions = useSelector((state) => state.mission?.missions);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
+	const confirmForm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	useEffect(() => {
@@ -33,8 +39,31 @@ const MissionPage = () => {
 	}, [dispatch]);
 
 	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	// const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+
+	const handleDelete = async (data) => {
+		try {
+			await deleteMissionById(data?.id);
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+			handleCloseForm();
+		} catch (error) {
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+			throw error;
+		}
+		dispatch(fetchMissionList());
+	};
 
 	const columns = [
 		{
@@ -95,6 +124,14 @@ const MissionPage = () => {
 							className='text-nowrap mx-2'
 							icon='Edit'
 							onClick={() => handleOpenFormEdit(item)}
+						/>
+						<Button
+							isOutline={!darkModeStatus}
+							color='danger'
+							isLight={darkModeStatus}
+							className='text-nowrap mx-2 '
+							icon='Delete'
+							onClick={() => handleOpenFormDelete(item)}
 						/>
 					</div>,
 					['admin'],
@@ -160,6 +197,13 @@ const MissionPage = () => {
 								show={toggleFormEdit}
 								onClose={handleCloseForm}
 								item={itemEdit}
+							/>
+							<AlertConfirm
+								openModal={confirmForm}
+								onCloseModal={handleCloseForm}
+								onConfirm={() => handleDelete(itemEdit)}
+								title='Xoá mục tiêu'
+								content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
 							/>
 						</>,
 						['admin', 'manager'],
