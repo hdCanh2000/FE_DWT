@@ -186,7 +186,7 @@ const KpiNormPage = () => {
 			// hr: data?.hr,
 			// manday: parseInt(data?.manday, 10),
 			// unit_id: parseInt(data?.unit, 10),
-			tasktype: data?.tasktype.value,
+			taskType: data?.taskType.value,
 		};
 		if (data.id) {
 			try {
