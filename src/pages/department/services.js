@@ -20,6 +20,12 @@ const getDepartmentByIdWithUser = (id) => {
 		url: `/api/departments/${id}`,
 	});
 };
+const deleteDepartment = (id) => {
+	return axiosClient({
+		method: 'DELETE',
+		url: `/api/departments/${id}`,
+	});
+};
 
 const addDepartment = (data) => {
 	return axiosClient({
@@ -43,4 +49,5 @@ export {
 	getDepartmentByIdWithUser,
 	addDepartment,
 	updateDepartment,
+	deleteDepartment,
 };
