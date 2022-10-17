@@ -180,7 +180,8 @@ const OrderTask = () => {
 															<td style={{ width: '15%' }}>
 																{_.get(item, 'position.name')}
 															</td>
-															<td>{item?.kpiValue || 'Không'}</td>
+
+															<td>{item?.kpi_value || 'Không'}</td>
 														</tr>
 													</React.Fragment>
 												))}
