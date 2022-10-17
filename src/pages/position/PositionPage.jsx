@@ -112,8 +112,8 @@ const PositionPage = () => {
 			type: 'singleSelect',
 			align: 'left',
 			isShow: false,
-			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels,
+			render: (item) => <span>{item?.positions?.name || 'No data'}</span>,
+			options: positions,
 			col: 6,
 		},
 		{
