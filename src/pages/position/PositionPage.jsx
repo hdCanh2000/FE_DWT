@@ -71,7 +71,7 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+			col: 5,
 		},
 		{
 			title: 'Mã Vị Trí',
@@ -81,7 +81,7 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+			col: 2,
 		},
 		{
 			title: 'Phòng Ban',
@@ -92,7 +92,7 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
-			col: 6,
+			col: 5,
 		},
 		{
 			title: 'Cấp Nhân Sự',
