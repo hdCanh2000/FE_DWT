@@ -89,9 +89,9 @@ const RecruitmentRequirementPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: parseInt(data?.id, 10),
+			id: parseInt(data.id, 10),
 			name: data.name,
-			description: data.description,
+			description: data?.description,
 		};
 		if (data.id) {
 			// eslint-disable-next-line no-useless-catch
