@@ -39,14 +39,14 @@ const PositionPage = () => {
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
 	// const [nvs] = React.useState(true);
-	// const fetchRequirement = () => {
-	// 	const newItem = itemEdit?.requirements?.map((items) => ({
-	// 		...items,
-	// 		label: items.name,
-	// 		value: items.id,
-	// 	}));
-	// 	return { ...itemEdit, requirements: newItem };
-	// };
+	const fetchRequirement = () => {
+		const newItem = itemEdit?.requirements?.map((items) => ({
+			...items,
+			label: items.name,
+			value: items.id,
+		}));
+		return { ...itemEdit, requirements: newItem };
+	};
 	const fetchRequirementDetail = (data) => {
 		const newItem = data?.requirements?.map((items) => ({
 			...items,
@@ -254,7 +254,7 @@ const PositionPage = () => {
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
-							item={fetchRequirementDetail(itemEdit)}
+							item={fetchRequirement(itemEdit)}
 							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
 							// nv={nvs}

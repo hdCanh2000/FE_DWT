@@ -37,9 +37,9 @@ const KPINormForm = ({
 	const formik = useFormik({
 		initialValues: {
 			...item,
-			tasktype: {
-				value: item.tasktype,
-				label: item.tasktype,
+			taskType: {
+				value: item.taskType,
+				label: item.taskType,
 			},
 			parent: dataParent(item.parent_id),
 		},

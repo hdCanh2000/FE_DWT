@@ -62,7 +62,6 @@ const KpiNormPage = () => {
 		dispatch(fetchPositionList());
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
 	const [treeValue, setTreeValue] = React.useState([]);
@@ -80,7 +79,6 @@ const KpiNormPage = () => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [kpiNorm]);
-
 	const columns = [
 		{
 			title: 'Tên nhiệm vụ',
@@ -98,7 +96,6 @@ const KpiNormPage = () => {
 			type: 'select',
 			align: 'center',
 			isShow: true,
-			render: (item) => <span>{item?.position?.name || 'No data'}</span>,
 			options: positions,
 			isMulti: false,
 			col: 6,
@@ -116,8 +113,8 @@ const KpiNormPage = () => {
 		},
 		{
 			title: 'Loại nhiệm vụ',
-			id: 'tasktype',
-			key: 'tasktype',
+			id: 'taskType',
+			key: 'taskType',
 			type: 'select',
 			align: 'center',
 			options: [
@@ -137,6 +134,7 @@ const KpiNormPage = () => {
 			isShow: true,
 			isMulti: false,
 			col: 6,
+			render: (item) => <span>{item?.taskType?.value || 'No data'}</span>,
 		},
 		{
 			title: 'Mô tả/Diễn giải',
@@ -180,8 +178,7 @@ const KpiNormPage = () => {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
 			description: data?.description,
-			descriptionkpivalue: data?.descriptionkpivalue,
-			// department_id: parseInt(data?.position?.department?.id, 10),
+			descriptionKpiValue: data?.descriptionkpivalue,
 			position_id: parseInt(data?.position?.id, 10),
 			parent_id: parseInt(data?.parent?.id, 10),
 			kpi_value: parseInt(data?.kpivalue, 10),
