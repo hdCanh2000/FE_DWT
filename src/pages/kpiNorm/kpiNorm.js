@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	TreeGridComponent,
@@ -16,12 +16,9 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import useDarkMode from '../../hooks/useDarkMode';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
-import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
-import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
+import { addKpiNorm, updateKpiNorm } from './services';
 import validate from './validate';
-import DetailForm from '../common/ComponentCommon/DetailForm';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
@@ -47,14 +44,11 @@ const createDataTree = (dataset) => {
 };
 
 const KpiNormPage = () => {
-	const { darkModeStatus } = useDarkMode();
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const positions = useSelector((state) => state.position.positions);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const [openDetail, setOpenDetail] = useState(false);
-	const [dataDetail, setDataDetail] = useState(false);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
@@ -62,9 +56,9 @@ const KpiNormPage = () => {
 		dispatch(fetchPositionList());
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-	const [itemDelete, setItemDelete] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
+
 	const [treeValue, setTreeValue] = React.useState([]);
+
 	const fixForm = () => {
 		return kpiNorm.map((item) => ({
 			...item,
@@ -72,6 +66,7 @@ const KpiNormPage = () => {
 			kpi_value: !_.isNumber(item.kpi_value) ? '--' : item.kpi_value,
 		}));
 	};
+
 	useEffect(() => {
 		if (!isEmpty(kpiNorm)) {
 			const treeData = createDataTree(fixForm());
@@ -79,6 +74,7 @@ const KpiNormPage = () => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [kpiNorm]);
+
 	const columns = [
 		{
 			title: 'Tên nhiệm vụ',
@@ -144,33 +140,6 @@ const KpiNormPage = () => {
 			align: 'center',
 			isShow: true,
 		},
-		{
-			title: 'Hành động',
-			id: 'action',
-			key: 'action',
-			align: 'center',
-			render: (item) => (
-				<>
-					<Button
-						isOutline={!darkModeStatus}
-						color='success'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-1'
-						icon='Edit'
-						onClick={() => handleOpenForm(item)}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
-						color='danger'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-1'
-						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
-					/>
-				</>
-			),
-			isShow: false,
-		},
 	];
 
 	const handleSubmitForm = async (data) => {
@@ -208,30 +177,6 @@ const KpiNormPage = () => {
 		}
 	};
 
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
-	};
-
-	const handleCloseDelete = () => {
-		setIsDelete(false);
-	};
-
-	const handleCloseDetail = () => {
-		setOpenDetail(false);
-		setDataDetail({});
-	};
-
-	const handleDeleteKpiNorm = async (item) => {
-		// eslint-disable-next-line no-useless-catch
-		try {
-			await deleteKpiNorm(item);
-			dispatch(fetchKpiNormList());
-		} catch (error) {
-			throw error;
-		}
-		handleCloseDelete();
-	};
 	return (
 		<PageWrapper title='Khai báo nhiệm vụ'>
 			<Page container='fluid'>
@@ -314,20 +259,6 @@ const KpiNormPage = () => {
 					label={itemEdit?.id ? 'Cập nhật nhiệm vụ' : 'Thêm mới nhiệm vụ'}
 					fields={columns}
 					validate={validate}
-				/>
-				<DetailForm
-					show={openDetail}
-					onClose={handleCloseDetail}
-					item={dataDetail}
-					label={`${dataDetail?.name}`}
-					fields={columns}
-				/>
-				<TaskAlertConfirm
-					openModal={isDelete}
-					onCloseModal={handleCloseDelete}
-					onConfirm={() => handleDeleteKpiNorm(itemDelete?.id)}
-					title='Xoá nhiệm vụ'
-					content={`Xác nhận xoá nhiệm vụ <strong>${itemDelete?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>
