@@ -68,8 +68,8 @@ const KpiNormPage = () => {
 	const fixForm = () => {
 		return kpiNorm.map((item) => ({
 			...item,
-			quantity: _.isEmpty(item.quantity) ? '--' : item.quantity,
-			kpi_value: _.isEmpty(item.kpi_value) ? '--' : item.kpi_value,
+			quantity: !_.isNumber(item.quantity) ? '--' : item.quantity,
+			kpi_value: !_.isNumber(item.kpi_value) ? '--' : item.kpi_value,
 		}));
 	};
 	useEffect(() => {
@@ -178,15 +178,12 @@ const KpiNormPage = () => {
 			id: parseInt(data?.id, 10),
 			name: data?.name,
 			description: data?.description,
-			descriptionKpiValue: data?.descriptionkpivalue,
-			position_id: parseInt(data?.position?.id, 10),
-			parent_id: parseInt(data?.parent?.id, 10),
-			kpi_value: parseInt(data?.kpivalue, 10),
-			quantity: parseInt(data?.quantity, 10),
-			// hr: data?.hr,
-			// manday: parseInt(data?.manday, 10),
-			// unit_id: parseInt(data?.unit, 10),
-			taskType: data?.taskType.value,
+			descriptionKpiValue: data.descriptionKpiValue,
+			position_id: parseInt(data.position.id, 10) || null,
+			parent_id: parseInt(data.parent?.id, 10) || null,
+			kpi_value: parseInt(data.kpi_value, 10) || null,
+			quantity: parseInt(data.quantity, 10) || null,
+			taskType: data?.taskType.value || 'Thường xuyên',
 		};
 		if (data.id) {
 			try {

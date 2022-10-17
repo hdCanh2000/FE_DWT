@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
+import _ from 'lodash';
 import Form from 'react-bootstrap/Form';
 import { Button, Modal } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
@@ -42,13 +43,15 @@ const KPINormForm = ({
 				label: item.taskType,
 			},
 			parent: dataParent(item.parent_id),
+			descriptionKpiValue: _.get(item, 'descriptionKpiValue') || '',
+			quantity: _.get(item, 'quantity') || '',
+			kpi_value: _.get(item, 'kpi_value') || '',
 		},
 
 		validationSchema: validate,
 		enableReinitialize: true,
-		onSubmit: (values, { resetForm }) => {
+		onSubmit: (values) => {
 			handleSubmit(values);
-			resetForm();
 		},
 	});
 
@@ -240,12 +243,12 @@ const KPINormForm = ({
 							{showForm === 1 && (
 								<div className='row g-4'>
 									<div className='col-3'>
-										<FormGroup id='kpivalue' label='Thang điểm'>
+										<FormGroup id='kpi_value' label='Thang điểm'>
 											<Input
 												type='number'
-												name='kpivalue'
+												name='kpi_value'
 												onChange={formik.handleChange}
-												value={formik.values.kpivalue || ''}
+												value={formik.values.kpi_value || ''}
 												size='lg'
 												placeholder='Thang điểm'
 												className='border border-2 rounded-0 shadow-none'
@@ -255,13 +258,13 @@ const KPINormForm = ({
 									</div>
 									<div className='col-6'>
 										<FormGroup
-											id='descriptionkpivalue'
+											id='descriptionKpiValue'
 											label='Tương đương với kết quả'>
 											<Input
 												type='text'
-												name='descriptionkpivalue'
+												name='descriptionKpiValue'
 												onChange={formik.handleChange}
-												value={formik.values.descriptionkpivalue || ''}
+												value={formik.values.descriptionKpiValue || ''}
 												size='lg'
 												placeholder='Tương đương với kết quả'
 												className='border border-2 rounded-0 shadow-none'
