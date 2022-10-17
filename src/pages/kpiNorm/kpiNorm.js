@@ -37,7 +37,7 @@ const createDataTree = (dataset) => {
 	const dataTree = [];
 	dataset.forEach((aData) => {
 		if (aData.parentId) {
-			hashTable[aData.parentId].children.push(hashTable[aData.id]);
+			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
 			// hashTable[aData.parentId]
 		} else {
 			dataTree.push(hashTable[aData.id]);
@@ -62,7 +62,6 @@ const KpiNormPage = () => {
 		dispatch(fetchPositionList());
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
 	const [treeValue, setTreeValue] = React.useState([]);
@@ -80,7 +79,6 @@ const KpiNormPage = () => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [kpiNorm]);
-
 	const columns = [
 		{
 			title: 'Tên nhiệm vụ',
@@ -98,7 +96,6 @@ const KpiNormPage = () => {
 			type: 'select',
 			align: 'center',
 			isShow: true,
-			render: (item) => <span>{item?.position?.name || 'No data'}</span>,
 			options: positions,
 			isMulti: false,
 			col: 6,
@@ -137,6 +134,7 @@ const KpiNormPage = () => {
 			isShow: true,
 			isMulti: false,
 			col: 6,
+			render: (item) => <span>{item?.taskType?.value || 'No data'}</span>,
 		},
 		{
 			title: 'Mô tả/Diễn giải',

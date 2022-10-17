@@ -297,7 +297,7 @@ const DepartmentPage = () => {
 													</div>
 													<TreeTable
 														value={treeValue}
-														height={400}
+														height={600}
 														onChange={handleOnChange}>
 														<TreeTable.Column
 															style={{ minWidth: 300 }}

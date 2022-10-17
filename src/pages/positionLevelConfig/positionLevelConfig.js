@@ -125,7 +125,7 @@ const KeyPage = () => {
 			handleCloseForm();
 			handleShowToast(
 				'Chỉnh sửa cấp nhân sự',
-				`Chỉnh sửa cấp nhân sự ${result.name} thành công !`,
+				`Chỉnh sửa cấp nhân sự ${result.data.name} thành công !`,
 			);
 		}
 	};
