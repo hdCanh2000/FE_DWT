@@ -26,6 +26,7 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
+
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -46,8 +47,8 @@ const PositionPage = () => {
 		}));
 		return { ...itemEdit, requirements: newItem };
 	};
-	const fetchRequirementDetail = () => {
-		const newItem = dataDetail?.requirements?.map((items) => ({
+	const fetchRequirementDetail = (data) => {
+		const newItem = data?.requirements?.map((items) => ({
 			...items,
 			label: items.name,
 			value: items.id,
@@ -70,7 +71,7 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+			col: 5,
 		},
 		{
 			title: 'Mã Vị Trí',
@@ -80,7 +81,7 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+			col: 2,
 		},
 		{
 			title: 'Phòng Ban',
@@ -91,7 +92,7 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
-			col: 6,
+			col: 5,
 		},
 		{
 			title: 'Cấp Nhân Sự',
@@ -140,7 +141,7 @@ const PositionPage = () => {
 			type: 'select',
 			align: 'left',
 			isShow: false,
-			render: fetchRequirement().requirements,
+			render: (item) => <span>{item?.requirement?.name || 'No data'}</span>,
 			options: requirements,
 			isMulti: true,
 		},
@@ -253,7 +254,7 @@ const PositionPage = () => {
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
-							item={fetchRequirement()}
+							item={fetchRequirement(itemEdit)}
 							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
 							// nv={nvs}
@@ -262,7 +263,7 @@ const PositionPage = () => {
 						<PositionDetail
 							show={openDetail}
 							onClose={handleCloseDetail}
-							item={fetchRequirementDetail()}
+							item={fetchRequirementDetail(dataDetail)}
 							label={`Chi tiết vị trí: ${dataDetail?.name}`}
 							fields={columns}
 							// nv
