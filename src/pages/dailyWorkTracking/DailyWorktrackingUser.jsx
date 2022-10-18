@@ -97,7 +97,7 @@ const DailyWorkTracking = () => {
 												rowSelected={(item) => {
 													handleOpenForm({
 														...item.data.data,
-														parent: worktrack.find(
+														parent: worktrack?.workTracks?.find(
 															(i) => i.id === item.data.data.parentId,
 														),
 													});
