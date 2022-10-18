@@ -303,6 +303,7 @@ const DepartmentPage = () => {
 																: 'Thu gọn'}
 														</Button>
 													</div>
+													<div id='treeTable'>
 													<TreeTable
 														value={treeValue}
 														height={600}
@@ -313,6 +314,8 @@ const DepartmentPage = () => {
 															renderHeaderCell={() => <span />}
 														/>
 													</TreeTable>
+													</div>
+													
 												</div>
 											</CardBody>
 										</Card>
