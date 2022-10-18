@@ -79,21 +79,21 @@ const MissionPage = () => {
 			type: 'number',
 			render: (item) =>
 				item.departments.filter((i) => i.missionDepartments?.isResponsible)[0]?.name ||
-				'Không',
+				'--',
 		},
 		{
 			title: 'Thời gian bắt đầu',
 			id: 'startTime',
 			key: 'startTime',
 			type: 'text',
-			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : 'Không'),
+			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : '--'),
 			align: 'center',
 		},
 		{
 			title: 'Thời gian kết thúc',
 			id: 'endTime',
 			key: 'endTime',
-			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : 'Không'),
+			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : '--'),
 			align: 'center',
 		},
 		{
