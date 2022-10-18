@@ -304,18 +304,17 @@ const DepartmentPage = () => {
 														</Button>
 													</div>
 													<div id='treeTable'>
-													<TreeTable
-														value={treeValue}
-														height={600}
-														onChange={handleOnChange}>
-														<TreeTable.Column
-															style={{ minWidth: 300 }}
-															renderCell={renderIndexCell}
-															renderHeaderCell={() => <span />}
-														/>
-													</TreeTable>
+														<TreeTable
+															value={treeValue}
+															height={600}
+															onChange={handleOnChange}>
+															<TreeTable.Column
+																style={{ minWidth: 300 }}
+																renderCell={renderIndexCell}
+																renderHeaderCell={() => <span />}
+															/>
+														</TreeTable>
 													</div>
-													
 												</div>
 											</CardBody>
 										</Card>

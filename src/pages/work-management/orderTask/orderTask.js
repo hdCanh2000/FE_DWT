@@ -164,7 +164,9 @@ const OrderTask = () => {
 													<th style={{ width: '15%' }}>
 														Vị trí đảm nhiệm
 													</th>
-													<th className='text-right'>Giá trị KPI</th>
+													<th style={{ textAlign: 'center' }}>
+														Giá trị KPI
+													</th>
 												</tr>
 											</thead>
 										</table>
@@ -190,8 +192,10 @@ const OrderTask = () => {
 															<td style={{ width: '15%' }}>
 																{_.get(item, 'position.name')}
 															</td>
-															<td className='text-right'>
-																{_.get(item, 'kpiValue', '--')}
+															<td style={{ textAlign: 'center' }}>
+																{item.kpi_value
+																	? item.kpi_value
+																	: 'null'}
 															</td>
 														</tr>
 													</React.Fragment>
