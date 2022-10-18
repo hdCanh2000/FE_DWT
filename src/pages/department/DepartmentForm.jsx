@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import { Button, Modal } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
+import _ from 'lodash';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Select from '../../components/bootstrap/forms/Select';
 import CustomSelect from '../../components/form/CustomSelect';
@@ -10,6 +12,8 @@ import Textarea from '../../components/bootstrap/forms/Textarea';
 import Checks from '../../components/bootstrap/forms/Checks';
 import Input from '../../components/bootstrap/forms/Input';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
+import Icon from '../../components/icon/Icon';
+import DeleteDepartment from './deleteDepartment';
 
 const DepartmentForm = ({
 	className,
@@ -27,6 +31,8 @@ const DepartmentForm = ({
 	...props
 }) => {
 	const [isDelete, setIsDelete] = React.useState(false);
+	const [isNotDelete, setIsNotDelete] = React.useState(false);
+	const department = useSelector((state) => state.department.departments);
 	const formik = useFormik({
 		initialValues: { ...item },
 		validationSchema: validate,
@@ -37,8 +43,12 @@ const DepartmentForm = ({
 		},
 	});
 	const handleDelete = () => {
-		
-		setIsDelete(!isDelete);
+		const newDepartment = department.filter((items) => items.parent_id === item.id);
+		if (_.isEmpty(newDepartment)) {
+			setIsDelete(!isDelete);
+		} else {
+			setIsNotDelete(!isNotDelete);
+		}
 	};
 	return (
 		<Modal
@@ -50,17 +60,22 @@ const DepartmentForm = ({
 			centered
 			{...props}>
 			<Modal.Header closeButton className='p-4'>
-				<Modal.Title>{label}</Modal.Title>
-				<Button
-					onClick={() => handleDelete()}
-					style={{
-						color: 'red',
-						background: 'white',
-						marginLeft: '10px',
-						borderColor: 'red',
-					}}>
-					Xóa
-				</Button>
+				<Modal.Title>
+					{item.name ? item.name : 'Thêm mới cơ cấu tổ chức'}{' '}
+					{item?.id && (
+						<Icon
+							icon='Trash'
+							size='lg'
+							onClick={() => handleDelete()}
+							style={{
+								cursor: 'pointer',
+								color: 'red',
+								background: 'white',
+								borderColor: 'red',
+							}}
+						/>
+					)}
+				</Modal.Title>
 			</Modal.Header>
 			<Modal.Body className='px-4'>
 				<form>
@@ -225,11 +240,12 @@ const DepartmentForm = ({
 				onCloseModal={handleDelete}
 				onConfirm={() => {
 					onDelete(item);
-					onClose()
+					onClose();
 				}}
 				title='Xoá đơn vị tính'
 				content={`Xác nhận xoá đơn vị tính <strong>${item?.name}</strong> ?`}
 			/>
+			<DeleteDepartment openModal={isNotDelete} onCloseModal={setIsNotDelete} />
 		</Modal>
 	);
 };
