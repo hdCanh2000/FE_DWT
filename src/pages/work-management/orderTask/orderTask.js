@@ -25,7 +25,13 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Button from '../../../components/bootstrap/Button';
 
 const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
-	const { quantity, deadlineDate } = data;
+	const { quantity, deadlineDate, users } = data;
+	const userResponsible = _.get(
+		_.filter(users, (user) => {
+			return _.get(user, 'workTrackUsers.isResponsible') === true;
+		})[0],
+		'name',
+	);
 	const handlDeleteItem = async (ele) => {
 		await deleteWorkTrack(ele.id);
 		fetch();
@@ -55,7 +61,7 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 				</CardActions>
 			</CardHeader>
 			<div className='row px-4 pb-2'>
-				<div className='col-12'>Người phụ trách: {_.get(data, 'user.name')}</div>
+				<div className='col-12'>Người phụ trách: {userResponsible}</div>
 				<div className='col-12'>
 					Thời hạn hoàn thành: {moment(deadlineDate).format('DD-MM-YYYY')}
 				</div>
@@ -158,7 +164,7 @@ const OrderTask = () => {
 													<th style={{ width: '15%' }}>
 														Vị trí đảm nhiệm
 													</th>
-													<th>Giá trị KPI</th>
+													<th className='text-right'>Giá trị KPI</th>
 												</tr>
 											</thead>
 										</table>
@@ -172,15 +178,21 @@ const OrderTask = () => {
 															onClick={() => handleOpenForm(item)}
 															className='cursor-pointer'>
 															<td style={{ width: '54%' }}>
-																{item?.name}
+																{_.get(item, 'name')}
 															</td>
 															<td style={{ width: '18%' }}>
-																{item?.taskType || 'Thường xuyên'}
+																{_.get(
+																	item,
+																	'taskType',
+																	'Thường xuyên',
+																)}
 															</td>
 															<td style={{ width: '15%' }}>
 																{_.get(item, 'position.name')}
 															</td>
-															<td>{item?.kpiValue || 'Không'}</td>
+															<td className='text-right'>
+																{_.get(item, 'kpiValue', '--')}
+															</td>
 														</tr>
 													</React.Fragment>
 												))}
