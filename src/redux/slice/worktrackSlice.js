@@ -31,15 +31,7 @@ export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', 
 
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
-	return response.data.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			parentId: item.parent_id,
-		};
-	});
+	return response.data.data;
 });
 
 export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async () => {
@@ -93,7 +85,7 @@ export const worktrackSlice = createSlice({
 		},
 		[fetchWorktrackList.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktracks = [...action.payload];
+			state.worktrack = { ...action.payload };
 		},
 		[fetchWorktrackList.rejected]: (state, action) => {
 			state.loading = false;
