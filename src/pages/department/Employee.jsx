@@ -24,7 +24,6 @@ const EmployeePage = ({ dataDepartment }) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch, dataDepartment.id]);
-
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -97,13 +96,15 @@ const EmployeePage = ({ dataDepartment }) => {
 			],
 		},
 	];
-
 	return (
 		<div className='col-lg-12 col-md-6'>
 			<div className='row mb-4'>
 				<div className='col-12'>
 					<div className='d-flex justify-content-between align-items-center'>
-						<div className='display-6 fw-bold py-3'>Danh sách nhân sự</div>
+						<div style={{ fontSize: '20px' }} className='fw-bold py-3'>
+							Danh sách nhân sự{' '}
+							{dataDepartment?.name ? ` của ${dataDepartment?.name}` : ''}
+						</div>
 					</div>
 				</div>
 			</div>
