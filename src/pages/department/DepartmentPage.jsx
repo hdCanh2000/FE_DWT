@@ -245,7 +245,7 @@ const DepartmentPage = () => {
 					''
 				)}
 
-						<span>{row.data.name || ''}</span>
+				<span>{row?.data?.name || ''}</span>
 			</div>
 		);
 	};

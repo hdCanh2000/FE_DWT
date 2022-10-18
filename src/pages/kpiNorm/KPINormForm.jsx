@@ -334,11 +334,11 @@ const KPINormForm = ({
 							Xoá
 						</Button>
 					)}
-					<Button size='lg' variant='primary' type='submit' onClick={formik.handleSubmit}>
-						Lưu lại
-					</Button>
 					<Button size='lg' variant='secondary' onClick={onClose}>
 						Đóng
+					</Button>
+					<Button size='lg' variant='primary' type='submit' onClick={formik.handleSubmit}>
+						Lưu lại
 					</Button>
 				</Modal.Footer>
 			</Modal>
