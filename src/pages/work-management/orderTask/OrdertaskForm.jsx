@@ -86,34 +86,33 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	};
 	const handleSubmit = async () => {
 		const dataValue = {
-			id: item?.id ? item?.id : null,
 			kpiNorm_id: item.id,
-			mission_id: missionOption?.id,
-			quantity: parseInt(mission?.quantity, 10),
-			user_id: userOption?.id,
-			priority: parseInt(mission?.priority, 10),
-			note: mission?.note,
-			description: item?.description,
-			deadline: mission?.deadline,
-			startDate: mission?.startDate,
+			mission_id: missionOption.id || null,
+			quantity: parseInt(mission.quantity, 10) || null,
+			user_id: userOption.id || null,
+			priority: parseInt(mission.priority, 10) || null,
+			note: mission.note || null,
+			description: item.description || null,
+			deadline: mission.deadline || null,
+			startDate: mission.startDate || null,
 		};
 		addWorktrack(dataValue).then((res) => {
 			dataSubMission.forEach(async (item) => {
 				await addWorktrack({
-					mission_id: missionOption?.id,
-					priority: parseInt(mission?.priority, 10),
-					note: mission?.note,
-					description: item?.description,
-					deadline: mission?.deadlineDate,
-					startDate: mission?.startDate,
+					mission_id: missionOption.id || null,
+					priority: parseInt(mission.priority, 10) || null,
+					note: mission.note || null,
+					description: item.description || null,
+					deadline: mission.deadlineDate || null,
+					startDate: mission.startDate || null,
 					kpiNorm_id: item.id,
 					parent_id: res.data.data.id,
-					quantity: parseInt(mission?.quantity, 10),
-					user_id: userOption?.id,
+					quantity: parseInt(mission.quantity, 10) || null,
+					user_id: userOption.id || null,
 				});
 			});
+			fetch();
 		});
-		fetch();
 		onClose();
 		setMission({});
 		setMissionOption({});
