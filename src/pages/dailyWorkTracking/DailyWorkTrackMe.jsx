@@ -10,6 +10,8 @@ import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../componen
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import './style.css';
+// eslint-disable-next-line import/order
+import moment from 'moment';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
 import { getAllWorktrackByUserId } from './services';
@@ -33,7 +35,7 @@ const createDataTree = (dataset) => {
 
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
-	const [worktrack, setWorktrack] = useState([]);
+	const [worktrack, setWorktrack] = useState({});
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
@@ -43,30 +45,29 @@ const DailyWorkTrackingMe = () => {
 	useEffect(() => {
 		async function fetchData() {
 			getAllWorktrackByUserId(id).then((res) => {
-				setWorktrack(
-					res.data.data.map((item) => {
-						return {
-							...item,
-							label: item.name,
-							value: item.id,
-							text: item.name,
-							parentId: item.parent_id,
-						};
-					}),
-				);
+				setWorktrack(res.data.data);
 			});
 		}
 		fetchData();
 	}, [dispatch, id]);
-	const fixForm = () => {
-		return worktrack.map((item) => ({
-			...item,
-			deadline: _.isEmpty(item.deadline) ? '--' : item.deadline,
-		}));
-	};
+
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
-			const treeData = createDataTree(fixForm());
+			const treeData = createDataTree(
+				worktrack?.workTracks?.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+						parentId: item.parent_id,
+						department: {
+							name: _.get(worktrack, 'department.name', '--'),
+						},
+					};
+				}),
+			);
 			setTreeValue(treeData);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,7 +99,7 @@ const DailyWorkTrackingMe = () => {
 												rowSelected={(item) => {
 													handleOpenForm({
 														...item.data.data,
-														parent: worktrack.find(
+														parent: worktrack?.workTracks?.find(
 															(i) => i.id === item.data.data.parentId,
 														),
 													});
