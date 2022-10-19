@@ -119,12 +119,6 @@ const ListPickKpiNorm = ({ data, handleClose, show, setDataSubMission , initItem
 					/>
 					<TreeTable.Column
 						renderCell={(row) => (
-							<span className='expenses-cell text-left'>{row.data.tasktype}</span>
-						)}
-						renderHeaderCell={() => <span className='t-left'>Loại nhiệm vụ</span>}
-					/>
-					<TreeTable.Column
-						renderCell={(row) => (
 							<span className='expenses-cell text-right'>
 								{row.data.kpiValue || 'Không'}
 							</span>

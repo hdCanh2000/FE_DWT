@@ -287,7 +287,7 @@ const DepartmentPage = () => {
 									<div className='col-lg-4 col-md-6 pb-4'>
 										<Card className='h-100'>
 											<CardBody>
-												<div className='p-4' style={{ height: '100%' }}>
+												<div className='pt-4' style={{ height: '100%' }}>
 													<div className='d-flex align-items-center justify-content-start'>
 														<Button
 															color='info'
@@ -304,18 +304,17 @@ const DepartmentPage = () => {
 														</Button>
 													</div>
 													<div id='treeTable'>
-													<TreeTable
-														value={treeValue}
-														height={600}
-														onChange={handleOnChange}>
-														<TreeTable.Column
-															style={{ minWidth: 300 }}
-															renderCell={renderIndexCell}
-															renderHeaderCell={() => <span />}
-														/>
-													</TreeTable>
+														<TreeTable
+															value={treeValue}
+															height={600}
+															onChange={handleOnChange}>
+															<TreeTable.Column
+																style={{ minWidth: 300 }}
+																renderCell={renderIndexCell}
+																renderHeaderCell={() => <span />}
+															/>
+														</TreeTable>
 													</div>
-													
 												</div>
 											</CardBody>
 										</Card>

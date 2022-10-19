@@ -174,7 +174,9 @@ const OrderTask = () => {
 													<th style={{ width: '15%' }}>
 														Vị trí đảm nhiệm
 													</th>
-													<th className='text-right'>Giá trị KPI</th>
+													<th style={{ textAlign: 'center' }}>
+														Giá trị KPI
+													</th>
 												</tr>
 											</thead>
 										</table>

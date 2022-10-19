@@ -185,7 +185,7 @@ const EmployeePage = () => {
 			key: 'role',
 			type: 'singleSelect',
 			align: 'left',
-			isShow: true,
+			isShow: false,
 			format: (value) =>
 				// eslint-disable-next-line no-nested-ternary
 				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
@@ -325,7 +325,7 @@ const EmployeePage = () => {
 								<div
 									className='row mb-0'
 									style={{
-										maxWidth: '80%',
+										maxWidth: '95%',
 										minWidth: '60%',
 										margin: '0 auto',
 									}}>
