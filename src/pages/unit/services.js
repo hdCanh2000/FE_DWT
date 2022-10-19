@@ -1,9 +1,10 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllUnits = () => {
+const getAllUnits = (params) => {
 	return axiosClient({
 		method: 'GET',
 		url: '/api/units',
+		params,
 	});
 };
 
