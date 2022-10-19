@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import {
+	useParams,
+	useNavigate,
+	useLocation,
+	createSearchParams,
+	useSearchParams,
+} from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -25,16 +31,24 @@ const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const params = useParams();
+	const navigate = useNavigate();
+	const localtion = useLocation();
+	const [searchParams] = useSearchParams();
+
+	const text = searchParams.get('text') || '';
+	const page = searchParams.get('page') || '';
+
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
-	const [units, setUnits] = useState([]);
+	const [units, setUnits] = useState({});
 	const [deletes, setDeletes] = React.useState({});
 	const [openConfirm, set0penConfirm] = React.useState(false);
+	const [currentPage, setCurrentPage] = useState(page || 1);
 
-	async function getUnit() {
+	async function getUnit(query) {
 		try {
-			const response = await getAllUnits();
-			const data = await response.data?.data;
+			const response = await getAllUnits(query);
+			const data = await response.data;
 			setUnits(data);
 		} catch (error) {
 			setUnits([]);
@@ -42,8 +56,39 @@ const UnitPage = () => {
 	}
 
 	useEffect(() => {
-		getUnit();
-	}, []);
+		const query = {};
+		query.text = text;
+		query.page = text ? 1 : page;
+		getUnit(query);
+	}, [page, text]);
+
+	const handleSubmitSearch = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: 1,
+			}).toString(),
+		});
+		const query = {};
+		query.text = text;
+		query.page = 1;
+		getUnit(query);
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: searchValue.page,
+			}).toString(),
+		});
+		const query = {};
+		query.text = text;
+		query.page = page;
+		getUnit(query);
+	};
 
 	const handleOpenConfirm = (item) => {
 		setDeletes({
@@ -217,7 +262,15 @@ const UnitPage = () => {
 											<TableCommon
 												className='table table-modern mb-0'
 												columns={columns}
-												data={units}
+												data={units?.data}
+												onSubmitSearch={handleSubmitSearch}
+												onChangeCurrentPage={handleChangeCurrentPage}
+												currentPage={parseInt(currentPage, 10)}
+												totalItem={units?.pagination?.totalRows}
+												total={units?.pagination?.total}
+												setCurrentPage={setCurrentPage}
+												searchvalue={text}
+												isSearch
 											/>
 										</div>
 									</div>
