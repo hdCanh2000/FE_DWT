@@ -52,7 +52,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		note: '',
 	});
 	const [isOpen, setIsOpen] = React.useState(false);
-
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 		dispatch(fetchMissionList());
@@ -66,8 +65,16 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 
 	useEffect(() => {
 		setMission({ ...item });
-		setMissionOption({ ..._.get(item, 'parent') });
-		setUserOption({ label: item?.user?.name, value: item?.user?.id });
+		setMissionOption({
+			...item.mission,
+			label: _.get(item, 'mission.name'),
+			value: _.get(item, 'mission.name'),
+		});
+		setUserOption({
+			label: _.get(item.users, '.name'),
+			value: _.get(item.users, '.name'),
+			id: _.get(item.users, '.id'),
+		});
 	}, [item]);
 	// show toast
 	const handleChange = (e) => {
@@ -80,32 +87,32 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const handleSubmit = async () => {
 		const dataValue = {
 			kpiNorm_id: item.id,
-			parent_id: null,
-			mission_id: missionOption?.id,
-			quantity: parseInt(mission?.quantity, 10),
-			user_id: userOption?.id,
-			priority: parseInt(mission?.priority, 10),
-			note: mission?.note,
-			description: item?.description,
-			deadlineDate: mission?.deadlineDate,
-			startDate: mission?.startDate,
+			mission_id: missionOption.id || null,
+			quantity: parseInt(mission.quantity, 10) || null,
+			user_id: userOption.id || null,
+			priority: parseInt(mission.priority, 10) || null,
+			note: mission.note || null,
+			description: item.description || null,
+			deadline: mission.deadline || null,
+			startDate: mission.startDate || null,
 		};
 		addWorktrack(dataValue).then((res) => {
 			dataSubMission.forEach(async (item) => {
 				await addWorktrack({
-					priority: parseInt(mission?.priority, 10),
-					note: mission?.note,
-					description: item?.description,
-					deadline: mission?.deadlineDate,
-					startDate: mission?.startDate,
+					mission_id: missionOption.id || null,
+					priority: parseInt(mission.priority, 10) || null,
+					note: mission.note || null,
+					description: item.description || null,
+					deadline: mission.deadlineDate || null,
+					startDate: mission.startDate || null,
 					kpiNorm_id: item.id,
 					parent_id: res.data.data.id,
-					quantity: item.quantity,
-					user_id: userOption?.id,
+					quantity: parseInt(mission.quantity, 10) || null,
+					user_id: userOption.id || null,
 				});
 			});
+			fetch();
 		});
-		fetch();
 		onClose();
 		setMission({});
 		setMissionOption({});
@@ -114,14 +121,15 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const handleShowPickListKpiNorm = () => {
 		setIsOpen(!isOpen);
 	};
-
 	return (
 		<Modal show={show} onHide={onClose} centered size='lg'>
 			<div className='row px-3'>
 				<Card className='px-0 w-100 m-auto'>
 					<CardHeader className='py-2'>
 						<CardLabel>
-							<CardTitle className='fs-4 ml-0'>Giao nhiệm vụ</CardTitle>
+							<CardTitle className='fs-4 ml-0'>
+								{item?.id ? 'Chỉnh sửa nhiệm vụ ' : 'Giao nhiệm vụ'}
+							</CardTitle>
 						</CardLabel>
 						<CardActions>
 							<FormGroup>
@@ -152,13 +160,15 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 								<tbody>
 									<tr style={{ height: '30px' }}>
 										<td>
-											Tên nhiệm vụ: <b>{item?.name || item?.kpiNorm?.name}</b>
+											Tên nhiệm vụ:{' '}
+											<b>{mission?.name || mission?.kpiNorm?.name}</b>
 										</td>
 										<td>
-											Định mức KPI: <b>{item.kpiValue || 'Không'}</b>
+											Định mức KPI: <b>{mission.kpiValue || 'Không'}</b>
 										</td>
 										<td>
-											Loại nhiệm vụ: <b>{item.taskType || 'Thường xuyên'}</b>
+											Loại nhiệm vụ:{' '}
+											<b>{mission.taskType || 'Thường xuyên'}</b>
 										</td>
 									</tr>
 								</tbody>
@@ -219,13 +229,13 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 									</FormGroup>
 								</div>
 								<div className='col-4'>
-									<FormGroup id='deadlineDate' label='Hạn ngày hoàn thành'>
+									<FormGroup id='deadline' label='Hạn ngày hoàn thành'>
 										<Input
-											name='deadlineDate'
+											name='deadline'
 											placeholder='Hạn ngày hoàn thành'
 											onChange={handleChange}
 											value={
-												mission.deadlineDate
+												mission.deadline
 												// moment().add(1, 'days').format('YYYY-MM-DD')
 											}
 											type='date'

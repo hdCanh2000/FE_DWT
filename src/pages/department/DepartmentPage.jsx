@@ -21,14 +21,14 @@ import Button from '../../components/bootstrap/Button';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
-import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addDepartment, updateDepartment } from './services';
+import { addDepartment, deleteDepartment, updateDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
 import Employee from './Employee';
 import NotPermission from '../presentation/auth/NotPermission';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import Icon from '../../components/icon/Icon';
 import './style.scss';
+import DepartmentForm from './DepartmentForm';
 
 const DepartmentPage = () => {
 	const { addToast } = useToasts();
@@ -156,7 +156,15 @@ const DepartmentPage = () => {
 			},
 		);
 	};
-
+	const handleDelete = async (valueDelete) => {
+		try {
+			await deleteDepartment(valueDelete?.id);
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+		}
+		dispatch(fetchDepartmentList());
+	};
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
@@ -237,7 +245,7 @@ const DepartmentPage = () => {
 					''
 				)}
 
-				<span>{row.data.name || ''}</span>
+				<span>{row?.data?.name || ''}</span>
 			</div>
 		);
 	};
@@ -295,9 +303,10 @@ const DepartmentPage = () => {
 																: 'Thu gọn'}
 														</Button>
 													</div>
+													<div id='treeTable'>
 													<TreeTable
 														value={treeValue}
-														height={400}
+														height={600}
 														onChange={handleOnChange}>
 														<TreeTable.Column
 															style={{ minWidth: 300 }}
@@ -305,6 +314,8 @@ const DepartmentPage = () => {
 															renderHeaderCell={() => <span />}
 														/>
 													</TreeTable>
+													</div>
+													
 												</div>
 											</CardBody>
 										</Card>
@@ -323,7 +334,7 @@ const DepartmentPage = () => {
 					['admin'],
 					<NotPermission />,
 				)}
-				<CommonForm
+				<DepartmentForm
 					show={toggleForm}
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
@@ -331,6 +342,7 @@ const DepartmentPage = () => {
 					label={itemEdit?.id ? 'Cập nhật cơ cấu tổ chức' : 'Thêm mới cơ cấu tổ chức'}
 					fields={columns}
 					validate={validate}
+					onDelete={handleDelete}
 				/>
 			</Page>
 		</PageWrapper>

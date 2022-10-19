@@ -15,8 +15,6 @@ import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
 import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
-import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
-import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -27,7 +25,6 @@ const createDataTree = (dataset) => {
 	dataset.forEach((aData) => {
 		if (aData.parentId) {
 			hashTable[aData.parentId].children.push(hashTable[aData.id]);
-			// hashTable[aData.parentId]
 		} else {
 			dataTree.push(hashTable[aData.id]);
 		}
@@ -37,51 +34,41 @@ const createDataTree = (dataset) => {
 
 const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
-	const worktrack = useSelector((state) => state.worktrack.worktracks);
+	const worktrack = useSelector((state) => state.worktrack.worktrack);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
-	const department = useSelector((state) => state.department.departments);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const users = useSelector((state) => state.employee.employees);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const [treeValue, setTreeValue] = React.useState([]);
 	const params = useParams();
 	const { id } = params;
-	const showDepartment = () => {
-		return worktrack.map((item) => {
-			const newItem = department.filter((items) => items.id === item.kpiNorm.department_id);
-			return {
-				...item,
-				department: {
-					name: _.get(newItem, '0.name', '--'),
-				},
-				deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
-				missionValue: _.get(item, 'mission.name', '--'),
-			};
-		});
-	};
-	const showUser = () => {
-		const user = users.filter((e) => e.id === parseInt(params.id, 10));
-		return `${_.get(user, '0.name')} (${_.get(user, '0.position.name')})`;
-	};
-	useEffect(() => {
-		dispatch(fetchEmployeeList());
-	}, [dispatch]);
-	useEffect(() => {
-		dispatch(fetchDepartmentList());
-	}, [dispatch]);
+
 	useEffect(() => {
 		dispatch(fetchWorktrackList(id));
 	}, [dispatch, id]);
-	showDepartment();
+
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
-			const newWorktrack = showDepartment();
-			const treeData = createDataTree(newWorktrack);
+			const treeData = createDataTree(
+				worktrack.workTracks.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+						parentId: item.parent_id,
+						department: {
+							name: _.get(worktrack, 'department.name', '--'),
+						},
+					};
+				}),
+			);
 			setTreeValue(treeData);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [worktrack]);
+
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -95,7 +82,7 @@ const DailyWorkTracking = () => {
 									<CardLabel icon='TaskAlt' iconColor='primary'>
 										<CardTitle>
 											<CardLabel>
-												Danh sách nhiệm vụ của {showUser()}
+												Danh sách nhiệm vụ của {_.get(worktrack, 'name')}
 											</CardLabel>
 										</CardTitle>
 									</CardLabel>
@@ -110,7 +97,7 @@ const DailyWorkTracking = () => {
 												rowSelected={(item) => {
 													handleOpenForm({
 														...item.data.data,
-														parent: worktrack.find(
+														parent: worktrack?.workTracks?.find(
 															(i) => i.id === item.data.data.parentId,
 														),
 													});
@@ -121,16 +108,16 @@ const DailyWorkTracking = () => {
 													<ColumnDirective
 														field='data.kpiNorm.name'
 														headerText='Tên nhiệm vụ'
-														width='200'
+														width='250'
 													/>
 													<ColumnDirective
 														field='data.department.name'
-														headerText='Phòng ban phụ trách'
+														headerText='Phòng ban'
 														width='200'
 														textAlign='Center'
 													/>
 													<ColumnDirective
-														field='data.missionValue'
+														field='data.mission.name'
 														headerText='Thuộc mục tiêu'
 														width='150'
 														textAlign='Center'

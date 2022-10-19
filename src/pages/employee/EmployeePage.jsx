@@ -211,7 +211,7 @@ const EmployeePage = () => {
 			],
 		},
 		{
-			title: '',
+			title: 'Hành Động',
 			id: 'action',
 			key: 'action',
 			align: 'center',

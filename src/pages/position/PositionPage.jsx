@@ -26,6 +26,7 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
+
 	const dispatch = useDispatch();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -46,8 +47,8 @@ const PositionPage = () => {
 		}));
 		return { ...itemEdit, requirements: newItem };
 	};
-	const fetchRequirementDetail = () => {
-		const newItem = dataDetail?.requirements?.map((items) => ({
+	const fetchRequirementDetail = (data) => {
+		const newItem = data?.requirements?.map((items) => ({
 			...items,
 			label: items.name,
 			value: items.id,
@@ -70,7 +71,17 @@ const PositionPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+			col: 5,
+		},
+		{
+			title: 'Mã Vị Trí',
+			placeholder: 'mã vị trí',
+			id: 'code',
+			key: 'code',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+			col: 2,
 		},
 		{
 			title: 'Phòng Ban',
@@ -81,7 +92,7 @@ const PositionPage = () => {
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
 			options: departments,
-			col: 6,
+			col: 5,
 		},
 		{
 			title: 'Cấp Nhân Sự',
@@ -101,8 +112,8 @@ const PositionPage = () => {
 			type: 'singleSelect',
 			align: 'left',
 			isShow: false,
-			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
-			options: positionLevels,
+			render: (item) => <span>{item?.positions?.name || 'No data'}</span>,
+			options: positions,
 			col: 6,
 		},
 		{
@@ -130,7 +141,7 @@ const PositionPage = () => {
 			type: 'select',
 			align: 'left',
 			isShow: false,
-			render: fetchRequirement().requirements,
+			render: (item) => <span>{item?.requirement?.name || 'No data'}</span>,
 			options: requirements,
 			isMulti: true,
 		},
@@ -164,13 +175,14 @@ const PositionPage = () => {
 	];
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: parseInt(data?.id, 10),
-			name: data?.name,
+			id: parseInt(data.id, 10),
+			name: data.name,
+			code: data?.code,
 			address: data?.address,
 			description: data?.description,
-			department_id: parseInt(data.department_id, 10),
-			position_levels_id: parseInt(data.position_levels_id, 10),
-			manager: parseInt(data.manager, 10),
+			department_id: parseInt(data?.department_id, 10),
+			position_levels_id: parseInt(data?.position_levels_id, 10),
+			manager: parseInt(data?.manager, 10),
 			// kpiNormId: data?.kpiName,
 			requirement_id: data?.requirements?.map((item) => item.id),
 		};
@@ -242,7 +254,7 @@ const PositionPage = () => {
 							show={toggleForm}
 							onClose={handleCloseForm}
 							handleSubmit={handleSubmitForm}
-							item={fetchRequirement()}
+							item={fetchRequirement(itemEdit)}
 							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 							fields={columns}
 							// nv={nvs}
@@ -251,7 +263,7 @@ const PositionPage = () => {
 						<PositionDetail
 							show={openDetail}
 							onClose={handleCloseDetail}
-							item={fetchRequirementDetail()}
+							item={fetchRequirementDetail(dataDetail)}
 							label={`Chi tiết vị trí: ${dataDetail?.name}`}
 							fields={columns}
 							// nv
