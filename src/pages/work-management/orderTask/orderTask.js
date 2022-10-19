@@ -26,16 +26,19 @@ import Button from '../../../components/bootstrap/Button';
 
 const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadlineDate, users } = data;
+
 	const userResponsible = _.get(
 		_.filter(users, (user) => {
 			return _.get(user, 'workTrackUsers.isResponsible') === true;
 		})[0],
 		'name',
 	);
+
 	const handlDeleteItem = async (ele) => {
 		await deleteWorkTrack(ele.id);
 		fetch();
 	};
+
 	return (
 		<Card>
 			<CardHeader>
@@ -87,32 +90,39 @@ const OrderTask = () => {
 		currentPage,
 		perPage,
 	);
+
 	const fetch = async () => {
 		const response = await getAllWorktrackByUser();
 		const result = await response.data.data;
-		setTasks(result.filter((item) => item.user_id !== null));
+		setTasks(
+			result?.role === 'manager'
+				? result.workTracks.filter((item) => item.user_id !== null)
+				: result.filter((item) => item.user_id !== null),
+		);
 	};
+
 	useEffect(() => {
 		fetch();
 	}, []);
+
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
+
 	const handleOpenForm = (item) => {
 		setItemEdit({ ...item });
 		setIsOpenForm(true);
 	};
+
 	const handleCloseForm = () => {
 		setIsOpenForm(false);
 	};
 
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
-		if (newKpiNorm.length !== 0) {
-			return newKpiNorm[0].label;
-		}
-		return 'null';
+		return newKpiNorm.length !== 0 ? newKpiNorm[0].label : null;
 	};
+
 	return (
 		<PageWrapper title='Giao việc'>
 			<Page container='fluid'>
@@ -192,10 +202,8 @@ const OrderTask = () => {
 															<td style={{ width: '15%' }}>
 																{_.get(item, 'position.name')}
 															</td>
-															<td style={{ textAlign: 'center' }}>
-																{item.kpi_value
-																	? item.kpi_value
-																	: 'null'}
+															<td className='text-right'>
+																{_.get(item, 'kpi_value', '--')}
 															</td>
 														</tr>
 													</React.Fragment>

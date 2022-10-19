@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
 import _, { isEmpty } from 'lodash';
 import {
 	TreeGridComponent,
@@ -44,7 +45,9 @@ const DailyWorkTracking = () => {
 	const fixForm = () => {
 		return worktrack.map((item) => ({
 			...item,
+			user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
 			missionValue: _.isEmpty(item.mission) ? '--' : item.mission.name,
+			deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
 		}));
 	};
 	useEffect(() => {
@@ -101,7 +104,7 @@ const DailyWorkTracking = () => {
 													<ColumnDirective
 														field='data.user.department.name'
 														headerText='Phòng ban phụ trách'
-														width='200'
+														width='150'
 													/>
 													<ColumnDirective
 														field='data.user.name'
@@ -112,15 +115,15 @@ const DailyWorkTracking = () => {
 														field='data.missionValue'
 														headerText='Thuộc mục tiêu'
 														width='150'
-														textAlign='Center'
+														textAlign='Left'
 													/>
-													{/* <ColumnDirective
+													<ColumnDirective
 														field='data.deadline'
 														headerText='Hạn hoàn thành'
 														format='yMd'
 														width='90'
 														textAlign='Center'
-													/> */}
+													/>
 													<ColumnDirective
 														field='data.quantity'
 														headerText='Số lượng'

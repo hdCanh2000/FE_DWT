@@ -18,28 +18,30 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async () => {
 	const response = await getAllWorktrack();
-	return response.data.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			parentId: item.parent_id,
-		};
-	});
+	return response.data.data?.role === 'manager'
+		? response.data.data.workTracks.map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					parentId: item.parent_id,
+				};
+		  })
+		: response.data.data.map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					parentId: item.parent_id,
+				};
+		  });
 });
 
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
-	return response.data.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			parentId: item.parent_id,
-		};
-	});
+	return response.data.data;
 });
 
 export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async () => {
@@ -93,7 +95,7 @@ export const worktrackSlice = createSlice({
 		},
 		[fetchWorktrackList.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktracks = [...action.payload];
+			state.worktrack = { ...action.payload };
 		},
 		[fetchWorktrackList.rejected]: (state, action) => {
 			state.loading = false;
