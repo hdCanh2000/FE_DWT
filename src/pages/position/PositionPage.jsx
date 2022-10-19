@@ -123,7 +123,7 @@ const PositionPage = () => {
 			key: 'address',
 			type: 'text',
 			align: 'left',
-			isShow: true,
+			isShow: false,
 		},
 		{
 			title: 'Mô tả vị trí',
@@ -219,7 +219,7 @@ const PositionPage = () => {
 					<>
 						<div
 							className='row mb-0'
-							style={{ maxWidth: '95%', minWidth: '60%', margin: '0 auto' }}>
+							style={{ maxWidth: '100%', minWidth: '60%', margin: '0 auto' }}>
 							<div className='col-12'>
 								<Card className='w-100'>
 									<div style={{ margin: '24px 24px 0' }}>
