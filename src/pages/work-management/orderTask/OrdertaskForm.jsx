@@ -160,24 +160,22 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					</CardHeader>
 					<div className='col-12 p-4'>
 						<div className='row'>
-							<table
-								style={{
-									width: '100%',
-									marginLeft: '20px',
-									marginBottom: '20px',
-								}}>
+							<table className='w-100 mb-4 border'>
+								<thead>
+									<th className='p-3 border text-left'>Tên nhiệm vụ</th>
+									<th className='p-3 border text-center'>Định mức KPI</th>
+								</thead>
 								<tbody>
-									<tr style={{ height: '30px' }}>
-										<td>
-											Tên nhiệm vụ:{' '}
-											<b>{mission?.name || mission?.kpiNorm?.name}</b>
+									<tr>
+										<td className='p-3 border text-left'>
+											<b>
+												{_.get(mission, 'name')
+													? _.get(mission, 'name')
+													: _.get(mission, 'kpiNorm.name')}
+											</b>
 										</td>
-										<td>
-											Định mức KPI: <b>{mission.kpi_value || 'null'}</b>
-										</td>
-										<td>
-											Loại nhiệm vụ:{' '}
-											<b>{mission.taskType || 'Thường xuyên'}</b>
+										<td className='p-3 border text-center'>
+											<b>{_.get(item, 'kpi_value', '--')}</b>
 										</td>
 									</tr>
 								</tbody>
