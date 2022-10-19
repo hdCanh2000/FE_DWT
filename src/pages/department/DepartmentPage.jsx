@@ -284,10 +284,10 @@ const DepartmentPage = () => {
 									</CardActions>
 								</CardHeader>
 								<div className='row h-100 w-100'>
-									<div className='col-lg-5 col-md-6 pb-4'>
+									<div className='col-lg-4 col-md-6 pb-4'>
 										<Card className='h-100'>
 											<CardBody>
-												<div className='p-4' style={{ height: '100%' }}>
+												<div className='pt-4' style={{ height: '100%' }}>
 													<div className='d-flex align-items-center justify-content-start'>
 														<Button
 															color='info'
@@ -319,7 +319,7 @@ const DepartmentPage = () => {
 											</CardBody>
 										</Card>
 									</div>
-									<div className='col-lg-7 col-md-6'>
+									<div className='col-lg-8 col-md-6'>
 										<Card>
 											<CardBody>
 												<Employee dataDepartment={dataDepartment} />
