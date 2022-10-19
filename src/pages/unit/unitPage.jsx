@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-	useParams,
-	useNavigate,
-	useLocation,
-	createSearchParams,
-	useSearchParams,
-} from 'react-router-dom';
+import { useNavigate, useLocation, createSearchParams, useSearchParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -30,7 +24,6 @@ import NotPermission from '../presentation/auth/NotPermission';
 const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
-	const params = useParams();
 	const navigate = useNavigate();
 	const localtion = useLocation();
 	const [searchParams] = useSearchParams();
@@ -103,19 +96,17 @@ const UnitPage = () => {
 		set0penConfirm(false);
 	};
 
-	async function fetchUnits() {
-		const res = await getAllUnits();
-		setUnits(res.data.data);
-	}
-
 	const handleDelete = async (valueDelete) => {
 		try {
 			await deleteUnit(valueDelete?.id);
 			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			getUnit(query);
 		} catch (error) {
 			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
 		}
-		fetchUnits(params?.id);
 	};
 
 	const columns = [
@@ -180,7 +171,7 @@ const UnitPage = () => {
 				{content}
 			</Toasts>,
 			{
-				autoDismiss: true,
+				autoDismiss: false,
 			},
 		);
 	};
@@ -191,41 +182,36 @@ const UnitPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: data?.id,
 			name: data.name,
 			code: data.code,
 			status: Number(data.status),
 		};
 		if (data.id) {
 			try {
-				const response = await updateUnit(dataSubmit);
-				const result = await response.data;
-				const newUnits = [...units];
-				setUnits(newUnits.map((item) => (item.id === data.id ? { ...result } : item)));
+				const response = await updateUnit({ id: data?.id, ...dataSubmit });
+				await response.data;
 				handleClearValueForm();
 				hanleCloseForm();
-				getUnit();
-				handleShowToast(
-					`Cập nhật đơn vị!`,
-					`Đơn vị ${result.data.name} được cập nhật thành công!`,
-				);
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				getUnit(query);
+				handleShowToast(`Cập nhật đơn vị!`, `Cập nhật đơn vị thành công!`);
 			} catch (error) {
-				setUnits(units);
 				handleShowToast(`Cập nhật đơn vị`, `Cập nhật đơn vị không thành công!`);
 			}
 		} else {
 			try {
 				const response = await addUnit(dataSubmit);
-				const result = await response.data;
-				const newUnits = [...units];
-				newUnits.push(result);
-				setUnits(newUnits);
+				await response.data;
 				handleClearValueForm();
 				hanleCloseForm();
-				getUnit();
-				handleShowToast(`Thêm đơn vị`, `Đơn vị ${result.data.name} được thêm thành công!`);
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				getUnit(query);
+				handleShowToast(`Thêm đơn vị`, `Thêm đơn vị thành công!`);
 			} catch (error) {
-				setUnits(units);
 				handleShowToast(`Thêm đơn vị`, `Thêm đơn vị không thành công!`);
 			}
 		}
