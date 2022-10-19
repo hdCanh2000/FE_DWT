@@ -70,11 +70,16 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			label: _.get(item, 'mission.name'),
 			value: _.get(item, 'mission.name'),
 		});
-		setUserOption({
-			label: _.get(item.users, '.name'),
-			value: _.get(item.users, '.name'),
-			id: _.get(item.users, '.id'),
-		});
+		if (!_.isEmpty(item?.users)) {
+			const userResponsible = item?.users.filter(
+				(items) => items?.workTrackUsers?.isResponsible === true,
+			);
+			setUserOption({
+				label: _.get(userResponsible, '[0].name'),
+				value: _.get(userResponsible, '[0].name'),
+				id: _.get(userResponsible, '[0].id'),
+			});
+		}
 	}, [item]);
 	// show toast
 	const handleChange = (e) => {
@@ -83,6 +88,12 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			...mission,
 			[name]: value,
 		});
+	};
+	const handleClose = () => {
+		onClose();
+		setMission({});
+		setMissionOption({});
+		setUserOption({});
 	};
 	const handleSubmit = async () => {
 		const dataValue = {
@@ -113,22 +124,20 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			});
 			fetch();
 		});
-		onClose();
-		setMission({});
-		setMissionOption({});
-		setUserOption({});
+		fetch();
+		handleClose();
 	};
 	const handleShowPickListKpiNorm = () => {
 		setIsOpen(!isOpen);
 	};
 	return (
-		<Modal show={show} onHide={onClose} centered size='lg'>
+		<Modal show={show} onHide={handleClose} centered size='lg'>
 			<div className='row px-3'>
 				<Card className='px-0 w-100 m-auto'>
 					<CardHeader className='py-2'>
 						<CardLabel>
 							<CardTitle className='fs-4 ml-0'>
-								{item?.id ? 'Chỉnh sửa nhiệm vụ ' : 'Giao nhiệm vụ'}
+								{item?.kpiNorm ? 'Chỉnh sửa nhiệm vụ ' : 'Giao nhiệm vụ'}
 							</CardTitle>
 						</CardLabel>
 						<CardActions>
@@ -164,7 +173,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											<b>{mission?.name || mission?.kpiNorm?.name}</b>
 										</td>
 										<td>
-											Định mức KPI: <b>{mission.kpiValue || 'Không'}</b>
+											Định mức KPI: <b>{mission.kpi_value || 'null'}</b>
 										</td>
 										<td>
 											Loại nhiệm vụ:{' '}
@@ -286,7 +295,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 								color='danger'
 								className='w-15 p-3 m-1'
 								type='button'
-								onClick={onClose}>
+								onClick={handleClose}>
 								Đóng
 							</Button>
 							<Button

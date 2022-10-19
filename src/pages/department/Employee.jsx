@@ -9,7 +9,7 @@ const EmployeePage = ({ dataDepartment }) => {
 	const dispatch = useDispatch();
 
 	const users = useSelector((state) => state.employee.employees);
-	const departments = useSelector((state) => state.department.departments);
+	// const departments = useSelector((state) => state.department.departments);
 	const positions = useSelector((state) => state.position.positions);
 
 	useEffect(() => {
@@ -34,14 +34,6 @@ const EmployeePage = ({ dataDepartment }) => {
 			isShow: true,
 		},
 		{
-			title: 'Email',
-			id: 'email',
-			key: 'email',
-			type: 'text',
-			align: 'left',
-			isShow: true,
-		},
-		{
 			title: 'SĐT',
 			id: 'phone',
 			key: 'phone',
@@ -49,17 +41,17 @@ const EmployeePage = ({ dataDepartment }) => {
 			align: 'center',
 			isShow: false,
 		},
-		{
-			title: 'Phòng ban',
-			id: 'department',
-			key: 'department',
-			type: 'select',
-			align: 'left',
-			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''} </span>,
-			options: departments,
-			isMulti: false,
-		},
+		// {
+		// 	title: 'Phòng ban',
+		// 	id: 'department',
+		// 	key: 'department',
+		// 	type: 'select',
+		// 	align: 'left',
+		// 	isShow: true,
+		// 	render: (item) => <span>{item?.department?.name || ''} </span>,
+		// 	options: departments,
+		// 	isMulti: false,
+		// },
 		{
 			title: 'Vị trí làm việc',
 			id: 'position',
@@ -67,7 +59,9 @@ const EmployeePage = ({ dataDepartment }) => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.position?.name || ''}</span>,
+			render: (item) => (
+				<span>{`${item?.position?.name} (${item?.department?.name})` || ''}</span>
+			),
 			options: positions,
 			isMulti: false,
 		},
