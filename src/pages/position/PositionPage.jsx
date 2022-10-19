@@ -64,7 +64,7 @@ const PositionPage = () => {
 
 	const columns = [
 		{
-			title: 'Tên Vị Trí',
+			title: 'Tên vị trí',
 			placeholder: 'tên vị trí',
 			id: 'name',
 			key: 'name',
@@ -74,7 +74,7 @@ const PositionPage = () => {
 			col: 5,
 		},
 		{
-			title: 'Mã Vị Trí',
+			title: 'Mã vị trí',
 			placeholder: 'mã vị trí',
 			id: 'code',
 			key: 'code',
@@ -84,7 +84,7 @@ const PositionPage = () => {
 			col: 2,
 		},
 		{
-			title: 'Phòng Ban',
+			title: 'Phòng ban',
 			id: 'department_id',
 			key: 'department_id',
 			type: 'singleSelect',
@@ -95,7 +95,7 @@ const PositionPage = () => {
 			col: 5,
 		},
 		{
-			title: 'Cấp Nhân Sự',
+			title: 'Cấp nhân sự',
 			id: 'position_levels_id',
 			key: 'position_levels_id',
 			type: 'singleSelect',
@@ -126,13 +126,13 @@ const PositionPage = () => {
 			isShow: true,
 		},
 		{
-			title: 'Mô Tả Vị Trí',
+			title: 'Mô tả vị trí',
 			placeholder: 'mô tả vị trí',
 			id: 'description',
 			key: 'description',
 			type: 'textarea',
 			align: 'left',
-			isShow: true,
+			isShow: false,
 		},
 		{
 			title: 'Yêu cầu năng lực',
@@ -146,7 +146,7 @@ const PositionPage = () => {
 			isMulti: true,
 		},
 		{
-			title: 'Hành Động',
+			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			align: 'center',
@@ -219,7 +219,7 @@ const PositionPage = () => {
 					<>
 						<div
 							className='row mb-0'
-							style={{ maxWidth: '80%', minWidth: '60%', margin: '0 auto' }}>
+							style={{ maxWidth: '95%', minWidth: '60%', margin: '0 auto' }}>
 							<div className='col-12'>
 								<Card className='w-100'>
 									<div style={{ margin: '24px 24px 0' }}>

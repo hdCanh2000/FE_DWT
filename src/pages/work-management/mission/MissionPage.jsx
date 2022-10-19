@@ -80,9 +80,10 @@ const MissionPage = () => {
 			render: (item) =>
 				item.departments.filter((i) => i.missionDepartments?.isResponsible)[0]?.name ||
 				'--',
+
 		},
 		{
-			title: 'Thời gian bắt đầu',
+			title: 'Ngày bắt đầu',
 			id: 'startTime',
 			key: 'startTime',
 			type: 'text',
@@ -90,7 +91,7 @@ const MissionPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Thời gian kết thúc',
+			title: 'Ngày kết thúc',
 			id: 'endTime',
 			key: 'endTime',
 			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : '--'),
@@ -111,7 +112,7 @@ const MissionPage = () => {
 			align: 'center',
 		},
 		{
-			title: '',
+			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			render: (item) =>
@@ -138,7 +139,7 @@ const MissionPage = () => {
 				),
 		},
 	];
-
+console.log(missions);
 	return (
 		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
@@ -147,7 +148,7 @@ const MissionPage = () => {
 						<>
 							<div
 								className='row'
-								style={{ maxWidth: '75%', minWidth: '60%', margin: '0 auto' }}>
+								style={{ maxWidth: '95%', minWidth: '60%', margin: '0 auto' }}>
 								<div className='col-12'>
 									<Card>
 										<div style={{ margin: '24px 24px 0' }}>
