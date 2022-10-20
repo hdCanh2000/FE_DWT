@@ -43,3 +43,9 @@ export const formatDateFromMiliseconds = (data) => {
 	result += `${date}/${month}/${year}, ${hours}:${minutes}`;
 	return result;
 };
+export const handleLogout = () => {
+	localStorage.removeItem('token');
+	localStorage.removeItem('email');
+	localStorage.removeItem('name');
+	localStorage.removeItem('roles');
+};
