@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header, { HeaderLeft } from '../../../layout/Header/Header';
 // import CommonHeaderChat from './CommonHeaderChat';
 // import Search from '../../../components/Search';
@@ -7,9 +8,12 @@ import USERS from '../../../common/data/userDummyData';
 import Avatar from '../../../components/Avatar';
 
 const DashboardHeader = () => {
+	const navigate = useNavigate();
 	const userName = window.localStorage.getItem('name');
 	const email = window.localStorage.getItem('email');
-
+	const handleClick = () => {
+		navigate('/thong-tin-ca-nhan');
+	};
 	return (
 		<Header>
 			<HeaderLeft>
@@ -19,6 +23,7 @@ const DashboardHeader = () => {
 			<CommonHeaderRight
 				afterChildren={
 					<div
+						onClick={() => handleClick()}
 						className='col d-flex align-items-center cursor-pointer'
 						role='presentation'>
 						<div className='me-3'>

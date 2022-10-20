@@ -1,5 +1,5 @@
 import React, { lazy } from 'react';
-import { dashboardMenu, demoPages } from '../menu';
+import { dashboardMenu, demoPages, profile } from '../menu';
 
 const LANDING = {
 	DASHBOARD: lazy(() => import('../pages/dashboard/DashboardPage')),
@@ -56,7 +56,9 @@ const AUTH = {
 	PAGE_404: lazy(() => import('../pages/presentation/auth/Page404')),
 	LOGIN: lazy(() => import('../pages/presentation/auth/Login')),
 };
-
+const PROFILE = {
+	PROFILE: lazy(() => import('../layout/Header/Information')),
+};
 const UNIT = {
 	UNIT: lazy(() => import('../pages/unit/unitPage')),
 };
@@ -169,6 +171,10 @@ const presentation = [
 	{
 		path: demoPages.taskAndAssign.subMenu.pendingAccepted.path,
 		element: <DAILYWORKTRACKING.PEDINGWORKTRACKPAGE />,
+	},
+	{
+		path: profile.profile.path,
+		element: <PROFILE.PROFILE />,
 	},
 	{
 		path: '*',
