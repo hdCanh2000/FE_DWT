@@ -40,6 +40,14 @@ export const dashboardMenu = {
 	},
 };
 
+export const profile={
+	profile: {
+		id: 'profile',
+		text: 'Profile',
+		path: '/thong-tin-ca-nhan',
+		subMenu: null,
+	},
+}
 export const demoPages = {
 	dashboard: {
 		id: 'dashboard',
