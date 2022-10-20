@@ -80,7 +80,6 @@ const MissionPage = () => {
 			render: (item) =>
 				item.departments.filter((i) => i.missionDepartments?.isResponsible)[0]?.name ||
 				'--',
-
 		},
 		{
 			title: 'Ngày bắt đầu',
@@ -139,7 +138,7 @@ const MissionPage = () => {
 				),
 		},
 	];
-console.log(missions);
+
 	return (
 		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>

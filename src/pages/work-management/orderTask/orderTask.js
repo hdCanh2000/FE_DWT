@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Card, {
 	CardActions,
+	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -25,7 +26,7 @@ import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Button from '../../../components/bootstrap/Button';
 
 const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
-	const { quantity, deadlineDate, users } = data;
+	const { quantity, deadline, users } = data;
 
 	const userResponsible = _.get(
 		_.filter(users, (user) => {
@@ -41,35 +42,28 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 
 	return (
 		<Card>
-			<CardHeader>
+			<CardHeader className='pb-1 cursor-pointer'>
 				<CardLabel style={{ cursor: 'pointer' }} onClick={() => onOpen(data)}>
 					<CardTitle>
 						<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
 					</CardTitle>
 				</CardLabel>
-				<CardActions
-					style={{ border: '1px solid', borderRadius: '6px' }}
-					onClick={() => handlDeleteItem(data)}>
+				<CardActions onClick={() => handlDeleteItem(data)}>
 					<FormGroup>
 						<OverlayTrigger
 							overlay={<Tooltip id='addSubMission'>Xóa nhiệm vụ đã giao</Tooltip>}>
-							<Button
-								type='button'
-								className='d-block w-10'
-								icon='Close'
-								// onClick={handleShowPickListKpiNorm}
-							/>
+							<Button type='button' size='lg' className='d-block w-10' icon='Close' />
 						</OverlayTrigger>
 					</FormGroup>
 				</CardActions>
 			</CardHeader>
-			<div className='row px-4 pb-2'>
+			<CardBody className='row px-4 pb-4 pt-1 cursor-pointer' onClick={() => onOpen(data)}>
 				<div className='col-12'>Người phụ trách: {userResponsible}</div>
 				<div className='col-12'>
-					Thời hạn hoàn thành: {moment(deadlineDate).format('DD-MM-YYYY')}
+					Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
 				</div>
 				<div className='col-12'>Số lượng : {quantity}</div>
-			</div>
+			</CardBody>
 		</Card>
 	);
 };
@@ -202,7 +196,7 @@ const OrderTask = () => {
 															<td style={{ width: '15%' }}>
 																{_.get(item, 'position.name')}
 															</td>
-															<td className='text-right'>
+															<td className='text-center'>
 																{_.get(item, 'kpi_value', '--')}
 															</td>
 														</tr>
