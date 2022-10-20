@@ -95,6 +95,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		setMissionOption({});
 		setUserOption({});
 	};
+	const role = localStorage.getItem('roles');
 	const handleSubmit = async () => {
 		const dataValue = {
 			kpiNorm_id: item.id,
@@ -106,6 +107,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			description: item.description || null,
 			deadline: mission.deadline || null,
 			startDate: mission.startDate || null,
+			status: role.includes('user') ? 'pending' : 'accepted',
 		};
 		addWorktrack(dataValue).then((res) => {
 			dataSubMission.forEach(async (item) => {
@@ -120,6 +122,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					parent_id: res.data.data.id,
 					quantity: parseInt(mission.quantity, 10) || null,
 					user_id: userOption.id || null,
+					status: role.includes('user') ? 'pending' : 'accepted',
 				});
 			});
 			fetch();

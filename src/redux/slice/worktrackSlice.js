@@ -1,15 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import moment from 'moment';
 import {
 	addWorktrack,
 	getAllWorktrack,
 	getAllWorktrackByUser,
 	getAllWorktrackByUserId,
-	// getAllWorktrackByUser,
 	updateWorktrack,
 } from '../../pages/dailyWorkTracking/services';
+import { getAllWorktrackByStatus } from '../../pages/pendingWorktrack/services';
+import { LIST_STATUS_PENDING } from '../../utils/constants';
 
 const initialState = {
 	worktracks: [],
+	worktracksByStatus: [],
 	worktrack: {},
 	loading: false,
 	error: false,
@@ -38,6 +41,49 @@ export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', 
 				};
 		  });
 });
+
+// Đầu tiên, tạo thunk
+export const fetchWorktrackListByStatus = createAsyncThunk(
+	'worktrack/fetchListByStatus',
+	async (status) => {
+		const response = await getAllWorktrackByStatus(status);
+		return response.data.data?.role === 'manager'
+			? response.data.data.workTracks.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						parentId: item.parent_id,
+						deadlineText: item.deadline
+							? moment(item.deadline).format('DD-MM-YYYY')
+							: '--',
+						statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status)
+							.label,
+						userResponsible: item.users.find(
+							(u) => u?.workTrackUsers?.isResponsible === true,
+						)?.name,
+					};
+			  })
+			: response.data.data.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						parentId: item.parent_id,
+						deadlineText: item.deadline
+							? moment(item.deadline).format('DD-MM-YYYY')
+							: '--',
+						statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status)
+							.label,
+						userResponsible: item.users.find(
+							(u) => u?.workTrackUsers?.isResponsible === true,
+						)?.name,
+					};
+			  });
+	},
+);
 
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
@@ -86,6 +132,18 @@ export const worktrackSlice = createSlice({
 			state.worktracks = [...action.payload];
 		},
 		[fetchWorktrackListAll.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list all by status
+		[fetchWorktrackListByStatus.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchWorktrackListByStatus.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.worktracksByStatus = [...action.payload];
+		},
+		[fetchWorktrackListByStatus.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},

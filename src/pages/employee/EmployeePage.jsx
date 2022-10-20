@@ -282,7 +282,6 @@ const EmployeePage = () => {
 			department_id: data?.department?.value,
 			code: data?.code,
 			email: data?.email,
-			password: '123456',
 			dateOfBirth: data?.dateOfBirth,
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
@@ -290,7 +289,7 @@ const EmployeePage = () => {
 			position_id: data?.position?.value,
 			role: data?.role,
 		};
-		if (data?.id) {
+		if (data.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				await response.data;
@@ -303,7 +302,7 @@ const EmployeePage = () => {
 			}
 		} else {
 			try {
-				const response = await addEmployee(dataSubmit);
+				const response = await addEmployee({ ...dataSubmit, password: '123456' });
 				await response.data;
 				dispatch(fetchEmployeeList());
 				handleCloseForm();

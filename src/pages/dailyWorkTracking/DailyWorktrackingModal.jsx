@@ -120,7 +120,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			show={show}
 			onHide={handleClose}
 			aria-labelledby='contained-modal-title-vcenter'
-			size='xl'
+			size='lg'
 			keyboard={false}
 			centered>
 			<Modal.Header closeButton className='text-center pb-0'>
@@ -149,6 +149,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 														(i) => i?.date === item?.date,
 													)?.status,
 												),
+												borderRadius: 0,
 											}}
 											onClick={() =>
 												handleShowForm(
@@ -158,7 +159,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 													item,
 												)
 											}
-											className='text-center mb-2 rounded-0 cursor-pointer'>
+											className='text-center mb-2 rounded-none cursor-pointer'>
 											<span className='d-block'>Ngày</span>
 											{item?.day}
 										</th>

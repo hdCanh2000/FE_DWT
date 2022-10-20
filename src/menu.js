@@ -71,6 +71,11 @@ export const demoPages = {
 				text: 'Khai báo nhiệm vụ',
 				path: '/khai-bao-nhiem-vu',
 			},
+			pendingAccepted: {
+				id: 'pendingAccepted',
+				text: 'Công việc chờ duyệt',
+				path: '/cong-viec-cho-duyet',
+			},
 			assign: {
 				id: 'assign',
 				text: 'Giao việc',

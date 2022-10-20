@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
 import {
 	TreeGridComponent,
 	ColumnsDirective,
@@ -9,12 +10,11 @@ import _, { isEmpty } from 'lodash';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import './style.css';
-// eslint-disable-next-line import/order
-import moment from 'moment';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
-import { getAllWorktrackByUserId } from './services';
+import { getAllWorktrackMe } from './services';
+import './style.css';
+import { LIST_STATUS } from '../../utils/constants';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -25,7 +25,6 @@ const createDataTree = (dataset) => {
 	dataset.forEach((aData) => {
 		if (!_.isEmpty(aData.parentId)) {
 			hashTable[aData.parentId].children.push(hashTable[aData.id]);
-			// hashTable[aData.parentId]
 		} else {
 			dataTree.push(hashTable[aData.id]);
 		}
@@ -44,7 +43,7 @@ const DailyWorkTrackingMe = () => {
 	const id = localStorage.getItem('userId');
 	useEffect(() => {
 		async function fetchData() {
-			getAllWorktrackByUserId(id).then((res) => {
+			getAllWorktrackMe().then((res) => {
 				setWorktrack(res.data.data);
 			});
 		}
@@ -61,6 +60,7 @@ const DailyWorkTrackingMe = () => {
 						value: item.id,
 						text: item.name,
 						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 						parentId: item.parent_id,
 						department: {
 							name: _.get(worktrack, 'department.name', '--'),
@@ -123,6 +123,12 @@ const DailyWorkTrackingMe = () => {
 														headerText='Hạn hoàn thành'
 														format='yMd'
 														width='90'
+														textAlign='Center'
+													/>
+													<ColumnDirective
+														field='data.statusName'
+														headerText='Trạng thái'
+														width='100'
 														textAlign='Center'
 													/>
 													<ColumnDirective
