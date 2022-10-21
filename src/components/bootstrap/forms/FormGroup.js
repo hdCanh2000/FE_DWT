@@ -76,7 +76,7 @@ FormGroup.propTypes = {
 	isFloating: PropTypes.bool,
 	id: PropTypes.string,
 	label: PropTypes.string,
-	size: PropTypes.oneOf([null, 'lg', 'sm']),
+	size: PropTypes.oneOf([null, 'lg', 'sm', 'xl']),
 	isHiddenLabel: PropTypes.bool,
 	isColForLabel: PropTypes.bool,
 	// eslint-disable-next-line react/require-default-props
