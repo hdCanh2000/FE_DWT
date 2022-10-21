@@ -8,7 +8,6 @@ import SelectComponent from 'react-select';
 import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
-import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
 import Select from '../../../components/bootstrap/forms/Select';
 import { PRIORITIES } from '../../../utils/constants';
 import Option from '../../../components/bootstrap/Option';
@@ -23,9 +22,9 @@ import Card, {
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
-import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import ListPickKpiNorm from './ListPickKpiNorm';
 import { addWorktrack } from '../../dailyWorkTracking/services';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 
 const customStyles = {
 	control: (provided) => ({
@@ -53,10 +52,8 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	});
 	const [isOpen, setIsOpen] = React.useState(false);
 	useEffect(() => {
-		dispatch(fetchDepartmentList());
 		dispatch(fetchMissionList());
 		dispatch(fetchEmployeeList());
-		dispatch(fetchUnitList());
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -96,12 +93,13 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		setUserOption({});
 	};
 	const role = localStorage.getItem('roles');
+	const userId = localStorage.getItem('userId');
 	const handleSubmit = async () => {
 		const dataValue = {
 			kpiNorm_id: item.id,
 			mission_id: missionOption.id || null,
 			quantity: parseInt(mission.quantity, 10) || null,
-			user_id: userOption.id || null,
+			user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
 			priority: parseInt(mission.priority, 10) || null,
 			note: mission.note || null,
 			description: item.description || null,
@@ -121,7 +119,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					kpiNorm_id: item.id,
 					parent_id: res.data.data.id,
 					quantity: parseInt(mission.quantity, 10) || null,
-					user_id: userOption.id || null,
+					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
 					status: role.includes('user') ? 'pending' : 'accepted',
 				});
 			});
@@ -196,18 +194,22 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										/>
 									</FormGroup>
 								</div>
-								<div className='col-4'>
-									<FormGroup id='userOption' label='Nguời phụ trách'>
-										<SelectComponent
-											style={customStyles}
-											placeholder='Chọn nguời phụ trách'
-											value={userOption}
-											defaultValue={userOption}
-											onChange={setUserOption}
-											options={users}
-										/>
-									</FormGroup>
-								</div>
+								{verifyPermissionHOC(
+									<div className='col-4'>
+										<FormGroup id='userOption' label='Nguời phụ trách'>
+											<SelectComponent
+												style={customStyles}
+												placeholder='Chọn nguời phụ trách'
+												value={userOption}
+												defaultValue={userOption}
+												onChange={setUserOption}
+												options={users}
+											/>
+										</FormGroup>
+									</div>,
+									['admin', 'manager'],
+								)}
+
 								<div className='col-3'>
 									<FormGroup id='quantity' label='Số lượng'>
 										<Input
@@ -220,8 +222,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										/>
 									</FormGroup>
 								</div>
-							</div>
-							<div className='row g-2'>
 								<div className='col-4'>
 									<FormGroup id='startDate' label='Ngày bắt đầu'>
 										<Input
@@ -320,10 +320,5 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		</Modal>
 	);
 };
-// OrderTaskForm.propTypes = {
-// 	isEdit: PropTypes.bool,
-// };
-// OrderTaskForm.defaultProps = {
-// 	isEdit: false,
-// };
+
 export default memo(OrderTaskForm);

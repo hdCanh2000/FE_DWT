@@ -6,7 +6,10 @@ import Modal from 'react-bootstrap/Modal';
 import Card from '../../components/bootstrap/Card';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog, getWorktrackById, updateWorktrackLog } from './services';
-import { fetchWorktrackList, fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
+import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
+import Button from '../../components/bootstrap/Button';
+import useDarkMode from '../../hooks/useDarkMode';
+import { updateStatusWorktrack } from '../pendingWorktrack/services';
 
 const styleHead = {
 	border: '1px solid #c8c7c7',
@@ -42,6 +45,7 @@ const renderColor = (status) => {
 };
 
 const DailyWorktrackingModal = ({ data, show, handleClose }) => {
+	const { darkModeStatus } = useDarkMode();
 	const dispatch = useDispatch();
 	const [worktrack, setWorktrack] = useState({});
 	const [showForm, setShowForm] = useState(false);
@@ -92,7 +96,6 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			updateWorktrackLog(dataSubmit)
 				.then(() => {
 					handleCloseForm();
-					dispatch(fetchWorktrackList(worktrack.user_id));
 					dispatch(fetchWorktrackListAll());
 					getById(worktrack.id);
 				})
@@ -104,7 +107,6 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			addWorktrackLog(dataSubmit)
 				.then(() => {
 					handleCloseForm();
-					dispatch(fetchWorktrackList(worktrack.user_id));
 					getById(worktrack.id);
 					dispatch(fetchWorktrackListAll());
 				})
@@ -113,6 +115,22 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 					console.log(err);
 				});
 		}
+	};
+
+	const handleChangeStatus = (worktrackSubmit) => {
+		const dataSubmit = {
+			id: worktrackSubmit?.id,
+			status: 'completed',
+		};
+		updateStatusWorktrack(dataSubmit)
+			.then(() => {
+				dispatch(fetchWorktrackListAll());
+				getById(worktrack.id);
+			})
+			.catch((error) => {
+				// eslint-disable-next-line no-console
+				console.log(error);
+			});
 	};
 
 	return (
@@ -132,8 +150,18 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 				<Card className='w-100 h-100 p-4'>
 					<div
 						style={styleHead}
-						className='d-flex justify-content-center align-items-center'>
-						<p className='m-0 d-block text-center fs-4 fw-bold'>Nhật trình công việc</p>
+						className='d-flex justify-content-between align-items-center'>
+						<p className='m-0 d-block fs-4 fw-bold'>Nhật trình công việc</p>
+						<Button
+							color='info'
+							isOutline={!darkModeStatus}
+							isLight={darkModeStatus}
+							onClick={() => handleChangeStatus(worktrack)}
+							isDisable={worktrack.status === 'closed'}
+							className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
+							icon='Check'>
+							Xác nhận hoàn thành
+						</Button>
 					</div>
 					<table className='table table-modern mb-0 py-4'>
 						<thead>

@@ -10,7 +10,7 @@ export const getAllWorktrackByStatus = (status) => {
 
 export const updateStatusWorktrack = (data) => {
 	return axiosClient({
-		method: 'PUT',
+		method: 'PATCH',
 		url: `/api/worktracks/${data.id}`,
 		data,
 	});
