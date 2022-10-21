@@ -40,7 +40,7 @@ const updateEmployee = (data) => {
 };
 const exportExcel = () => {
 	return axiosClient({
-		method: 'POST',
+		method: 'GET',
 		url: `/api/users/exportExcel`,
 	});
 };
