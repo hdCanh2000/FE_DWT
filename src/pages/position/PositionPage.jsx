@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -29,21 +30,32 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const [searchParams] = useSearchParams();
 
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
+
+	const text = searchParams.get('text') || '';
+	const page = searchParams.get('page') || '';
+
+	const localtion = useLocation();
 	const { addToast } = useToasts();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
+
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const positions = useSelector((state) => state.position.positions);
+	const pagination = useSelector((state) => state.position.pagination);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
 	const requirements = useSelector((state) => state.requirement.requirements);
 	const [openDetail, setOpenDetail] = React.useState(false);
 	const [dataDetail, setDataDetail] = React.useState({});
+	const [currentPage, setCurrentPage] = React.useState(page || 1);
+
 	// const [nvs] = React.useState(true);
 	const fetchRequirement = () => {
 		const newItem = itemEdit?.requirements?.map((items) => ({
@@ -53,6 +65,7 @@ const PositionPage = () => {
 		}));
 		return { ...itemEdit, requirements: newItem };
 	};
+
 	const fetchRequirementDetail = (data) => {
 		const newItem = data?.requirements?.map((items) => ({
 			...items,
@@ -61,8 +74,35 @@ const PositionPage = () => {
 		}));
 		return { ...dataDetail, requirements: newItem };
 	};
+
 	useEffect(() => {
-		dispatch(fetchPositionList());
+		const query = {};
+		query.text = text;
+		query.page = text ? 1 : page;
+		dispatch(fetchPositionList(query));
+	}, [dispatch, page, text]);
+
+	const handleSubmitSearch = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: 1,
+			}).toString(),
+		});
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: searchValue.page,
+			}).toString(),
+		});
+	};
+
+	useEffect(() => {
 		dispatch(fetchPositionLevelList());
 		dispatch(fetchDepartmentList());
 		dispatch(fetchRequirementList());
@@ -187,6 +227,18 @@ const PositionPage = () => {
 			isShow: false,
 		},
 	];
+
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data.id, 10),
@@ -206,28 +258,29 @@ const PositionPage = () => {
 				await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
-				// eslint-disable-next-line no-empty
-			} catch (error) {}
+				handleShowToast(
+					`Cập nhật vị trí công việc!`,
+					`Cập nhật vị trí công việc thành công!`,
+				);
+			} catch (error) {
+				handleShowToast(
+					`Cập nhật vị trí công việc`,
+					`Cập nhật vị trí công việc không thành công!`,
+				);
+			}
 		} else {
 			try {
 				const response = await addPosition(dataSubmit);
 				await response.data;
 				dispatch(fetchPositionList());
 				handleCloseForm();
-				// eslint-disable-next-line no-empty
-			} catch (error) {}
+				handleShowToast(`Thêm vị trí công việc`, `Thêm vị trí công việc thành công!`);
+			} catch (error) {
+				handleShowToast(`Thêm vị trí công việc`, `Thêm vị trí công việc không thành công!`);
+			}
 		}
 	};
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
+
 	const handleOpenDetail = (item) => {
 		setOpenDetail(true);
 		setDataDetail({ ...item });
@@ -285,6 +338,14 @@ const PositionPage = () => {
 												className='table table-modern mb-0'
 												columns={columns}
 												data={positions}
+												onSubmitSearch={handleSubmitSearch}
+												onChangeCurrentPage={handleChangeCurrentPage}
+												currentPage={parseInt(currentPage, 10)}
+												totalItem={pagination?.totalRows}
+												total={pagination?.total}
+												setCurrentPage={setCurrentPage}
+												searchvalue={text}
+												isSearch
 											/>
 										</div>
 									</div>
