@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
+import { useToasts } from 'react-toast-notifications';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
@@ -7,6 +8,7 @@ import Card from '../../components/bootstrap/Card';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog, getWorktrackById, updateWorktrackLog } from './services';
 import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
+import Toasts from '../../components/bootstrap/Toasts';
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import { updateStatusWorktrack } from '../pendingWorktrack/services';
@@ -46,6 +48,7 @@ const renderColor = (status) => {
 
 const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 	const { darkModeStatus } = useDarkMode();
+	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const [worktrack, setWorktrack] = useState({});
 	const [showForm, setShowForm] = useState(false);
@@ -67,6 +70,17 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			getById(data.id);
 		}
 	}, [data, data.id]);
+
+	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
+		addToast(
+			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: false,
+			},
+		);
+	};
 
 	const handleCloseForm = () => {
 		setShowForm(false);
@@ -98,10 +112,24 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 					handleCloseForm();
 					dispatch(fetchWorktrackListAll());
 					getById(worktrack.id);
+					handleShowToast(
+						`Xác nhận nhật trình công việc`,
+						`Xác nhận nhật trình công việc thành công!`,
+						'Warning',
+						'danger',
+						// 'Check2Circle',
+						// 'success',
+					);
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
 					console.log(err);
+					handleShowToast(
+						`Xác nhận nhật trình công việc`,
+						`Xác nhận nhật trình công việc không thành công!`,
+						'Warning',
+						'danger',
+					);
 				});
 		} else {
 			addWorktrackLog(dataSubmit)
@@ -109,10 +137,20 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 					handleCloseForm();
 					getById(worktrack.id);
 					dispatch(fetchWorktrackListAll());
+					handleShowToast(
+						`Xác nhận nhật trình công việc`,
+						`Xác nhận nhật trình công việc thành công!`,
+					);
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
 					console.log(err);
+					handleShowToast(
+						`Xác nhận nhật trình công việc`,
+						`Xác nhận nhật trình công việc không thành công!`,
+						'Warning',
+						'danger',
+					);
 				});
 		}
 	};
@@ -126,10 +164,20 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			.then(() => {
 				dispatch(fetchWorktrackListAll());
 				getById(worktrack.id);
+				handleShowToast(
+					`Xác nhận hoàn thành công việc`,
+					`Xác nhận hoàn thành công việc thành công!`,
+				);
 			})
 			.catch((error) => {
 				// eslint-disable-next-line no-console
 				console.log(error);
+				handleShowToast(
+					`Xác nhận hoàn thành công việc`,
+					`Xác nhận hoàn thành công việc không thành công!`,
+					'Warning',
+					'danger',
+				);
 			});
 	};
 
@@ -152,16 +200,18 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 						style={styleHead}
 						className='d-flex justify-content-between align-items-center'>
 						<p className='m-0 d-block fs-4 fw-bold'>Nhật trình công việc</p>
-						<Button
-							color='info'
-							isOutline={!darkModeStatus}
-							isLight={darkModeStatus}
-							onClick={() => handleChangeStatus(worktrack)}
-							isDisable={worktrack.status === 'closed'}
-							className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
-							icon='Check'>
-							Xác nhận hoàn thành
-						</Button>
+						{worktrack.status === 'accepted' && (
+							<Button
+								color='info'
+								isOutline={!darkModeStatus}
+								isLight={darkModeStatus}
+								onClick={() => handleChangeStatus(worktrack)}
+								isDisable={worktrack.status === 'closed'}
+								className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
+								icon='Check'>
+								Xác nhận hoàn thành
+							</Button>
+						)}
 					</div>
 					<table className='table table-modern mb-0 py-4'>
 						<thead>

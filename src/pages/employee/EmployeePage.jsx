@@ -314,12 +314,12 @@ const EmployeePage = () => {
 		}
 	};
 	const handleExportExcel = async () => {
-		try{
+		try {
 			await exportExcel();
-			handleShowToast('Xuất Excel', 'Xuất excel thành công')
-		}catch(error){
+			handleShowToast('Xuất Excel', 'Xuất excel thành công');
+		} catch (error) {
 			handleShowToast('Xuất Excel', 'Xuất excel thất bại');
-				throw error;
+			throw error;
 		}
 	};
 	return (
