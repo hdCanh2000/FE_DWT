@@ -57,7 +57,7 @@ const AUTH = {
 	LOGIN: lazy(() => import('../pages/presentation/auth/Login')),
 };
 const PROFILE = {
-	PROFILE: lazy(() => import('../layout/Header/Information')),
+	PROFILE: lazy(() => import('../pages/information/Information')),
 };
 const UNIT = {
 	UNIT: lazy(() => import('../pages/unit/unitPage')),

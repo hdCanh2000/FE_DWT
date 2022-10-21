@@ -21,25 +21,15 @@ const initialState = {
 // Đầu tiên, tạo thunk
 export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async () => {
 	const response = await getAllWorktrack();
-	return response.data.data?.role === 'manager'
-		? response.data.data.workTracks.map((item) => {
-				return {
-					...item,
-					label: item.name,
-					value: item.id,
-					text: item.name,
-					parentId: item.parent_id,
-				};
-		  })
-		: response.data.data.map((item) => {
-				return {
-					...item,
-					label: item.name,
-					value: item.id,
-					text: item.name,
-					parentId: item.parent_id,
-				};
-		  });
+	return response.data.data.map((item) => {
+		return {
+			...item,
+			label: item.name,
+			value: item.id,
+			text: item.name,
+			parentId: item.parent_id,
+		};
+	});
 });
 
 // Đầu tiên, tạo thunk
@@ -47,41 +37,19 @@ export const fetchWorktrackListByStatus = createAsyncThunk(
 	'worktrack/fetchListByStatus',
 	async (status) => {
 		const response = await getAllWorktrackByStatus(status);
-		return response.data.data?.role === 'manager'
-			? response.data.data.workTracks.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-						text: item.name,
-						parentId: item.parent_id,
-						deadlineText: item.deadline
-							? moment(item.deadline).format('DD-MM-YYYY')
-							: '--',
-						statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status)
-							.label,
-						userResponsible: item.users.find(
-							(u) => u?.workTrackUsers?.isResponsible === true,
-						)?.name,
-					};
-			  })
-			: response.data.data.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-						text: item.name,
-						parentId: item.parent_id,
-						deadlineText: item.deadline
-							? moment(item.deadline).format('DD-MM-YYYY')
-							: '--',
-						statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status)
-							.label,
-						userResponsible: item.users.find(
-							(u) => u?.workTrackUsers?.isResponsible === true,
-						)?.name,
-					};
-			  });
+		return response.data.data.map((item) => {
+			return {
+				...item,
+				label: item.name,
+				value: item.id,
+				text: item.name,
+				parentId: item.parent_id,
+				deadlineText: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+				statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status).label,
+				userResponsible: item.users.find((u) => u?.workTrackUsers?.isResponsible === true)
+					?.name,
+			};
+		});
 	},
 );
 

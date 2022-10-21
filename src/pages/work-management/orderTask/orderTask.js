@@ -58,7 +58,10 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 				</CardActions>
 			</CardHeader>
 			<CardBody className='row px-4 pb-4 pt-1 cursor-pointer' onClick={() => onOpen(data)}>
-				<div className='col-12'>Người phụ trách: {userResponsible}</div>
+				{verifyPermissionHOC(
+					<div className='col-12'>Người phụ trách: {userResponsible}</div>,
+					['admin', 'manager'],
+				)}
 				<div className='col-12'>
 					Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
 				</div>
@@ -89,7 +92,7 @@ const OrderTask = () => {
 		const response = await getAllWorktrackByUser();
 		const result = await response.data.data;
 		setTasks(
-			result?.role === 'manager'
+			result?.role === 'manager' || result?.role === 'user'
 				? result.workTracks.filter((item) => item.user_id !== null)
 				: result.filter((item) => item.user_id !== null),
 		);
