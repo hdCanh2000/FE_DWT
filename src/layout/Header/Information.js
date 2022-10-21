@@ -21,7 +21,7 @@ import UserImage from '../../assets/img/wanna/wanna6.png';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
 import Icon from '../../components/icon/Icon';
-import Alert from '../../components/bootstrap/Alert';
+// import Alert from '../../components/bootstrap/Alert';
 import Avatar from '../../components/Avatar';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { getUserById } from '../../pages/employee/services';
@@ -98,9 +98,9 @@ const Information = () => {
 				<div>
 					<Card hasTab style={{ minWidth: '95%', margin: '0 auto', minHeight: '90vh' }}>
 						<CardTabItem id='profile' title='Profile' icon='Contacts'>
-							<Alert isLight className='border-0' shadow='md' icon='LocalPolice'>
+							{/* <Alert isLight className='border-0' shadow='md' icon='LocalPolice'>
 								Vui lòng liên hệ admin để thay đổi thông tin .
-							</Alert>
+							</Alert> */}
 							<Card style={{ minWidth: '95%', margin: '0 auto', minHeight: '45vh' }}>
 								<div className='row g-5 m-2'>
 									<div className='col-12'>
