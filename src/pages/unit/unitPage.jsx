@@ -63,10 +63,6 @@ const UnitPage = () => {
 				page: 1,
 			}).toString(),
 		});
-		const query = {};
-		query.text = text;
-		query.page = 1;
-		getUnit(query);
 	};
 
 	const handleChangeCurrentPage = (searchValue) => {

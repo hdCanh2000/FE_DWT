@@ -35,7 +35,6 @@ const createDataTree = (dataset) => {
 	dataset.forEach((aData) => {
 		if (aData.parentId) {
 			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
-			// hashTable[aData.parentId]
 		} else {
 			dataTree.push(hashTable[aData.id]);
 		}
@@ -149,6 +148,7 @@ const KpiNormPage = () => {
 			description: data?.description,
 			descriptionKpiValue: data.descriptionKpiValue,
 			position_id: parseInt(data.position.id, 10) || null,
+			department_id: parseInt(data.position.department.id, 10) || null,
 			parent_id: parseInt(data.parent?.id, 10) || null,
 			kpi_value: parseInt(data.kpi_value, 10) || null,
 			quantity: parseInt(data.quantity, 10) || null,
