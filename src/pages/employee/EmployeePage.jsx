@@ -21,7 +21,7 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
-import { addEmployee, updateEmployee } from './services';
+import { addEmployee, exportExcel, updateEmployee } from './services';
 import { getAllDepartment } from '../department/services';
 import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
@@ -313,7 +313,15 @@ const EmployeePage = () => {
 			}
 		}
 	};
-
+	const handleExportExcel = async () => {
+		try{
+			await exportExcel();
+			handleShowToast('Xuất Excel', 'Xuất excel thành công')
+		}catch(error){
+			handleShowToast('Xuất Excel', 'Xuất excel thất bại');
+				throw error;
+		}
+	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
@@ -349,6 +357,13 @@ const EmployeePage = () => {
 																	handleOpenForm(null)
 																}>
 																Thêm mới
+															</Button>
+															<Button
+																color='info'
+																icon='IosShare'
+																tag='button'
+																onClick={() => handleExportExcel()}>
+																Xuất Excel
 															</Button>
 														</CardActions>,
 														['admin'],

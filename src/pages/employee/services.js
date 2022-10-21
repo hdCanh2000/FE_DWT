@@ -38,6 +38,12 @@ const updateEmployee = (data) => {
 		data,
 	});
 };
+const exportExcel = () => {
+	return axiosClient({
+		method: 'POST',
+		url: `/api/users/exportExcel`,
+	});
+};
 
 const deleteEmployee = (id) => {
 	return axiosClient({
@@ -53,4 +59,5 @@ export {
 	addEmployee,
 	updateEmployee,
 	deleteEmployee,
+	exportExcel,
 };
