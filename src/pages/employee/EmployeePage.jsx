@@ -289,7 +289,7 @@ const EmployeePage = () => {
 			position_id: data?.position?.value,
 			role: data?.role,
 		};
-		if (data.id) {
+		if (data?.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				await response.data;
@@ -302,7 +302,7 @@ const EmployeePage = () => {
 			}
 		} else {
 			try {
-				const response = await addEmployee({ ...dataSubmit, password: '123456' });
+				const response = await addEmployee(dataSubmit);
 				await response.data;
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
@@ -314,12 +314,12 @@ const EmployeePage = () => {
 		}
 	};
 	const handleExportExcel = async () => {
-		try{
+		try {
 			await exportExcel();
-			handleShowToast('Xuất Excel', 'Xuất excel thành công')
-		}catch(error){
+			handleShowToast('Xuất Excel', 'Xuất excel thành công');
+		} catch (error) {
 			handleShowToast('Xuất Excel', 'Xuất excel thất bại');
-				throw error;
+			throw error;
 		}
 	};
 	return (
