@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -14,12 +15,14 @@ import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
+import Toasts from '../../components/bootstrap/Toasts';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
-import { addPosition, updatePosition } from './services';
+import { addPosition, updatePosition, deletePositions } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
 import PositionDetail from './PositionDetail';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -28,8 +31,11 @@ const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 
 	const dispatch = useDispatch();
+	const { addToast } = useToasts();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const [itemDelete, setItemDelete] = React.useState({});
+	const [isDelete, setIsDelete] = React.useState(false);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const positions = useSelector((state) => state.position.positions);
@@ -90,7 +96,7 @@ const PositionPage = () => {
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || 'No data'}</span>,
+			render: (item) => <span>{item?.department?.name || ''}</span>,
 			options: departments,
 			col: 5,
 		},
@@ -101,7 +107,7 @@ const PositionPage = () => {
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.positionLevel?.name || 'No data'}</span>,
+			render: (item) => <span>{item?.positionLevel?.name || ''}</span>,
 			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
 			col: 6,
 		},
@@ -112,7 +118,7 @@ const PositionPage = () => {
 			type: 'singleSelect',
 			align: 'left',
 			isShow: false,
-			render: (item) => <span>{item?.positions?.name || 'No data'}</span>,
+			render: (item) => <span>{item?.positions?.name || ''}</span>,
 			options: positions,
 			col: 6,
 		},
@@ -141,7 +147,7 @@ const PositionPage = () => {
 			type: 'select',
 			align: 'left',
 			isShow: false,
-			render: (item) => <span>{item?.requirement?.name || 'No data'}</span>,
+			render: (item) => <span>{item?.requirement?.name || ''}</span>,
 			options: requirements,
 			isMulti: true,
 		},
@@ -167,6 +173,14 @@ const PositionPage = () => {
 						className='text-nowrap mx-2'
 						icon='RemoveRedEye'
 						onClick={() => handleOpenDetail(item)}
+					/>
+					<Button
+						isOutline={!darkModeStatus}
+						color='danger'
+						isLight={darkModeStatus}
+						className='text-nowrap mx-2'
+						icon='Trash'
+						onClick={() => handleOpenDelete(item)}
 					/>
 				</div>
 			),
@@ -204,6 +218,16 @@ const PositionPage = () => {
 			} catch (error) {}
 		}
 	};
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
 	const handleOpenDetail = (item) => {
 		setOpenDetail(true);
 		setDataDetail({ ...item });
@@ -211,6 +235,23 @@ const PositionPage = () => {
 	const handleCloseDetail = () => {
 		setOpenDetail(false);
 		setDataDetail({});
+	};
+	const handleOpenDelete = (item) => {
+		setIsDelete(true);
+		setItemDelete({ ...item });
+	};
+	const handleCloseDelete = () => {
+		setIsDelete(false);
+	};
+	const handleDeletePosition = async (item) => {
+		try {
+			await deletePositions(item);
+			dispatch(fetchPositionList());
+			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc thành công!`);
+		} catch (error) {
+			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc không thành công!`);
+		}
+		handleCloseDelete();
 	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.position.text}>
@@ -267,6 +308,13 @@ const PositionPage = () => {
 							label={`Chi tiết vị trí: ${dataDetail?.name}`}
 							fields={columns}
 							// nv
+						/>
+						<TaskAlertConfirm
+							openModal={isDelete}
+							onCloseModal={handleCloseDelete}
+							onConfirm={() => handleDeletePosition(itemDelete?.id)}
+							title='Xoá vị trí công việc'
+							content={`Xác nhận xoá vị trí công việc: <strong>${itemDelete?.name}</strong> ?`}
 						/>
 					</>,
 					['admin'],
