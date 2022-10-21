@@ -19,7 +19,7 @@ import Icon from '../../components/icon/Icon';
 import validate from './validate';
 
 const ChangeInformation = () => {
-	const [newUser, setNewUser] = React.useState();
+	const [newUser, setNewUser] = React.useState({});
 	const [isEdit, setIsEdit] = React.useState(true);
 	const { addToast } = useToasts();
 	const user = window.localStorage;
@@ -83,7 +83,9 @@ const ChangeInformation = () => {
 		setIsEdit(!isEdit);
 	};
 	return (
-		<div style={{ minWidth: '95%', margin: '0 auto', minHeight: '45vh', fontSize: '1.5rem' }} id='information'>
+		<div
+			style={{ minWidth: '95%', margin: '0 auto', minHeight: '45vh', fontSize: '1.5rem' }}
+			id='information'>
 			<div className='row g-5 m-2'>
 				<div className='col-12'>
 					<div className='d-flex align-items-center'>
