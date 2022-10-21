@@ -44,9 +44,7 @@ const RecruitmentRequirementPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const requirements = useSelector((state) => state.requirement.requirements);
-	console.log(requirements);
 	const pagination = useSelector((state) => state.requirement.pagination);
-	console.log(pagination);
 
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
