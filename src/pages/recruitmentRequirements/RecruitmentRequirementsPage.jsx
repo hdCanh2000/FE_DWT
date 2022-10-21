@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
+import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -13,6 +15,7 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
+import Toasts from '../../components/bootstrap/Toasts';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
@@ -23,7 +26,17 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const RecruitmentRequirementPage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const [searchParams] = useSearchParams();
+
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
+
+	const text = searchParams.get('text') || '';
+	const page = searchParams.get('page') || '';
+
+	const localtion = useLocation();
+	const { addToast } = useToasts();
+
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
@@ -31,14 +44,40 @@ const RecruitmentRequirementPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const requirements = useSelector((state) => state.requirement.requirements);
+	console.log(requirements);
+	const pagination = useSelector((state) => state.requirement.pagination);
+	console.log(pagination);
 
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
+	const [currentPage, setCurrentPage] = React.useState(page || 1);
 
 	useEffect(() => {
-		dispatch(fetchRequirementList());
-	}, [dispatch]);
+		const query = {};
+		query.text = text;
+		query.page = text ? 1 : page;
+		dispatch(fetchRequirementList(query));
+	}, [dispatch, page, text]);
 
+	const handleSubmitSearch = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: 1,
+			}).toString(),
+		});
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: searchValue.page,
+			}).toString(),
+		});
+	};
 	const columns = [
 		{
 			title: 'Tên yêu cầu',
@@ -87,6 +126,17 @@ const RecruitmentRequirementPage = () => {
 		},
 	];
 
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data.id, 10),
@@ -100,8 +150,15 @@ const RecruitmentRequirementPage = () => {
 				await response.data;
 				dispatch(fetchRequirementList());
 				handleCloseForm();
+				handleShowToast(
+					`Cập nhật yêu cầu tuyển dụng!`,
+					`Cập nhật yêu cầu tuyển dụng thành công!`,
+				);
 			} catch (error) {
-				throw error;
+				handleShowToast(
+					`Cập nhật yêu cầu tuyển dụng`,
+					`Cập nhật yêu cầu tuyển dụng không thành công!`,
+				);
 			}
 		} else {
 			// eslint-disable-next-line no-useless-catch
@@ -110,8 +167,9 @@ const RecruitmentRequirementPage = () => {
 				await response.data;
 				dispatch(fetchRequirementList());
 				handleCloseForm();
+				handleShowToast(`Thêm yêu cầu tuyển dụng`, `Thêm yêu cầu tuyển dụng thành công!`);
 			} catch (error) {
-				throw error;
+				handleShowToast(`Thêm cầu tuyển dụng`, `Thêm cầu tuyển dụng không thành công!`);
 			}
 		}
 	};
@@ -129,8 +187,9 @@ const RecruitmentRequirementPage = () => {
 		try {
 			await deleteRequirement(data);
 			dispatch(fetchRequirementList());
+			handleShowToast(`Xoá yêu cầu tuyển dụng`, `Xoá yêu cầu tuyển dụng thành công!`);
 		} catch (error) {
-			throw error;
+			handleShowToast(`Xoá yêu cầu tuyển dụng`, `Xoá yêu cầu tuyển dụng không thành công!`);
 		}
 		handleCloseDelete();
 	};
@@ -169,6 +228,14 @@ const RecruitmentRequirementPage = () => {
 												className='table table-modern mb-0'
 												columns={columns}
 												data={requirements}
+												onSubmitSearch={handleSubmitSearch}
+												onChangeCurrentPage={handleChangeCurrentPage}
+												currentPage={parseInt(currentPage, 10)}
+												totalItem={pagination?.totalRows}
+												total={pagination?.total}
+												setCurrentPage={setCurrentPage}
+												searchvalue={text}
+												isSearch
 											/>
 										</div>
 									</div>

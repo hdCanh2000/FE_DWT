@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useToasts } from 'react-toast-notifications';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
@@ -31,8 +32,17 @@ import { getAllPosition } from '../position/services';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const [searchParams] = useSearchParams();
+
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
+
+	const text = searchParams.get('text') || '';
+	const page = searchParams.get('page') || '';
+
+	const localtion = useLocation();
+
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
@@ -40,13 +50,44 @@ const EmployeePage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const users = useSelector((state) => state.employee.employees);
+	const pagination = useSelector((state) => state.employee.pagination);
 	const [departments, setDepartments] = React.useState([]);
 	const [positions, setPositions] = React.useState([]);
 	const [openDelete, setOpenDelete] = React.useState(false);
 	const [dataDelete, setDataDelete] = React.useState({});
+	const [currentPage, setCurrentPage] = React.useState(page || 1);
+
 	const fetchUser = () => {
 		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
 	};
+
+	useEffect(() => {
+		const query = {};
+		query.text = text;
+		query.page = text ? 1 : page;
+		dispatch(fetchEmployeeList(query));
+	}, [dispatch, page, text]);
+
+	const handleSubmitSearch = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: 1,
+			}).toString(),
+		});
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: searchValue.page,
+			}).toString(),
+		});
+	};
+
 	useEffect(() => {
 		const fecth = async () => {
 			const response = await getAllDepartment();
@@ -80,9 +121,6 @@ const EmployeePage = () => {
 		fecth();
 	}, []);
 
-	useEffect(() => {
-		dispatch(fetchEmployeeList());
-	}, [dispatch]);
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -374,6 +412,16 @@ const EmployeePage = () => {
 														className='table table-modern mb-0'
 														columns={columns}
 														data={fetchUser()}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
 													/>
 												</div>
 											</div>
