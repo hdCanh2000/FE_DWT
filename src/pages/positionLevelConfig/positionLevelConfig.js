@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
-
 import { useDispatch, useSelector } from 'react-redux';
 import Card, {
 	CardActions,
@@ -27,11 +26,28 @@ import NotPermission from '../presentation/auth/NotPermission';
 
 const KeyPage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const [searchParams] = useSearchParams();
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
+
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const { addToast } = useToasts();
+
+	const text = searchParams.get('text') || '';
+	const page = searchParams.get('page') || '';
+
+	const localtion = useLocation();
+
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const pagination = useSelector((state) => state.positionLevel.pagination);
+	const [data, setData] = useState([]);
+	const datas = useSelector((state) => state.positionLevel.positionLevels);
+	const [currentPage, setCurrentPage] = React.useState(page || 1);
+
 	const columns = [
 		{
 			title: 'Tên cấp nhân sự',
@@ -77,22 +93,42 @@ const KeyPage = () => {
 			isShow: false,
 		},
 	];
+
 	useEffect(() => {
-		dispatch(fetchPositionLevelList());
-	}, [dispatch]);
-	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+		const query = {};
+		query.text = text;
+		query.page = text ? 1 : page;
+		dispatch(fetchPositionLevelList(query));
+	}, [dispatch, page, text]);
+
+	const handleSubmitSearch = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: 1,
+			}).toString(),
+		});
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: searchValue.page,
+			}).toString(),
+		});
+	};
+
 	useEffect(() => {
 		setData(datas.filter((item) => item?.id !== 0));
-		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
-	},[datas])
-	const { addToast } = useToasts();
-	const [data, setData] = useState([]);
-	const datas = useSelector((state) => state.positionLevel.positionLevels);
+	}, [datas]);
+
 	useEffect(() => {
 		setData(datas.filter((item) => item?.id !== 0));
-		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
-	},[datas])
+	}, [datas]);
+
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -178,6 +214,14 @@ const KeyPage = () => {
 												className='table table-modern mb-0'
 												columns={columns}
 												data={data}
+												onSubmitSearch={handleSubmitSearch}
+												onChangeCurrentPage={handleChangeCurrentPage}
+												currentPage={parseInt(currentPage, 10)}
+												totalItem={pagination?.totalRows}
+												total={pagination?.total}
+												setCurrentPage={setCurrentPage}
+												searchvalue={text}
+												isSearch
 											/>
 										</div>
 									</div>
