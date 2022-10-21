@@ -48,7 +48,7 @@ const DailyWorkTrackingMe = () => {
 			});
 		}
 		fetchData();
-	}, [dispatch, id]);
+	}, [dispatch, id, toggleForm]);
 
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
@@ -56,9 +56,6 @@ const DailyWorkTrackingMe = () => {
 				worktrack?.workTracks?.map((item) => {
 					return {
 						...item,
-						label: item.name,
-						value: item.id,
-						text: item.name,
 						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
 						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 						parentId: item.parent_id,

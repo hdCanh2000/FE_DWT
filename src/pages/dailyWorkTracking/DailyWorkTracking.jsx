@@ -14,6 +14,7 @@ import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
 import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
+import { LIST_STATUS } from '../../utils/constants';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -48,6 +49,8 @@ const DailyWorkTracking = () => {
 			user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
 			missionValue: _.isEmpty(item.mission) ? '--' : item.mission.name,
 			deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+			statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+			parentId: item.parent_id,
 		}));
 	};
 	useEffect(() => {
