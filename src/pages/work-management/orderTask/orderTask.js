@@ -219,7 +219,7 @@ const OrderTask = () => {
 							</div>
 						</div>
 					</div>,
-					['admin', 'manager'],
+					['admin', 'manager', 'user'],
 					<NotPermission />,
 				)}
 			</Page>

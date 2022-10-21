@@ -125,6 +125,12 @@ const DailyWorkTracking = () => {
 														textAlign='Center'
 													/>
 													<ColumnDirective
+														field='data.statusName'
+														headerText='Trạng thái'
+														width='100'
+														textAlign='Center'
+													/>
+													<ColumnDirective
 														field='data.quantity'
 														headerText='Số lượng'
 														width='90'

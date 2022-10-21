@@ -15,6 +15,7 @@ import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
 import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
+import { LIST_STATUS } from '../../utils/constants';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -57,6 +58,7 @@ const DailyWorkTracking = () => {
 						value: item.id,
 						text: item.name,
 						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 						parentId: item.parent_id,
 						department: {
 							name: _.get(worktrack, 'department.name', '--'),
@@ -127,6 +129,12 @@ const DailyWorkTracking = () => {
 														headerText='Hạn hoàn thành'
 														format='dMy'
 														width='90'
+														textAlign='Center'
+													/>
+													<ColumnDirective
+														field='data.statusName'
+														headerText='Trạng thái'
+														width='100'
 														textAlign='Center'
 													/>
 													<ColumnDirective
