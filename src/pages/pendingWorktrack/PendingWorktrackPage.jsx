@@ -13,6 +13,8 @@ import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import { LIST_STATUS_PENDING } from '../../utils/constants';
 import { getAllWorktrackByStatus, updateStatusWorktrack } from './services';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import NotPermission from '../presentation/auth/NotPermission';
 
 const Styles = styled.div`
 	table {
@@ -159,35 +161,19 @@ const PendingWorktrackPage = () => {
 		setDataWorktracks(
 			// eslint-disable-next-line no-nested-ternary
 			response.data.data !== null
-				? response.data.data?.role === 'manager'
-					? response.data?.data?.workTracks?.map((item) => {
-							return {
-								...item,
-								deadlineText: item.deadline
-									? moment(item.deadline).format('DD-MM-YYYY')
-									: '--',
-								statusName: LIST_STATUS_PENDING.find(
-									(st) => st.value === item.status,
-								).label,
-								userResponsible: item.users.find(
-									(item) => item?.workTrackUsers?.isResponsible === true,
-								)?.name,
-							};
-					  })
-					: response.data?.data?.map((item) => {
-							return {
-								...item,
-								deadlineText: item.deadline
-									? moment(item.deadline).format('DD-MM-YYYY')
-									: '--',
-								statusName: LIST_STATUS_PENDING.find(
-									(st) => st.value === item.status,
-								).label,
-								userResponsible: item.users.find(
-									(item) => item?.workTrackUsers?.isResponsible === true,
-								)?.name,
-							};
-					  })
+				? response.data?.data?.map((item) => {
+						return {
+							...item,
+							deadlineText: item.deadline
+								? moment(item.deadline).format('DD-MM-YYYY')
+								: '--',
+							statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status)
+								.label,
+							userResponsible: item.users.find(
+								(item) => item?.workTrackUsers?.isResponsible === true,
+							)?.name,
+						};
+				  })
 				: [],
 		);
 	}
@@ -199,15 +185,6 @@ const PendingWorktrackPage = () => {
 	const handleChangeStatus = (row) => {
 		const dataSubmit = {
 			id: row?.id,
-			kpiNorm_id: row.kpiNorm_id,
-			mission_id: row.mission_id,
-			quantity: row.quantity,
-			user_id: row.users.find((item) => item?.workTrackUsers?.isResponsible === true)?.id,
-			priority: row.priority,
-			note: row.note,
-			description: row.description,
-			deadline: row.deadline,
-			startDate: row.startDate,
 			status: row.status === 'pending' ? 'accepted' : 'closed',
 		};
 		updateStatusWorktrack(dataSubmit)
@@ -224,16 +201,6 @@ const PendingWorktrackPage = () => {
 		for (let i = 0; i < rows.length; i += 1) {
 			updateStatusWorktrack({
 				id: rows[i].id,
-				kpiNorm_id: rows[i].kpiNorm_id,
-				mission_id: rows[i].mission_id,
-				quantity: rows[i].quantity,
-				user_id: rows[i].users.find((item) => item.workTrackUsers.isResponsible === true)
-					.id,
-				priority: rows[i].priority,
-				note: rows[i].note,
-				description: rows[i].description,
-				deadline: rows[i].deadline,
-				startDate: rows[i].startDate,
 				status: rows[i].status === 'pending' ? 'accepted' : 'closed',
 			})
 				.then(() => {})
@@ -306,47 +273,51 @@ const PendingWorktrackPage = () => {
 	return (
 		<PageWrapper title='Công việc hàng ngày'>
 			<Page container='fluid'>
-				<div
-					className='row mb-0 h-100'
-					style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
-					<div className='col-12'>
-						<Card className='w-100'>
-							<div style={{ margin: '24px 24px 0' }}>
-								<CardHeader>
-									<CardLabel icon='FormatListBulleted' iconColor='primary'>
-										<CardTitle>
-											<CardLabel>Danh sách nhiệm vụ</CardLabel>
-										</CardTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody className='w-100'>
-									<div className='w-100 mb-3'>
-										<div className='row g-2'>
-											<div className='col-5'>
-												<Select
-													className='w-100'
-													placeholder='Trạng thái'
-													value={statusOption}
-													defaultValue={statusOption}
-													onChange={setStatusOption}
-													options={LIST_STATUS_PENDING}
-												/>
+				{verifyPermissionHOC(
+					<div
+						className='row mb-0 h-100'
+						style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+						<div className='col-12'>
+							<Card className='w-100'>
+								<div style={{ margin: '24px 24px 0' }}>
+									<CardHeader>
+										<CardLabel icon='FormatListBulleted' iconColor='primary'>
+											<CardTitle>
+												<CardLabel>Danh sách nhiệm vụ</CardLabel>
+											</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody className='w-100'>
+										<div className='w-100 mb-3'>
+											<div className='row g-2'>
+												<div className='col-5'>
+													<Select
+														className='w-100'
+														placeholder='Trạng thái'
+														value={statusOption}
+														defaultValue={statusOption}
+														onChange={setStatusOption}
+														options={LIST_STATUS_PENDING}
+													/>
+												</div>
 											</div>
 										</div>
-									</div>
-									<Styles>
-										<Table
-											columns={columns}
-											data={data}
-											darkModeStatus={darkModeStatus}
-											onChangeStatusMultiple={handleChangeStatusMultiple}
-										/>
-									</Styles>
-								</CardBody>
-							</div>
-						</Card>
-					</div>
-				</div>
+										<Styles>
+											<Table
+												columns={columns}
+												data={data}
+												darkModeStatus={darkModeStatus}
+												onChangeStatusMultiple={handleChangeStatusMultiple}
+											/>
+										</Styles>
+									</CardBody>
+								</div>
+							</Card>
+						</div>
+					</div>,
+					['admin', 'manager'],
+					<NotPermission />,
+				)}
 			</Page>
 		</PageWrapper>
 	);
