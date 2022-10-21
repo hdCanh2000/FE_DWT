@@ -40,14 +40,14 @@ export const dashboardMenu = {
 	},
 };
 
-export const profile={
+export const profile = {
 	profile: {
 		id: 'profile',
 		text: 'Profile',
 		path: '/thong-tin-ca-nhan',
 		subMenu: null,
 	},
-}
+};
 export const demoPages = {
 	dashboard: {
 		id: 'dashboard',
@@ -78,6 +78,11 @@ export const demoPages = {
 				id: 'kpiNorm',
 				text: 'Khai báo nhiệm vụ',
 				path: '/khai-bao-nhiem-vu',
+			},
+			pendingAccepted: {
+				id: 'pendingAccepted',
+				text: 'Công việc chờ duyệt',
+				path: '/cong-viec-cho-duyet',
 			},
 			assign: {
 				id: 'assign',

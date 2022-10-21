@@ -13,6 +13,7 @@ const DAILYWORKTRACKING = {
 	DAILYWORKTRACKINGUSER: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackingUser')),
 	DAILYWORKTRACKINGME: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTrackMe')),
 	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/orderTask')),
+	PEDINGWORKTRACKPAGE: lazy(() => import('../pages/pendingWorktrack/PendingWorktrackPage')),
 };
 const TASK = {
 	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
@@ -166,6 +167,10 @@ const presentation = [
 	{
 		path: demoPages.mission.path,
 		element: <MISSION.MISSION />,
+	},
+	{
+		path: demoPages.taskAndAssign.subMenu.pendingAccepted.path,
+		element: <DAILYWORKTRACKING.PEDINGWORKTRACKPAGE />,
 	},
 	{
 		path: profile.profile.path,
