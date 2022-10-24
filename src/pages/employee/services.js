@@ -1,10 +1,11 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllEmployee = () => {
+const getAllEmployee = (params) => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
 		url: `/api/users`,
+		params,
 	});
 };
 

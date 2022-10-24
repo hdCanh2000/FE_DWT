@@ -6,10 +6,11 @@ const getAllPositionWithUser = () => {
 		url: '/api/positions?_embed=users',
 	});
 };
-const getAllPosition = () => {
+const getAllPosition = (params) => {
 	return axiosClient({
 		method: 'GET',
 		url: '/api/positions',
+		params,
 	});
 };
 
