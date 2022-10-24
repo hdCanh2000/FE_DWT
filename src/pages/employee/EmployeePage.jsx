@@ -293,7 +293,10 @@ const EmployeePage = () => {
 		try {
 			const response = await updateEmployee(dataSubmit);
 			await response.data;
-			dispatch(fetchEmployeeList());
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			dispatch(fetchEmployeeList(query));
 			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
 			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
@@ -353,7 +356,25 @@ const EmployeePage = () => {
 	};
 	const handleExportExcel = async () => {
 		try {
-			await exportExcel();
+			const response = await exportExcel();
+			// If you want to download file automatically using link attribute.
+			let filename = 'danh-sach-nhan-vien.xlsx';
+			const disposition = _.get(response.headers, 'content-disposition');
+			if (disposition && disposition.indexOf('attachment') !== -1) {
+				const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+				const matches = filenameRegex.exec(disposition);
+				if (matches != null && matches[1]) {
+					filename = matches[1].replace(/['"]/g, '');
+				}
+			}
+			const url = window.URL.createObjectURL(
+				new Blob([response.data], { type: _.get(response.headers, 'content-type') }),
+			);
+			const link = document.createElement('a');
+			link.href = url;
+			link.setAttribute('download', filename);
+			document.body.appendChild(link);
+			link.click();
 			handleShowToast('Xuất Excel', 'Xuất excel thành công');
 		} catch (error) {
 			handleShowToast('Xuất Excel', 'Xuất excel thất bại');

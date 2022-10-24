@@ -43,6 +43,7 @@ const exportExcel = () => {
 	return axiosClient({
 		method: 'GET',
 		url: `/api/users/exportExcel`,
+		responseType: 'blob',
 	});
 };
 
