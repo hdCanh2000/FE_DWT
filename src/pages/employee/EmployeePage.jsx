@@ -293,7 +293,10 @@ const EmployeePage = () => {
 		try {
 			const response = await updateEmployee(dataSubmit);
 			await response.data;
-			dispatch(fetchEmployeeList());
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			dispatch(fetchEmployeeList(query));
 			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
 			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);

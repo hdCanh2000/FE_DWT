@@ -299,7 +299,10 @@ const PositionPage = () => {
 	const handleDeletePosition = async (item) => {
 		try {
 			await deletePositions(item);
-			dispatch(fetchPositionList());
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			dispatch(fetchPositionList(query));
 			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc không thành công!`);

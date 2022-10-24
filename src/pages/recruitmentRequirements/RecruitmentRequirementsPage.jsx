@@ -184,7 +184,10 @@ const RecruitmentRequirementPage = () => {
 		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteRequirement(data);
-			dispatch(fetchRequirementList());
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			dispatch(fetchRequirementList(query));
 			handleShowToast(`Xoá yêu cầu tuyển dụng`, `Xoá yêu cầu tuyển dụng thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá yêu cầu tuyển dụng`, `Xoá yêu cầu tuyển dụng không thành công!`);
