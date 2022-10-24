@@ -175,7 +175,10 @@ const KeyPage = () => {
 	const handleDeletePositionLevel = async (item) => {
 		try {
 			await deletePositionLevel(item);
-			dispatch(fetchPositionLevelList());
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			dispatch(fetchPositionLevelList(query));
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự thành công!`);
 		} catch (error) {
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
