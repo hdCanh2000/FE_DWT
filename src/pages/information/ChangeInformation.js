@@ -32,6 +32,7 @@ const ChangeInformation = () => {
 		fetch();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
+	
 	const handleSubmit = async (data) => {
 		const newData = {
 			...data,
@@ -60,9 +61,10 @@ const ChangeInformation = () => {
 			},
 		);
 	};
+	console.log(newUser,'newUser');
 	const [valueSex, setValueSex] = React.useState();
 	React.useEffect(() => {
-		setValueSex({ value: newUser?.sex, label: newUser === 'male' ? 'Nam' : 'Nữ' });
+		setValueSex({ value: newUser?.sex, label: newUser?.sex === 'male' ? 'Nam' : 'Nữ' });
 	}, [newUser]);
 	const handleChangeSelect = (data) => {
 		setValueSex(data);
