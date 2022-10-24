@@ -61,7 +61,6 @@ const ChangeInformation = () => {
 			},
 		);
 	};
-
 	const [valueSex, setValueSex] = React.useState();
 	React.useEffect(() => {
 		setValueSex({ value: newUser?.sex, label: newUser?.sex === 'male' ? 'Nam' : 'Nữ' });

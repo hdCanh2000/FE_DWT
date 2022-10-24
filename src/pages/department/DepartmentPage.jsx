@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { arrayToTree } from 'performant-array-to-tree';
 import { TreeTable, TreeState } from 'cp-react-tree-table';
 import { useToasts } from 'react-toast-notifications';
+import { Form } from 'react-bootstrap';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -19,33 +20,35 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import validate from './validate';
-import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { addDepartment, deleteDepartment, updateDepartment } from './services';
 import Toasts from '../../components/bootstrap/Toasts';
 import Employee from './Employee';
-import NotPermission from '../presentation/auth/NotPermission';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import Icon from '../../components/icon/Icon';
 import './style.scss';
 import DepartmentForm from './DepartmentForm';
+import useDarkMode from '../../hooks/useDarkMode';
 
 const DepartmentPage = () => {
+	const { darkModeStatus } = useDarkMode();
 	const { addToast } = useToasts();
 	const dispatch = useDispatch();
-	const department = useSelector((state) => state.department.departments);
+	const departments = useSelector((state) => state.department.departments);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-
 	const [toggle, setToggle] = useState(true);
 	const [dataDepartment, setDepartmentId] = useState(true);
-
+	const [valueSearch, setValueSearch] = useState('');
+	const [department, setDepartment] = React.useState([]);
 	const [treeValue, setTreeValue] = React.useState(
 		TreeState.create(arrayToTree(department, { childrenField: 'children' })),
 	);
-
+	useEffect(() => {
+		setDepartment(departments);
+	}, [departments]);
 	useEffect(() => {
 		if (!isEmpty(department)) {
 			setTreeValue(
@@ -54,6 +57,7 @@ const DepartmentPage = () => {
 				),
 			);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [department]);
 
 	useEffect(() => {
@@ -207,7 +211,9 @@ const DepartmentPage = () => {
 	const handleOnChange = (newValue) => {
 		setTreeValue(newValue);
 	};
-
+	const handleChangeSearch = (e) => {
+		setValueSearch(e.target.value);
+	};
 	const renderIndexCell = (row) => {
 		return (
 			<div
@@ -259,80 +265,105 @@ const DepartmentPage = () => {
 			setTreeValue(TreeState.collapseAll(treeValue));
 		}
 	};
-
+	const handleSubmitSearch = () => {
+		if (!isEmpty(department)) {
+			// const dataSearch = department?.filter((item) =>
+			// 	item?.name?.toLowerCase().includes(valueSearch?.toLowerCase()),
+			// );
+			const dataSearch = department.map((item) => {
+				console.log(item.label.includes(valueSearch));
+				return item;
+			});
+			console.log(dataSearch);
+		}
+	};
 	return (
 		<PageWrapper title={demoPages.companyPage.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<div className='row mb-0'>
-						<div className='col-12'>
-							<Card className='w-100 '>
-								<CardHeader>
-									<CardLabel icon='Sort' iconColor='primary'>
-										<CardTitle>
-											<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
-										</CardTitle>
-									</CardLabel>
-									<CardActions>
-										<Button
-											color='info'
-											icon='AddCircleOutline'
-											tag='button'
-											onClick={() => handleOpenForm(null)}>
-											Thêm mới
-										</Button>
-									</CardActions>
-								</CardHeader>
-								<div className='row h-100 w-100'>
-									<div className='col-lg-4 col-md-6 pb-4'>
-										<Card className='h-100'>
-											<CardBody>
-												<div className='pt-4' style={{ height: '100%' }}>
-													<div className='d-flex align-items-center justify-content-start'>
+				<div className='row mb-0'>
+					<div className='col-12'>
+						<Card className='w-100 '>
+							<CardHeader>
+								<CardLabel icon='Sort' iconColor='primary'>
+									<CardTitle>
+										<CardLabel>Danh sách cơ cấu tổ chức</CardLabel>
+									</CardTitle>
+								</CardLabel>
+								<CardActions>
+									<Button
+										color='info'
+										icon='AddCircleOutline'
+										tag='button'
+										onClick={() => handleOpenForm(null)}>
+										Thêm mới
+									</Button>
+								</CardActions>
+							</CardHeader>
+							<div className='row h-100 w-100'>
+								<div className='col-lg-4 col-md-6 pb-4'>
+									<Card className='h-100'>
+										<CardBody>
+											<div className='pt-4' style={{ height: '100%' }}>
+												<div className='d-flex align-items-center justify-content-start'>
+													<Button
+														color='info'
+														icon={!toggle ? 'ExpandMore' : 'ExpandLess'}
+														tag='button'
+														onClick={toggleExpand}>
+														{!toggle ? 'Hiển thị tất cả' : 'Thu gọn'}
+													</Button>
+												</div>
+												<br />
+												<div style={{ maxWidth: '100%' }}>
+													<Form className='mb-3 d-flex align-items-center'>
+														<Form.Control
+															placeholder='Search...'
+															className='rounded-none outline-none shadow-none'
+															style={{
+																border: '1px solid',
+																borderRadius: '0.5rem',
+															}}
+															onChange={(e) => handleChangeSearch(e)}
+															value={valueSearch}
+														/>
 														<Button
 															color='info'
-															icon={
-																!toggle
-																	? 'ExpandMore'
-																	: 'ExpandLess'
-															}
-															tag='button'
-															onClick={toggleExpand}>
-															{!toggle
-																? 'Hiển thị tất cả'
-																: 'Thu gọn'}
+															isOutline={!darkModeStatus}
+															isLight={darkModeStatus}
+															onClick={handleSubmitSearch}
+															className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
+															icon='Search'>
+															Tìm kiếm
 														</Button>
-													</div>
-													<div id='treeTable'>
-														<TreeTable
-															value={treeValue}
-															height={600}
-															onChange={handleOnChange}>
-															<TreeTable.Column
-																style={{ minWidth: 300 }}
-																renderCell={renderIndexCell}
-																renderHeaderCell={() => <span />}
-															/>
-														</TreeTable>
-													</div>
+													</Form>
 												</div>
-											</CardBody>
-										</Card>
-									</div>
-									<div className='col-lg-8 col-md-6'>
-										<Card>
-											<CardBody>
-												<Employee dataDepartment={dataDepartment} />
-											</CardBody>
-										</Card>
-									</div>
+												<div id='treeTable'>
+													<TreeTable
+														value={treeValue}
+														height={600}
+														onChange={handleOnChange}>
+														<TreeTable.Column
+															style={{ minWidth: 300 }}
+															renderCell={renderIndexCell}
+															renderHeaderCell={() => <span />}
+														/>
+													</TreeTable>
+												</div>
+											</div>
+										</CardBody>
+									</Card>
 								</div>
-							</Card>
-						</div>
-					</div>,
-					['admin'],
-					<NotPermission />,
-				)}
+								<div className='col-lg-8 col-md-6'>
+									<Card>
+										<CardBody>
+											<Employee dataDepartment={dataDepartment} />
+										</CardBody>
+									</Card>
+								</div>
+							</div>
+						</Card>
+					</div>
+				</div>
 				<DepartmentForm
 					show={toggleForm}
 					onClose={handleCloseForm}
