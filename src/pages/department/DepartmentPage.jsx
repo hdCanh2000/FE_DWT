@@ -272,8 +272,8 @@ const DepartmentPage = () => {
 			// );
 			const dataSearch = department.map((item) => {
 				console.log(item.label.includes(valueSearch));
-				return item
-			})
+				return item;
+			});
 			console.log(dataSearch);
 		}
 	};
