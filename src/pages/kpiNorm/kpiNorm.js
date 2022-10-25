@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	TreeGridComponent,
 	ColumnsDirective,
 	ColumnDirective,
+	Filter,
+	Toolbar,
+	Inject,
 } from '@syncfusion/ej2-react-treegrid';
+import { L10n } from '@syncfusion/ej2-base';
 import _, { isEmpty } from 'lodash';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -22,34 +26,36 @@ import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import NotPermission from '../presentation/auth/NotPermission';
 import './style.css';
 import KPINormForm from './KPINormForm';
+import Loading from '../../components/Loading/Loading';
 
-const createDataTree = (dataset) => {
-	const hashTable = Object.create(null);
-	dataset.forEach((aData) => {
-		hashTable[aData.id] = { data: aData, children: [] };
-	});
-	const dataTree = [];
-	dataset.forEach((aData) => {
-		if (aData.parentId) {
-			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
-		} else {
-			dataTree.push(hashTable[aData.id]);
-		}
-	});
-	return dataTree;
-};
+L10n.load({
+	'vi-VI': {
+		grid: {
+			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
+			EmptyRecord: 'Không có dữ liệu nhiệm vụ.',
+		},
+	},
+});
 
 const KpiNormPage = () => {
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+	const loading = useSelector((state) => state.kpiNorm.loading);
 	const positions = useSelector((state) => state.position.positions);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const toolbarOptions = ['Search'];
+	const searchOptions = {
+		fields: ['data.name', 'data.position.name'],
+		ignoreCase: true,
+		key: '',
+		operator: 'contains',
+	};
 
 	useEffect(() => {
 		dispatch(fetchPositionList());
@@ -66,13 +72,29 @@ const KpiNormPage = () => {
 		}));
 	};
 
+	const createDataTree = useCallback((dataset) => {
+		const hashTable = Object.create(null);
+		dataset.forEach((aData) => {
+			hashTable[aData.id] = { data: aData, children: [] };
+		});
+		const dataTree = [];
+		dataset.forEach((aData) => {
+			if (aData.parentId) {
+				hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
+			} else {
+				dataTree.push(hashTable[aData.id]);
+			}
+		});
+		return dataTree;
+	}, []);
+
 	useEffect(() => {
 		if (!isEmpty(kpiNorm)) {
 			const treeData = createDataTree(fixForm());
 			setTreeValue(treeData);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [kpiNorm]);
+	}, [createDataTree, kpiNorm]);
 
 	const columns = [
 		{
@@ -180,77 +202,91 @@ const KpiNormPage = () => {
 	return (
 		<PageWrapper title='Khai báo nhiệm vụ'>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<div
-						className='row mb-0'
-						style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
-						<div className='col-12'>
-							<Card className='w-100 h-100'>
-								<div style={{ margin: '24px 24px 0' }}>
-									<CardHeader>
-										<CardLabel icon='FormatListBulleted' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách nhiệm vụ</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='PlaylistAdd'
-												tag='button'
-												onClick={() => handleOpenForm(null)}>
-												Thêm mới
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<CardBody>
-										<div className='control-pane'>
-											<div className='control-section'>
-												<TreeGridComponent
-													dataSource={treeValue}
-													treeColumnIndex={0}
-													className='cursor-pointer'
-													rowSelected={(item) => {
-														handleOpenForm(item.data.data);
-													}}
-													childMapping='children'
-													height='410'>
-													<ColumnsDirective>
-														<ColumnDirective
-															field='data.name'
-															headerText='Tên nhiệm vụ'
-															width='200'
-														/>
-														<ColumnDirective
-															field='data.position.name'
-															headerText='Vị trí đảm nhiệm'
-															width='90'
-															textAlign='Left'
-														/>
-														<ColumnDirective
-															field='data.quantity'
-															headerText='Số lượng'
-															width='90'
-															textAlign='Center'
-														/>
-														<ColumnDirective
-															field='data.kpi_value'
-															headerText='Giá trị KPI'
-															width='90'
-															textAlign='Center'
-														/>
-													</ColumnsDirective>
-												</TreeGridComponent>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						<div
+							className='row mb-0'
+							style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+							<div className='col-12'>
+								<Card className='w-100 h-100'>
+									<div style={{ margin: '24px 24px 0' }}>
+										<CardHeader>
+											<CardLabel
+												icon='FormatListBulleted'
+												iconColor='primary'>
+												<CardTitle>
+													<CardLabel>Danh sách nhiệm vụ</CardLabel>
+												</CardTitle>
+											</CardLabel>
+											{verifyPermissionHOC(
+												<CardActions>
+													<Button
+														color='info'
+														icon='PlaylistAdd'
+														tag='button'
+														onClick={() => handleOpenForm(null)}>
+														Thêm mới
+													</Button>
+												</CardActions>,
+												['admin', 'manager'],
+											)}
+										</CardHeader>
+										<CardBody>
+											<div className='control-pane'>
+												<div className='control-section'>
+													<TreeGridComponent
+														locale='vi-VI'
+														dataSource={treeValue}
+														treeColumnIndex={0}
+														allowResizing
+														allowReordering
+														toolbar={toolbarOptions}
+														searchSettings={searchOptions}
+														className='cursor-pointer'
+														rowSelected={(item) => {
+															handleOpenForm(item.data.data);
+														}}
+														childMapping='children'
+														height='410'>
+														<ColumnsDirective>
+															<ColumnDirective
+																field='data.name'
+																headerText='Tên nhiệm vụ'
+																width='200'
+															/>
+															<ColumnDirective
+																field='data.position.name'
+																headerText='Vị trí đảm nhiệm'
+																width='90'
+																textAlign='Left'
+															/>
+															<ColumnDirective
+																field='data.quantity'
+																headerText='Số lượng'
+																width='90'
+																textAlign='Center'
+															/>
+															<ColumnDirective
+																field='data.kpi_value'
+																headerText='Giá trị KPI'
+																width='90'
+																textAlign='Center'
+															/>
+														</ColumnsDirective>
+														<Inject services={[Filter, Toolbar]} />
+													</TreeGridComponent>
+												</div>
 											</div>
-										</div>
-									</CardBody>
-								</div>
-							</Card>
+										</CardBody>
+									</div>
+								</Card>
+							</div>
 						</div>
-					</div>,
-					['admin', 'manager'],
-					<NotPermission />,
+					</div>
 				)}
+
 				<KPINormForm
 					show={toggleForm}
 					onClose={handleCloseForm}
@@ -259,6 +295,7 @@ const KpiNormPage = () => {
 					label={itemEdit?.id ? 'Cập nhật nhiệm vụ' : 'Thêm mới nhiệm vụ'}
 					fields={columns}
 					validate={validate}
+					size='xl'
 				/>
 			</Page>
 		</PageWrapper>

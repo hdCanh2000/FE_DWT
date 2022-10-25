@@ -3,6 +3,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import _ from 'lodash';
 import { useTable, useRowSelect } from 'react-table';
 import Select from 'react-select';
 import moment from 'moment';
@@ -15,6 +16,7 @@ import { LIST_STATUS_PENDING } from '../../utils/constants';
 import { getAllWorktrackByStatus, updateStatusWorktrack } from './services';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
+import Alert from '../../components/bootstrap/Alert';
 
 const Styles = styled.div`
 	table {
@@ -119,18 +121,21 @@ const Table = ({ columns, data, onChangeStatusMultiple, darkModeStatus }) => {
 					})}
 				</tbody>
 			</table>
-			<div className='w-25 m-auto mt-4'>
-				<Button
-					color='info'
-					isOutline={!darkModeStatus}
-					isLight={darkModeStatus}
-					onClick={handleChangeStatusMultiple}
-					isDisable={!selectedFlatRows?.length}
-					className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
-					icon='Check'>
-					Duyệt nhiều
-				</Button>
-			</div>
+			{selectedFlatRows?.length >= 2 && (
+				<div className='w-25 m-auto mt-4'>
+					<Button
+						color='info'
+						isOutline={!darkModeStatus}
+						isLight={darkModeStatus}
+						onClick={handleChangeStatusMultiple}
+						isDisable={!selectedFlatRows?.length}
+						className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
+						icon='Check'>
+						Duyệt nhiều
+					</Button>
+				</div>
+			)}
+
 			{/* <p>Selected Rows: {Object.keys(selectedRowIds).length}</p>
 			<pre>
 				<code>
@@ -302,14 +307,26 @@ const PendingWorktrackPage = () => {
 												</div>
 											</div>
 										</div>
-										<Styles>
-											<Table
-												columns={columns}
-												data={data}
-												darkModeStatus={darkModeStatus}
-												onChangeStatusMultiple={handleChangeStatusMultiple}
-											/>
-										</Styles>
+										{!_.isEmpty(data) ? (
+											<Styles>
+												<Table
+													columns={columns}
+													data={data}
+													darkModeStatus={darkModeStatus}
+													onChangeStatusMultiple={
+														handleChangeStatusMultiple
+													}
+												/>
+											</Styles>
+										) : (
+											<Alert
+												color='warning'
+												isLight
+												icon='Report'
+												className='mt-0'>
+												Chưa có công việc cần duyệt!
+											</Alert>
+										)}
 									</CardBody>
 								</div>
 							</Card>

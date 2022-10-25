@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { L10n } from '@syncfusion/ej2-base';
 import {
 	TreeGridComponent,
 	ColumnsDirective,
@@ -31,6 +32,15 @@ const createDataTree = (dataset) => {
 	});
 	return dataTree;
 };
+
+L10n.load({
+	'vi-VI': {
+		grid: {
+			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
+			EmptyRecord: 'Hiện tại chưa có công việc.',
+		},
+	},
+});
 
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
@@ -90,6 +100,7 @@ const DailyWorkTrackingMe = () => {
 									<div className='control-pane'>
 										<div className='control-section'>
 											<TreeGridComponent
+												locale='vi-VI'
 												dataSource={treeValue}
 												treeColumnIndex={0}
 												className='cursor-pointer user-select-none'

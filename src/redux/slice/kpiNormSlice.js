@@ -15,8 +15,8 @@ const initialState = {
 };
 
 // Đầu tiên, tạo thunk
-export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async () => {
-	const response = await getAllKpiNorm();
+export const fetchKpiNormList = createAsyncThunk('kpiNorm/fetchList', async (params) => {
+	const response = await getAllKpiNorm(params);
 	return response.data.data.map((item) => {
 		return {
 			...item,
