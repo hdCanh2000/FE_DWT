@@ -266,16 +266,31 @@ const DepartmentPage = () => {
 		}
 	};
 	const handleSubmitSearch = () => {
-		if (!isEmpty(department)) {
-			const dataSearch = department?.filter(
-				(item) => item?.name?.toLowerCase().match(valueSearch?.toLowerCase()) !== null,
+		const dataSearch = department
+			?.filter((item) =>
+				item?.name
+					?.toLowerCase()
+					.normalize('NFD')
+					.replace(/[\u0300-\u036f]/g, '')
+					.includes(
+						valueSearch
+							?.toLowerCase()
+							.normalize('NFD')
+							.replace(/[\u0300-\u036f]/g, ''),
+					),
+			)
+			.map((item) => ({ ...item, parent_id: null, parentId: null }));
+		setTreeValue(
+			TreeState.expandAll(
+				TreeState.create(arrayToTree(dataSearch, { childrenField: 'children' })),
+			),
+		);
+		if (isEmpty(valueSearch)) {
+			setTreeValue(
+				TreeState.expandAll(
+					TreeState.create(arrayToTree(department, { childrenField: 'children' })),
+				),
 			);
-			// const dataSearch = department.map((item) => {
-			// 	console.log(item.label.ma(valueSearch));
-			// 	return item;
-			// });
-			console.log(department);
-			console.log(dataSearch);
 		}
 	};
 	return (
