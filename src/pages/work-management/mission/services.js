@@ -1,10 +1,11 @@
 import axiosClient from '../../../utils/axiosClient';
 
-const getAllMission = () => {
+const getAllMission = (params) => {
 	// lấy toàn bộ danh sách mục tiêu
 	return axiosClient({
 		method: 'GET',
 		url: '/api/missions',
+		params,
 	});
 };
 

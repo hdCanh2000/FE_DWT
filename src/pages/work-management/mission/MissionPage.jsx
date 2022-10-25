@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -24,19 +25,34 @@ import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import NotPermission from '../../presentation/auth/NotPermission';
 import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
 import { deleteMissionById } from './services';
+import Loading from '../../../components/Loading/Loading';
 
 const MissionPage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const [searchParams] = useSearchParams();
 	const { addToast } = useToasts();
+	const navigate = useNavigate();
+	const localtion = useLocation();
+
+	const text = searchParams.get('text') || '';
+	const page = searchParams.get('page') || '';
+
 	const dispatch = useDispatch();
-	const missions = useSelector((state) => state.mission?.missions);
+	const missions = useSelector((state) => state.mission.missions);
+	const pagination = useSelector((state) => state.mission.pagination);
+	const loading = useSelector((state) => state.mission.loading);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
 	const confirmForm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
+	const [currentPage, setCurrentPage] = React.useState(page || 1);
+
 	useEffect(() => {
-		dispatch(fetchMissionList());
-	}, [dispatch]);
+		const query = {};
+		query.text = text;
+		query.page = text ? 1 : page;
+		dispatch(fetchMissionList(query));
+	}, [dispatch, page, text]);
 
 	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
@@ -139,77 +155,113 @@ const MissionPage = () => {
 		},
 	];
 
+	const handleSubmitSearch = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: 1,
+			}).toString(),
+		});
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		navigate({
+			pathname: localtion.pathname,
+			search: createSearchParams({
+				text: searchValue.text,
+				page: searchValue.page,
+			}).toString(),
+		});
+	};
+
 	return (
 		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
-				<div>
-					{verifyPermissionHOC(
-						<>
-							<div
-								className='row'
-								style={{ maxWidth: '95%', minWidth: '60%', margin: '0 auto' }}>
-								<div className='col-12'>
-									<Card>
-										<div style={{ margin: '24px 24px 0' }}>
-											<CardHeader>
-												<CardLabel icon='Task' iconColor='danger'>
-													<CardTitle>
-														<CardLabel>Danh sách mục tiêu</CardLabel>
-													</CardTitle>
-												</CardLabel>
-												{verifyPermissionHOC(
-													<CardActions>
-														<Button
-															color='info'
-															icon='Plus'
-															tag='button'
-															onClick={() =>
-																handleOpenFormEdit(null)
-															}>
-															Thêm mới
-														</Button>
-													</CardActions>,
-													['admin'],
-												)}
-											</CardHeader>
-											<div className='p-4'>
-												<TableCommon
-													className='table table-modern mb-0'
-													columns={columns}
-													data={missions}
-												/>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row'
+									style={{ maxWidth: '95%', minWidth: '60%', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel icon='Task' iconColor='danger'>
+														<CardTitle>
+															<CardLabel>
+																Danh sách mục tiêu
+															</CardLabel>
+														</CardTitle>
+													</CardLabel>
+													{verifyPermissionHOC(
+														<CardActions>
+															<Button
+																color='info'
+																icon='Plus'
+																tag='button'
+																onClick={() =>
+																	handleOpenFormEdit(null)
+																}>
+																Thêm mới
+															</Button>
+														</CardActions>,
+														['admin'],
+													)}
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={missions}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
 											</div>
-										</div>
 
-										{!missions?.length && (
-											<Alert
-												color='warning'
-												isLight
-												icon='Report'
-												className='mt-3'>
-												Không có mục tiêu!
-											</Alert>
-										)}
-									</Card>
+											{!missions?.length && (
+												<Alert
+													color='warning'
+													isLight
+													icon='Report'
+													className='mt-3'>
+													Không có mục tiêu!
+												</Alert>
+											)}
+										</Card>
+									</div>
 								</div>
-							</div>
-							<MissionFormModal
-								show={toggleFormEdit}
-								onClose={handleCloseForm}
-								item={itemEdit}
-							/>
-							<AlertConfirm
-								openModal={confirmForm}
-								onCloseModal={handleCloseForm}
-								onConfirm={() => handleDelete(itemEdit)}
-								title='Xoá mục tiêu'
-								content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
-							/>
-						</>,
-						['admin', 'manager'],
-						<NotPermission />,
-					)}
-				</div>
+								<MissionFormModal
+									show={toggleFormEdit}
+									onClose={handleCloseForm}
+									item={itemEdit}
+								/>
+								<AlertConfirm
+									openModal={confirmForm}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDelete(itemEdit)}
+									title='Xoá mục tiêu'
+									content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
+								/>
+							</>,
+							['admin', 'manager'],
+							<NotPermission />,
+						)}
+					</div>
+				)}
 			</Page>
 		</PageWrapper>
 	);

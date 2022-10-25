@@ -27,6 +27,7 @@ import { addPosition, updatePosition, deletePositions } from './services';
 import PositionForm from '../common/ComponentCommon/PositionForm';
 import PositionDetail from './PositionDetail';
 import NotPermission from '../presentation/auth/NotPermission';
+import Loading from '../../components/Loading/Loading';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -49,6 +50,7 @@ const PositionPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const positions = useSelector((state) => state.position.positions);
 	const pagination = useSelector((state) => state.position.pagination);
+	const loading = useSelector((state) => state.position.loading);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
 	const requirements = useSelector((state) => state.requirement.requirements);
@@ -56,7 +58,6 @@ const PositionPage = () => {
 	const [dataDetail, setDataDetail] = React.useState({});
 	const [currentPage, setCurrentPage] = React.useState(page || 1);
 
-	// const [nvs] = React.useState(true);
 	const fetchRequirement = () => {
 		const newItem = itemEdit?.requirements?.map((items) => ({
 			...items,
@@ -285,17 +286,21 @@ const PositionPage = () => {
 		setOpenDetail(true);
 		setDataDetail({ ...item });
 	};
+
 	const handleCloseDetail = () => {
 		setOpenDetail(false);
 		setDataDetail({});
 	};
+
 	const handleOpenDelete = (item) => {
 		setIsDelete(true);
 		setItemDelete({ ...item });
 	};
+
 	const handleCloseDelete = () => {
 		setIsDelete(false);
 	};
+
 	const handleDeletePosition = async (item) => {
 		try {
 			await deletePositions(item);
@@ -309,80 +314,91 @@ const PositionPage = () => {
 		}
 		handleCloseDelete();
 	};
+
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.position.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<>
-						<div
-							className='row mb-0'
-							style={{ maxWidth: '100%', minWidth: '60%', margin: '0 auto' }}>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<div style={{ margin: '24px 24px 0' }}>
-										<CardHeader>
-											<CardLabel icon='Assignment' iconColor='primary'>
-												<CardTitle>
-													<CardLabel>Danh sách vị trí</CardLabel>
-												</CardTitle>
-											</CardLabel>
-											<CardActions>
-												<Button
-													color='info'
-													icon='PostAdd'
-													tag='button'
-													onClick={() => handleOpenForm(null)}>
-													Thêm mới
-												</Button>
-											</CardActions>
-										</CardHeader>
-										<div className='p-4'>
-											<TableCommon
-												className='table table-modern mb-0'
-												columns={columns}
-												data={positions}
-												onSubmitSearch={handleSubmitSearch}
-												onChangeCurrentPage={handleChangeCurrentPage}
-												currentPage={parseInt(currentPage, 10)}
-												totalItem={pagination?.totalRows}
-												total={pagination?.total}
-												setCurrentPage={setCurrentPage}
-												searchvalue={text}
-												isSearch
-											/>
-										</div>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row mb-0'
+									style={{ maxWidth: '100%', minWidth: '60%', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card className='w-100'>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel
+														icon='Assignment'
+														iconColor='primary'>
+														<CardTitle>
+															<CardLabel>Danh sách vị trí</CardLabel>
+														</CardTitle>
+													</CardLabel>
+													<CardActions>
+														<Button
+															color='info'
+															icon='PostAdd'
+															tag='button'
+															onClick={() => handleOpenForm(null)}>
+															Thêm mới
+														</Button>
+													</CardActions>
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={positions}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
+											</div>
+										</Card>
 									</div>
-								</Card>
-							</div>
-						</div>
-						<PositionForm
-							show={toggleForm}
-							onClose={handleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={fetchRequirement(itemEdit)}
-							label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
-							fields={columns}
-							// nv={nvs}
-							validate={validate}
-						/>
-						<PositionDetail
-							show={openDetail}
-							onClose={handleCloseDetail}
-							item={fetchRequirementDetail(dataDetail)}
-							label={`Chi tiết vị trí: ${dataDetail?.name}`}
-							fields={columns}
-							// nv
-						/>
-						<TaskAlertConfirm
-							openModal={isDelete}
-							onCloseModal={handleCloseDelete}
-							onConfirm={() => handleDeletePosition(itemDelete?.id)}
-							title='Xoá vị trí công việc'
-							content={`Xác nhận xoá vị trí công việc: <strong>${itemDelete?.name}</strong> ?`}
-						/>
-					</>,
-					['admin'],
-					<NotPermission />,
+								</div>
+								<PositionForm
+									show={toggleForm}
+									onClose={handleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={fetchRequirement(itemEdit)}
+									label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
+									fields={columns}
+									// nv={nvs}
+									validate={validate}
+								/>
+								<PositionDetail
+									show={openDetail}
+									onClose={handleCloseDetail}
+									item={fetchRequirementDetail(dataDetail)}
+									label={`Chi tiết vị trí: ${dataDetail?.name}`}
+									fields={columns}
+									// nv
+								/>
+								<TaskAlertConfirm
+									openModal={isDelete}
+									onCloseModal={handleCloseDelete}
+									onConfirm={() => handleDeletePosition(itemDelete?.id)}
+									title='Xoá vị trí công việc'
+									content={`Xác nhận xoá vị trí công việc: <strong>${itemDelete?.name}</strong> ?`}
+								/>
+							</>,
+							['admin'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
 			</Page>
 		</PageWrapper>

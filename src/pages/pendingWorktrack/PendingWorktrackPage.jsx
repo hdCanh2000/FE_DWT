@@ -17,6 +17,7 @@ import { getAllWorktrackByStatus, updateStatusWorktrack } from './services';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
 import Alert from '../../components/bootstrap/Alert';
+import Loading from '../../components/Loading/Loading';
 
 const Styles = styled.div`
 	table {
@@ -156,31 +157,39 @@ const Table = ({ columns, data, onChangeStatusMultiple, darkModeStatus }) => {
 const PendingWorktrackPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [dataWorktracks, setDataWorktracks] = useState([]);
+	const [loading, setLoading] = useState(true);
 	const [statusOption, setStatusOption] = useState({
 		label: 'Chờ duyệt',
 		value: 'pending',
 	});
 
 	async function fetchDataWorktracksByStatus(status) {
-		const response = await getAllWorktrackByStatus(status);
-		setDataWorktracks(
-			// eslint-disable-next-line no-nested-ternary
-			response.data.data !== null
-				? response.data?.data?.map((item) => {
-						return {
-							...item,
-							deadlineText: item.deadline
-								? moment(item.deadline).format('DD-MM-YYYY')
-								: '--',
-							statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status)
-								.label,
-							userResponsible: item.users.find(
-								(item) => item?.workTrackUsers?.isResponsible === true,
-							)?.name,
-						};
-				  })
-				: [],
-		);
+		try {
+			const response = await getAllWorktrackByStatus(status);
+			setDataWorktracks(
+				// eslint-disable-next-line no-nested-ternary
+				response.data.data !== null
+					? response.data?.data?.map((item) => {
+							return {
+								...item,
+								deadlineText: item.deadline
+									? moment(item.deadline).format('DD-MM-YYYY')
+									: '--',
+								statusName: LIST_STATUS_PENDING.find(
+									(st) => st.value === item.status,
+								).label,
+								userResponsible: item.users.find(
+									(item) => item?.workTrackUsers?.isResponsible === true,
+								)?.name,
+							};
+					  })
+					: [],
+			);
+			setLoading(false);
+		} catch (error) {
+			setLoading(false);
+			setDataWorktracks([]);
+		}
 	}
 
 	useEffect(() => {
@@ -282,55 +291,61 @@ const PendingWorktrackPage = () => {
 					<div
 						className='row mb-0 h-100'
 						style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
-						<div className='col-12'>
-							<Card className='w-100'>
-								<div style={{ margin: '24px 24px 0' }}>
-									<CardHeader>
-										<CardLabel icon='FormatListBulleted' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách nhiệm vụ</CardLabel>
-											</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<CardBody className='w-100'>
-										<div className='w-100 mb-3'>
-											<div className='row g-2'>
-												<div className='col-5'>
-													<Select
-														className='w-100'
-														placeholder='Trạng thái'
-														value={statusOption}
-														defaultValue={statusOption}
-														onChange={setStatusOption}
-														options={LIST_STATUS_PENDING}
-													/>
+						{loading ? (
+							<Loading />
+						) : (
+							<div className='col-12'>
+								<Card className='w-100'>
+									<div style={{ margin: '24px 24px 0' }}>
+										<CardHeader>
+											<CardLabel
+												icon='FormatListBulleted'
+												iconColor='primary'>
+												<CardTitle>
+													<CardLabel>Danh sách nhiệm vụ</CardLabel>
+												</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody className='w-100'>
+											<div className='w-100 mb-3'>
+												<div className='row g-2'>
+													<div className='col-5'>
+														<Select
+															className='w-100'
+															placeholder='Trạng thái'
+															value={statusOption}
+															defaultValue={statusOption}
+															onChange={setStatusOption}
+															options={LIST_STATUS_PENDING}
+														/>
+													</div>
 												</div>
 											</div>
-										</div>
-										{!_.isEmpty(data) ? (
-											<Styles>
-												<Table
-													columns={columns}
-													data={data}
-													darkModeStatus={darkModeStatus}
-													onChangeStatusMultiple={
-														handleChangeStatusMultiple
-													}
-												/>
-											</Styles>
-										) : (
-											<Alert
-												color='warning'
-												isLight
-												icon='Report'
-												className='mt-0'>
-												Chưa có công việc cần duyệt!
-											</Alert>
-										)}
-									</CardBody>
-								</div>
-							</Card>
-						</div>
+											{!_.isEmpty(data) ? (
+												<Styles>
+													<Table
+														columns={columns}
+														data={data}
+														darkModeStatus={darkModeStatus}
+														onChangeStatusMultiple={
+															handleChangeStatusMultiple
+														}
+													/>
+												</Styles>
+											) : (
+												<Alert
+													color='warning'
+													isLight
+													icon='Report'
+													className='mt-0'>
+													Chưa có công việc cần duyệt!
+												</Alert>
+											)}
+										</CardBody>
+									</div>
+								</Card>
+							</div>
+						)}
 					</div>,
 					['admin', 'manager'],
 					<NotPermission />,

@@ -29,6 +29,7 @@ import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/Comfirm
 import EmployeeForm from './EmployeeForm';
 import NotPermission from '../presentation/auth/NotPermission';
 import { getAllPosition } from '../position/services';
+import Loading from '../../components/Loading/Loading';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -51,6 +52,7 @@ const EmployeePage = () => {
 
 	const users = useSelector((state) => state.employee.employees);
 	const pagination = useSelector((state) => state.employee.pagination);
+	const loading = useSelector((state) => state.employee.loading);
 	const [departments, setDepartments] = React.useState([]);
 	const [positions, setPositions] = React.useState([]);
 	const [openDelete, setOpenDelete] = React.useState(false);
@@ -384,95 +386,105 @@ const EmployeePage = () => {
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
-				<div>
-					{verifyPermissionHOC(
-						<div>
-							{verifyPermissionHOC(
-								<div
-									className='row mb-0'
-									style={{
-										maxWidth: '95%',
-										minWidth: '60%',
-										margin: '0 auto',
-									}}>
-									<div className='col-12'>
-										<Card className='w-100'>
-											<div style={{ margin: '24px 24px 0' }}>
-												<CardHeader>
-													<CardLabel
-														icon='AccountCircle'
-														iconColor='primary'>
-														<CardTitle>
-															<CardLabel>Danh sách nhân sự</CardLabel>
-														</CardTitle>
-													</CardLabel>
-													{verifyPermissionHOC(
-														<CardActions>
-															<Button
-																color='info'
-																icon='PersonPlusFill'
-																tag='button'
-																onClick={() =>
-																	handleOpenForm(null)
-																}>
-																Thêm mới
-															</Button>
-															<Button
-																color='info'
-																icon='IosShare'
-																tag='button'
-																onClick={() => handleExportExcel()}>
-																Xuất Excel
-															</Button>
-														</CardActions>,
-														['admin'],
-													)}
-												</CardHeader>
-												<div className='p-4'>
-													<TableCommon
-														className='table table-modern mb-0'
-														columns={columns}
-														data={fetchUser()}
-														onSubmitSearch={handleSubmitSearch}
-														onChangeCurrentPage={
-															handleChangeCurrentPage
-														}
-														currentPage={parseInt(currentPage, 10)}
-														totalItem={pagination?.totalRows}
-														total={pagination?.total}
-														setCurrentPage={setCurrentPage}
-														searchvalue={text}
-														isSearch
-													/>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<div>
+								{verifyPermissionHOC(
+									<div
+										className='row mb-0'
+										style={{
+											maxWidth: '95%',
+											minWidth: '60%',
+											margin: '0 auto',
+										}}>
+										<div className='col-12'>
+											<Card className='w-100'>
+												<div style={{ margin: '24px 24px 0' }}>
+													<CardHeader>
+														<CardLabel
+															icon='AccountCircle'
+															iconColor='primary'>
+															<CardTitle>
+																<CardLabel>
+																	Danh sách nhân sự
+																</CardLabel>
+															</CardTitle>
+														</CardLabel>
+														{verifyPermissionHOC(
+															<CardActions>
+																<Button
+																	color='info'
+																	icon='PersonPlusFill'
+																	tag='button'
+																	onClick={() =>
+																		handleOpenForm(null)
+																	}>
+																	Thêm mới
+																</Button>
+																<Button
+																	color='info'
+																	icon='IosShare'
+																	tag='button'
+																	onClick={() =>
+																		handleExportExcel()
+																	}>
+																	Xuất Excel
+																</Button>
+															</CardActions>,
+															['admin'],
+														)}
+													</CardHeader>
+													<div className='p-4'>
+														<TableCommon
+															className='table table-modern mb-0'
+															columns={columns}
+															data={fetchUser()}
+															onSubmitSearch={handleSubmitSearch}
+															onChangeCurrentPage={
+																handleChangeCurrentPage
+															}
+															currentPage={parseInt(currentPage, 10)}
+															totalItem={pagination?.totalRows}
+															total={pagination?.total}
+															setCurrentPage={setCurrentPage}
+															searchvalue={text}
+															isSearch
+														/>
+													</div>
 												</div>
-											</div>
-										</Card>
-									</div>
-								</div>,
-								['admin', 'manager'],
-							)}
+											</Card>
+										</div>
+									</div>,
+									['admin', 'manager'],
+								)}
 
-							<EmployeeForm
-								show={toggleForm}
-								onClose={handleCloseForm}
-								handleSubmit={handleSubmitForm}
-								item={itemEdit}
-								label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
-								fields={columns}
-								validate={validate}
-							/>
-							<ComfirmSubtask
-								openModal={openDelete}
-								onCloseModal={handleOpenDelete}
-								onConfirm={() => handleDelete(dataDelete)}
-								title='Xoá nhân viên'
-								content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
-							/>
-						</div>,
-						['admin', 'manager'],
-						<NotPermission />,
-					)}
-				</div>
+								<EmployeeForm
+									show={toggleForm}
+									onClose={handleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={itemEdit}
+									label={
+										itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'
+									}
+									fields={columns}
+									validate={validate}
+								/>
+								<ComfirmSubtask
+									openModal={openDelete}
+									onCloseModal={handleOpenDelete}
+									onConfirm={() => handleDelete(dataDelete)}
+									title='Xoá nhân viên'
+									content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
+								/>
+							</div>,
+							['admin', 'manager'],
+							<NotPermission />,
+						)}
+					</div>
+				)}
 			</Page>
 		</PageWrapper>
 	);

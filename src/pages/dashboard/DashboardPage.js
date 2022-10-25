@@ -35,6 +35,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from '../dailyWorkTracking/DailyWorktrackingModal';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
+import Loading from '../../components/Loading/Loading';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -45,7 +46,6 @@ const createDataTree = (dataset) => {
 	dataset.forEach((aData) => {
 		if (!_.isEmpty(aData.parentId)) {
 			hashTable[aData.parentId].children.push(hashTable[aData.id]);
-			// hashTable[aData.parentId]
 		} else {
 			dataTree.push(hashTable[aData.id]);
 		}
@@ -58,6 +58,7 @@ const DashboardPage = () => {
 	const { themeStatus } = useDarkMode();
 	const [worktrack, setWorktrack] = useState({});
 	const [treeValue, setTreeValue] = React.useState([]);
+	const [loading, setLoading] = React.useState(true);
 
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -76,9 +77,15 @@ const DashboardPage = () => {
 
 	useEffect(() => {
 		async function fetchData() {
-			getAllWorktrackByUserId(id).then((res) => {
-				setWorktrack(res.data.data);
-			});
+			getAllWorktrackByUserId(id)
+				.then((res) => {
+					setWorktrack(res.data.data);
+					setLoading(false);
+				})
+				.catch((err) => {
+					setLoading(false);
+					throw err;
+				});
 		}
 		fetchData();
 	}, [dispatch, id]);
@@ -923,368 +930,396 @@ const DashboardPage = () => {
 	return (
 		<PageWrapper title={dashboardMenu.dashboard.text}>
 			<Page container='fluid overflow-hidden'>
-				<div className='row'>
-					{verifyPermissionHOC(
-						<div className='col-md-6'>
-							<Card className='mb-0'>
-								<CardHeader>
-									<CardLabel icon='ReceiptLong'>
-										<CardTitle tag='h4' className='h5'>
-											Thống Kê Doanh Thu
-										</CardTitle>
-										<CardSubTitle tag='h5' className='h6'>
-											Báo cáo
-										</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardActions
-									style={{
-										textAlign: 'right',
-										marginRight: '19.5px',
-										marginLeft: '19.5px',
-									}}>
-									<Dropdown isButtonGroup>
-										<DropdownToggle>
-											<Button color='success' isLight>
-												{activeCompanyTab}
-											</Button>
-										</DropdownToggle>
-										<DropdownMenu isAlignmentEnd>
-											<DropdownItem>
-												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP1)
-													}>
-													Tổng công ty
-												</Button>
-											</DropdownItem>
-											<DropdownItem>
-												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP2)
-													}>
-													Kênh OTC
-												</Button>
-											</DropdownItem>
-											<DropdownItem>
-												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP3)
-													}>
-													Kênh ETC
-												</Button>
-											</DropdownItem>
-											<DropdownItem>
-												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP4)
-													}>
-													Kênh MT
-												</Button>
-											</DropdownItem>
-											<DropdownItem>
-												<Button
-													onClick={() =>
-														setActiveCompanyTab(COMPANIES_TAB.COMP5)
-													}>
-													Kênh Online
-												</Button>
-											</DropdownItem>
-										</DropdownMenu>
-									</Dropdown>
-									<ButtonGroup style={{ marginRight: '0' }}>
-										{search.map((element) => (
-											<div key={element.name}>
-												<Button
-													isLight={searchTab !== element.name}
-													onClick={() => setSearchTab(element.name)}
-													color={themeStatus}>
-													{element.name}
-												</Button>
+				{loading ? (
+					<Loading />
+				) : (
+					<>
+						<div className='row'>
+							{verifyPermissionHOC(
+								<div className='col-md-6'>
+									<Card className='mb-0'>
+										<CardHeader>
+											<CardLabel icon='ReceiptLong'>
+												<CardTitle tag='h4' className='h5'>
+													Thống Kê Doanh Thu
+												</CardTitle>
+												<CardSubTitle tag='h5' className='h6'>
+													Báo cáo
+												</CardSubTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardActions
+											style={{
+												textAlign: 'right',
+												marginRight: '19.5px',
+												marginLeft: '19.5px',
+											}}>
+											<Dropdown isButtonGroup>
+												<DropdownToggle>
+													<Button color='success' isLight>
+														{activeCompanyTab}
+													</Button>
+												</DropdownToggle>
+												<DropdownMenu isAlignmentEnd>
+													<DropdownItem>
+														<Button
+															onClick={() =>
+																setActiveCompanyTab(
+																	COMPANIES_TAB.COMP1,
+																)
+															}>
+															Tổng công ty
+														</Button>
+													</DropdownItem>
+													<DropdownItem>
+														<Button
+															onClick={() =>
+																setActiveCompanyTab(
+																	COMPANIES_TAB.COMP2,
+																)
+															}>
+															Kênh OTC
+														</Button>
+													</DropdownItem>
+													<DropdownItem>
+														<Button
+															onClick={() =>
+																setActiveCompanyTab(
+																	COMPANIES_TAB.COMP3,
+																)
+															}>
+															Kênh ETC
+														</Button>
+													</DropdownItem>
+													<DropdownItem>
+														<Button
+															onClick={() =>
+																setActiveCompanyTab(
+																	COMPANIES_TAB.COMP4,
+																)
+															}>
+															Kênh MT
+														</Button>
+													</DropdownItem>
+													<DropdownItem>
+														<Button
+															onClick={() =>
+																setActiveCompanyTab(
+																	COMPANIES_TAB.COMP5,
+																)
+															}>
+															Kênh Online
+														</Button>
+													</DropdownItem>
+												</DropdownMenu>
+											</Dropdown>
+											<ButtonGroup style={{ marginRight: '0' }}>
+												{search.map((element) => (
+													<div key={element.name}>
+														<Button
+															isLight={searchTab !== element.name}
+															onClick={() =>
+																setSearchTab(element.name)
+															}
+															color={themeStatus}>
+															{element.name}
+														</Button>
+													</div>
+												))}
+											</ButtonGroup>
+											{searchTab === '30 Ngày' ||
+											searchTab === 'Năm' ? null : (
+												<Dropdown isButtonGroup>
+													<DropdownToggle>
+														<Button color='success' isLight>
+															{year}
+														</Button>
+													</DropdownToggle>
+													<DropdownMenu isAlignmentEnd>
+														<DropdownItem>
+															<Button
+																color='primary'
+																isLight
+																isDisable={year === 2019}
+																onClick={() => {
+																	setYear(2019);
+																	setSearchTab('');
+																}}>
+																2019
+															</Button>
+														</DropdownItem>
+														<DropdownItem>
+															<Button
+																color='primary'
+																isLight
+																isDisable={year === 2020}
+																onClick={() => {
+																	setYear(2020);
+																	setSearchTab('');
+																}}>
+																2020
+															</Button>
+														</DropdownItem>
+														<DropdownItem>
+															<Button
+																color='primary'
+																isLight
+																isDisable={year === 2021}
+																onClick={() => {
+																	setYear(2021);
+																	setSearchTab('');
+																}}>
+																2021
+															</Button>
+														</DropdownItem>
+														<DropdownItem>
+															<Button
+																color='primary'
+																isLight
+																isDisable={year === 2022}
+																onClick={() => {
+																	setYear(2022);
+																	setSearchTab('');
+																}}>
+																2022
+															</Button>
+														</DropdownItem>
+													</DropdownMenu>
+												</Dropdown>
+											)}
+										</CardActions>
+										<CardBody>
+											<div className='row'>
+												<div className='col-md-12'>
+													<Chart
+														series={
+															(searchTab === SEARCH_TAB.COMP1 &&
+																dayStoreSeries) ||
+															(searchTab === SEARCH_TAB.COMP2 &&
+																monthStoreSeries) ||
+															(searchTab === SEARCH_TAB.COMP3 &&
+																quarterStoreSeries) ||
+															(searchTab === SEARCH_TAB.COMP4 &&
+																yearStoreSeries) ||
+															(activeCompanyTab ===
+																COMPANIES_TAB.COMP2 &&
+																salesByStoreSeries1) ||
+															(activeCompanyTab ===
+																COMPANIES_TAB.COMP3 &&
+																salesByStoreSeries2) ||
+															(activeCompanyTab ===
+																COMPANIES_TAB.COMP4 &&
+																salesByStoreSeries3) ||
+															salesByStoreSeries4
+														}
+														options={
+															(searchTab === SEARCH_TAB.COMP1 &&
+																dayOptions) ||
+															(searchTab === SEARCH_TAB.COMP2 &&
+																monthOptions) ||
+															(searchTab === SEARCH_TAB.COMP3 &&
+																quarterOptions) ||
+															(searchTab === SEARCH_TAB.COMP4 &&
+																yearOptions) ||
+															salesByStoreOptions
+														}
+														type={salesByStoreOptions.chart.type}
+														height={salesByStoreOptions.chart.height}
+													/>
+												</div>
 											</div>
-										))}
-									</ButtonGroup>
-									{searchTab === '30 Ngày' || searchTab === 'Năm' ? null : (
-										<Dropdown isButtonGroup>
-											<DropdownToggle>
-												<Button color='success' isLight>
-													{year}
-												</Button>
-											</DropdownToggle>
-											<DropdownMenu isAlignmentEnd>
-												<DropdownItem>
-													<Button
-														color='primary'
-														isLight
-														isDisable={year === 2019}
-														onClick={() => {
-															setYear(2019);
-															setSearchTab('');
-														}}>
-														2019
-													</Button>
-												</DropdownItem>
-												<DropdownItem>
-													<Button
-														color='primary'
-														isLight
-														isDisable={year === 2020}
-														onClick={() => {
-															setYear(2020);
-															setSearchTab('');
-														}}>
-														2020
-													</Button>
-												</DropdownItem>
-												<DropdownItem>
-													<Button
-														color='primary'
-														isLight
-														isDisable={year === 2021}
-														onClick={() => {
-															setYear(2021);
-															setSearchTab('');
-														}}>
-														2021
-													</Button>
-												</DropdownItem>
-												<DropdownItem>
-													<Button
-														color='primary'
-														isLight
-														isDisable={year === 2022}
-														onClick={() => {
-															setYear(2022);
-															setSearchTab('');
-														}}>
-														2022
-													</Button>
-												</DropdownItem>
-											</DropdownMenu>
-										</Dropdown>
-									)}
-								</CardActions>
-								<CardBody>
-									<div className='row'>
-										<div className='col-md-12'>
+										</CardBody>
+									</Card>
+								</div>,
+								['admin'],
+							)}
+							<div className='col-md-6'>
+								{verifyPermissionHOC(
+									<Card stretch>
+										<CardHeader>
+											<CardLabel icon='StackedBarChart'>
+												<CardTitle>Thống kê người dùng</CardTitle>
+												<CardSubTitle>Báo cáo</CardSubTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody>
 											<Chart
-												series={
-													(searchTab === SEARCH_TAB.COMP1 &&
-														dayStoreSeries) ||
-													(searchTab === SEARCH_TAB.COMP2 &&
-														monthStoreSeries) ||
-													(searchTab === SEARCH_TAB.COMP3 &&
-														quarterStoreSeries) ||
-													(searchTab === SEARCH_TAB.COMP4 &&
-														yearStoreSeries) ||
-													(activeCompanyTab === COMPANIES_TAB.COMP2 &&
-														salesByStoreSeries1) ||
-													(activeCompanyTab === COMPANIES_TAB.COMP3 &&
-														salesByStoreSeries2) ||
-													(activeCompanyTab === COMPANIES_TAB.COMP4 &&
-														salesByStoreSeries3) ||
-													salesByStoreSeries4
-												}
-												options={
-													(searchTab === SEARCH_TAB.COMP1 &&
-														dayOptions) ||
-													(searchTab === SEARCH_TAB.COMP2 &&
-														monthOptions) ||
-													(searchTab === SEARCH_TAB.COMP3 &&
-														quarterOptions) ||
-													(searchTab === SEARCH_TAB.COMP4 &&
-														yearOptions) ||
-													salesByStoreOptions
-												}
-												type={salesByStoreOptions.chart.type}
-												height={salesByStoreOptions.chart.height}
+												series={guestChart.series}
+												options={guestChart.options}
+												type='bar'
+												height={370}
 											/>
-										</div>
+										</CardBody>
+									</Card>,
+									['admin'],
+								)}
+							</div>
+						</div>
+						<div className='row mt-0'>
+							{verifyPermissionHOC(
+								<>
+									<div className='col-md-6' style={{ marginTop: '1%' }}>
+										<CommonSalePerformance />
 									</div>
-								</CardBody>
-							</Card>
-						</div>,
-						['admin'],
-					)}
-					<div className='col-md-6'>
+									<div className='col-md-6' style={{ marginTop: '1%' }}>
+										<CommonApprovedAppointmentChart />
+									</div>
+								</>,
+								['admin', 'manager'],
+							)}
+						</div>
 						{verifyPermissionHOC(
-							<Card stretch>
-								<CardHeader>
-									<CardLabel icon='StackedBarChart'>
-										<CardTitle>Thống kê người dùng</CardTitle>
-										<CardSubTitle>Báo cáo</CardSubTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody>
-									<Chart
-										series={guestChart.series}
-										options={guestChart.options}
-										type='bar'
-										height={370}
-									/>
-								</CardBody>
-							</Card>,
+							<div className='row my-4'>
+								<div className='col-md-12'>
+									<Card>
+										<CardHeader>
+											<CardLabel icon='Task' iconColor='danger'>
+												<CardTitle>
+													<CardLabel>
+														Thống kê công việc theo nhân viên
+													</CardLabel>
+												</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<div className='p-4'>
+											<table
+												className='table table-modern mb-0'
+												style={{ fontSize: 14 }}>
+												<thead>
+													<tr>
+														<th>Họ và tên</th>
+														<th>Phòng ban</th>
+														<th>Vị trí</th>
+														<th className='text-center'>
+															Số nhiệm vụ đang có
+														</th>
+														<th>Chức vụ</th>
+													</tr>
+												</thead>
+												<tbody>
+													{items?.map((item) => (
+														<React.Fragment key={item.id}>
+															<tr>
+																<td>
+																	<a
+																		className='text-underline'
+																		href={`/cong-viec-hang-ngay/${item.id}`}>
+																		{item.name}
+																	</a>
+																</td>
+																<td>{item?.department?.name}</td>
+																<td>{item?.position?.name}</td>
+																<td className='text-center'>
+																	{item?.workTracks?.length || 0}
+																</td>
+																<td>
+																	{item?.role === 'manager'
+																		? 'Quản lý '
+																		: 'Nhân viên'}
+																</td>
+															</tr>
+														</React.Fragment>
+													))}
+												</tbody>
+											</table>
+											<hr />
+											<footer>
+												<PaginationButtons
+													data={users}
+													setCurrentPage={setCurrentPage}
+													currentPage={currentPage}
+													perPage={perPage}
+													setPerPage={setPerPage}
+												/>
+											</footer>
+										</div>
+									</Card>
+								</div>
+							</div>,
+							['manager'],
+						)}
+						{verifyPermissionHOC(
+							<div className='row mt-4'>
+								<div className='col-md-12 h-100'>
+									<Card className='h-100'>
+										<CardHeader>
+											<CardLabel icon='Task' iconColor='danger'>
+												<CardTitle>
+													<CardLabel>
+														Danh sách công việc đang thực hiện
+													</CardLabel>
+												</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<div className='p-4'>
+											<div className='control-pane'>
+												<div className='control-section'>
+													<TreeGridComponent
+														dataSource={treeValue}
+														treeColumnIndex={0}
+														className='cursor-pointer user-select-none'
+														rowSelected={(item) => {
+															handleOpenForm({
+																...item.data.data,
+																parent: worktrack?.workTracks?.find(
+																	(i) =>
+																		i.id ===
+																		item.data.data.parentId,
+																),
+															});
+														}}
+														childMapping='children'
+														height='410'>
+														<ColumnsDirective>
+															<ColumnDirective
+																field='data.kpiNorm.name'
+																headerText='Tên nhiệm vụ'
+																width='200'
+															/>
+															<ColumnDirective
+																field='data.mission.name'
+																headerText='Thuộc mục tiêu'
+																width='90'
+																textAlign='Left'
+															/>
+															<ColumnDirective
+																field='data.deadline'
+																headerText='Hạn hoàn thành'
+																format='yMd'
+																width='90'
+																textAlign='Center'
+															/>
+															<ColumnDirective
+																field='data.quantity'
+																headerText='Số lượng'
+																width='90'
+																textAlign='Right'
+															/>
+														</ColumnsDirective>
+													</TreeGridComponent>
+												</div>
+											</div>
+										</div>
+									</Card>
+								</div>
+								<DailyWorktrackingModal
+									data={itemEdit}
+									worktrack={worktrack}
+									handleClose={handleCloseForm}
+									show={toggleForm}
+								/>
+							</div>,
+							['user', 'manager'],
+						)}
+						{verifyPermissionHOC(
+							<div className='row'>
+								<div className='col-md-6'>
+									<OrderBarChart />
+								</div>
+							</div>,
 							['admin'],
 						)}
-					</div>
-				</div>
-				<div className='row mt-0'>
-					{verifyPermissionHOC(
-						<>
-							<div className='col-md-6' style={{ marginTop: '1%' }}>
-								<CommonSalePerformance />
-							</div>
-							<div className='col-md-6' style={{ marginTop: '1%' }}>
-								<CommonApprovedAppointmentChart />
-							</div>
-						</>,
-						['admin', 'manager'],
-					)}
-				</div>
-				{verifyPermissionHOC(
-					<div className='row my-4'>
-						<div className='col-md-12'>
-							<Card>
-								<CardHeader>
-									<CardLabel icon='Task' iconColor='danger'>
-										<CardTitle>
-											<CardLabel>Thống kê công việc theo nhân viên</CardLabel>
-										</CardTitle>
-									</CardLabel>
-								</CardHeader>
-								<div className='p-4'>
-									<table
-										className='table table-modern mb-0'
-										style={{ fontSize: 14 }}>
-										<thead>
-											<tr>
-												<th>Họ và tên</th>
-												<th>Phòng ban</th>
-												<th>Vị trí</th>
-												<th className='text-center'>Số nhiệm vụ đang có</th>
-												<th>Chức vụ</th>
-											</tr>
-										</thead>
-										<tbody>
-											{items?.map((item) => (
-												<React.Fragment key={item.id}>
-													<tr>
-														<td>
-															<a
-																className='text-underline'
-																href={`/cong-viec-hang-ngay/${item.id}`}>
-																{item.name}
-															</a>
-														</td>
-														<td>{item?.department?.name}</td>
-														<td>{item?.position?.name}</td>
-														<td className='text-center'>
-															{item?.workTracks?.length || 0}
-														</td>
-														<td>
-															{item?.role === 'manager'
-																? 'Quản lý '
-																: 'Nhân viên'}
-														</td>
-													</tr>
-												</React.Fragment>
-											))}
-										</tbody>
-									</table>
-									<hr />
-									<footer>
-										<PaginationButtons
-											data={users}
-											setCurrentPage={setCurrentPage}
-											currentPage={currentPage}
-											perPage={perPage}
-											setPerPage={setPerPage}
-										/>
-									</footer>
-								</div>
-							</Card>
-						</div>
-					</div>,
-					['manager'],
-				)}
-				{verifyPermissionHOC(
-					<div className='row mt-4'>
-						<div className='col-md-12 h-100'>
-							<Card className='h-100'>
-								<CardHeader>
-									<CardLabel icon='Task' iconColor='danger'>
-										<CardTitle>
-											<CardLabel>
-												Danh sách công việc đang thực hiện
-											</CardLabel>
-										</CardTitle>
-									</CardLabel>
-								</CardHeader>
-								<div className='p-4'>
-									<div className='control-pane'>
-										<div className='control-section'>
-											<TreeGridComponent
-												dataSource={treeValue}
-												treeColumnIndex={0}
-												className='cursor-pointer user-select-none'
-												rowSelected={(item) => {
-													handleOpenForm({
-														...item.data.data,
-														parent: worktrack?.workTracks?.find(
-															(i) => i.id === item.data.data.parentId,
-														),
-													});
-												}}
-												childMapping='children'
-												height='410'>
-												<ColumnsDirective>
-													<ColumnDirective
-														field='data.kpiNorm.name'
-														headerText='Tên nhiệm vụ'
-														width='200'
-													/>
-													<ColumnDirective
-														field='data.mission.name'
-														headerText='Thuộc mục tiêu'
-														width='90'
-														textAlign='Left'
-													/>
-													<ColumnDirective
-														field='data.deadline'
-														headerText='Hạn hoàn thành'
-														format='yMd'
-														width='90'
-														textAlign='Center'
-													/>
-													<ColumnDirective
-														field='data.quantity'
-														headerText='Số lượng'
-														width='90'
-														textAlign='Right'
-													/>
-												</ColumnsDirective>
-											</TreeGridComponent>
-										</div>
-									</div>
-								</div>
-							</Card>
-						</div>
-						<DailyWorktrackingModal
-							data={itemEdit}
-							worktrack={worktrack}
-							handleClose={handleCloseForm}
-							show={toggleForm}
-						/>
-					</div>,
-					['user', 'manager'],
-				)}
-				{verifyPermissionHOC(
-					<div className='row'>
-						<div className='col-md-6'>
-							<OrderBarChart />
-						</div>
-					</div>,
-					['admin'],
+					</>
 				)}
 			</Page>
 		</PageWrapper>
