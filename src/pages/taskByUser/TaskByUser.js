@@ -66,6 +66,17 @@ const TaskByUser = () => {
 		dispatch(fetchPositionList());
 	}, [dispatch]);
 
+	const handleResetFilter = () => {
+		dispatch(fetchEmployeeList());
+		setTextSearch('');
+		setSearchValue({
+			text: '',
+			departmentId: '',
+			positionId: '',
+			role: '',
+		});
+	};
+
 	return (
 		<PageWrapper title='Giám sát công việc nhân viên'>
 			<Page container='fluid'>
@@ -147,12 +158,22 @@ const TaskByUser = () => {
 											</div>
 											<div className='w-100 d-flex justify-content-end'>
 												<Button
+													color='primary'
+													size='lg'
+													isOutline
+													isLight={false}
+													onClick={handleResetFilter}
+													className='text-nowrap rounded-0 outline-none shadow-none me-2'
+													icon='ClearAll'>
+													Xoá bộ lọc
+												</Button>
+												<Button
 													color='info'
 													size='lg'
 													isOutline
 													isLight={false}
 													onClick={handleSubmit}
-													className='text-nowrap rounded-0 outline-none shadow-none'
+													className='text-nowrap rounded-0 outline-none shadow-none ms-2'
 													icon='Search'>
 													Tìm kiếm
 												</Button>
