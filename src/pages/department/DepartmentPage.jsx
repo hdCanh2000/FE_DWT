@@ -267,13 +267,14 @@ const DepartmentPage = () => {
 	};
 	const handleSubmitSearch = () => {
 		if (!isEmpty(department)) {
-			// const dataSearch = department?.filter((item) =>
-			// 	item?.name?.toLowerCase().includes(valueSearch?.toLowerCase()),
-			// );
-			const dataSearch = department.map((item) => {
-				console.log(item.label.includes(valueSearch));
-				return item;
-			});
+			const dataSearch = department?.filter(
+				(item) => item?.name?.toLowerCase().match(valueSearch?.toLowerCase()) !== null,
+			);
+			// const dataSearch = department.map((item) => {
+			// 	console.log(item.label.ma(valueSearch));
+			// 	return item;
+			// });
+			console.log(department);
 			console.log(dataSearch);
 		}
 	};
