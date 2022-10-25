@@ -42,7 +42,7 @@ const TableCommon = ({
 	return (
 		<div>
 			{isSearch && (
-				<div style={{ maxWidth: '100%' }}>
+				<div style={{ maxWidth: '50%' }}>
 					<Form className='mb-3 d-flex align-items-center' onSubmit={handleSubmit}>
 						<Form.Control
 							placeholder='Search...'

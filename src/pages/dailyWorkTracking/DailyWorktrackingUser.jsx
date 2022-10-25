@@ -6,6 +6,7 @@ import {
 	ColumnsDirective,
 	ColumnDirective,
 } from '@syncfusion/ej2-react-treegrid';
+import { L10n } from '@syncfusion/ej2-base';
 import { useParams } from 'react-router-dom';
 import moment from 'moment';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
@@ -16,6 +17,7 @@ import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from './DailyWorktrackingModal';
 import { LIST_STATUS } from '../../utils/constants';
+import Loading from '../../components/Loading/Loading';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -33,9 +35,19 @@ const createDataTree = (dataset) => {
 	return dataTree;
 };
 
+L10n.load({
+	'vi-VI': {
+		grid: {
+			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
+			EmptyRecord: 'Không có dữ liệu nhiệm vụ.',
+		},
+	},
+});
+
 const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
+	const loading = useSelector((state) => state.worktrack.loading);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
@@ -43,6 +55,14 @@ const DailyWorkTracking = () => {
 	const [treeValue, setTreeValue] = React.useState([]);
 	const params = useParams();
 	const { id } = params;
+
+	const toolbarOptions = ['Search'];
+	const searchOptions = {
+		fields: ['data.kpiNorm.name', 'data.mission.name'],
+		ignoreCase: true,
+		key: '',
+		operator: 'contains',
+	};
 
 	useEffect(() => {
 		dispatch(fetchWorktrackList(id));
@@ -74,84 +94,90 @@ const DailyWorkTracking = () => {
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
-				<div
-					className='row mb-0'
-					style={{ maxWidth: '90%', minWidth: '60%', margin: '0 auto' }}>
-					<div className='col-12'>
-						<Card className='w-100'>
-							<div style={{ margin: '24px 24px 0' }}>
-								<CardHeader>
-									<CardLabel icon='TaskAlt' iconColor='primary'>
-										<CardTitle>
-											<CardLabel>
-												Danh sách nhiệm vụ của {_.get(worktrack, 'name')}
-											</CardLabel>
-										</CardTitle>
-									</CardLabel>
-								</CardHeader>
-								<CardBody>
-									<div className='control-pane'>
-										<div className='control-section'>
-											<TreeGridComponent
-												dataSource={treeValue}
-												treeColumnIndex={0}
-												className='cursor-pointer user-select-none'
-												rowSelected={(item) => {
-													handleOpenForm({
-														...item.data.data,
-														parent: worktrack?.workTracks?.find(
-															(i) => i.id === item.data.data.parentId,
-														),
-													});
-												}}
-												childMapping='children'
-												height='500'>
-												<ColumnsDirective>
-													<ColumnDirective
-														field='data.kpiNorm.name'
-														headerText='Tên nhiệm vụ'
-														width='250'
-													/>
-													<ColumnDirective
-														field='data.department.name'
-														headerText='Phòng ban'
-														width='200'
-														textAlign='Center'
-													/>
-													<ColumnDirective
-														field='data.mission.name'
-														headerText='Thuộc mục tiêu'
-														width='150'
-														textAlign='Center'
-													/>
-													<ColumnDirective
-														field='data.deadline'
-														headerText='Hạn hoàn thành'
-														format='dMy'
-														width='90'
-														textAlign='Center'
-													/>
-													<ColumnDirective
-														field='data.statusName'
-														headerText='Trạng thái'
-														width='100'
-														textAlign='Center'
-													/>
-													<ColumnDirective
-														field='data.quantity'
-														headerText='Số lượng'
-														width='90'
-														textAlign='Right'
-													/>
-												</ColumnsDirective>
-											</TreeGridComponent>
+				{loading ? (
+					<Loading />
+				) : (
+					<div
+						className='row mb-0'
+						style={{ maxWidth: '90%', minWidth: '60%', margin: '0 auto' }}>
+						<div className='col-12'>
+							<Card className='w-100'>
+								<div style={{ margin: '24px 24px 0' }}>
+									<CardHeader>
+										<CardLabel icon='TaskAlt' iconColor='primary'>
+											<CardTitle>
+												<CardLabel>
+													Danh sách nhiệm vụ của{' '}
+													{_.get(worktrack, 'name')}
+												</CardLabel>
+											</CardTitle>
+										</CardLabel>
+									</CardHeader>
+									<CardBody>
+										<div className='control-pane'>
+											<div className='control-section'>
+												<TreeGridComponent
+													locale='vi-VI'
+													dataSource={treeValue}
+													treeColumnIndex={0}
+													allowResizing
+													allowReordering
+													toolbar={toolbarOptions}
+													searchSettings={searchOptions}
+													className='cursor-pointer user-select-none'
+													rowSelected={(item) => {
+														handleOpenForm({
+															...item.data.data,
+															parent: worktrack?.workTracks?.find(
+																(i) =>
+																	i.id ===
+																	item.data.data.parentId,
+															),
+														});
+													}}
+													childMapping='children'
+													height='500'>
+													<ColumnsDirective>
+														<ColumnDirective
+															field='data.kpiNorm.name'
+															headerText='Tên nhiệm vụ'
+															width='250'
+														/>
+														<ColumnDirective
+															field='data.mission.name'
+															headerText='Thuộc mục tiêu'
+															width='150'
+															textAlign='Center'
+														/>
+														<ColumnDirective
+															field='data.deadline'
+															headerText='Hạn hoàn thành'
+															format='dMy'
+															width='90'
+															textAlign='Center'
+														/>
+														<ColumnDirective
+															field='data.statusName'
+															headerText='Trạng thái'
+															width='100'
+															textAlign='Center'
+														/>
+														<ColumnDirective
+															field='data.quantity'
+															headerText='Số lượng'
+															width='90'
+															textAlign='Right'
+														/>
+													</ColumnsDirective>
+												</TreeGridComponent>
+											</div>
 										</div>
-									</div>
-								</CardBody>
-							</div>
-						</Card>
+									</CardBody>
+								</div>
+							</Card>
+						</div>
 					</div>
-				</div>
+				)}
 				<DailyWorktrackingModal
 					data={itemEdit}
 					worktrack={worktrack}

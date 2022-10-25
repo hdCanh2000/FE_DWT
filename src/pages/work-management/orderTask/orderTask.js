@@ -24,6 +24,7 @@ import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Button from '../../../components/bootstrap/Button';
+import Loading from '../../../components/Loading/Loading';
 
 const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
@@ -82,6 +83,7 @@ const OrderTask = () => {
 	const dispatch = useDispatch();
 	const [currentPage, setCurrentPage] = useState(1);
 	const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	const [loading, setLoading] = useState(true);
 	const items = dataPagination(
 		kpiNorm.filter((item) => item.parentId === null),
 		currentPage,
@@ -89,13 +91,19 @@ const OrderTask = () => {
 	);
 
 	const fetch = async () => {
-		const response = await getAllWorktrackByUser();
-		const result = await response.data.data;
-		setTasks(
-			result?.role === 'manager' || result?.role === 'user'
-				? result.workTracks.filter((item) => item.user_id !== null)
-				: result.filter((item) => item.user_id !== null),
-		);
+		try {
+			const response = await getAllWorktrackByUser();
+			const result = await response.data.data;
+			setTasks(
+				result?.role === 'manager' || result?.role === 'user'
+					? result.workTracks.filter((item) => item.user_id !== null)
+					: result.filter((item) => item.user_id !== null),
+			);
+			setLoading(false);
+		} catch (err) {
+			setLoading(false);
+			throw err;
+		}
 	};
 
 	useEffect(() => {
@@ -123,107 +131,133 @@ const OrderTask = () => {
 	return (
 		<PageWrapper title='Giao việc'>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<div className='col-12'>
-						<div className='row h-100 w-100'>
-							<div className='col-4' style={{ height: '800px' }}>
-								<Card style={{ height: '800px' }}>
-									<CardHeader>
-										<CardLabel>
-											<CardTitle>
-												<CardLabel>Nhiệm vụ đã giao</CardLabel>
-											</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<div className='p-4' style={{ overflow: 'scroll' }}>
-										<div>
-											<div>
-												{tasks.length === 0 && 'Chưa giao nhiệm vụ nào!'}
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<div className='col-12'>
+								<div className='row h-100 w-100'>
+									<div className='col-4' style={{ height: '800px' }}>
+										<Card style={{ height: '800px' }}>
+											<CardHeader>
+												<CardLabel>
+													<CardTitle>
+														<CardLabel>Nhiệm vụ đã giao</CardLabel>
+													</CardTitle>
+												</CardLabel>
+											</CardHeader>
+											<div className='p-4' style={{ overflow: 'scroll' }}>
+												<div>
+													<div>
+														{tasks.length === 0 &&
+															'Chưa giao nhiệm vụ nào!'}
+													</div>
+													{tasks?.map((item) => (
+														<Item
+															fetch={fetch}
+															key={item.id}
+															showKpiNorm={showKpiNorm}
+															data={item}
+															onOpen={handleOpenForm}
+														/>
+													))}
+												</div>
 											</div>
-											{tasks?.map((item) => (
-												<Item
-													fetch={fetch}
-													key={item.id}
-													showKpiNorm={showKpiNorm}
-													data={item}
-													onOpen={handleOpenForm}
-												/>
-											))}
-										</div>
+										</Card>
 									</div>
-								</Card>
-							</div>
-							<div className='col-8' style={{ height: '800px' }}>
-								<Card style={{ height: '800px' }}>
-									<CardHeader>
-										<CardLabel>
-											<CardTitle>
-												<CardLabel>Danh sách nhiệm vụ</CardLabel>
-											</CardTitle>
-										</CardLabel>
-									</CardHeader>
-									<div>
-										<table className='table table-modern mb-0'>
-											<thead>
-												<tr>
-													<th style={{ width: '53%' }}>Tên nhiệm vụ</th>
-													<th style={{ width: '18%' }}>Loại nhiệm vụ</th>
-													<th style={{ width: '15%' }}>
-														Vị trí đảm nhiệm
-													</th>
-													<th style={{ textAlign: 'center' }}>
-														Giá trị KPI
-													</th>
-												</tr>
-											</thead>
-										</table>
-									</div>
-									<div style={{ overflow: 'scroll', padding: '5px 5px 5px 5px' }}>
-										<table className='table table-modern mb-0'>
-											<tbody>
-												{items?.map((item) => (
-													<React.Fragment key={item.id}>
-														<tr
-															onClick={() => handleOpenForm(item)}
-															className='cursor-pointer'>
-															<td style={{ width: '54%' }}>
-																{_.get(item, 'name')}
-															</td>
-															<td style={{ width: '18%' }}>
-																{_.get(
-																	item,
-																	'taskType',
-																	'Thường xuyên',
-																)}
-															</td>
-															<td style={{ width: '15%' }}>
-																{_.get(item, 'position.name')}
-															</td>
-															<td className='text-center'>
-																{_.get(item, 'kpi_value', '--')}
-															</td>
+									<div className='col-8' style={{ height: '800px' }}>
+										<Card style={{ height: '800px' }}>
+											<CardHeader>
+												<CardLabel>
+													<CardTitle>
+														<CardLabel>Danh sách nhiệm vụ</CardLabel>
+													</CardTitle>
+												</CardLabel>
+											</CardHeader>
+											<div>
+												<table className='table table-modern mb-0'>
+													<thead>
+														<tr>
+															<th style={{ width: '53%' }}>
+																Tên nhiệm vụ
+															</th>
+															<th style={{ width: '18%' }}>
+																Loại nhiệm vụ
+															</th>
+															<th style={{ width: '15%' }}>
+																Vị trí đảm nhiệm
+															</th>
+															<th style={{ textAlign: 'center' }}>
+																Giá trị KPI
+															</th>
 														</tr>
-													</React.Fragment>
-												))}
-											</tbody>
-										</table>
+													</thead>
+												</table>
+											</div>
+											<div
+												style={{
+													overflow: 'scroll',
+													padding: '5px 5px 5px 5px',
+												}}>
+												<table className='table table-modern mb-0'>
+													<tbody>
+														{items?.map((item) => (
+															<React.Fragment key={item.id}>
+																<tr
+																	onClick={() =>
+																		handleOpenForm(item)
+																	}
+																	className='cursor-pointer'>
+																	<td style={{ width: '54%' }}>
+																		{_.get(item, 'name')}
+																	</td>
+																	<td style={{ width: '18%' }}>
+																		{_.get(
+																			item,
+																			'taskType',
+																			'Thường xuyên',
+																		)}
+																	</td>
+																	<td style={{ width: '15%' }}>
+																		{_.get(
+																			item,
+																			'position.name',
+																		)}
+																	</td>
+																	<td className='text-center'>
+																		{_.get(
+																			item,
+																			'kpi_value',
+																			'--',
+																		)}
+																	</td>
+																</tr>
+															</React.Fragment>
+														))}
+													</tbody>
+												</table>
+											</div>
+											<div>
+												<hr />
+												<PaginationButtons
+													data={kpiNorm.filter(
+														(item) => item.parentId === null,
+													)}
+													setCurrentPage={setCurrentPage}
+													currentPage={currentPage}
+													perPage={perPage}
+													setPerPage={setPerPage}
+												/>
+											</div>
+										</Card>
 									</div>
-									<div>
-										<hr />
-										<PaginationButtons
-											data={kpiNorm.filter((item) => item.parentId === null)}
-											setCurrentPage={setCurrentPage}
-											currentPage={currentPage}
-											perPage={perPage}
-											setPerPage={setPerPage}
-										/>
-									</div>
-								</Card>
-							</div>
-						</div>
-					</div>,
-					['admin', 'manager', 'user'],
-					<NotPermission />,
+								</div>
+							</div>,
+							['admin', 'manager', 'user'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
 			</Page>
 			<OrderTaskForm

@@ -9,21 +9,16 @@ import {
 const initialState = {
 	missions: [],
 	mission: {},
+	pagination: {},
 	missionReport: {},
 	loading: false,
 	error: false,
 };
 
 // Đầu tiên, tạo thunk
-export const fetchMissionList = createAsyncThunk('mission/fetchList', async () => {
-	const response = await getAllMission();
-	return response.data.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-		};
-	});
+export const fetchMissionList = createAsyncThunk('mission/fetchList', async (params) => {
+	const response = await getAllMission(params);
+	return response.data;
 });
 
 export const fetchMissionById = createAsyncThunk('mission/fetchId', async (id) => {
@@ -53,7 +48,14 @@ export const missionSlice = createSlice({
 		},
 		[fetchMissionList.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.missions = [...action.payload];
+			state.missions = [...action.payload.data].map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+				};
+			});
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchMissionList.rejected]: (state, action) => {
 			state.loading = false;
