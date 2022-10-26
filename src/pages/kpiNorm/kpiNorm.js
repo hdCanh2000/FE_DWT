@@ -215,7 +215,7 @@ const KpiNormPage = () => {
 		try {
 			const response = await exportExcel();
 			// If you want to download file automatically using link attribute.
-			let filename = 'danh-sach-nhiem-vu.xlsx';
+			let filename = 'Danh mục định mức lao động.xlsx';
 			const disposition = _.get(response.headers, 'content-disposition');
 			if (disposition && disposition.indexOf('attachment') !== -1) {
 				const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
