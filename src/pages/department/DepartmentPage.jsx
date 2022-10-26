@@ -1,6 +1,4 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-
 import React, { useEffect, useState } from 'react';
 import { isEmpty, deburr } from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
@@ -216,6 +214,7 @@ const DepartmentPage = () => {
 	};
 	const renderIndexCell = (row) => {
 		return (
+			// eslint-disable-next-line jsx-a11y/click-events-have-key-events
 			<div
 				style={{
 					paddingLeft: `${row.metadata.depth * 30}px`,
@@ -334,7 +333,7 @@ const DepartmentPage = () => {
 												</div>
 												<br />
 												<div style={{ maxWidth: '100%' }}>
-													<Form className='mb-3 d-flex align-items-center'>
+													<div className='mb-3 d-flex align-items-center'>
 														<Form.Control
 															placeholder='Search...'
 															className='rounded-none outline-none shadow-none'
@@ -354,7 +353,7 @@ const DepartmentPage = () => {
 															icon='Search'>
 															Tìm kiếm
 														</Button>
-													</Form>
+													</div>
 												</div>
 												<div id='treeTable'>
 													<TreeTable
