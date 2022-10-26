@@ -2,10 +2,10 @@
 /* eslint-disable no-shadow */
 import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import moment from 'moment';
+import { useToasts } from 'react-toast-notifications';
 import _ from 'lodash';
 import SelectComponent from 'react-select';
-import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Select from '../../../components/bootstrap/forms/Select';
@@ -13,18 +13,13 @@ import { PRIORITIES } from '../../../utils/constants';
 import Option from '../../../components/bootstrap/Option';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Button from '../../../components/bootstrap/Button';
-import Card, {
-	CardActions,
-	CardHeader,
-	CardLabel,
-	CardTitle,
-} from '../../../components/bootstrap/Card';
+import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
-import ListPickKpiNorm from './ListPickKpiNorm';
-import { addWorktrack } from '../../dailyWorkTracking/services';
+import { addWorktrack, updateWorktrack } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import Toasts from '../../../components/bootstrap/Toasts';
 
 const customStyles = {
 	control: (provided) => ({
@@ -34,23 +29,22 @@ const customStyles = {
 		borderRadius: '1.25rem',
 	}),
 };
-// eslint-disable-next-line react/prop-types, no-unused-vars
+
 const OrderTaskForm = ({ show, onClose, item, fetch }) => {
-	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
+	const { addToast } = useToasts();
 	const users = useSelector((state) => state.employee.employees);
-	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 	const missions = useSelector((state) => state.mission.missions);
 	const [missionOption, setMissionOption] = useState({});
 	const [userOption, setUserOption] = useState({});
 	const [mission, setMission] = React.useState({
 		quantity: '',
 		startDate: '',
-		deadlineDate: '',
+		deadline: '',
 		priority: 2,
 		note: '',
 	});
-	const [isOpen, setIsOpen] = React.useState(false);
+
 	useEffect(() => {
 		dispatch(fetchMissionList());
 		dispatch(fetchEmployeeList());
@@ -61,7 +55,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		setMission({ ...item });
+		if (item.id) setMission({ ...item });
 		setMissionOption({
 			...item.mission,
 			label: _.get(item, 'mission.name'),
@@ -78,7 +72,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			});
 		}
 	}, [item]);
-	// show toast
+
 	const handleChange = (e) => {
 		const { value, name } = e.target;
 		setMission({
@@ -86,51 +80,89 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			[name]: value,
 		});
 	};
+
 	const handleClose = () => {
 		onClose();
 		setMission({});
 		setMissionOption({});
 		setUserOption({});
 	};
+
+	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
+		addToast(
+			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: false,
+			},
+		);
+	};
+
 	const role = localStorage.getItem('roles');
 	const userId = localStorage.getItem('userId');
+
 	const handleSubmit = async () => {
-		const dataValue = {
-			kpiNorm_id: item.id,
-			mission_id: missionOption.id || null,
-			quantity: parseInt(mission.quantity, 10) || null,
-			user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
-			priority: parseInt(mission.priority, 10) || null,
-			note: mission.note || null,
-			description: item.description || null,
-			deadline: mission.deadline || null,
-			startDate: mission.startDate || null,
-			status: role.includes('user') ? 'pending' : 'accepted',
-		};
-		addWorktrack(dataValue).then((res) => {
-			dataSubMission.forEach(async (item) => {
-				await addWorktrack({
-					mission_id: missionOption.id || null,
-					priority: parseInt(mission.priority, 10) || null,
-					note: mission.note || null,
-					description: item.description || null,
-					deadline: mission.deadlineDate || null,
-					startDate: mission.startDate || null,
-					kpiNorm_id: item.id,
-					parent_id: res.data.data.id,
-					quantity: parseInt(mission.quantity, 10) || null,
-					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
-					status: role.includes('user') ? 'pending' : 'accepted',
+		if (item.id) {
+			const dataValue = {
+				id: item.id,
+				kpiNorm_id: item.kpiNorm_id,
+				mission_id: missionOption.id || null,
+				quantity: parseInt(mission.quantity, 10) || null,
+				user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
+				priority: parseInt(mission.priority, 10) || null,
+				note: mission.note || null,
+				description: item.description || null,
+				deadline: mission.deadline || null,
+				startDate: mission.startDate || null,
+				status: role.includes('user') ? 'pending' : 'accepted',
+			};
+			updateWorktrack(dataValue)
+				.then(() => {
+					handleShowToast(`CậP nhật công việc`, `CậP nhật công việc thành công!`);
+					handleClose();
+					fetch();
+				})
+				.catch((err) => {
+					handleShowToast(
+						`CậP nhật công việc`,
+						`CậP nhật công việc không thành công. Vui lòng thử lại!`,
+						'Warning',
+						'danger',
+					);
+					throw err;
 				});
-			});
-			fetch();
-		});
-		fetch();
-		handleClose();
+		} else {
+			const dataValue = {
+				kpiNorm_id: item.kpiNorm_id,
+				mission_id: missionOption.id || null,
+				quantity: parseInt(mission.quantity, 10) || null,
+				user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
+				priority: parseInt(mission.priority, 10) || null,
+				note: mission.note || null,
+				description: item.description || null,
+				deadline: mission.deadline || null,
+				startDate: mission.startDate || null,
+				status: role.includes('user') ? 'pending' : 'accepted',
+			};
+			addWorktrack(dataValue)
+				.then(() => {
+					handleShowToast(`Thêm công việc`, `Thêm công việc thành công!`);
+					handleClose();
+					fetch();
+				})
+				.catch((err) => {
+					handleShowToast(
+						`Thêm công việc`,
+						`Thêm công việc không thành công. Vui lòng thử lại!`,
+						'Warning',
+						'danger',
+					);
+					throw err;
+				});
+		}
 	};
-	const handleShowPickListKpiNorm = () => {
-		setIsOpen(!isOpen);
-	};
+
 	return (
 		<Modal show={show} onHide={handleClose} centered size='lg'>
 			<div className='row px-3'>
@@ -141,37 +173,22 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 								{item?.kpiNorm ? 'Chỉnh sửa nhiệm vụ ' : 'Giao nhiệm vụ'}
 							</CardTitle>
 						</CardLabel>
-						<CardActions>
-							<FormGroup>
-								<OverlayTrigger
-									overlay={
-										<Tooltip id='addSubMission'>Thêm nhiệm vụ con</Tooltip>
-									}>
-									<Button
-										color='success'
-										type='button'
-										icon='Plus'
-										className='d-block w-10'
-										onClick={handleShowPickListKpiNorm}>
-										Thêm nhiệm vụ con
-									</Button>
-								</OverlayTrigger>
-							</FormGroup>
-						</CardActions>
 					</CardHeader>
 					<div className='col-12 p-4'>
 						<div className='row'>
 							<table className='w-100 mb-4 border'>
 								<thead>
-									<th className='p-3 border text-left'>Tên nhiệm vụ</th>
-									<th className='p-3 border text-center'>Định mức KPI</th>
+									<tr>
+										<th className='p-3 border text-left'>Tên nhiệm vụ</th>
+										<th className='p-3 border text-center'>Định mức KPI</th>
+									</tr>
 								</thead>
 								<tbody>
 									<tr>
 										<td className='p-3 border text-left'>
 											<b>
-												{_.get(mission, 'name')
-													? _.get(mission, 'name')
+												{_.get(item, 'kpiNorm_name')
+													? _.get(item, 'kpiNorm_name')
 													: _.get(mission, 'kpiNorm.name')}
 											</b>
 										</td>
@@ -228,10 +245,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											name='startDate'
 											placeholder='Ngày bắt đầu'
 											onChange={handleChange}
-											value={
-												mission.startDate ||
-												moment().add(0, 'days').format('YYYY-MM-DD')
-											}
+											value={mission.startDate}
 											type='date'
 											ariaLabel='Ngày bắt đầu'
 											className='border border-2 rounded-0 shadow-none'
@@ -244,10 +258,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											name='deadline'
 											placeholder='Hạn ngày hoàn thành'
 											onChange={handleChange}
-											value={
-												mission.deadline
-												// moment().add(1, 'days').format('YYYY-MM-DD')
-											}
+											value={mission.deadline}
 											type='date'
 											ariaLabel='Hạn ngày hoàn thành'
 											className='border border-2 rounded-0 shadow-none'
@@ -309,13 +320,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 						</div>
 					</div>
 				</Card>
-				<ListPickKpiNorm
-					setDataSubMission={setDataSubMission}
-					show={isOpen}
-					data={kpiNorms}
-					handleClose={handleShowPickListKpiNorm}
-					initItem={item}
-				/>
 			</div>
 		</Modal>
 	);
