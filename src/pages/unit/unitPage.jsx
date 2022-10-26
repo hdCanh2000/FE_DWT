@@ -20,6 +20,7 @@ import { getAllUnits, addUnit, updateUnit, deleteUnit } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
+import Loading from '../../components/Loading/Loading';
 
 const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -34,6 +35,7 @@ const UnitPage = () => {
 	const [openForm, setOpenForm] = useState(false);
 	const [itemEdit, setItemEdit] = useState({});
 	const [units, setUnits] = useState({});
+	const [loading, setLoading] = useState(true);
 	const [deletes, setDeletes] = React.useState({});
 	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [currentPage, setCurrentPage] = useState(page || 1);
@@ -43,8 +45,10 @@ const UnitPage = () => {
 			const response = await getAllUnits(query);
 			const data = await response.data;
 			setUnits(data);
+			setLoading(false);
 		} catch (error) {
 			setUnits([]);
+			setLoading(false);
 		}
 	}
 
@@ -216,62 +220,81 @@ const UnitPage = () => {
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.unit.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<>
-						<div
-							className='row mb-0'
-							style={{ maxWidth: '60%', minWidth: '60%', margin: '0 auto' }}>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<div style={{ margin: '24px 24px 0' }}>
-										<CardHeader>
-											<CardLabel icon='ReceiptLong' iconColor='primary'>
-												<CardTitle>
-													<CardLabel>Danh sách đơn vị tính</CardLabel>
-												</CardTitle>
-											</CardLabel>
-											<CardActions>
-												<Button
-													color='info'
-													icon='ReceiptLong'
-													tag='button'
-													onClick={() => handleOpenActionForm(null)}>
-													Thêm mới
-												</Button>
-											</CardActions>
-										</CardHeader>
-										<div className='p-4'>
-											<TableCommon
-												className='table table-modern mb-0'
-												columns={columns}
-												data={units?.data}
-												onSubmitSearch={handleSubmitSearch}
-												onChangeCurrentPage={handleChangeCurrentPage}
-												currentPage={parseInt(currentPage, 10)}
-												totalItem={units?.pagination?.totalRows}
-												total={units?.pagination?.total}
-												setCurrentPage={setCurrentPage}
-												searchvalue={text}
-												isSearch
-											/>
-										</div>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row mb-0'
+									style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card className='w-100'>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel
+														icon='ReceiptLong'
+														iconColor='primary'>
+														<CardTitle>
+															<CardLabel>
+																Danh sách đơn vị tính
+															</CardLabel>
+														</CardTitle>
+													</CardLabel>
+													<CardActions>
+														<Button
+															color='info'
+															icon='ReceiptLong'
+															tag='button'
+															onClick={() =>
+																handleOpenActionForm(null)
+															}>
+															Thêm mới
+														</Button>
+													</CardActions>
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={units?.data}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={units?.pagination?.totalRows}
+														total={units?.pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
+											</div>
+										</Card>
 									</div>
-								</Card>
-							</div>
-						</div>
-						<CommonForm
-							show={openForm}
-							onClose={hanleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật đơn vị tính' : 'Tạo đơn vị mới tính'}
-							fields={columns}
-							validate={validate}
-						/>
-					</>,
-					['admin'],
-					<NotPermission />,
+								</div>
+								<CommonForm
+									show={openForm}
+									onClose={hanleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={itemEdit}
+									label={
+										itemEdit?.id
+											? 'Cập nhật đơn vị tính'
+											: 'Tạo đơn vị mới tính'
+									}
+									fields={columns}
+									validate={validate}
+								/>
+							</>,
+							['admin'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
+
 				<ComfirmSubtask
 					openModal={openConfirm}
 					onCloseModal={handleCloseDeleteComfirm}

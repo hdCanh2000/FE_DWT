@@ -23,6 +23,7 @@ import { addRequirement, updateRequirement, deleteRequirement } from './services
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import NotPermission from '../presentation/auth/NotPermission';
+import Loading from '../../components/Loading/Loading';
 
 const RecruitmentRequirementPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -45,6 +46,7 @@ const RecruitmentRequirementPage = () => {
 
 	const requirements = useSelector((state) => state.requirement.requirements);
 	const pagination = useSelector((state) => state.requirement.pagination);
+	const loading = useSelector((state) => state.requirement.loading);
 
 	const [itemDelete, setItemDelete] = React.useState({});
 	const [isDelete, setIsDelete] = React.useState(false);
@@ -198,74 +200,84 @@ const RecruitmentRequirementPage = () => {
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.recruitmentRequirements.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<>
-						<div
-							className='row mb-0'
-							style={{ maxWidth: '60%', minWidth: '60%', margin: '0 auto' }}>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<div style={{ margin: '24px 24px 0' }}>
-										<CardHeader>
-											<CardLabel icon='AccountCircle' iconColor='primary'>
-												<CardTitle>
-													<CardLabel>
-														Danh sách yêu cầu tuyển dụng
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row mb-0'
+									style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card className='w-100'>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel
+														icon='AccountCircle'
+														iconColor='primary'>
+														<CardTitle>
+															<CardLabel>
+																Danh sách yêu cầu tuyển dụng
+															</CardLabel>
+														</CardTitle>
 													</CardLabel>
-												</CardTitle>
-											</CardLabel>
-											<CardActions>
-												<Button
-													color='info'
-													icon='PersonPlusFill'
-													tag='button'
-													onClick={() => handleOpenForm(null)}>
-													Thêm mới
-												</Button>
-											</CardActions>
-										</CardHeader>
-										<div className='p-4'>
-											<TableCommon
-												className='table table-modern mb-0'
-												columns={columns}
-												data={requirements}
-												onSubmitSearch={handleSubmitSearch}
-												onChangeCurrentPage={handleChangeCurrentPage}
-												currentPage={parseInt(currentPage, 10)}
-												totalItem={pagination?.totalRows}
-												total={pagination?.total}
-												setCurrentPage={setCurrentPage}
-												searchvalue={text}
-												isSearch
-											/>
-										</div>
+													<CardActions>
+														<Button
+															color='info'
+															icon='PersonPlusFill'
+															tag='button'
+															onClick={() => handleOpenForm(null)}>
+															Thêm mới
+														</Button>
+													</CardActions>
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={requirements}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
+											</div>
+										</Card>
 									</div>
-								</Card>
-							</div>
-						</div>
-						<CommonForm
-							show={toggleForm}
-							onClose={handleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label={
-								itemEdit?.id
-									? 'Cập nhật yêu cầu năng lực'
-									: 'Thêm mới yêu cầu năng lực'
-							}
-							fields={columns}
-							validate={validate}
-						/>
-						<TaskAlertConfirm
-							openModal={isDelete}
-							onCloseModal={handleCloseDelete}
-							onConfirm={() => handleDeleteRequirement(itemDelete?.id)}
-							title='Xoá yêu cầu năng lực'
-							content={`Xác nhận xoá yêu cầu năng lực <strong>${itemDelete?.name}</strong> ?`}
-						/>
-					</>,
-					['admin'],
-					<NotPermission />,
+								</div>
+								<CommonForm
+									show={toggleForm}
+									onClose={handleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={itemEdit}
+									label={
+										itemEdit?.id
+											? 'Cập nhật yêu cầu năng lực'
+											: 'Thêm mới yêu cầu năng lực'
+									}
+									fields={columns}
+									validate={validate}
+								/>
+								<TaskAlertConfirm
+									openModal={isDelete}
+									onCloseModal={handleCloseDelete}
+									onConfirm={() => handleDeleteRequirement(itemDelete?.id)}
+									title='Xoá yêu cầu năng lực'
+									content={`Xác nhận xoá yêu cầu năng lực <strong>${itemDelete?.name}</strong> ?`}
+								/>
+							</>,
+							['admin'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
 			</Page>
 		</PageWrapper>
