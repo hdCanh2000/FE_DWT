@@ -57,10 +57,14 @@ const EmployeePage = ({ dataDepartment }) => {
 			id: 'position',
 			key: 'position',
 			type: 'select',
-			align: 'left',
+			align: 'center',
 			isShow: true,
 			render: (item) => (
-				<span>{`${item?.position?.name} (${item?.department?.name})` || ''}</span>
+				<span>
+					{item?.position?.name
+						? `${item?.position?.name} (${item?.department?.name})`
+						: '--'}
+				</span>
 			),
 			options: positions,
 			isMulti: false,

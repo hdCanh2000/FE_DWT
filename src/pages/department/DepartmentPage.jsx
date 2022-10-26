@@ -1,8 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-
 import React, { useEffect, useState } from 'react';
-import { isEmpty } from 'lodash';
+import { isEmpty, deburr } from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { arrayToTree } from 'performant-array-to-tree';
 import { TreeTable, TreeState } from 'cp-react-tree-table';
@@ -216,6 +214,7 @@ const DepartmentPage = () => {
 	};
 	const renderIndexCell = (row) => {
 		return (
+			// eslint-disable-next-line jsx-a11y/click-events-have-key-events
 			<div
 				style={{
 					paddingLeft: `${row.metadata.depth * 30}px`,
@@ -268,16 +267,19 @@ const DepartmentPage = () => {
 	const handleSubmitSearch = () => {
 		const dataSearch = department
 			?.filter((item) =>
-				item?.name
-					?.toLowerCase()
-					.normalize('NFD')
-					.replace(/[\u0300-\u036f]/g, '')
-					.includes(
+				deburr(
+					item?.name
+						?.toLowerCase()
+						.normalize('NFD')
+						.replace(/[\u0300-\u036f]/g, ''),
+				).includes(
+					deburr(
 						valueSearch
 							?.toLowerCase()
 							.normalize('NFD')
 							.replace(/[\u0300-\u036f]/g, ''),
 					),
+				),
 			)
 			.map((item) => ({ ...item, parent_id: null, parentId: null }));
 		setTreeValue(
@@ -331,7 +333,7 @@ const DepartmentPage = () => {
 												</div>
 												<br />
 												<div style={{ maxWidth: '100%' }}>
-													<Form className='mb-3 d-flex align-items-center'>
+													<div className='mb-3 d-flex align-items-center'>
 														<Form.Control
 															placeholder='Search...'
 															className='rounded-none outline-none shadow-none'
@@ -351,7 +353,7 @@ const DepartmentPage = () => {
 															icon='Search'>
 															Tìm kiếm
 														</Button>
-													</Form>
+													</div>
 												</div>
 												<div id='treeTable'>
 													<TreeTable
