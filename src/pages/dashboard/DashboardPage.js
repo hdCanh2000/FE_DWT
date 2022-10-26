@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	TreeGridComponent,
@@ -1201,11 +1202,11 @@ const DashboardPage = () => {
 														<React.Fragment key={item.id}>
 															<tr>
 																<td>
-																	<a
+																	<Link
 																		className='text-underline'
-																		href={`/cong-viec-hang-ngay/${item.id}`}>
+																		to={`/cong-viec-cua-nhan-vien/${item.id}`}>
 																		{item.name}
-																	</a>
+																	</Link>
 																</td>
 																<td>{item?.department?.name}</td>
 																<td>{item?.position?.name}</td>
