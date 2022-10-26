@@ -6,6 +6,7 @@ import {
 	ColumnDirective,
 } from '@syncfusion/ej2-react-treegrid';
 import _, { isEmpty } from 'lodash';
+import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, {
@@ -17,7 +18,7 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
-import { addKpiNorm, updateKpiNorm } from './services';
+import { addKpiNorm, exportExcel, updateKpiNorm } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
@@ -25,6 +26,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import './style.css';
 import KPINormForm from './KPINormForm';
+import Toasts from '../../components/bootstrap/Toasts';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -50,7 +52,7 @@ const KpiNormPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-
+	const { addToast } = useToasts();
 	useEffect(() => {
 		dispatch(fetchPositionList());
 		dispatch(fetchKpiNormList());
@@ -176,6 +178,43 @@ const KpiNormPage = () => {
 			}
 		}
 	};
+	const handleShowToast = (title, content) => {
+		addToast(
+			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: true,
+			},
+		);
+	};
+	const handleExportExcel = async () => {
+		try {
+			const response = await exportExcel();
+			// If you want to download file automatically using link attribute.
+			let filename = 'danh-sach-nhiem-vu.xlsx';
+			const disposition = _.get(response.headers, 'content-disposition');
+			if (disposition && disposition.indexOf('attachment') !== -1) {
+				const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+				const matches = filenameRegex.exec(disposition);
+				if (matches != null && matches[1]) {
+					filename = matches[1].replace(/['"]/g, '');
+				}
+			}
+			const url = window.URL.createObjectURL(
+				new Blob([response.data], { type: _.get(response.headers, 'content-type') }),
+			);
+			const link = document.createElement('a');
+			link.href = url;
+			link.setAttribute('download', filename);
+			document.body.appendChild(link);
+			link.click();
+			handleShowToast('Xuất Excel', 'Xuất excel thành công');
+		} catch (error) {
+			handleShowToast('Xuất Excel', 'Xuất excel thất bại');
+			throw error;
+		}
+	};
 
 	return (
 		<PageWrapper title='Khai báo nhiệm vụ'>
@@ -200,6 +239,13 @@ const KpiNormPage = () => {
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
 												Thêm mới
+											</Button>
+											<Button
+												color='info'
+												icon='IosShare'
+												tag='button'
+												onClick={() => handleExportExcel()}>
+												Xuất Excel
 											</Button>
 										</CardActions>
 									</CardHeader>
