@@ -52,8 +52,16 @@ const fetchAllSubKpiNorms = (data) => {
 		data,
 	});
 };
+const exportExcel = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/api/kpiNorms/exportExcel`,
+		responseType: 'blob',
+	});
+};
 
 export {
+	exportExcel,
 	getAllKpiNorm,
 	addKpiNorm,
 	updateKpiNorm,
