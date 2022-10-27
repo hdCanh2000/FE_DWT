@@ -90,19 +90,25 @@ const DashboardPage = () => {
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
 			const treeData = createDataTree(
-				worktrack?.workTracks?.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-						text: item.name,
-						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
-						parentId: item.parent_id,
-						department: {
-							name: _.get(worktrack, 'department.name', '--'),
-						},
-					};
-				}),
+				worktrack?.workTracks
+					?.filter((item) => {
+						return item?.workTrackUsers?.isResponsible === true;
+					})
+					?.map((item) => {
+						return {
+							...item,
+							label: item.name,
+							value: item.id,
+							text: item.name,
+							deadline: item.deadline
+								? moment(item.deadline).format('DD-MM-YYYY')
+								: '--',
+							parentId: item.parent_id,
+							department: {
+								name: _.get(worktrack, 'department.name', '--'),
+							},
+						};
+					}),
 			);
 			setTreeValue(treeData);
 		}
@@ -1188,7 +1194,12 @@ const DashboardPage = () => {
 															<td>{item?.department?.name}</td>
 															<td>{item?.position?.name}</td>
 															<td className='text-center'>
-																{item?.workTracks?.length || 0}
+																{item?.workTracks?.filter((wt) => {
+																	return (
+																		wt?.workTrackUsers
+																			?.isResponsible === true
+																	);
+																})?.length || 0}
 															</td>
 															<td>
 																{item?.role === 'manager'

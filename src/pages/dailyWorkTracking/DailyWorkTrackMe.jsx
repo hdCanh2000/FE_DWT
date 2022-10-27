@@ -73,17 +73,23 @@ const DailyWorkTrackingMe = () => {
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
 			const treeData = createDataTree(
-				worktrack?.workTracks?.map((item) => {
-					return {
-						...item,
-						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
-						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
-						parentId: item.parent_id,
-						department: {
-							name: _.get(worktrack, 'department.name', '--'),
-						},
-					};
-				}),
+				worktrack?.workTracks
+					?.filter((item) => {
+						return item?.workTrackUsers?.isResponsible === true;
+					})
+					?.map((item) => {
+						return {
+							...item,
+							deadline: item.deadline
+								? moment(item.deadline).format('DD-MM-YYYY')
+								: '--',
+							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+							parentId: item.parent_id,
+							department: {
+								name: _.get(worktrack, 'department.name', '--'),
+							},
+						};
+					}),
 			);
 			setTreeValue(treeData);
 		}

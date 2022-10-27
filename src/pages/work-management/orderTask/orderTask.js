@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
@@ -25,7 +25,7 @@ import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import OrderTaskForm from './OrdertaskForm';
-import { deleteWorkTrack, getAllWorktrackByUser } from '../../dailyWorkTracking/services';
+import { deleteWorkTrack } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
@@ -34,6 +34,7 @@ import Loading from '../../../components/Loading/Loading';
 import Toasts from '../../../components/bootstrap/Toasts';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
+import { fetchAssignTask } from '../../../redux/slice/worktrackSlice';
 
 L10n.load({
 	'vi-VI': {
@@ -44,7 +45,7 @@ L10n.load({
 	},
 });
 
-const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
+const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
 	const { addToast } = useToasts();
 	const [open, setOpen] = useState(false);
@@ -138,7 +139,7 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 			/>
 		</>
 	);
-};
+});
 
 const toolbarOptions = ['Search'];
 const searchOptions = {
@@ -151,34 +152,22 @@ const searchOptions = {
 const OrderTask = () => {
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+	const tasks = useSelector((state) => state.worktrack.tasks);
+	const loading = useSelector((state) => state.worktrack.loading);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = useState([]);
-	const [tasks, setTasks] = useState([]);
-	const [loading, setLoading] = useState(true);
-
-	const fetchDataListAssignWorktrack = async () => {
-		try {
-			const response = await getAllWorktrackByUser();
-			const result = await response.data.data;
-			setTasks(
-				result?.role === 'manager' || result?.role === 'user'
-					? result.workTracks.filter((item) => item.user_id !== null)
-					: result.filter((item) => item.user_id !== null),
-			);
-			setLoading(false);
-		} catch (err) {
-			setLoading(false);
-			throw err;
-		}
-	};
 
 	useEffect(() => {
-		fetchDataListAssignWorktrack();
-	}, []);
+		dispatch(fetchAssignTask());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchKpiNormList());
+	}, [dispatch]);
 
 	const createDataTree = useCallback((dataset) => {
 		const hashTable = Object.create(null);
@@ -210,10 +199,6 @@ const OrderTask = () => {
 			setTreeValue(treeData);
 		}
 	}, [createDataTree, kpiNorm]);
-
-	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
 
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
@@ -247,7 +232,9 @@ const OrderTask = () => {
 													</div>
 													{tasks?.map((item) => (
 														<Item
-															fetch={fetchDataListAssignWorktrack}
+															fetch={() =>
+																dispatch(fetchAssignTask())
+															}
 															key={item.id}
 															showKpiNorm={showKpiNorm}
 															data={item}
@@ -331,7 +318,7 @@ const OrderTask = () => {
 				)}
 			</Page>
 			<OrderTaskForm
-				fetch={fetchDataListAssignWorktrack}
+				fetch={() => dispatch(fetchAssignTask())}
 				show={toggleForm}
 				onClose={handleCloseForm}
 				item={itemEdit}

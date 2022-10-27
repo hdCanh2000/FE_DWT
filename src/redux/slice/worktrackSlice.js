@@ -12,24 +12,65 @@ import { LIST_STATUS_PENDING } from '../../utils/constants';
 
 const initialState = {
 	worktracks: [],
+	tasks: [],
 	worktracksByStatus: [],
 	worktrack: {},
 	loading: false,
 	error: false,
 };
 
-// Đầu tiên, tạo thunk
 export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async () => {
 	const response = await getAllWorktrack();
-	return response.data.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			parentId: item.parent_id,
-		};
-	});
+	return response.data.data?.role === 'manager' || response.data.data?.role === 'user'
+		? response.data.data.workTracks.map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					parentId: item.parent_id,
+				};
+		  })
+		: response.data.data.map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					parentId: item.parent_id,
+				};
+		  });
+});
+
+export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', async () => {
+	const response = await getAllWorktrack();
+	return response.data.data?.role === 'manager' || response.data.data?.role === 'user'
+		? response.data.data.workTracks
+				?.filter((item) => {
+					return item.workTrackUsers.isCreated === true;
+				})
+				?.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						parentId: item.parent_id,
+					};
+				})
+		: response.data.data
+				?.filter((item) => {
+					return item.workTrackUsers.isCreated === true;
+				})
+				?.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						parentId: item.parent_id,
+					};
+				});
 });
 
 // Đầu tiên, tạo thunk
@@ -100,6 +141,18 @@ export const worktrackSlice = createSlice({
 			state.worktracks = [...action.payload];
 		},
 		[fetchWorktrackListAll.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list assign
+		[fetchAssignTask.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchAssignTask.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.tasks = [...action.payload];
+		},
+		[fetchAssignTask.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
