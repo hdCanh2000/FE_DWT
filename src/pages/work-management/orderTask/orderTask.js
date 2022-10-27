@@ -33,6 +33,7 @@ import Button from '../../../components/bootstrap/Button';
 import Loading from '../../../components/Loading/Loading';
 import Toasts from '../../../components/bootstrap/Toasts';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
+import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
 
 L10n.load({
 	'vi-VI': {
@@ -46,6 +47,16 @@ L10n.load({
 const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
 	const { addToast } = useToasts();
+	const [open, setOpen] = useState(false);
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
+	const handleOpen = () => {
+		setOpen(true);
+	};
+
 	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
 		addToast(
 			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
@@ -81,33 +92,51 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	};
 
 	return (
-		<Card>
-			<CardHeader className='pb-1 cursor-pointer w-100'>
-				<CardLabel className='w-100 cursor-pointer' onClick={() => onOpen(data)}>
-					<CardTitle>
-						<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
-					</CardTitle>
-				</CardLabel>
-				<CardActions onClick={() => handlDeleteItem(data)}>
-					<FormGroup>
-						<OverlayTrigger
-							overlay={<Tooltip id='addSubMission'>Xóa nhiệm vụ đã giao</Tooltip>}>
-							<Button type='button' size='lg' className='d-block w-10' icon='Close' />
-						</OverlayTrigger>
-					</FormGroup>
-				</CardActions>
-			</CardHeader>
-			<CardBody className='row px-4 pb-4 pt-1 cursor-pointer' onClick={() => onOpen(data)}>
-				{verifyPermissionHOC(
-					<div className='col-12'>Người phụ trách: {userResponsible}</div>,
-					['admin', 'manager'],
-				)}
-				<div className='col-12'>
-					Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
-				</div>
-				<div className='col-12'>Số lượng : {quantity}</div>
-			</CardBody>
-		</Card>
+		<>
+			<Card>
+				<CardHeader className='pb-1 cursor-pointer w-100'>
+					<CardLabel className='w-100 cursor-pointer' onClick={() => onOpen(data)}>
+						<CardTitle>
+							<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
+						</CardTitle>
+					</CardLabel>
+					<CardActions onClick={handleOpen}>
+						<FormGroup>
+							<OverlayTrigger
+								overlay={
+									<Tooltip id='addSubMission'>Xóa nhiệm vụ đã giao</Tooltip>
+								}>
+								<Button
+									type='button'
+									size='lg'
+									className='d-block w-10'
+									icon='Close'
+								/>
+							</OverlayTrigger>
+						</FormGroup>
+					</CardActions>
+				</CardHeader>
+				<CardBody
+					className='row px-4 pb-4 pt-1 cursor-pointer'
+					onClick={() => onOpen(data)}>
+					{verifyPermissionHOC(
+						<div className='col-12'>Người phụ trách: {userResponsible}</div>,
+						['admin', 'manager'],
+					)}
+					<div className='col-12'>
+						Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
+					</div>
+					<div className='col-12'>Số lượng : {quantity}</div>
+				</CardBody>
+			</Card>
+			<AlertConfirm
+				openModal={open}
+				onCloseModal={handleClose}
+				onConfirm={() => handlDeleteItem(data)}
+				title='Xoá công việc'
+				content='Xác nhận xoá công việc đã giao?'
+			/>
+		</>
 	);
 };
 
@@ -249,7 +278,7 @@ const OrderTask = () => {
 															allowReordering
 															toolbar={toolbarOptions}
 															searchSettings={searchOptions}
-															className='cursor-pointer h-100'
+															className='cursor-pointer'
 															rowSelected={(item) => {
 																handleOpenForm({
 																	kpiNorm_id: item.data.data.id,
@@ -260,7 +289,7 @@ const OrderTask = () => {
 																});
 															}}
 															childMapping='children'
-															height='410'>
+															height='600'>
 															<ColumnsDirective>
 																<ColumnDirective
 																	field='data.name'

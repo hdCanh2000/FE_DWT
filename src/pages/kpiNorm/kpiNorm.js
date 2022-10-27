@@ -296,7 +296,7 @@ const KpiNormPage = () => {
 															handleOpenForm(item.data.data);
 														}}
 														childMapping='children'
-														height='410'>
+														height='600'>
 														<ColumnsDirective>
 															<ColumnDirective
 																field='data.name'

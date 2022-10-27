@@ -72,10 +72,10 @@ const MissionPage = () => {
 	const handleDelete = async (data) => {
 		try {
 			await deleteMissionById(data?.id);
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
 			handleCloseForm();
 		} catch (error) {
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
 			throw error;
 		}
 		dispatch(fetchMissionList());

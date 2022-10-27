@@ -137,7 +137,7 @@ const DailyWorkTracking = () => {
 														});
 													}}
 													childMapping='children'
-													height='500'>
+													height='600'>
 													<ColumnsDirective>
 														<ColumnDirective
 															field='data.kpiNorm.name'
