@@ -68,6 +68,14 @@ const KeyPage = () => {
 			isShow: true,
 		},
 		{
+			title: 'Mô tả',
+			id: 'description',
+			key: 'description',
+			type: 'text',
+			align: 'left',
+			isShow: true,
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',
