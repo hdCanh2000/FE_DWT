@@ -36,6 +36,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DailyWorktrackingModal from '../dailyWorkTracking/DailyWorktrackingModal';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
+import { LIST_STATUS } from '../../utils/constants';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -100,6 +101,7 @@ const DashboardPage = () => {
 							label: item.name,
 							value: item.id,
 							text: item.name,
+							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 							deadline: item.deadline
 								? moment(item.deadline).format('DD-MM-YYYY')
 								: '--',
@@ -1276,6 +1278,12 @@ const DashboardPage = () => {
 															headerText='Hạn hoàn thành'
 															format='yMd'
 															width='90'
+															textAlign='Center'
+														/>
+														<ColumnDirective
+															field='data.statusName'
+															headerText='Trạng thái'
+															width='100'
 															textAlign='Center'
 														/>
 														<ColumnDirective

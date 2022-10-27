@@ -103,7 +103,12 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: `${demoPages.taskAndAssign.path}`,
+		path: `${demoPages.taskAndAssign.subMenu.assign.path}`,
+		element: <DAILYWORKTRACKING.ORDERTASK />,
+		exact: true,
+	},
+	{
+		path: `${demoPages.employeeAssignTask.path}`,
 		element: <DAILYWORKTRACKING.ORDERTASK />,
 		exact: true,
 	},
