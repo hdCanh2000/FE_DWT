@@ -28,9 +28,6 @@ import Loading from '../../components/Loading/Loading';
 const KeyPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
-	const [itemDelete, setItemDelete] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
-
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { addToast } = useToasts();
@@ -40,9 +37,11 @@ const KeyPage = () => {
 
 	const localtion = useLocation();
 
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const pagination = useSelector((state) => state.positionLevel.pagination);
 	const loading = useSelector((state) => state.positionLevel.loading);
@@ -96,7 +95,7 @@ const KeyPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
@@ -171,16 +170,6 @@ const KeyPage = () => {
 			);
 		}
 	};
-
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
-	};
-
-	const handleCloseDelete = () => {
-		setIsDelete(false);
-	};
-
 	const handleDeletePositionLevel = async (item) => {
 		try {
 			await deletePositionLevel(item);
@@ -192,7 +181,7 @@ const KeyPage = () => {
 		} catch (error) {
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
 		}
-		handleCloseDelete();
+		handleCloseForm();
 	};
 
 	return (
@@ -265,11 +254,11 @@ const KeyPage = () => {
 									validate={validate}
 								/>
 								<TaskAlertConfirm
-									openModal={isDelete}
-									onCloseModal={handleCloseDelete}
-									onConfirm={() => handleDeletePositionLevel(itemDelete?.id)}
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDeletePositionLevel(itemEdit?.id)}
 									title='Xoá cấp nhân sự'
-									content={`Xác nhận xoá cấp nhân sự <strong>${itemDelete?.name}</strong> ?`}
+									content={`Xác nhận xoá cấp nhân sự <strong>${itemEdit?.name}</strong> ?`}
 								/>
 							</>,
 							['admin'],

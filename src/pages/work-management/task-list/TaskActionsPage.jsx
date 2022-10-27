@@ -23,7 +23,6 @@ import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import Icon from '../../../components/icon/Icon';
 import CustomSelect from '../../../components/form/CustomSelect';
-import { fetchKeyList } from '../../../redux/slice/keySlice';
 import SubHeaderCommon from '../../common/SubHeaders/SubHeaderCommon';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
@@ -144,11 +143,6 @@ const TaskActionsPage = () => {
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 	}, [dispatch]);
-
-	useEffect(() => {
-		dispatch(fetchKeyList());
-	}, [dispatch]);
-
 	useEffect(() => {
 		dispatch(fetchMissionList());
 	}, [dispatch]);

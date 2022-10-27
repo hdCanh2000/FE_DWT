@@ -20,7 +20,7 @@ const CommonForm = ({
 	fields,
 	options,
 	validate,
-	disable,
+	disabled,
 	size,
 	...props
 }) => {
@@ -56,6 +56,7 @@ const CommonForm = ({
 										className={field.col ? `col-${field.col}` : 'col-12'}>
 										<FormGroup id={field.id} label={field.title}>
 											<Select
+												disabled={disabled}
 												ariaLabel={field.title || ''}
 												placeholder={`${field.title}`}
 												list={field.options}
@@ -86,6 +87,7 @@ const CommonForm = ({
 										className={field.col ? `col-${field.col}` : 'col-12'}>
 										<FormGroup key={field.id} id={field.id} label={field.title}>
 											<CustomSelect
+												disabled={disabled}
 												placeholder={`${field.title}`}
 												value={formik.values[field.id]}
 												onChange={(value) => {
@@ -115,6 +117,7 @@ const CommonForm = ({
 										className={field.col ? `col-${field.col}` : 'col-12'}>
 										<FormGroup key={field.id} id={field.id} label={field.title}>
 											<Textarea
+												disabled={disabled}
 												rows={3}
 												ariaLabel={field.title}
 												placeholder={`${field.title}`}
@@ -145,6 +148,7 @@ const CommonForm = ({
 										className={field.col ? `col-${field.col}` : 'col-12'}>
 										<FormGroup key={field.id} id={field.id} label={field.title}>
 											<Checks
+												disabled={disabled}
 												id={field.id}
 												type='switch'
 												size='lg'
@@ -173,6 +177,7 @@ const CommonForm = ({
 									className={field.col ? `col-${field.col}` : 'col-12'}>
 									<FormGroup id={field.id} label={field.title}>
 										<Input
+											disabled={disabled}
 											type={field.type || 'text'}
 											name={field.id}
 											onChange={formik.handleChange}
@@ -209,7 +214,7 @@ const CommonForm = ({
 
 CommonForm.propTypes = {
 	className: PropTypes.string,
-	disable: PropTypes.string,
+	disabled: PropTypes.string,
 	show: PropTypes.bool,
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
@@ -228,7 +233,7 @@ CommonForm.propTypes = {
 };
 CommonForm.defaultProps = {
 	className: null,
-	disable: null,
+	disabled: false,
 	show: false,
 	columns: [],
 	options: [],

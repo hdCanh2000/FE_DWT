@@ -23,13 +23,13 @@ import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, exportExcel, updateEmployee } from './services';
-import { getAllDepartment } from '../department/services';
-import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
+import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
-import EmployeeForm from './EmployeeForm';
+// import EmployeeForm from './EmployeeForm';
 import NotPermission from '../presentation/auth/NotPermission';
-import { getAllPosition } from '../position/services';
 import Loading from '../../components/Loading/Loading';
+import CommonForm from '../common/ComponentCommon/CommonForm';
+import { fetchPositionList } from '../../redux/slice/positionSlice';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -46,17 +46,17 @@ const EmployeePage = () => {
 
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const users = useSelector((state) => state.employee.employees);
+	const departments = useSelector((state) => state.department.departments);
+	const positions = useSelector((state) => state.position.positions);
 	const pagination = useSelector((state) => state.employee.pagination);
 	const loading = useSelector((state) => state.employee.loading);
-	const [departments, setDepartments] = React.useState([]);
-	const [positions, setPositions] = React.useState([]);
-	const [openDelete, setOpenDelete] = React.useState(false);
-	const [dataDelete, setDataDelete] = React.useState({});
 	const [currentPage, setCurrentPage] = React.useState(page || 1);
 
 	const fetchUser = () => {
@@ -69,7 +69,10 @@ const EmployeePage = () => {
 		query.page = text ? 1 : page;
 		dispatch(fetchEmployeeList(query));
 	}, [dispatch, page, text]);
-
+	useEffect(() => {
+		dispatch(fetchDepartmentList());
+		dispatch(fetchPositionList());
+	}, [dispatch]);
 	const handleSubmitSearch = (searchValue) => {
 		navigate({
 			pathname: localtion.pathname,
@@ -90,39 +93,6 @@ const EmployeePage = () => {
 		});
 	};
 
-	useEffect(() => {
-		const fecth = async () => {
-			const response = await getAllDepartment();
-			const result = await response.data;
-			setDepartments(
-				result.data.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-					};
-				}),
-			);
-		};
-		fecth();
-	}, []);
-	useEffect(() => {
-		const fecth = async () => {
-			const response = await getAllPosition();
-			const result = await response.data;
-			setPositions(
-				result.data.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-					};
-				}),
-			);
-		};
-		fecth();
-	}, []);
-
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -131,6 +101,7 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 6,
 		},
 		{
 			title: 'Mã nhân sự',
@@ -139,14 +110,43 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'center',
 			isShow: true,
+			col: 6,
 		},
 		{
-			title: 'SĐT',
-			id: 'phone',
-			key: 'phone',
-			type: 'text',
+			title: 'Giới tính',
+			id: 'sex',
+			key: 'sex',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: false,
+			format: (value) =>
+				// eslint-disable-next-line no-nested-ternary
+				value === 'male' ? 'Nam' : 'Nữ',
+			options: [
+				{
+					id: 1,
+					text: 'Nam',
+					label: 'Nam',
+					value: 'male',
+				},
+				{
+					id: 2,
+					text: 'Nữ',
+					label: 'Nữ',
+					value: 'famale',
+				},
+			],
+			col: 6,
+		},
+		{
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
 			align: 'center',
 			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 6,
 		},
 		{
 			title: 'Email liên hệ',
@@ -155,6 +155,16 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 6,
+		},
+		{
+			title: 'SĐT',
+			id: 'phone',
+			key: 'phone',
+			type: 'text',
+			align: 'center',
+			isShow: false,
+			col: 6,
 		},
 		{
 			title: 'Phòng ban công tác',
@@ -166,6 +176,17 @@ const EmployeePage = () => {
 			render: (item) => <span>{item?.department?.name || ''} </span>,
 			options: departments,
 			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 6,
 		},
 		{
 			title: 'Vị trí làm việc',
@@ -177,47 +198,7 @@ const EmployeePage = () => {
 			render: (item) => <span>{item?.position?.name || ''}</span>,
 			options: positions,
 			isMulti: false,
-		},
-		{
-			title: 'Địa chỉ',
-			id: 'address',
-			key: 'address',
-			type: 'textarea',
-			align: 'center',
-			isShow: false,
-			render: (item) => (
-				<Popovers desc={item?.address} trigger='hover'>
-					<div
-						style={{
-							maxWidth: 150,
-							WebkitLineClamp: '2',
-							overflow: 'hidden',
-							textOverflow: 'ellipsis',
-							display: '-webkit-box',
-							WebkitBoxOrient: 'vertical',
-						}}>
-						{item?.address}
-					</div>
-				</Popovers>
-			),
-		},
-		{
-			title: 'Ngày sinh',
-			id: 'dateOfBirth',
-			key: 'dateOfBirth',
-			type: 'date',
-			align: 'center',
-			isShow: false,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'Ngày tham gia',
-			id: 'dateOfJoin',
-			key: 'dateOfJoin',
-			type: 'date',
-			align: 'center',
-			isShow: false,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 6,
 		},
 		{
 			title: 'Chức vụ',
@@ -249,6 +230,30 @@ const EmployeePage = () => {
 					value: 'user',
 				},
 			],
+			col: 6,
+		},
+		{
+			title: 'Địa chỉ',
+			id: 'address',
+			key: 'address',
+			type: 'textarea',
+			align: 'center',
+			isShow: false,
+			render: (item) => (
+				<Popovers desc={item?.address} trigger='hover'>
+					<div
+						style={{
+							maxWidth: 150,
+							WebkitLineClamp: '2',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							display: '-webkit-box',
+							WebkitBoxOrient: 'vertical',
+						}}>
+						{item?.address}
+					</div>
+				</Popovers>
+			),
 		},
 		{
 			title: 'Hành Động',
@@ -273,7 +278,7 @@ const EmployeePage = () => {
 								isLight={darkModeStatus}
 								className='text-nowrap mx-2'
 								icon='Trash'
-								onClick={() => handleOpenDelete(item)}
+								onClick={() => handleOpenFormDelete(item)}
 							/>
 						</div>,
 						['admin'],
@@ -283,10 +288,6 @@ const EmployeePage = () => {
 			isShow: false,
 		},
 	];
-	const handleOpenDelete = (item) => {
-		setDataDelete(item);
-		setOpenDelete(!openDelete);
-	};
 	const handleDelete = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
@@ -299,7 +300,6 @@ const EmployeePage = () => {
 			query.text = text;
 			query.page = 1;
 			dispatch(fetchEmployeeList(query));
-			dispatch(fetchDepartmentWithUserList());
 			handleCloseForm();
 			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
 		} catch (error) {
@@ -331,6 +331,7 @@ const EmployeePage = () => {
 			address: data?.address,
 			position_id: data?.position?.value,
 			role: data?.role,
+			sex: data?.sex,
 		};
 		if (data?.id) {
 			try {
@@ -461,7 +462,8 @@ const EmployeePage = () => {
 									['admin', 'manager'],
 								)}
 
-								<EmployeeForm
+								<CommonForm
+									size='lg'
 									show={toggleForm}
 									onClose={handleCloseForm}
 									handleSubmit={handleSubmitForm}
@@ -473,11 +475,11 @@ const EmployeePage = () => {
 									validate={validate}
 								/>
 								<ComfirmSubtask
-									openModal={openDelete}
-									onCloseModal={handleOpenDelete}
-									onConfirm={() => handleDelete(dataDelete)}
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDelete(itemEdit)}
 									title='Xoá nhân viên'
-									content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
+									content={`Xác nhận xoá nhân viên <strong>${itemEdit?.name}</strong> ?`}
 								/>
 							</div>,
 							['admin', 'manager'],

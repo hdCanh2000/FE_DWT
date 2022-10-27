@@ -24,10 +24,9 @@ import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import { addPosition, updatePosition, deletePositions } from './services';
-import PositionForm from '../common/ComponentCommon/PositionForm';
-import PositionDetail from './PositionDetail';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
+import CommonForm from '../common/ComponentCommon/CommonForm';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -43,9 +42,9 @@ const PositionPage = () => {
 	const { addToast } = useToasts();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const [itemDelete, setItemDelete] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const positions = useSelector((state) => state.position.positions);
@@ -221,7 +220,7 @@ const PositionPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</div>
 			),
@@ -292,15 +291,6 @@ const PositionPage = () => {
 		setDataDetail({});
 	};
 
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
-	};
-
-	const handleCloseDelete = () => {
-		setIsDelete(false);
-	};
-
 	const handleDeletePosition = async (item) => {
 		try {
 			await deletePositions(item);
@@ -309,10 +299,11 @@ const PositionPage = () => {
 			query.page = 1;
 			dispatch(fetchPositionList(query));
 			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc thành công!`);
+			handleCloseForm();
 		} catch (error) {
 			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc không thành công!`);
+			handleCloseForm();
 		}
-		handleCloseDelete();
 	};
 
 	return (
@@ -369,7 +360,7 @@ const PositionPage = () => {
 										</Card>
 									</div>
 								</div>
-								<PositionForm
+								<CommonForm
 									show={toggleForm}
 									onClose={handleCloseForm}
 									handleSubmit={handleSubmitForm}
@@ -379,20 +370,21 @@ const PositionPage = () => {
 									// nv={nvs}
 									validate={validate}
 								/>
-								<PositionDetail
+								<CommonForm
 									show={openDetail}
 									onClose={handleCloseDetail}
 									item={fetchRequirementDetail(dataDetail)}
 									label={`Chi tiết vị trí: ${dataDetail?.name}`}
 									fields={columns}
+									disabled
 									// nv
 								/>
 								<TaskAlertConfirm
-									openModal={isDelete}
-									onCloseModal={handleCloseDelete}
-									onConfirm={() => handleDeletePosition(itemDelete?.id)}
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDeletePosition(itemEdit?.id)}
 									title='Xoá vị trí công việc'
-									content={`Xác nhận xoá vị trí công việc: <strong>${itemDelete?.name}</strong> ?`}
+									content={`Xác nhận xoá vị trí công việc: <strong>${itemEdit?.name}</strong> ?`}
 								/>
 							</>,
 							['admin'],
