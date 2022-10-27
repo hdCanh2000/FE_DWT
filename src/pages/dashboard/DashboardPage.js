@@ -6,7 +6,11 @@ import {
 	TreeGridComponent,
 	ColumnsDirective,
 	ColumnDirective,
+	Inject,
+	Filter,
+	Toolbar,
 } from '@syncfusion/ej2-react-treegrid';
+import { L10n } from '@syncfusion/ej2-base';
 import _, { isEmpty } from 'lodash';
 import { dashboardMenu } from '../../menu';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -53,6 +57,23 @@ const createDataTree = (dataset) => {
 	});
 	return dataTree;
 };
+
+const toolbarOptions = ['Search'];
+const searchOptions = {
+	fields: ['data.kpiNorm.name', 'data.mission.name'],
+	ignoreCase: true,
+	key: '',
+	operator: 'contains',
+};
+
+L10n.load({
+	'vi-VI': {
+		grid: {
+			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
+			EmptyRecord: 'Hiện tại chưa có công việc.',
+		},
+	},
+});
 
 const DashboardPage = () => {
 	const dispatch = useDispatch();
@@ -1246,8 +1267,13 @@ const DashboardPage = () => {
 										<div className='control-pane'>
 											<div className='control-section'>
 												<TreeGridComponent
+													locale='vi-VI'
 													dataSource={treeValue}
 													treeColumnIndex={0}
+													allowResizing
+													allowReordering
+													toolbar={toolbarOptions}
+													searchSettings={searchOptions}
 													className='cursor-pointer user-select-none'
 													rowSelected={(item) => {
 														handleOpenForm({
@@ -1293,6 +1319,7 @@ const DashboardPage = () => {
 															textAlign='Right'
 														/>
 													</ColumnsDirective>
+													<Inject services={[Filter, Toolbar]} />
 												</TreeGridComponent>
 											</div>
 										</div>

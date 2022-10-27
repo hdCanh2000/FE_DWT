@@ -5,6 +5,9 @@ import {
 	TreeGridComponent,
 	ColumnsDirective,
 	ColumnDirective,
+	Inject,
+	Filter,
+	Toolbar,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { useParams } from 'react-router-dom';
@@ -175,6 +178,7 @@ const DailyWorkTracking = () => {
 															textAlign='Right'
 														/>
 													</ColumnsDirective>
+													<Inject services={[Filter, Toolbar]} />
 												</TreeGridComponent>
 											</div>
 										</div>
