@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
@@ -25,7 +25,7 @@ import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import OrderTaskForm from './OrdertaskForm';
-import { deleteWorkTrack, getAllWorktrackByUser } from '../../dailyWorkTracking/services';
+import { deleteWorkTrack } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
@@ -33,6 +33,8 @@ import Button from '../../../components/bootstrap/Button';
 import Loading from '../../../components/Loading/Loading';
 import Toasts from '../../../components/bootstrap/Toasts';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
+import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
+import { fetchAssignTask } from '../../../redux/slice/worktrackSlice';
 
 L10n.load({
 	'vi-VI': {
@@ -43,9 +45,19 @@ L10n.load({
 	},
 });
 
-const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
+const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
 	const { addToast } = useToasts();
+	const [open, setOpen] = useState(false);
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
+	const handleOpen = () => {
+		setOpen(true);
+	};
+
 	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
 		addToast(
 			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
@@ -81,35 +93,53 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	};
 
 	return (
-		<Card>
-			<CardHeader className='pb-1 cursor-pointer w-100'>
-				<CardLabel className='w-100 cursor-pointer' onClick={() => onOpen(data)}>
-					<CardTitle>
-						<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
-					</CardTitle>
-				</CardLabel>
-				<CardActions onClick={() => handlDeleteItem(data)}>
-					<FormGroup>
-						<OverlayTrigger
-							overlay={<Tooltip id='addSubMission'>Xóa nhiệm vụ đã giao</Tooltip>}>
-							<Button type='button' size='lg' className='d-block w-10' icon='Close' />
-						</OverlayTrigger>
-					</FormGroup>
-				</CardActions>
-			</CardHeader>
-			<CardBody className='row px-4 pb-4 pt-1 cursor-pointer' onClick={() => onOpen(data)}>
-				{verifyPermissionHOC(
-					<div className='col-12'>Người phụ trách: {userResponsible}</div>,
-					['admin', 'manager'],
-				)}
-				<div className='col-12'>
-					Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
-				</div>
-				<div className='col-12'>Số lượng : {quantity}</div>
-			</CardBody>
-		</Card>
+		<>
+			<Card>
+				<CardHeader className='pb-1 cursor-pointer w-100'>
+					<CardLabel className='w-100 cursor-pointer' onClick={() => onOpen(data)}>
+						<CardTitle>
+							<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
+						</CardTitle>
+					</CardLabel>
+					<CardActions onClick={handleOpen}>
+						<FormGroup>
+							<OverlayTrigger
+								overlay={
+									<Tooltip id='addSubMission'>Xóa nhiệm vụ đã giao</Tooltip>
+								}>
+								<Button
+									type='button'
+									size='lg'
+									className='d-block w-10'
+									icon='Close'
+								/>
+							</OverlayTrigger>
+						</FormGroup>
+					</CardActions>
+				</CardHeader>
+				<CardBody
+					className='row px-4 pb-4 pt-1 cursor-pointer'
+					onClick={() => onOpen(data)}>
+					{verifyPermissionHOC(
+						<div className='col-12'>Người phụ trách: {userResponsible}</div>,
+						['admin', 'manager'],
+					)}
+					<div className='col-12'>
+						Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
+					</div>
+					<div className='col-12'>Số lượng : {quantity}</div>
+				</CardBody>
+			</Card>
+			<AlertConfirm
+				openModal={open}
+				onCloseModal={handleClose}
+				onConfirm={() => handlDeleteItem(data)}
+				title='Xoá công việc'
+				content='Xác nhận xoá công việc đã giao?'
+			/>
+		</>
 	);
-};
+});
 
 const toolbarOptions = ['Search'];
 const searchOptions = {
@@ -122,34 +152,22 @@ const searchOptions = {
 const OrderTask = () => {
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+	const tasks = useSelector((state) => state.worktrack.tasks);
+	const loading = useSelector((state) => state.worktrack.loading);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = useState([]);
-	const [tasks, setTasks] = useState([]);
-	const [loading, setLoading] = useState(true);
-
-	const fetchDataListAssignWorktrack = async () => {
-		try {
-			const response = await getAllWorktrackByUser();
-			const result = await response.data.data;
-			setTasks(
-				result?.role === 'manager' || result?.role === 'user'
-					? result.workTracks.filter((item) => item.user_id !== null)
-					: result.filter((item) => item.user_id !== null),
-			);
-			setLoading(false);
-		} catch (err) {
-			setLoading(false);
-			throw err;
-		}
-	};
 
 	useEffect(() => {
-		fetchDataListAssignWorktrack();
-	}, []);
+		dispatch(fetchAssignTask());
+	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchKpiNormList());
+	}, [dispatch]);
 
 	const createDataTree = useCallback((dataset) => {
 		const hashTable = Object.create(null);
@@ -181,10 +199,6 @@ const OrderTask = () => {
 			setTreeValue(treeData);
 		}
 	}, [createDataTree, kpiNorm]);
-
-	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
 
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
@@ -218,7 +232,9 @@ const OrderTask = () => {
 													</div>
 													{tasks?.map((item) => (
 														<Item
-															fetch={fetchDataListAssignWorktrack}
+															fetch={() =>
+																dispatch(fetchAssignTask())
+															}
 															key={item.id}
 															showKpiNorm={showKpiNorm}
 															data={item}
@@ -249,7 +265,7 @@ const OrderTask = () => {
 															allowReordering
 															toolbar={toolbarOptions}
 															searchSettings={searchOptions}
-															className='cursor-pointer h-100'
+															className='cursor-pointer'
 															rowSelected={(item) => {
 																handleOpenForm({
 																	kpiNorm_id: item.data.data.id,
@@ -260,7 +276,7 @@ const OrderTask = () => {
 																});
 															}}
 															childMapping='children'
-															height='410'>
+															height='600'>
 															<ColumnsDirective>
 																<ColumnDirective
 																	field='data.name'
@@ -302,7 +318,7 @@ const OrderTask = () => {
 				)}
 			</Page>
 			<OrderTaskForm
-				fetch={fetchDataListAssignWorktrack}
+				fetch={() => dispatch(fetchAssignTask())}
 				show={toggleForm}
 				onClose={handleCloseForm}
 				item={itemEdit}

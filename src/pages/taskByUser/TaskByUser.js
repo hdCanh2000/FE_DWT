@@ -211,7 +211,12 @@ const TaskByUser = () => {
 															<td>{item?.department?.name}</td>
 															<td>{item?.position?.name}</td>
 															<td className='text-center'>
-																{item?.workTracks?.length || 0}
+																{item?.workTracks?.filter((wt) => {
+																	return (
+																		wt?.workTrackUsers
+																			?.isResponsible === true
+																	);
+																})?.length || 0}
 															</td>
 															<td>
 																{item?.role === 'manager' &&

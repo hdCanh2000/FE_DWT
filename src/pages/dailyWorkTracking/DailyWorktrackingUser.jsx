@@ -5,6 +5,9 @@ import {
 	TreeGridComponent,
 	ColumnsDirective,
 	ColumnDirective,
+	Inject,
+	Filter,
+	Toolbar,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { useParams } from 'react-router-dom';
@@ -71,20 +74,26 @@ const DailyWorkTracking = () => {
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
 			const treeData = createDataTree(
-				worktrack.workTracks.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-						text: item.name,
-						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
-						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
-						parentId: item.parent_id,
-						department: {
-							name: _.get(worktrack, 'department.name', '--'),
-						},
-					};
-				}),
+				worktrack.workTracks
+					?.filter((item) => {
+						return item?.workTrackUsers?.isResponsible === true;
+					})
+					.map((item) => {
+						return {
+							...item,
+							label: item.name,
+							value: item.id,
+							text: item.name,
+							deadline: item.deadline
+								? moment(item.deadline).format('DD-MM-YYYY')
+								: '--',
+							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+							parentId: item.parent_id,
+							department: {
+								name: _.get(worktrack, 'department.name', '--'),
+							},
+						};
+					}),
 			);
 			setTreeValue(treeData);
 		}
@@ -136,7 +145,7 @@ const DailyWorkTracking = () => {
 														});
 													}}
 													childMapping='children'
-													height='500'>
+													height='600'>
 													<ColumnsDirective>
 														<ColumnDirective
 															field='data.kpiNorm.name'
@@ -169,6 +178,7 @@ const DailyWorkTracking = () => {
 															textAlign='Right'
 														/>
 													</ColumnsDirective>
+													<Inject services={[Filter, Toolbar]} />
 												</TreeGridComponent>
 											</div>
 										</div>

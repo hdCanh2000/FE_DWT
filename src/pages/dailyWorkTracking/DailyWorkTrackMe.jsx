@@ -6,6 +6,9 @@ import {
 	TreeGridComponent,
 	ColumnsDirective,
 	ColumnDirective,
+	Inject,
+	Filter,
+	Toolbar,
 } from '@syncfusion/ej2-react-treegrid';
 import _, { isEmpty } from 'lodash';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
@@ -43,6 +46,14 @@ L10n.load({
 	},
 });
 
+const toolbarOptions = ['Search'];
+const searchOptions = {
+	fields: ['data.kpiNorm.name', 'data.mission.name'],
+	ignoreCase: true,
+	key: '',
+	operator: 'contains',
+};
+
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
 	const [worktrack, setWorktrack] = useState({});
@@ -73,17 +84,23 @@ const DailyWorkTrackingMe = () => {
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
 			const treeData = createDataTree(
-				worktrack?.workTracks?.map((item) => {
-					return {
-						...item,
-						deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
-						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
-						parentId: item.parent_id,
-						department: {
-							name: _.get(worktrack, 'department.name', '--'),
-						},
-					};
-				}),
+				worktrack?.workTracks
+					?.filter((item) => {
+						return item?.workTrackUsers?.isResponsible === true;
+					})
+					?.map((item) => {
+						return {
+							...item,
+							deadline: item.deadline
+								? moment(item.deadline).format('DD-MM-YYYY')
+								: '--',
+							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+							parentId: item.parent_id,
+							department: {
+								name: _.get(worktrack, 'department.name', '--'),
+							},
+						};
+					}),
 			);
 			setTreeValue(treeData);
 		}
@@ -116,6 +133,10 @@ const DailyWorkTrackingMe = () => {
 													locale='vi-VI'
 													dataSource={treeValue}
 													treeColumnIndex={0}
+													allowResizing
+													allowReordering
+													toolbar={toolbarOptions}
+													searchSettings={searchOptions}
 													className='cursor-pointer user-select-none'
 													rowSelected={(item) => {
 														handleOpenForm({
@@ -128,7 +149,7 @@ const DailyWorkTrackingMe = () => {
 														});
 													}}
 													childMapping='children'
-													height='410'>
+													height='600'>
 													<ColumnsDirective>
 														<ColumnDirective
 															field='data.kpiNorm.name'
@@ -161,6 +182,7 @@ const DailyWorkTrackingMe = () => {
 															textAlign='Right'
 														/>
 													</ColumnsDirective>
+													<Inject services={[Filter, Toolbar]} />
 												</TreeGridComponent>
 											</div>
 										</div>
