@@ -40,7 +40,9 @@ const RecruitmentRequirementPage = () => {
 
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
@@ -48,8 +50,6 @@ const RecruitmentRequirementPage = () => {
 	const pagination = useSelector((state) => state.requirement.pagination);
 	const loading = useSelector((state) => state.requirement.loading);
 
-	const [itemDelete, setItemDelete] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
 	const [currentPage, setCurrentPage] = React.useState(page || 1);
 
 	useEffect(() => {
@@ -118,7 +118,7 @@ const RecruitmentRequirementPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
@@ -173,15 +173,6 @@ const RecruitmentRequirementPage = () => {
 			}
 		}
 	};
-
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
-	};
-	const handleCloseDelete = () => {
-		setIsDelete(false);
-	};
-
 	const handleDeleteRequirement = async (data) => {
 		// eslint-disable-next-line no-useless-catch
 		try {
@@ -194,7 +185,7 @@ const RecruitmentRequirementPage = () => {
 		} catch (error) {
 			handleShowToast(`Xoá yêu cầu tuyển dụng`, `Xoá yêu cầu tuyển dụng không thành công!`);
 		}
-		handleCloseDelete();
+		handleCloseForm();
 	};
 
 	return (
@@ -267,11 +258,11 @@ const RecruitmentRequirementPage = () => {
 									validate={validate}
 								/>
 								<TaskAlertConfirm
-									openModal={isDelete}
-									onCloseModal={handleCloseDelete}
-									onConfirm={() => handleDeleteRequirement(itemDelete?.id)}
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDeleteRequirement(itemEdit?.id)}
 									title='Xoá yêu cầu năng lực'
-									content={`Xác nhận xoá yêu cầu năng lực <strong>${itemDelete?.name}</strong> ?`}
+									content={`Xác nhận xoá yêu cầu năng lực <strong>${itemEdit?.name}</strong> ?`}
 								/>
 							</>,
 							['admin'],

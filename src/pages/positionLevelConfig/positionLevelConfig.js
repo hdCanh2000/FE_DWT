@@ -23,12 +23,11 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
-import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
+import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 
 const PositionLevelPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
-
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const { addToast } = useToasts();
@@ -38,11 +37,11 @@ const PositionLevelPage = () => {
 
 	const localtion = useLocation();
 
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	const handleOpenDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const toggleForm = useSelector((state) => state.toggleForm.open);
-	const confirmForm = useSelector((state) => state.toggleForm.confirm);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const pagination = useSelector((state) => state.positionLevel.pagination);
 	const loading = useSelector((state) => state.positionLevel.loading);
@@ -95,7 +94,7 @@ const PositionLevelPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
@@ -162,7 +161,6 @@ const PositionLevelPage = () => {
 			);
 		}
 	};
-
 	const handleDeletePositionLevel = async (item) => {
 		try {
 			await deletePositionLevel(item);
@@ -175,6 +173,7 @@ const PositionLevelPage = () => {
 		} catch (error) {
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
 		}
+		handleCloseForm();
 	};
 
 	return (
@@ -246,12 +245,12 @@ const PositionLevelPage = () => {
 									fields={columns}
 									validate={validate}
 								/>
-								<AlertConfirm
-									openModal={confirmForm}
+								<TaskAlertConfirm
+									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}
-									onConfirm={() => handleDeletePositionLevel(itemEdit.id)}
-									title='Xoá mục tiêu'
-									content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
+									onConfirm={() => handleDeletePositionLevel(itemEdit?.id)}
+									title='Xoá cấp nhân sự'
+									content={`Xác nhận xoá cấp nhân sự <strong>${itemEdit?.name}</strong> ?`}
 								/>
 							</>,
 							['admin'],

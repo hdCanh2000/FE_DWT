@@ -99,6 +99,38 @@ const EmployeeForm = ({
 												</div>
 											);
 										}
+										if (field.id === 'sex') {
+											return (
+												<div
+													key={field.id}
+													className={
+														field.col ? `col-${field.col}` : 'col-12'
+													}>
+													<FormGroup id={field.id} label={field.title}>
+														<Select
+															ariaLabel={field.title || ''}
+															placeholder={`Chọn ${field.title}`}
+															list={field.options}
+															name={field.id}
+															size='lg'
+															className='border border-2 rounded-0 shadow-none'
+															onChange={formik.handleChange}
+															onBlur={formik.handleBlur}
+															value={formik.values[field.id]}
+															defaultValue={formik.values[field.id]}
+															isValid={formik.isValid}
+														/>
+													</FormGroup>
+													<div className='text-danger mt-1'>
+														{formik.errors[field.id] && (
+															<span className='error'>
+																{formik.errors[field.id]}
+															</span>
+														)}
+													</div>
+												</div>
+											);
+										}
 										if (field.id === 'code') {
 											return (
 												<div
