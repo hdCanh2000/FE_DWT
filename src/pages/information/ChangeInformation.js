@@ -19,10 +19,12 @@ import Icon from '../../components/icon/Icon';
 import validate from './validate';
 
 const ChangeInformation = () => {
-	const [newUser, setNewUser] = React.useState({});
-	const [isEdit, setIsEdit] = React.useState(true);
 	const { addToast } = useToasts();
 	const user = window.localStorage;
+
+	const [newUser, setNewUser] = React.useState({});
+	const [isEdit, setIsEdit] = React.useState(true);
+
 	const fetch = async () => {
 		const data = await getUserById(user?.userId);
 		const newData = _.get(data, 'data.data', {});

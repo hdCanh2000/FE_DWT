@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, createSearchParams, useSearchParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
+import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -21,6 +22,7 @@ import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 
 const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -28,16 +30,20 @@ const UnitPage = () => {
 	const navigate = useNavigate();
 	const localtion = useLocation();
 	const [searchParams] = useSearchParams();
+	const dispatch = useDispatch();
+
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const text = searchParams.get('text') || '';
 	const page = searchParams.get('page') || '';
 
-	const [openForm, setOpenForm] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
 	const [units, setUnits] = useState({});
 	const [loading, setLoading] = useState(true);
-	const [deletes, setDeletes] = React.useState({});
-	const [openConfirm, set0penConfirm] = React.useState(false);
 	const [currentPage, setCurrentPage] = useState(page || 1);
 
 	async function getUnit(query) {
@@ -83,19 +89,6 @@ const UnitPage = () => {
 		getUnit(query);
 	};
 
-	const handleOpenConfirm = (item) => {
-		setDeletes({
-			id: item.id,
-			name: item.name,
-		});
-		set0penConfirm(true);
-	};
-
-	const handleCloseDeleteComfirm = () => {
-		setDeletes({});
-		set0penConfirm(false);
-	};
-
 	const handleDelete = async (valueDelete) => {
 		try {
 			await deleteUnit(valueDelete?.id);
@@ -139,7 +132,7 @@ const UnitPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenActionForm(item)}
+						onClick={() => handleOpenForm(item)}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -147,24 +140,13 @@ const UnitPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2 '
 						icon='Delete'
-						onClick={() => handleOpenConfirm(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
 			isShow: false,
 		},
 	];
-
-	const handleOpenActionForm = (item) => {
-		setOpenForm(true);
-		setItemEdit({ ...item });
-	};
-
-	const hanleCloseForm = () => {
-		setOpenForm(false);
-		setItemEdit(null);
-	};
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -174,10 +156,6 @@ const UnitPage = () => {
 				autoDismiss: false,
 			},
 		);
-	};
-
-	const handleClearValueForm = () => {
-		setItemEdit(null);
 	};
 
 	const handleSubmitForm = async (data) => {
@@ -190,8 +168,7 @@ const UnitPage = () => {
 			try {
 				const response = await updateUnit({ id: data?.id, ...dataSubmit });
 				await response.data;
-				handleClearValueForm();
-				hanleCloseForm();
+				handleCloseForm();
 				const query = {};
 				query.text = text;
 				query.page = 1;
@@ -204,8 +181,7 @@ const UnitPage = () => {
 			try {
 				const response = await addUnit(dataSubmit);
 				await response.data;
-				handleClearValueForm();
-				hanleCloseForm();
+				handleCloseForm();
 				const query = {};
 				query.text = text;
 				query.page = 1;
@@ -247,9 +223,7 @@ const UnitPage = () => {
 															color='info'
 															icon='ReceiptLong'
 															tag='button'
-															onClick={() =>
-																handleOpenActionForm(null)
-															}>
+															onClick={() => handleOpenForm(null)}>
 															Thêm mới
 														</Button>
 													</CardActions>
@@ -276,8 +250,8 @@ const UnitPage = () => {
 									</div>
 								</div>
 								<CommonForm
-									show={openForm}
-									onClose={hanleCloseForm}
+									show={toggleForm}
+									onClose={handleCloseForm}
 									handleSubmit={handleSubmitForm}
 									item={itemEdit}
 									label={
@@ -296,11 +270,11 @@ const UnitPage = () => {
 				)}
 
 				<ComfirmSubtask
-					openModal={openConfirm}
-					onCloseModal={handleCloseDeleteComfirm}
-					onConfirm={() => handleDelete(deletes)}
+					openModal={toggleFormDelete}
+					onCloseModal={handleCloseForm}
+					onConfirm={() => handleDelete(itemEdit)}
 					title='Xoá đơn vị tính'
-					content={`Xác nhận xoá đơn vị tính <strong>${deletes?.name}</strong> ?`}
+					content={`Xác nhận xoá đơn vị tính <strong>${itemEdit?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>
