@@ -6,6 +6,9 @@ import {
 	TreeGridComponent,
 	ColumnsDirective,
 	ColumnDirective,
+	Inject,
+	Filter,
+	Toolbar,
 } from '@syncfusion/ej2-react-treegrid';
 import _, { isEmpty } from 'lodash';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
@@ -42,6 +45,14 @@ L10n.load({
 		},
 	},
 });
+
+const toolbarOptions = ['Search'];
+const searchOptions = {
+	fields: ['data.kpiNorm.name', 'data.mission.name'],
+	ignoreCase: true,
+	key: '',
+	operator: 'contains',
+};
 
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
@@ -122,6 +133,10 @@ const DailyWorkTrackingMe = () => {
 													locale='vi-VI'
 													dataSource={treeValue}
 													treeColumnIndex={0}
+													allowResizing
+													allowReordering
+													toolbar={toolbarOptions}
+													searchSettings={searchOptions}
 													className='cursor-pointer user-select-none'
 													rowSelected={(item) => {
 														handleOpenForm({
@@ -167,6 +182,7 @@ const DailyWorkTrackingMe = () => {
 															textAlign='Right'
 														/>
 													</ColumnsDirective>
+													<Inject services={[Filter, Toolbar]} />
 												</TreeGridComponent>
 											</div>
 										</div>
