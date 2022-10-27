@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,7 +14,6 @@ import { addPositionLevel, deletePositionLevel, updatePositionLevel } from './se
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import Toasts from '../../components/bootstrap/Toasts';
-import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
@@ -24,12 +23,11 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
+import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 
-const KeyPage = () => {
+const PositionLevelPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
-	const [itemDelete, setItemDelete] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
 
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -41,13 +39,14 @@ const KeyPage = () => {
 	const localtion = useLocation();
 
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleOpenDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const confirmForm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const pagination = useSelector((state) => state.positionLevel.pagination);
 	const loading = useSelector((state) => state.positionLevel.loading);
-	const [data, setData] = useState([]);
-	const datas = useSelector((state) => state.positionLevel.positionLevels);
+	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const [currentPage, setCurrentPage] = React.useState(page || 1);
 
 	const columns = [
@@ -131,14 +130,6 @@ const KeyPage = () => {
 		});
 	};
 
-	useEffect(() => {
-		setData(datas.filter((item) => item?.id !== 0));
-	}, [datas]);
-
-	useEffect(() => {
-		setData(datas.filter((item) => item?.id !== 0));
-	}, [datas]);
-
 	const handleShowToast = (title, content) => {
 		addToast(
 			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
@@ -172,15 +163,6 @@ const KeyPage = () => {
 		}
 	};
 
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
-	};
-
-	const handleCloseDelete = () => {
-		setIsDelete(false);
-	};
-
 	const handleDeletePositionLevel = async (item) => {
 		try {
 			await deletePositionLevel(item);
@@ -189,10 +171,10 @@ const KeyPage = () => {
 			query.page = 1;
 			dispatch(fetchPositionLevelList(query));
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự thành công!`);
+			handleCloseForm();
 		} catch (error) {
 			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
 		}
-		handleCloseDelete();
 	};
 
 	return (
@@ -234,7 +216,7 @@ const KeyPage = () => {
 													<TableCommon
 														className='table table-modern mb-0'
 														columns={columns}
-														data={data}
+														data={positionLevels}
 														onSubmitSearch={handleSubmitSearch}
 														onChangeCurrentPage={
 															handleChangeCurrentPage
@@ -264,12 +246,12 @@ const KeyPage = () => {
 									fields={columns}
 									validate={validate}
 								/>
-								<TaskAlertConfirm
-									openModal={isDelete}
-									onCloseModal={handleCloseDelete}
-									onConfirm={() => handleDeletePositionLevel(itemDelete?.id)}
-									title='Xoá cấp nhân sự'
-									content={`Xác nhận xoá cấp nhân sự <strong>${itemDelete?.name}</strong> ?`}
+								<AlertConfirm
+									openModal={confirmForm}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDeletePositionLevel(itemEdit.id)}
+									title='Xoá mục tiêu'
+									content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
 								/>
 							</>,
 							['admin'],
@@ -282,4 +264,4 @@ const KeyPage = () => {
 	);
 };
 
-export default KeyPage;
+export default PositionLevelPage;
