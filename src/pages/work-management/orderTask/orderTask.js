@@ -1,8 +1,18 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import _ from 'lodash';
+import {
+	TreeGridComponent,
+	ColumnsDirective,
+	ColumnDirective,
+	Filter,
+	Toolbar,
+	Inject,
+} from '@syncfusion/ej2-react-treegrid';
+import { L10n } from '@syncfusion/ej2-base';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Card, {
 	CardActions,
@@ -15,19 +25,37 @@ import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import OrderTaskForm from './OrdertaskForm';
-import PaginationButtons, {
-	dataPagination,
-	PER_COUNT,
-} from '../../../components/PaginationButtons';
 import { deleteWorkTrack, getAllWorktrackByUser } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import NotPermission from '../../presentation/auth/NotPermission';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Button from '../../../components/bootstrap/Button';
 import Loading from '../../../components/Loading/Loading';
+import Toasts from '../../../components/bootstrap/Toasts';
+import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
+
+L10n.load({
+	'vi-VI': {
+		grid: {
+			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
+			EmptyRecord: 'Không có dữ liệu nhiệm vụ.',
+		},
+	},
+});
 
 const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
+	const { addToast } = useToasts();
+	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
+		addToast(
+			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
+				{content}
+			</Toasts>,
+			{
+				autoDismiss: false,
+			},
+		);
+	};
 
 	const userResponsible = _.get(
 		_.filter(users, (user) => {
@@ -37,14 +65,25 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 	);
 
 	const handlDeleteItem = async (ele) => {
-		await deleteWorkTrack(ele.id);
-		fetch();
+		try {
+			await deleteWorkTrack(ele.id);
+			handleShowToast(`Xoá công việc`, `Xoá công việc thành công!`);
+			fetch();
+		} catch (error) {
+			handleShowToast(
+				`Xoá công việc`,
+				`Xoá công việc không thành công. Vui lòng thử lại!`,
+				'Warning',
+				'danger',
+			);
+			throw error;
+		}
 	};
 
 	return (
 		<Card>
-			<CardHeader className='pb-1 cursor-pointer'>
-				<CardLabel style={{ cursor: 'pointer' }} onClick={() => onOpen(data)}>
+			<CardHeader className='pb-1 cursor-pointer w-100'>
+				<CardLabel className='w-100 cursor-pointer' onClick={() => onOpen(data)}>
 					<CardTitle>
 						<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
 					</CardTitle>
@@ -71,26 +110,28 @@ const Item = ({ data, showKpiNorm, fetch, onOpen }) => {
 		</Card>
 	);
 };
-const OrderTask = () => {
-	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
-	const [isOpenForm, setIsOpenForm] = useState(false);
-	const [itemEdit, setItemEdit] = useState({
-		kpiNorm: [],
-		departmentReplated: [],
-		userReplated: [],
-	});
-	const [tasks, setTasks] = useState([]);
-	const dispatch = useDispatch();
-	const [currentPage, setCurrentPage] = useState(1);
-	const [perPage, setPerPage] = useState(PER_COUNT['10']);
-	const [loading, setLoading] = useState(true);
-	const items = dataPagination(
-		kpiNorm.filter((item) => item.parentId === null),
-		currentPage,
-		perPage,
-	);
 
-	const fetch = async () => {
+const toolbarOptions = ['Search'];
+const searchOptions = {
+	fields: ['data.name', 'data.position.name'],
+	ignoreCase: true,
+	key: '',
+	operator: 'contains',
+};
+
+const OrderTask = () => {
+	const dispatch = useDispatch();
+	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const [treeValue, setTreeValue] = useState([]);
+	const [tasks, setTasks] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	const fetchDataListAssignWorktrack = async () => {
 		try {
 			const response = await getAllWorktrackByUser();
 			const result = await response.data.data;
@@ -107,21 +148,43 @@ const OrderTask = () => {
 	};
 
 	useEffect(() => {
-		fetch();
+		fetchDataListAssignWorktrack();
 	}, []);
+
+	const createDataTree = useCallback((dataset) => {
+		const hashTable = Object.create(null);
+		dataset.forEach((aData) => {
+			hashTable[aData.id] = { data: aData, children: [] };
+		});
+		const dataTree = [];
+		dataset.forEach((aData) => {
+			if (aData.parentId) {
+				hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
+			} else {
+				dataTree.push(hashTable[aData.id]);
+			}
+		});
+		return dataTree;
+	}, []);
+
+	useEffect(() => {
+		if (!_.isEmpty(kpiNorm)) {
+			const treeData = createDataTree(
+				_.map(kpiNorm, (item) => {
+					return {
+						...item,
+						quantity: !_.isNumber(item.quantity) ? '--' : item.quantity,
+						kpi_value: !_.isNumber(item.kpi_value) ? '--' : item.kpi_value,
+					};
+				}),
+			);
+			setTreeValue(treeData);
+		}
+	}, [createDataTree, kpiNorm]);
 
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
-	const handleOpenForm = (item) => {
-		setItemEdit({ ...item });
-		setIsOpenForm(true);
-	};
-
-	const handleCloseForm = () => {
-		setIsOpenForm(false);
-	};
 
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
@@ -155,7 +218,7 @@ const OrderTask = () => {
 													</div>
 													{tasks?.map((item) => (
 														<Item
-															fetch={fetch}
+															fetch={fetchDataListAssignWorktrack}
 															key={item.id}
 															showKpiNorm={showKpiNorm}
 															data={item}
@@ -175,81 +238,59 @@ const OrderTask = () => {
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>
-											<div>
-												<table className='table table-modern mb-0'>
-													<thead>
-														<tr>
-															<th style={{ width: '53%' }}>
-																Tên nhiệm vụ
-															</th>
-															<th style={{ width: '18%' }}>
-																Loại nhiệm vụ
-															</th>
-															<th style={{ width: '15%' }}>
-																Vị trí đảm nhiệm
-															</th>
-															<th style={{ textAlign: 'center' }}>
-																Giá trị KPI
-															</th>
-														</tr>
-													</thead>
-												</table>
-											</div>
-											<div
-												style={{
-													overflow: 'scroll',
-													padding: '5px 5px 5px 5px',
-												}}>
-												<table className='table table-modern mb-0'>
-													<tbody>
-														{items?.map((item) => (
-															<React.Fragment key={item.id}>
-																<tr
-																	onClick={() =>
-																		handleOpenForm(item)
-																	}
-																	className='cursor-pointer'>
-																	<td style={{ width: '54%' }}>
-																		{_.get(item, 'name')}
-																	</td>
-																	<td style={{ width: '18%' }}>
-																		{_.get(
-																			item,
-																			'taskType',
-																			'Thường xuyên',
-																		)}
-																	</td>
-																	<td style={{ width: '15%' }}>
-																		{_.get(
-																			item,
-																			'position.name',
-																		)}
-																	</td>
-																	<td className='text-center'>
-																		{_.get(
-																			item,
-																			'kpi_value',
-																			'--',
-																		)}
-																	</td>
-																</tr>
-															</React.Fragment>
-														))}
-													</tbody>
-												</table>
-											</div>
-											<div>
-												<hr />
-												<PaginationButtons
-													data={kpiNorm.filter(
-														(item) => item.parentId === null,
-													)}
-													setCurrentPage={setCurrentPage}
-													currentPage={currentPage}
-													perPage={perPage}
-													setPerPage={setPerPage}
-												/>
-											</div>
+											<CardBody className='h-100'>
+												<div className='control-pane h-100'>
+													<div className='control-section h-100'>
+														<TreeGridComponent
+															locale='vi-VI'
+															dataSource={treeValue}
+															treeColumnIndex={0}
+															allowResizing
+															allowReordering
+															toolbar={toolbarOptions}
+															searchSettings={searchOptions}
+															className='cursor-pointer h-100'
+															rowSelected={(item) => {
+																handleOpenForm({
+																	kpiNorm_id: item.data.data.id,
+																	kpi_value:
+																		item.data.data.kpi_value,
+																	kpiNorm_name:
+																		item.data.data.name,
+																});
+															}}
+															childMapping='children'
+															height='410'>
+															<ColumnsDirective>
+																<ColumnDirective
+																	field='data.name'
+																	headerText='Tên nhiệm vụ'
+																	width='200'
+																/>
+																<ColumnDirective
+																	field='data.position.name'
+																	headerText='Vị trí đảm nhiệm'
+																	width='90'
+																	textAlign='Left'
+																/>
+																<ColumnDirective
+																	field='data.quantity'
+																	headerText='Số lượng'
+																	width='90'
+																	textAlign='Center'
+																/>
+																<ColumnDirective
+																	field='data.kpi_value'
+																	headerText='Giá trị KPI'
+																	width='90'
+																	textAlign='Center'
+																/>
+															</ColumnsDirective>
+															<Inject services={[Filter, Toolbar]} />
+														</TreeGridComponent>
+													</div>
+												</div>
+											</CardBody>
 										</Card>
 									</div>
 								</div>
@@ -261,8 +302,8 @@ const OrderTask = () => {
 				)}
 			</Page>
 			<OrderTaskForm
-				fetch={fetch}
-				show={isOpenForm}
+				fetch={fetchDataListAssignWorktrack}
+				show={toggleForm}
 				onClose={handleCloseForm}
 				item={itemEdit}
 			/>

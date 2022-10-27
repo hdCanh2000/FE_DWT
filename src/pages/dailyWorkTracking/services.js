@@ -52,7 +52,7 @@ const addWorktrack = (data) => {
 const updateWorktrack = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/worktracks/${data.id}`,
+		url: `/api/worktracks/${data.id}`,
 		data,
 	});
 };
