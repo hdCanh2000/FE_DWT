@@ -336,7 +336,7 @@ const Navigation = forwardRef(({ menu, horizontal, id, className, ...props }, re
 		if (!data) return null;
 		return Object.keys(data)
 			.filter((item) => {
-				return data[item].roles?.filter((role) => role?.includes(roles[0]))?.length > 0;
+				return data[item]?.roles?.filter((role) => role?.includes(roles?.[0]))?.length > 0;
 			})
 			.map((item) => {
 				if (!data[item]) return null;
