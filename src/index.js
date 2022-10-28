@@ -1,6 +1,6 @@
 import React from 'react';
-// import ReactDOM from 'react-dom'; // For React 17
-import { createRoot } from 'react-dom/client'; // For React 18
+import ReactDOM from 'react-dom'; // For React 17
+// import { createRoot } from 'react-dom/client'; // For React 18
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { registerLicense } from '@syncfusion/ej2-base';
@@ -27,8 +27,8 @@ const children = (
 
 const container = document.getElementById('root');
 
-// ReactDOM.render(children, container); // For React 17
-createRoot(container).render(children); // For React 18
+ReactDOM.render(children, container); // For React 17
+// createRoot(container).render(children); // For React 18
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

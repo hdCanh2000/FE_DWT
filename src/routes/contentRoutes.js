@@ -16,26 +16,10 @@ const DAILYWORKTRACKING = {
 	PEDINGWORKTRACKPAGE: lazy(() => import('../pages/pendingWorktrack/PendingWorktrackPage')),
 };
 const TASK = {
-	SUBTASK_STEP: lazy(() => import('../pages/work-management/subtask-step/SubTaskPage')),
-	TASKMANAGEMENT: lazy(() =>
-		import('../pages/work-management/task-management/TaskManagementPage'),
-	),
 	TASKDETAIL: lazy(() => import('../pages/work-management/TaskDetail/TaskDetailPage')),
 	ADD_OR_UPDATE_TASK: lazy(() => import('../pages/work-management/task-list/TaskActionsPage')),
-	ADD_OR_UPDATE_SUB_TASK: lazy(() =>
-		import('../pages/work-management/subtask/TaskDetailActionPage'),
-	),
 	ADD_NEW_TASK: lazy(() => import('../pages/work-management/task-list/AddTaskPage')),
 	TASKLIST: lazy(() => import('../pages/work-management/task-list/TaskListPage')),
-	SUBTASK: lazy(() => import('../pages/work-management/subtask/SubTaskPage')),
-	TASKLISTDEPARTMENT: lazy(() =>
-		import('../pages/work-management/task-department/TaskDepartmentPage'),
-	),
-	DETAIL_TASK_DEPARTMENT: lazy(() =>
-		import('../pages/work-management/detail-task-department/DetailTaskDepartment'),
-	),
-	CONFIGURE: lazy(() => import('../pages/work-management/configure/WorkConfigurePage')),
-	REPORT: lazy(() => import('../pages/work-management/report-department/ReportDepartmentPage')),
 };
 
 const MANAGEMENT = {
