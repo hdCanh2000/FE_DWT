@@ -10,7 +10,7 @@ import UserDashboard from './user/UserDashboard';
 const DashboardPage = () => {
 	return (
 		<PageWrapper title={dashboardMenu.dashboard.text}>
-			<Page container='fluid overflow-hidden'>
+			<Page container='fluid' className='overflow-hidden'>
 				{verifyPermissionHOC(<AdminDashboard />, ['admin'])}
 				{verifyPermissionHOC(<ManagerDashboard />, ['manager'])}
 				{verifyPermissionHOC(<UserDashboard />, ['user'])}
