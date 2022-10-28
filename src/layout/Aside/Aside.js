@@ -14,8 +14,16 @@ const Aside = () => {
 						<img src={Logo} alt='logo' style={{ width: '60%', marginLeft: '18%' }} />
 					</Link>
 				</div>
-				<Navigation menu={demoPages} id='aside-demo-pages' />
-				<div className='p-3'>* Phiên bản thử nghiệm *</div>
+				<Navigation menu={demoPages} id='aside-demo-pages' className='overflow-scroll' />
+				<div className='px-3 pb-4 pt-0 text-center fw-bold'>
+					<span style={{ color: 'red' }} className='me-2'>
+						*
+					</span>
+					Phiên bản thử nghiệm
+					<span style={{ color: 'red' }} className='ms-2'>
+						*
+					</span>
+				</div>
 			</Card>
 		</div>
 	);
