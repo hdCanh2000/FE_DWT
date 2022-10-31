@@ -6,6 +6,7 @@ const initialState = {
 	loading: false,
 	error: false,
 	pagination: {},
+	currentPage: 1,
 };
 
 export const fetchPositionLevelList = createAsyncThunk(
@@ -19,7 +20,11 @@ export const fetchPositionLevelList = createAsyncThunk(
 export const positionLevelSlice = createSlice({
 	name: 'positionLevelSlice',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch level list
 		[fetchPositionLevelList.pending]: (state) => {
@@ -43,3 +48,5 @@ export const positionLevelSlice = createSlice({
 		},
 	},
 });
+
+export const { changeCurrentPage } = positionLevelSlice.actions;

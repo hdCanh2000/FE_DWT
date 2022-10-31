@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import Card, {
 	CardActions,
@@ -13,27 +13,24 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { addPositionLevel, deletePositionLevel, updatePositionLevel } from './services';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import Toasts from '../../components/bootstrap/Toasts';
 import validate from './validate';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import Page from '../../layout/Page/Page';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
+import { fetchPositionLevelList, changeCurrentPage } from '../../redux/slice/positionLevelSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
-import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
+import AlertConfirm from '../work-management/mission/AlertConfirm';
 
 const PositionLevelPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const { addToast } = useToasts();
 
 	const text = searchParams.get('text') || '';
-	const page = searchParams.get('page') || '';
 
 	const localtion = useLocation();
 
@@ -46,7 +43,12 @@ const PositionLevelPage = () => {
 	const pagination = useSelector((state) => state.positionLevel.pagination);
 	const loading = useSelector((state) => state.positionLevel.loading);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
-	const [currentPage, setCurrentPage] = React.useState(page || 1);
+
+	const currentPage = useSelector((state) => state.positionLevel.currentPage);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
 
 	const columns = [
 		{
@@ -105,75 +107,96 @@ const PositionLevelPage = () => {
 	useEffect(() => {
 		const query = {};
 		query.text = text;
-		query.page = text ? 1 : page;
+		query.page = currentPage;
+		query.limit = 10;
 		dispatch(fetchPositionLevelList(query));
-	}, [dispatch, page, text]);
+	}, [dispatch, currentPage, text]);
 
 	const handleSubmitSearch = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: 1,
-			}).toString(),
-		});
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
 	};
 
 	const handleChangeCurrentPage = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: searchValue.page,
-			}).toString(),
-		});
-	};
-
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
+		setCurrentPage(searchValue.page);
 	};
 
 	const handleSubmitForm = async (itemSubmit) => {
 		if (!itemSubmit.id) {
-			const reponse = await addPositionLevel(itemSubmit);
-			const result = reponse.data;
-			dispatch(fetchPositionLevelList());
-			handleCloseForm();
-			handleShowToast(
-				'Thêm cấp nhân sự',
-				`Thêm cấp nhân sự ${result.data.name} thành công !`,
-			);
+			try {
+				const reponse = await addPositionLevel(itemSubmit);
+				await reponse.data;
+				toast.success('Thêm cấp nhân sự thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				query.limit = 10;
+				dispatch(fetchPositionLevelList(query));
+				handleCloseForm();
+			} catch (error) {
+				toast.error('Thêm cấp nhân sự không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
+			}
 		} else {
-			const reponse = await updatePositionLevel(itemSubmit);
-			const result = reponse.data;
-			dispatch(fetchPositionLevelList());
-			handleCloseForm();
-			handleShowToast(
-				'Chỉnh sửa cấp nhân sự',
-				`Chỉnh sửa cấp nhân sự ${result.data.name} thành công !`,
-			);
+			try {
+				const reponse = await updatePositionLevel(itemSubmit);
+				await reponse.data;
+				toast.success('Cập nhật cấp nhân sự thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = currentPage;
+				query.limit = 10;
+				dispatch(fetchPositionLevelList(query));
+				handleCloseForm();
+			} catch (error) {
+				toast.error('Cập nhật cấp nhân sự không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
+			}
 		}
 	};
 	const handleDeletePositionLevel = async (item) => {
 		try {
 			await deletePositionLevel(item);
+			toast.success('Xoá cấp nhân sự thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			const query = {};
 			query.text = text;
 			query.page = 1;
 			dispatch(fetchPositionLevelList(query));
-			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự thành công!`);
 			handleCloseForm();
 		} catch (error) {
-			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
+			toast.error('Xoá cấp nhân sự không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
 		}
-		handleCloseForm();
 	};
 
 	return (
@@ -245,7 +268,7 @@ const PositionLevelPage = () => {
 									fields={columns}
 									validate={validate}
 								/>
-								<TaskAlertConfirm
+								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}
 									onConfirm={() => handleDeletePositionLevel(itemEdit?.id)}

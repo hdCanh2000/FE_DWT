@@ -1,8 +1,8 @@
 import React from 'react';
 import { useFormik } from 'formik';
-import { useToasts } from 'react-toast-notifications';
 import moment from 'moment';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import Button from '../../components/bootstrap/Button';
 import { CardFooter, CardFooterRight } from '../../components/bootstrap/Card';
 import UserImageWebp from '../../assets/img/wanna/wanna6.webp';
@@ -11,7 +11,6 @@ import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
 import Avatar from '../../components/Avatar';
 import { getUserById } from '../employee/services';
-import Toasts from '../../components/bootstrap/Toasts';
 import './styles.scss';
 import CustomSelect from '../../components/form/CustomSelect';
 import updateInformation from './services';
@@ -19,7 +18,6 @@ import Icon from '../../components/icon/Icon';
 import validate from './validate';
 
 const ChangeInformation = () => {
-	const { addToast } = useToasts();
 	const user = window.localStorage;
 
 	const [newUser, setNewUser] = React.useState({});
@@ -43,33 +41,31 @@ const ChangeInformation = () => {
 		};
 		try {
 			await updateInformation(newData);
+			toast.success('Cập nhật thông tin thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			fetch();
-			handleShowToast('Cập nhật thông tin cá nhân', 'Cập nhật thông tin cá nhân thành công ');
 			handleOpenEdit();
-		} catch {
-			handleShowToast(
-				'Cập nhật thông tin cá nhân',
-				'Cập nhật thông tin cá nhân không thành công ',
-			);
+		} catch (error) {
+			toast.success('Cập nhật thông tin thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
 		}
 	};
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
+
 	const [valueSex, setValueSex] = React.useState();
+
 	React.useEffect(() => {
 		setValueSex({ value: newUser?.sex, label: newUser?.sex === 'male' ? 'Nam' : 'Nữ' });
 	}, [newUser]);
+
 	const handleChangeSelect = (data) => {
 		setValueSex(data);
 	};
+
 	const formik = useFormik({
 		initialValues: {
 			...newUser,
@@ -82,9 +78,11 @@ const ChangeInformation = () => {
 			handleSubmit(value);
 		},
 	});
+
 	const handleOpenEdit = () => {
 		setIsEdit(!isEdit);
 	};
+
 	return (
 		<div
 			style={{ minWidth: '95%', margin: '0 auto', minHeight: '45vh', fontSize: '1.5rem' }}

@@ -26,7 +26,7 @@ const PaginationButtons = ({
 	total,
 	label,
 }) => {
-	const totalItems = totalItem;
+	const totalItems = total;
 	const totalPage = Math.ceil(totalItems / perPage);
 
 	const handleChangeCurrentPage = (page) => {
@@ -91,7 +91,7 @@ const PaginationButtons = ({
 		return (
 			<span className='pagination__desc'>
 				{/* Showing {start} to {end > totalItems ? totalItems : end} of {totalItems} {label} */}
-				Hiển thị {end > total ? total : end} trên {total} bản ghi
+				Hiển thị {end > totalItem ? totalItem : end} trên {total} bản ghi
 				{/* {label} */}
 			</span>
 		);
@@ -161,8 +161,6 @@ PaginationButtons.propTypes = {
 	setCurrentPage: PropTypes.func.isRequired,
 	currentPage: PropTypes.number.isRequired,
 	perPage: PropTypes.number,
-	// eslint-disable-next-line react/forbid-prop-types
-	// data: PropTypes.array.isRequired,
 	label: PropTypes.string,
 	onChangeCurrentPage: PropTypes.func,
 	totalItem: PropTypes.number.isRequired,

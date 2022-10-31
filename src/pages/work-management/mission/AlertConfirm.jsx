@@ -2,11 +2,7 @@ import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 // eslint-disable-next-line react/prop-types
-const ComfirmSubtask = ({ openModal, onCloseModal, onConfirm, title, content }) => {
-	const onSubmit = () => {
-		onConfirm();
-		onCloseModal();
-	};
+const AlertConfirm = ({ openModal, onCloseModal, onConfirm, title, content }) => {
 	return (
 		<Modal
 			show={openModal}
@@ -23,7 +19,7 @@ const ComfirmSubtask = ({ openModal, onCloseModal, onConfirm, title, content }) 
 				<Button variant='secondary' onClick={onCloseModal}>
 					Đóng
 				</Button>
-				<Button variant='primary' onClick={onSubmit}>
+				<Button variant='primary' onClick={() => onConfirm()}>
 					Xác nhận
 				</Button>
 			</Modal.Footer>
@@ -31,4 +27,4 @@ const ComfirmSubtask = ({ openModal, onCloseModal, onConfirm, title, content }) 
 	);
 };
 
-export default ComfirmSubtask;
+export default AlertConfirm;

@@ -2,8 +2,8 @@
 /* eslint-disable no-shadow */
 import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import SelectComponent from 'react-select';
 import { Modal } from 'react-bootstrap';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
@@ -19,7 +19,6 @@ import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import { addWorktrack, updateWorktrack } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
-import Toasts from '../../../components/bootstrap/Toasts';
 
 const customStyles = {
 	control: (provided) => ({
@@ -32,7 +31,6 @@ const customStyles = {
 
 const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const dispatch = useDispatch();
-	const { addToast } = useToasts();
 	const users = useSelector((state) => state.employee.employees);
 	const missions = useSelector((state) => state.mission.missions);
 	const [missionOption, setMissionOption] = useState({});
@@ -88,17 +86,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		setUserOption({});
 	};
 
-	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
-		addToast(
-			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: false,
-			},
-		);
-	};
-
 	const role = localStorage.getItem('roles');
 	const userId = localStorage.getItem('userId');
 
@@ -119,17 +106,18 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			};
 			updateWorktrack(dataValue)
 				.then(() => {
-					handleShowToast(`CậP nhật công việc`, `CậP nhật công việc thành công!`);
+					toast.success('Cập nhật công việc thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 					handleClose();
 					fetch();
 				})
 				.catch((err) => {
-					handleShowToast(
-						`CậP nhật công việc`,
-						`CậP nhật công việc không thành công. Vui lòng thử lại!`,
-						'Warning',
-						'danger',
-					);
+					toast.success('Cập nhật công việc thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 					throw err;
 				});
 		} else {
@@ -147,17 +135,18 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			};
 			addWorktrack(dataValue)
 				.then(() => {
-					handleShowToast(`Thêm công việc`, `Thêm công việc thành công!`);
+					toast.success('Thêm công việc thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 					handleClose();
 					fetch();
 				})
 				.catch((err) => {
-					handleShowToast(
-						`Thêm công việc`,
-						`Thêm công việc không thành công. Vui lòng thử lại!`,
-						'Warning',
-						'danger',
-					);
+					toast.success('Thêm công việc thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 					throw err;
 				});
 		}

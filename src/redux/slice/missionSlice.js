@@ -13,9 +13,9 @@ const initialState = {
 	missionReport: {},
 	loading: false,
 	error: false,
+	currentPage: 1,
 };
 
-// Đầu tiên, tạo thunk
 export const fetchMissionList = createAsyncThunk('mission/fetchList', async (params) => {
 	const response = await getAllMission(params);
 	return response.data;
@@ -40,7 +40,11 @@ export const AddMissionList = createAsyncThunk('mission/AddList', async (data) =
 export const missionSlice = createSlice({
 	name: 'missionSlice',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch list
 		[fetchMissionList.pending]: (state) => {
@@ -100,3 +104,5 @@ export const missionSlice = createSlice({
 		// update
 	},
 });
+
+export const { changeCurrentPage } = missionSlice.actions;

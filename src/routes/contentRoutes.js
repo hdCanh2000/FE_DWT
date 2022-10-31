@@ -15,17 +15,10 @@ const DAILYWORKTRACKING = {
 	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/orderTask')),
 	PEDINGWORKTRACKPAGE: lazy(() => import('../pages/pendingWorktrack/PendingWorktrackPage')),
 };
-const TASK = {
-	TASKDETAIL: lazy(() => import('../pages/work-management/TaskDetail/TaskDetailPage')),
-	ADD_OR_UPDATE_TASK: lazy(() => import('../pages/work-management/task-list/TaskActionsPage')),
-	ADD_NEW_TASK: lazy(() => import('../pages/work-management/task-list/AddTaskPage')),
-	TASKLIST: lazy(() => import('../pages/work-management/task-list/TaskListPage')),
-};
 
 const MANAGEMENT = {
 	DEPARTMENT: lazy(() => import('../pages/department/DepartmentPage')),
 	EMPLOYEE: lazy(() => import('../pages/employee/EmployeePage')),
-	EMPLOYEE_DETAIL: lazy(() => import('../pages/employee/EmployeeDetailPage')),
 	POSITION: lazy(() => import('../pages/position/PositionPage')),
 	RECRUITMENT_REQUIREMENT: lazy(() =>
 		import('../pages/recruitmentRequirements/RecruitmentRequirementsPage'),
@@ -97,33 +90,8 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: `${demoPages.jobsPage.subMenu.mission.path}/:id`,
-		element: <TASK.TASKDETAIL />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.jobsPage.subMenu.mission.path}/them-moi`,
-		element: <TASK.ADD_OR_UPDATE_TASK />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.jobsPage.subMenu.mission.path}/cap-nhat/:id`,
-		element: <TASK.ADD_OR_UPDATE_TASK />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.jobsPage.subMenu.mission.path}/dau-viec/:id`,
-		element: <TASK.SUBTASK_STEP />,
-		exact: true,
-	},
-	{
 		path: `${demoPages.hrRecords.subMenu.hrList.path}`,
 		element: <MANAGEMENT.EMPLOYEE />,
-		exact: true,
-	},
-	{
-		path: `${demoPages.hrRecords.subMenu.hrList.path}/:id`,
-		element: <MANAGEMENT.EMPLOYEE_DETAIL />,
 		exact: true,
 	},
 	{

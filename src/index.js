@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom'; // For React 17
 // import { createRoot } from 'react-dom/client'; // For React 18
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
 import { registerLicense } from '@syncfusion/ej2-base';
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/styles.scss';
 import App from './App/App';
 import reportWebVitals from './reportWebVitals';
@@ -19,6 +21,7 @@ const children = (
 	<Router>
 		<Provider store={store}>
 			<ThemeContextProvider>
+				<ToastContainer />
 				<App />
 			</ThemeContextProvider>
 		</Provider>

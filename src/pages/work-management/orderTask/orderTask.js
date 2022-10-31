@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
+import { toast } from 'react-toastify';
 import moment from 'moment';
 import _ from 'lodash';
 import {
@@ -31,7 +31,6 @@ import NotPermission from '../../presentation/auth/NotPermission';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Button from '../../../components/bootstrap/Button';
 import Loading from '../../../components/Loading/Loading';
-import Toasts from '../../../components/bootstrap/Toasts';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
 import { fetchAssignTask } from '../../../redux/slice/worktrackSlice';
@@ -47,7 +46,6 @@ L10n.load({
 
 const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
-	const { addToast } = useToasts();
 	const [open, setOpen] = useState(false);
 
 	const handleClose = () => {
@@ -56,17 +54,6 @@ const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 
 	const handleOpen = () => {
 		setOpen(true);
-	};
-
-	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
-		addToast(
-			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: false,
-			},
-		);
 	};
 
 	const userResponsible = _.get(
@@ -79,15 +66,16 @@ const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 	const handlDeleteItem = async (ele) => {
 		try {
 			await deleteWorkTrack(ele.id);
-			handleShowToast(`Xoá công việc`, `Xoá công việc thành công!`);
+			toast.success('Xoá công việc thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			fetch();
 		} catch (error) {
-			handleShowToast(
-				`Xoá công việc`,
-				`Xoá công việc không thành công. Vui lòng thử lại!`,
-				'Warning',
-				'danger',
-			);
+			toast.error('Xoá công việc không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
 	};

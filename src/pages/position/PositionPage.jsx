@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
+import { toast } from 'react-toastify';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -16,10 +16,9 @@ import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
-import Toasts from '../../components/bootstrap/Toasts';
+import AlertConfirm from '../work-management/mission/AlertConfirm';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchPositionList } from '../../redux/slice/positionSlice';
+import { changeCurrentPage, fetchPositionList } from '../../redux/slice/positionSlice';
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
@@ -36,10 +35,8 @@ const PositionPage = () => {
 	const dispatch = useDispatch();
 
 	const text = searchParams.get('text') || '';
-	const page = searchParams.get('page') || '';
 
 	const localtion = useLocation();
-	const { addToast } = useToasts();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
@@ -53,9 +50,8 @@ const PositionPage = () => {
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
 	const requirements = useSelector((state) => state.requirement.requirements);
-	const [openDetail, setOpenDetail] = React.useState(false);
-	const [dataDetail, setDataDetail] = React.useState({});
-	const [currentPage, setCurrentPage] = React.useState(page || 1);
+
+	const currentPage = useSelector((state) => state.position.currentPage);
 
 	const fetchRequirement = () => {
 		const newItem = itemEdit?.requirements?.map((items) => ({
@@ -66,40 +62,37 @@ const PositionPage = () => {
 		return { ...itemEdit, requirements: newItem };
 	};
 
-	const fetchRequirementDetail = (data) => {
-		const newItem = data?.requirements?.map((items) => ({
-			...items,
-			label: items.name,
-			value: items.id,
-		}));
-		return { ...dataDetail, requirements: newItem };
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
 	};
 
 	useEffect(() => {
 		const query = {};
 		query.text = text;
-		query.page = text ? 1 : page;
+		query.page = currentPage;
+		query.limit = 10;
 		dispatch(fetchPositionList(query));
-	}, [dispatch, page, text]);
+	}, [currentPage, dispatch, text]);
 
 	const handleSubmitSearch = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: 1,
-			}).toString(),
-		});
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
 	};
 
 	const handleChangeCurrentPage = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: searchValue.page,
-			}).toString(),
-		});
+		setCurrentPage(searchValue.page);
 	};
 
 	useEffect(() => {
@@ -208,14 +201,6 @@ const PositionPage = () => {
 					/>
 					<Button
 						isOutline={!darkModeStatus}
-						color='primary'
-						isLight={darkModeStatus}
-						className='text-nowrap mx-2'
-						icon='RemoveRedEye'
-						onClick={() => handleOpenDetail(item)}
-					/>
-					<Button
-						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
@@ -228,17 +213,6 @@ const PositionPage = () => {
 		},
 	];
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data.id, 10),
@@ -249,60 +223,71 @@ const PositionPage = () => {
 			department_id: parseInt(data?.department_id, 10),
 			position_levels_id: parseInt(data?.position_levels_id, 10),
 			manager: parseInt(data?.manager, 10),
-			// kpiNormId: data?.kpiName,
 			requirement_id: data?.requirements?.map((item) => item.id),
 		};
-		if (data?.id) {
+		if (data.id) {
 			try {
 				const response = await updatePosition(dataSubmit);
 				await response.data;
-				dispatch(fetchPositionList());
+				toast.success('Cập nhật vị trí thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = currentPage;
+				query.limit = 10;
+				dispatch(fetchPositionList(query));
 				handleCloseForm();
-				handleShowToast(
-					`Cập nhật vị trí công việc!`,
-					`Cập nhật vị trí công việc thành công!`,
-				);
 			} catch (error) {
-				handleShowToast(
-					`Cập nhật vị trí công việc`,
-					`Cập nhật vị trí công việc không thành công!`,
-				);
+				toast.error('Cập nhật vị trí không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
 			}
 		} else {
 			try {
 				const response = await addPosition(dataSubmit);
 				await response.data;
-				dispatch(fetchPositionList());
+				toast.success('Thêm vị trí thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				query.limit = 10;
+				dispatch(fetchPositionList(query));
 				handleCloseForm();
-				handleShowToast(`Thêm vị trí công việc`, `Thêm vị trí công việc thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm vị trí công việc`, `Thêm vị trí công việc không thành công!`);
+				toast.error('Thêm vị trí không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
 			}
 		}
-	};
-
-	const handleOpenDetail = (item) => {
-		setOpenDetail(true);
-		setDataDetail({ ...item });
-	};
-
-	const handleCloseDetail = () => {
-		setOpenDetail(false);
-		setDataDetail({});
 	};
 
 	const handleDeletePosition = async (item) => {
 		try {
 			await deletePositions(item);
+			toast.success('Xoá vị trí thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			const query = {};
 			query.text = text;
 			query.page = 1;
 			dispatch(fetchPositionList(query));
-			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc thành công!`);
 			handleCloseForm();
 		} catch (error) {
-			handleShowToast(`Xoá vị trí công việc`, `Xoá vị trí công việc không thành công!`);
-			handleCloseForm();
+			toast.error('Xoá vị trí không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
 		}
 	};
 
@@ -367,19 +352,9 @@ const PositionPage = () => {
 									item={fetchRequirement(itemEdit)}
 									label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
 									fields={columns}
-									// nv={nvs}
 									validate={validate}
 								/>
-								<CommonForm
-									show={openDetail}
-									onClose={handleCloseDetail}
-									item={fetchRequirementDetail(dataDetail)}
-									label={`Chi tiết vị trí: ${dataDetail?.name}`}
-									fields={columns}
-									disabled
-									// nv
-								/>
-								<TaskAlertConfirm
+								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}
 									onConfirm={() => handleDeletePosition(itemEdit?.id)}

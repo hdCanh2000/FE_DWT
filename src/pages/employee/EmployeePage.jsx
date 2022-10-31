@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import { useToasts } from 'react-toast-notifications';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -15,7 +15,6 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
@@ -24,18 +23,16 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, exportExcel, updateEmployee } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
-import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
-// import EmployeeForm from './EmployeeForm';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
+import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 
-	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
@@ -133,7 +130,7 @@ const EmployeePage = () => {
 					id: 2,
 					text: 'Nữ',
 					label: 'Nữ',
-					value: 'famale',
+					value: 'female',
 				},
 			],
 			col: 6,
@@ -288,6 +285,7 @@ const EmployeePage = () => {
 			isShow: false,
 		},
 	];
+
 	const handleDelete = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
@@ -296,26 +294,22 @@ const EmployeePage = () => {
 		try {
 			const response = await updateEmployee(dataSubmit);
 			await response.data;
+			toast.success('Xoá nhân viên thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			const query = {};
 			query.text = text;
 			query.page = 1;
 			dispatch(fetchEmployeeList(query));
 			handleCloseForm();
-			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
 		} catch (error) {
-			handleShowToast(`Xóa nhân viên`, `Xóa nhật nhân viên không thành công!`);
+			toast.error('Xoá nhân viên không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
-	};
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
 	};
 
 	const handleSubmitForm = async (data) => {
@@ -337,26 +331,42 @@ const EmployeePage = () => {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				await response.data;
+				toast.success('Cập nhật nhân viên thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
-				handleShowToast(`Cập nhật nhân viên!`, `Cập nhật nhân viên thành công!`);
 			} catch (error) {
-				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+				toast.error('Cập nhật nhân viên không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		} else {
 			try {
-				const response = await addEmployee(dataSubmit);
+				const response = await addEmployee({
+					...dataSubmit,
+					password: '123456',
+				});
 				await response.data;
+				toast.success('Thêm nhân viên thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
-				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
+				toast.error('Thêm nhân viên không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		}
 	};
+
 	const handleExportExcel = async () => {
 		try {
 			const response = await exportExcel();
@@ -378,9 +388,15 @@ const EmployeePage = () => {
 			link.setAttribute('download', filename);
 			document.body.appendChild(link);
 			link.click();
-			handleShowToast('Xuất Excel', 'Xuất excel thành công');
+			toast.success('Xuất Excel thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 		} catch (error) {
-			handleShowToast('Xuất Excel', 'Xuất excel thất bại');
+			toast.error('Xuất Excel không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
 	};
@@ -474,7 +490,7 @@ const EmployeePage = () => {
 									fields={columns}
 									validate={validate}
 								/>
-								<ComfirmSubtask
+								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}
 									onConfirm={() => handleDelete(itemEdit)}

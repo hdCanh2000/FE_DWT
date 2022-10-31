@@ -28,9 +28,9 @@ const CommonForm = ({
 		initialValues: { ...item },
 		validationSchema: validate,
 		enableReinitialize: true,
-		onSubmit: (values, { resetForm }) => {
+		onSubmit: (values) => {
 			handleSubmit(values);
-			resetForm();
+			// resetForm();
 		},
 	});
 	return (
@@ -214,7 +214,7 @@ const CommonForm = ({
 
 CommonForm.propTypes = {
 	className: PropTypes.string,
-	disabled: PropTypes.string,
+	disabled: PropTypes.bool,
 	show: PropTypes.bool,
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,

@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
+import { toast } from 'react-toastify';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
@@ -16,11 +16,10 @@ import Card, {
 import Button from '../../../components/bootstrap/Button';
 import MissionFormModal from './MissionFormModal';
 import Alert from '../../../components/bootstrap/Alert';
-import Toasts from '../../../components/bootstrap/Toasts';
 import useDarkMode from '../../../hooks/useDarkMode';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
-import { fetchMissionList } from '../../../redux/slice/missionSlice';
+import { fetchMissionList, changeCurrentPage } from '../../../redux/slice/missionSlice';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import NotPermission from '../../presentation/auth/NotPermission';
 import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
@@ -30,12 +29,10 @@ import Loading from '../../../components/Loading/Loading';
 const MissionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
-	const { addToast } = useToasts();
 	const navigate = useNavigate();
 	const localtion = useLocation();
 
 	const text = searchParams.get('text') || '';
-	const page = searchParams.get('page') || '';
 
 	const dispatch = useDispatch();
 	const missions = useSelector((state) => state.mission.missions);
@@ -45,40 +42,44 @@ const MissionPage = () => {
 	const confirmForm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
-	const [currentPage, setCurrentPage] = React.useState(page || 1);
+	const currentPage = useSelector((state) => state.mission.currentPage);
 
 	useEffect(() => {
 		const query = {};
 		query.text = text;
-		query.page = text ? 1 : page;
+		query.page = currentPage;
+		query.limit = 10;
 		dispatch(fetchMissionList(query));
-	}, [dispatch, page, text]);
+	}, [dispatch, currentPage, text]);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
 
 	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
 	const handleDelete = async (data) => {
 		try {
 			await deleteMissionById(data?.id);
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu thành công!`);
+			toast.success('Xoá mục tiêu thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			handleCloseForm();
+			const query = {};
+			query.text = text;
+			query.page = currentPage;
+			query.limit = 10;
+			dispatch(fetchMissionList(query));
 		} catch (error) {
-			handleShowToast(`Xoá mục tiêu`, `Xoá mục tiêu không thành công!`);
+			toast.error('Xoá mục tiêu không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
-		dispatch(fetchMissionList());
 	};
 
 	const columns = [
@@ -156,23 +157,24 @@ const MissionPage = () => {
 	];
 
 	const handleSubmitSearch = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: 1,
-			}).toString(),
-		});
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
 	};
 
 	const handleChangeCurrentPage = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: searchValue.page,
-			}).toString(),
-		});
+		setCurrentPage(searchValue.page);
 	};
 
 	return (

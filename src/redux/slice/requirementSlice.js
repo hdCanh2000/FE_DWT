@@ -7,6 +7,7 @@ const initialState = {
 	loading: false,
 	error: false,
 	pagination: {},
+	currentPage: 1,
 };
 
 // Đầu tiên, tạo thunk
@@ -19,7 +20,11 @@ export const fetchRequirementList = createAsyncThunk('requirements/fetchList', a
 export const requirementSlice = createSlice({
 	name: 'requirementSlice',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch list
 		[fetchRequirementList.pending]: (state) => {
@@ -43,3 +48,5 @@ export const requirementSlice = createSlice({
 		},
 	},
 });
+
+export const { changeCurrentPage } = requirementSlice.actions;

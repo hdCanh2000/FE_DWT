@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -15,13 +15,12 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
-import Toasts from '../../components/bootstrap/Toasts';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchRequirementList } from '../../redux/slice/requirementSlice';
+import { fetchRequirementList, changeCurrentPage } from '../../redux/slice/requirementSlice';
 import { addRequirement, updateRequirement, deleteRequirement } from './services';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
+import AlertConfirm from '../work-management/mission/AlertConfirm';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 
@@ -33,10 +32,8 @@ const RecruitmentRequirementPage = () => {
 	const dispatch = useDispatch();
 
 	const text = searchParams.get('text') || '';
-	const page = searchParams.get('page') || '';
 
 	const localtion = useLocation();
-	const { addToast } = useToasts();
 
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -47,37 +44,43 @@ const RecruitmentRequirementPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const requirements = useSelector((state) => state.requirement.requirements);
+	const currentPage = useSelector((state) => state.requirement.currentPage);
 	const pagination = useSelector((state) => state.requirement.pagination);
 	const loading = useSelector((state) => state.requirement.loading);
-
-	const [currentPage, setCurrentPage] = React.useState(page || 1);
 
 	useEffect(() => {
 		const query = {};
 		query.text = text;
-		query.page = text ? 1 : page;
+		query.limit = 10;
+		query.page = currentPage;
 		dispatch(fetchRequirementList(query));
-	}, [dispatch, page, text]);
+	}, [dispatch, currentPage, text]);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
 
 	const handleSubmitSearch = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: 1,
-			}).toString(),
-		});
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
 	};
 
 	const handleChangeCurrentPage = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: searchValue.page,
-			}).toString(),
-		});
+		setCurrentPage(searchValue.page);
 	};
+
 	const columns = [
 		{
 			title: 'Tên yêu cầu',
@@ -126,17 +129,6 @@ const RecruitmentRequirementPage = () => {
 		},
 	];
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: parseInt(data.id, 10),
@@ -144,48 +136,70 @@ const RecruitmentRequirementPage = () => {
 			description: data?.description,
 		};
 		if (data.id) {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await updateRequirement(dataSubmit);
 				await response.data;
+				toast.success('Cập nhật yêu cầu thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchRequirementList());
 				handleCloseForm();
-				handleShowToast(
-					`Cập nhật yêu cầu tuyển dụng!`,
-					`Cập nhật yêu cầu tuyển dụng thành công!`,
-				);
+				const query = {};
+				query.text = text;
+				query.page = currentPage;
+				query.limit = 10;
+				dispatch(fetchRequirementList(query));
 			} catch (error) {
-				handleShowToast(
-					`Cập nhật yêu cầu tuyển dụng`,
-					`Cập nhật yêu cầu tuyển dụng không thành công!`,
-				);
+				toast.error('Cập nhật yêu cầu không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
 			}
 		} else {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await addRequirement(dataSubmit);
 				await response.data;
-				dispatch(fetchRequirementList());
+				toast.success('Cập nhật yêu cầu thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				query.limit = 10;
+				dispatch(fetchRequirementList(query));
 				handleCloseForm();
-				handleShowToast(`Thêm yêu cầu tuyển dụng`, `Thêm yêu cầu tuyển dụng thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm cầu tuyển dụng`, `Thêm cầu tuyển dụng không thành công!`);
+				toast.error('Cập nhật yêu cầu không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
 			}
 		}
 	};
+
 	const handleDeleteRequirement = async (data) => {
-		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteRequirement(data);
+			toast.success('Xoá yêu cầu thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			const query = {};
 			query.text = text;
-			query.page = 1;
+			query.page = currentPage;
 			dispatch(fetchRequirementList(query));
-			handleShowToast(`Xoá yêu cầu tuyển dụng`, `Xoá yêu cầu tuyển dụng thành công!`);
+			handleCloseForm();
 		} catch (error) {
-			handleShowToast(`Xoá yêu cầu tuyển dụng`, `Xoá yêu cầu tuyển dụng không thành công!`);
+			toast.error('Xoá yêu cầu không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
 		}
-		handleCloseForm();
 	};
 
 	return (
@@ -257,7 +271,7 @@ const RecruitmentRequirementPage = () => {
 									fields={columns}
 									validate={validate}
 								/>
-								<TaskAlertConfirm
+								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}
 									onConfirm={() => handleDeleteRequirement(itemEdit?.id)}

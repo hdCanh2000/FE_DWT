@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'react-bootstrap/Form';
 import { Button, Modal } from 'react-bootstrap';
@@ -59,20 +60,26 @@ const KPINormForm = ({
 		},
 		validationSchema: validate,
 		enableReinitialize: true,
-		onSubmit: (values, { resetForm }) => {
+		onSubmit: (values) => {
 			handleSubmit(values);
-			resetForm();
 		},
 	});
 
 	const [showForm, setShowForm] = useState(1);
 
 	const handleDeleteKpiNorm = async (id) => {
-		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteKpiNorm(id);
+			toast.success('Xoá nhiệm vụ thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			dispatch(fetchKpiNormList());
 		} catch (error) {
+			toast.error('Xoá nhiệm vụ không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
 		handleCloseForm();

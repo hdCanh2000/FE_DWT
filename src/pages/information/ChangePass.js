@@ -1,7 +1,7 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
-import { useToasts } from 'react-toast-notifications';
+import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/bootstrap/Button';
 import Card, {
@@ -16,31 +16,22 @@ import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Input from '../../components/bootstrap/forms/Input';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import changePass from '../../layout/Header/services';
-import Toasts from '../../components/bootstrap/Toasts';
 import { handleLogout } from '../../utils/utils';
 
 const ChangePass = () => {
 	const [validate, setValidate] = React.useState();
 	const navigate = useNavigate();
-	const { addToast } = useToasts();
 	const dispatch = useDispatch();
+
 	React.useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
+
 	const handleSubmit = async (data) => {
 		const reponse = await changePass(data);
 		handleValidate(reponse.data.data);
 	};
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
+
 	const handleValidate = (data) => {
 		if (data === 'Password must be at least 4 characters !!!') {
 			setValidate({ newPassword: 'Vui lòng nhập mật khẩu mới trên 4 kí tự !' });
@@ -57,8 +48,13 @@ const ChangePass = () => {
 		if (data === true) {
 			setValidate({});
 			handleLogout();
-			navigate('/dang-nhap');
-			handleShowToast(`Đổi mật khẩu`, `Đổi mật khẩu thành công!`);
+			toast.success('Đổi mật khẩu thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			setTimeout(() => {
+				navigate('/dang-nhap');
+			}, 1000);
 		}
 	};
 	const formik = useFormik({

@@ -1,10 +1,10 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useEffect, useState } from 'react';
 import { isEmpty, deburr } from 'lodash';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { arrayToTree } from 'performant-array-to-tree';
 import { TreeTable, TreeState } from 'cp-react-tree-table';
-import { useToasts } from 'react-toast-notifications';
 import { Form } from 'react-bootstrap';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -20,7 +20,6 @@ import Button from '../../components/bootstrap/Button';
 import validate from './validate';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { addDepartment, deleteDepartment, updateDepartment } from './services';
-import Toasts from '../../components/bootstrap/Toasts';
 import Employee from './Employee';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import Icon from '../../components/icon/Icon';
@@ -30,7 +29,6 @@ import useDarkMode from '../../hooks/useDarkMode';
 
 const DepartmentPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -148,25 +146,23 @@ const DepartmentPage = () => {
 		},
 	];
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
 	const handleDelete = async (valueDelete) => {
 		try {
 			await deleteDepartment(valueDelete?.id);
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+			toast.success('Xoá phòng ban thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			dispatch(fetchDepartmentList());
 		} catch (error) {
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+			toast.error('Xoá phòng ban không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
 		}
-		dispatch(fetchDepartmentList());
 	};
+
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
@@ -181,26 +177,35 @@ const DepartmentPage = () => {
 			try {
 				const response = await updateDepartment(dataSubmit);
 				await response.data;
+				toast.success('Cập nhật phòng ban thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchDepartmentList());
 				handleCloseForm();
-				handleShowToast(`Cập nhật phòng ban!`, `Cập nhật phòng ban thành công!`);
 			} catch (error) {
-				handleShowToast(`Cập nhật phòng ban`, `Cập nhật phòng ban không thành công!`);
+				toast.error('Cập nhật phòng ban không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		} else {
 			try {
 				const response = await addDepartment(dataSubmit);
-				const result = await response.data;
+				await response.data;
+				toast.success('Thêm phòng ban thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchDepartmentList());
 				handleCloseForm();
-				handleShowToast(
-					`Thêm phòng ban`,
-					`Phòng ban ${result.data.name} được thêm thành công!`,
-				);
 				setTreeValue(TreeState.expandAll(treeValue));
 			} catch (error) {
-				handleShowToast(`Thêm phòng ban`, `Thêm phòng ban không thành công!`);
+				toast.error('Thêm phòng ban không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				setTreeValue(TreeState.expandAll(treeValue));
 			}
 		}

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import {
 	TreeGridComponent,
 	ColumnsDirective,
@@ -10,7 +11,6 @@ import {
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import _, { isEmpty } from 'lodash';
-import { useToasts } from 'react-toast-notifications';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, {
@@ -29,7 +29,6 @@ import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import './style.css';
 import KPINormForm from './KPINormForm';
-import Toasts from '../../components/bootstrap/Toasts';
 import Loading from '../../components/Loading/Loading';
 
 L10n.load({
@@ -50,7 +49,6 @@ const KpiNormPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-	const { addToast } = useToasts();
 
 	const toolbarOptions = ['Search'];
 	const searchOptions = {
@@ -183,38 +181,44 @@ const KpiNormPage = () => {
 			try {
 				const response = await updateKpiNorm(dataSubmit);
 				await response.data;
+				toast.success('Cập nhật nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
 			} catch (error) {
 				dispatch(fetchKpiNormList());
+				toast.error('Cập nhật nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		} else {
 			try {
 				const response = await addKpiNorm(dataSubmit);
 				await response.data;
+				toast.success('Thêm nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchKpiNormList());
 				handleCloseForm();
 			} catch (error) {
 				dispatch(fetchKpiNormList());
+				toast.error('Thêm nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		}
 	};
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
+
 	const handleExportExcel = async () => {
 		try {
 			const response = await exportExcel();
-			// If you want to download file automatically using link attribute.
 			let filename = 'Danh mục định mức lao động.xlsx';
 			const disposition = _.get(response.headers, 'content-disposition');
 			if (disposition && disposition.indexOf('attachment') !== -1) {
@@ -232,9 +236,15 @@ const KpiNormPage = () => {
 			link.setAttribute('download', filename);
 			document.body.appendChild(link);
 			link.click();
-			handleShowToast('Xuất Excel', 'Xuất excel thành công');
+			toast.success('Xuất Excel thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 		} catch (error) {
-			handleShowToast('Xuất Excel', 'Xuất excel thất bại');
+			toast.error('Xuất Excel không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
 	};

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
-import { useToasts } from 'react-toast-notifications';
+import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
@@ -8,7 +8,6 @@ import Card from '../../components/bootstrap/Card';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog, getWorktrackById, updateWorktrackLog } from './services';
 import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
-import Toasts from '../../components/bootstrap/Toasts';
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import { updateStatusWorktrack } from '../pendingWorktrack/services';
@@ -48,7 +47,6 @@ const renderColor = (status) => {
 
 const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const [worktrack, setWorktrack] = useState({});
 	const [showForm, setShowForm] = useState(false);
@@ -70,17 +68,6 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			getById(data.id);
 		}
 	}, [data, data.id]);
-
-	const handleShowToast = (title, content, icon = 'Check2Circle', color = 'success') => {
-		addToast(
-			<Toasts title={title} icon={icon} iconColor={color} time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: false,
-			},
-		);
-	};
 
 	const handleCloseForm = () => {
 		setShowForm(false);
@@ -109,27 +96,21 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 		if (item?.data?.row?.id) {
 			updateWorktrackLog(dataSubmit)
 				.then(() => {
+					toast.success('Báo cáo nhiệm vụ thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 					handleCloseForm();
 					dispatch(fetchWorktrackListAll());
 					getById(worktrack.id);
-					handleShowToast(
-						`Xác nhận nhật trình công việc`,
-						`Xác nhận nhật trình công việc thành công!`,
-						'Warning',
-						'danger',
-						// 'Check2Circle',
-						// 'success',
-					);
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
 					console.log(err);
-					handleShowToast(
-						`Xác nhận nhật trình công việc`,
-						`Xác nhận nhật trình công việc không thành công!`,
-						'Warning',
-						'danger',
-					);
+					toast.error('Báo cáo nhiệm vụ không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 				});
 		} else {
 			addWorktrackLog(dataSubmit)
@@ -137,20 +118,18 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 					handleCloseForm();
 					getById(worktrack.id);
 					dispatch(fetchWorktrackListAll());
-					handleShowToast(
-						`Xác nhận nhật trình công việc`,
-						`Xác nhận nhật trình công việc thành công!`,
-					);
+					toast.success('Báo cáo nhiệm vụ thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
 					console.log(err);
-					handleShowToast(
-						`Xác nhận nhật trình công việc`,
-						`Xác nhận nhật trình công việc không thành công!`,
-						'Warning',
-						'danger',
-					);
+					toast.error('Báo cáo nhiệm vụ không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 				});
 		}
 	};
@@ -164,20 +143,18 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			.then(() => {
 				dispatch(fetchWorktrackListAll());
 				getById(worktrack.id);
-				handleShowToast(
-					`Xác nhận hoàn thành công việc`,
-					`Xác nhận hoàn thành công việc thành công!`,
-				);
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 			})
 			.catch((error) => {
 				// eslint-disable-next-line no-console
 				console.log(error);
-				handleShowToast(
-					`Xác nhận hoàn thành công việc`,
-					`Xác nhận hoàn thành công việc không thành công!`,
-					'Warning',
-					'danger',
-				);
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 			});
 	};
 

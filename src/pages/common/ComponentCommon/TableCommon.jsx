@@ -2,7 +2,7 @@ import React, { memo, useState } from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
-import PaginationButtons, { dataPagination } from './Pagination';
+import PaginationButtons from './Pagination';
 import Button from '../../../components/bootstrap/Button';
 import useDarkMode from '../../../hooks/useDarkMode';
 
@@ -13,6 +13,7 @@ const TableCommon = ({
 	isSearch,
 	onSubmitSearch,
 	onChangeCurrentPage,
+	onChangeTextSearch,
 	currentPage,
 	setCurrentPage,
 	totalItem,
@@ -22,7 +23,7 @@ const TableCommon = ({
 }) => {
 	const { darkModeStatus } = useDarkMode();
 
-	const items = dataPagination(data, currentPage, 10);
+	// const items = dataPagination(data, currentPage, 10);
 
 	const [textSearch, setTextSearch] = useState(searchvalue);
 
@@ -77,23 +78,9 @@ const TableCommon = ({
 										key={column.key}
 										className={classNames(
 											column.className,
-											`text-${
-												// eslint-disable-next-line no-nested-ternary
-												column.align === 'right'
-													? 'right'
-													: column.align === 'center'
-													? 'center'
-													: 'left'
-											}`,
+											`text-${column.align ? column.align : 'left'}`,
 										)}
-										align={
-											// eslint-disable-next-line no-nested-ternary
-											column.align === 'right'
-												? 'right'
-												: column.align === 'center'
-												? 'center'
-												: 'left'
-										}>
+										align={column.align ? column.align : 'left'}>
 										{column.title}
 									</th>
 								);
@@ -107,23 +94,9 @@ const TableCommon = ({
 									key={column.key}
 									className={classNames(
 										column.className,
-										`text-${
-											// eslint-disable-next-line no-nested-ternary
-											column.align === 'right'
-												? 'right'
-												: column.align === 'center'
-												? 'center'
-												: 'left'
-										}`,
+										`text-${column.align ? column.align : 'left'}`,
 									)}
-									align={
-										// eslint-disable-next-line no-nested-ternary
-										column.align === 'right'
-											? 'right'
-											: column.align === 'center'
-											? 'center'
-											: 'left'
-									}>
+									align={column.align ? column.align : 'left'}>
 									{column.title}
 								</th>
 							);
@@ -131,7 +104,7 @@ const TableCommon = ({
 					</tr>
 				</thead>
 				<tbody>
-					{items?.map((row) => {
+					{data?.map((row) => {
 						return (
 							<tr key={row.id}>
 								{columns?.map((column) => {
@@ -141,21 +114,9 @@ const TableCommon = ({
 											return (
 												<td
 													key={column.key}
-													align={
-														// eslint-disable-next-line no-nested-ternary
-														column.align === 'right'
-															? 'right'
-															: column.align === 'center'
-															? 'center'
-															: 'left'
-													}
+													align={column.align ? column.align : 'left'}
 													className={`text-${
-														// eslint-disable-next-line no-nested-ternary
-														column.align === 'right'
-															? 'right'
-															: column.align === 'center'
-															? 'center'
-															: 'left'
+														column.align ? column.align : 'left'
 													}`}
 													style={{ fontSize: 14 }}>
 													{column.render(row, value)}
@@ -170,21 +131,9 @@ const TableCommon = ({
 										return (
 											<td
 												key={column.key}
-												align={
-													// eslint-disable-next-line no-nested-ternary
-													column.align === 'right'
-														? 'right'
-														: column.align === 'center'
-														? 'center'
-														: 'left'
-												}
+												align={column.align ? column.align : 'left'}
 												className={`text-${
-													// eslint-disable-next-line no-nested-ternary
-													column.align === 'right'
-														? 'right'
-														: column.align === 'center'
-														? 'center'
-														: 'left'
+													column.align ? column.align : 'left'
 												}`}
 												style={{ fontSize: 14 }}>
 												{column.render(row, value)}
@@ -200,23 +149,9 @@ const TableCommon = ({
 											key={column.key}
 											className={classNames(
 												column.className,
-												`text-${
-													// eslint-disable-next-line no-nested-ternary
-													column.align === 'right'
-														? 'right'
-														: column.align === 'center'
-														? 'center'
-														: 'left'
-												}`,
+												`text-${column.align ? column.align : 'left'}`,
 											)}
-											align={
-												// eslint-disable-next-line no-nested-ternary
-												column.align === 'right'
-													? 'right'
-													: column.align === 'center'
-													? 'center'
-													: 'left'
-											}>
+											align={column.align ? column.align : 'left'}>
 											{column.format ? column.format(value) : value}
 										</td>
 									);
@@ -250,6 +185,7 @@ TableCommon.propTypes = {
 	isSearch: PropTypes.bool,
 	onSubmitSearch: PropTypes.func,
 	onChangeCurrentPage: PropTypes.func,
+	onChangeTextSearch: PropTypes.func,
 	currentPage: PropTypes.number,
 	setCurrentPage: PropTypes.func,
 	totalItem: PropTypes.number,
@@ -263,6 +199,7 @@ TableCommon.defaultProps = {
 	isSearch: false,
 	onSubmitSearch: null,
 	onChangeCurrentPage: null,
+	onChangeTextSearch: null,
 	currentPage: 1,
 	setCurrentPage: null,
 	searchvalue: '',

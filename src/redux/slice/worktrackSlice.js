@@ -58,19 +58,15 @@ export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', asyn
 						parentId: item.parent_id,
 					};
 				})
-		: response.data.data
-				?.filter((item) => {
-					return item.workTrackUsers.isCreated === true;
-				})
-				?.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-						text: item.name,
-						parentId: item.parent_id,
-					};
-				});
+		: response.data.data?.map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					parentId: item.parent_id,
+				};
+		  });
 });
 
 // Đầu tiên, tạo thunk
