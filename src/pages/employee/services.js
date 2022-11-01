@@ -9,11 +9,12 @@ const getAllEmployee = (params) => {
 	});
 };
 
-const getAllEmployeeByDepartment = (id) => {
+const getAllEmployeeByDepartment = (id, params) => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
 		url: `/api/users/department/${id}`,
+		params,
 	});
 };
 

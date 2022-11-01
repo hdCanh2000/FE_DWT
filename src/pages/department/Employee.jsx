@@ -2,15 +2,28 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import TableCommon from '../common/ComponentCommon/TableCommon';
-import { fetchEmployeeList, fetchEmployeeListByDepartment } from '../../redux/slice/employeeSlice';
+import {
+	fetchEmployeeList,
+	fetchEmployeeListByDepartment,
+	changeCurrentPage,
+} from '../../redux/slice/employeeSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 
 const EmployeePage = ({ dataDepartment }) => {
 	const dispatch = useDispatch();
 
 	const users = useSelector((state) => state.employee.employees);
-	// const departments = useSelector((state) => state.department.departments);
+	const currentPage = useSelector((state) => state.employee.currentPage);
+	const pagination = useSelector((state) => state.employee.pagination);
 	const positions = useSelector((state) => state.position.positions);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		setCurrentPage(searchValue.page);
+	};
 
 	useEffect(() => {
 		dispatch(fetchPositionList());
@@ -18,12 +31,20 @@ const EmployeePage = ({ dataDepartment }) => {
 
 	useEffect(() => {
 		if (dataDepartment.id && dataDepartment.parentId !== null) {
-			dispatch(fetchEmployeeListByDepartment(dataDepartment.id));
+			const query = {};
+			query.text = '';
+			query.page = currentPage;
+			query.limit = 100;
+			dispatch(fetchEmployeeListByDepartment(dataDepartment.id, query));
 		} else {
-			dispatch(fetchEmployeeList());
+			const query = {};
+			query.text = '';
+			query.page = currentPage;
+			query.limit = 10;
+			dispatch(fetchEmployeeList(query));
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [dispatch, dataDepartment.id]);
+	}, [dispatch, dataDepartment.id, dataDepartment.parentId, currentPage]);
+
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -94,6 +115,7 @@ const EmployeePage = ({ dataDepartment }) => {
 			],
 		},
 	];
+
 	return (
 		<div className='col-lg-12 col-md-6'>
 			<div className='row mb-4'>
@@ -113,6 +135,11 @@ const EmployeePage = ({ dataDepartment }) => {
 							className='table table-modern mb-0'
 							columns={columns}
 							data={users}
+							onChangeCurrentPage={handleChangeCurrentPage}
+							currentPage={parseInt(currentPage, 10)}
+							totalItem={pagination?.totalRows}
+							total={pagination?.total}
+							setCurrentPage={setCurrentPage}
 						/>
 					</div>
 				</div>
