@@ -20,7 +20,7 @@ import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
+import { fetchEmployeeList, changeCurrentPage } from '../../redux/slice/employeeSlice';
 import { addEmployee, exportExcel, updateEmployee } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -37,7 +37,6 @@ const EmployeePage = () => {
 	const navigate = useNavigate();
 
 	const text = searchParams.get('text') || '';
-	const page = searchParams.get('page') || '';
 
 	const localtion = useLocation();
 
@@ -53,41 +52,49 @@ const EmployeePage = () => {
 	const departments = useSelector((state) => state.department.departments);
 	const positions = useSelector((state) => state.position.positions);
 	const pagination = useSelector((state) => state.employee.pagination);
+	const currentPage = useSelector((state) => state.employee.currentPage);
 	const loading = useSelector((state) => state.employee.loading);
-	const [currentPage, setCurrentPage] = React.useState(page || 1);
 
 	const fetchUser = () => {
 		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
 	};
 
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
+
 	useEffect(() => {
 		const query = {};
 		query.text = text;
-		query.page = text ? 1 : page;
+		query.page = currentPage;
+		query.limit = 10;
 		dispatch(fetchEmployeeList(query));
-	}, [dispatch, page, text]);
+	}, [dispatch, currentPage, text]);
+
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
 		dispatch(fetchPositionList());
 	}, [dispatch]);
+
 	const handleSubmitSearch = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: 1,
-			}).toString(),
-		});
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
 	};
 
 	const handleChangeCurrentPage = (searchValue) => {
-		navigate({
-			pathname: localtion.pathname,
-			search: createSearchParams({
-				text: searchValue.text,
-				page: searchValue.page,
-			}).toString(),
-		});
+		setCurrentPage(searchValue.page);
 	};
 
 	const columns = [

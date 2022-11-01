@@ -11,6 +11,7 @@ const initialState = {
 	loading: false,
 	error: false,
 	pagination: {},
+	currentPage: 1,
 };
 
 // Đầu tiên, tạo thunk
@@ -21,8 +22,8 @@ export const fetchEmployeeList = createAsyncThunk('employee/fetchList', async (p
 
 export const fetchEmployeeListByDepartment = createAsyncThunk(
 	'employee/fetchListByDepartment',
-	async (id) => {
-		const response = await getAllEmployeeByDepartment(id);
+	async (id, params) => {
+		const response = await getAllEmployeeByDepartment(id, params);
 		return response.data?.data?.map((item) => {
 			return {
 				...item,
@@ -58,7 +59,11 @@ export const onUpdateEmployee = createAsyncThunk('employee/update', async (data)
 export const employeeSlice = createSlice({
 	name: 'employeeSlice',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch list
 		[fetchEmployeeList.pending]: (state) => {
@@ -135,3 +140,5 @@ export const employeeSlice = createSlice({
 		},
 	},
 });
+
+export const { changeCurrentPage } = employeeSlice.actions;
