@@ -50,7 +50,7 @@ export const demoPages = {
 		subMenu: {
 			kpiNorm: {
 				id: 'kpiNorm',
-				text: 'Khai báo nhiệm vụ',
+				text: 'Danh mục định mức lao động',
 				path: '/khai-bao-nhiem-vu',
 				roles: ['admin', 'manager'],
 			},

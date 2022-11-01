@@ -181,7 +181,7 @@ const KpiNormPage = () => {
 			try {
 				const response = await updateKpiNorm(dataSubmit);
 				await response.data;
-				toast.success('Cập nhật nhiệm vụ thành công!', {
+				toast.success('Cập nhật định mức lao động thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
@@ -189,7 +189,7 @@ const KpiNormPage = () => {
 				handleCloseForm();
 			} catch (error) {
 				dispatch(fetchKpiNormList());
-				toast.error('Cập nhật nhiệm vụ không thành công!', {
+				toast.error('Cập nhật định mức lao động không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
@@ -199,7 +199,7 @@ const KpiNormPage = () => {
 			try {
 				const response = await addKpiNorm(dataSubmit);
 				await response.data;
-				toast.success('Thêm nhiệm vụ thành công!', {
+				toast.success('Thêm định mức lao động thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
@@ -207,7 +207,7 @@ const KpiNormPage = () => {
 				handleCloseForm();
 			} catch (error) {
 				dispatch(fetchKpiNormList());
-				toast.error('Thêm nhiệm vụ không thành công!', {
+				toast.error('Thêm định mức lao động không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
@@ -250,7 +250,7 @@ const KpiNormPage = () => {
 	};
 
 	return (
-		<PageWrapper title='Khai báo nhiệm vụ'>
+		<PageWrapper title='Danh mục định mức lao động'>
 			<Page container='fluid'>
 				{loading ? (
 					<Loading />
@@ -267,7 +267,9 @@ const KpiNormPage = () => {
 												icon='FormatListBulleted'
 												iconColor='primary'>
 												<CardTitle>
-													<CardLabel>Danh sách nhiệm vụ</CardLabel>
+													<CardLabel>
+														Danh mục định mức lao động
+													</CardLabel>
 												</CardTitle>
 											</CardLabel>
 											{verifyPermissionHOC(
@@ -349,7 +351,9 @@ const KpiNormPage = () => {
 					onClose={handleCloseForm}
 					handleSubmit={handleSubmitForm}
 					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật nhiệm vụ' : 'Thêm mới nhiệm vụ'}
+					label={
+						itemEdit?.id ? 'Cập nhật định mức lao động' : 'Thêm mới định mức lao động'
+					}
 					fields={columns}
 					validate={validate}
 					size='xl'

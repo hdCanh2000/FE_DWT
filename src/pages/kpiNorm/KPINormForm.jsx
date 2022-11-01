@@ -70,13 +70,13 @@ const KPINormForm = ({
 	const handleDeleteKpiNorm = async (id) => {
 		try {
 			await deleteKpiNorm(id);
-			toast.success('Xoá nhiệm vụ thành công!', {
+			toast.success('Xoá định mức lao động thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
 			});
 			dispatch(fetchKpiNormList());
 		} catch (error) {
-			toast.error('Xoá nhiệm vụ không thành công!', {
+			toast.error('Xoá định mức lao động không thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
 			});
