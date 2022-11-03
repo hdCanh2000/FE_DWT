@@ -187,7 +187,6 @@ const OrderTask = () => {
 			setTreeValue(treeData);
 		}
 	}, [createDataTree, kpiNorm]);
-
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
 		return newKpiNorm.length !== 0 ? newKpiNorm[0].label : null;

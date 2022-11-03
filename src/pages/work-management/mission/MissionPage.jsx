@@ -119,6 +119,7 @@ const MissionPage = () => {
 			key: 'quantity',
 			type: 'number',
 			align: 'center',
+			format: (value) => value || '--',
 		},
 		{
 			title: 'Số ngày công',
@@ -176,7 +177,7 @@ const MissionPage = () => {
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
-
+	console.log(missions);
 	return (
 		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
@@ -204,7 +205,7 @@ const MissionPage = () => {
 														<CardActions>
 															<Button
 																color='info'
-																icon='Plus'
+																icon='AddCircleOutline'
 																tag='button'
 																onClick={() =>
 																	handleOpenFormEdit(null)

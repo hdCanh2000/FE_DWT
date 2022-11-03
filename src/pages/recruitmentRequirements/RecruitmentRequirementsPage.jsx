@@ -230,7 +230,7 @@ const RecruitmentRequirementPage = () => {
 													<CardActions>
 														<Button
 															color='info'
-															icon='PersonPlusFill'
+															icon='AddCircleOutline'
 															tag='button'
 															onClick={() => handleOpenForm(null)}>
 															Thêm mới

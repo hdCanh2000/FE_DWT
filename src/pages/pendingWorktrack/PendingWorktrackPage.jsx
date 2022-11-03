@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { useTable, useRowSelect } from 'react-table';
 import Select from 'react-select';
 import moment from 'moment';
+import { useDispatch, useSelector } from 'react-redux';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -18,6 +19,8 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
 import Alert from '../../components/bootstrap/Alert';
 import Loading from '../../components/Loading/Loading';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import DetailPendingWorkTrack from './DetailPendingWorktrack';
 
 const Styles = styled.div`
 	table {
@@ -162,7 +165,11 @@ const PendingWorktrackPage = () => {
 		label: 'Chờ duyệt',
 		value: 'pending',
 	});
-
+	const dispatch = useDispatch();
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const item = useSelector((state) => state.toggleForm.data);
 	async function fetchDataWorktracksByStatus(status) {
 		try {
 			const response = await getAllWorktrackByStatus(status);
@@ -231,7 +238,7 @@ const PendingWorktrackPage = () => {
 	const columns = React.useMemo(
 		() => [
 			{
-				Header: 'Danh sách nhiệm vụ',
+				Header: 'Danh sách công việc',
 				columns: [
 					{
 						Header: 'Tên nhiệm vụ',
@@ -261,7 +268,22 @@ const PendingWorktrackPage = () => {
 						Header: 'Hành động',
 						accessor: 'action',
 						Cell: ({ row }) => (
-							<div className='d-flex align-items-center justify-content-center'>
+							<div className='align-items-center'>
+								<Button
+									style={{ marginRight: '10px' }}
+									isOutline={!darkModeStatus}
+									color='primary'
+									isLight={darkModeStatus}
+									className='text-nowrap'
+									icon='RemoveRedEye'
+									size='sm'
+									onClick={() =>
+										handleOpenForm({
+											...row.original,
+										})
+									}>
+									Xem
+								</Button>
 								<Button
 									isOutline={!darkModeStatus}
 									color='success'
@@ -281,7 +303,6 @@ const PendingWorktrackPage = () => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[],
 	);
-
 	const data = React.useMemo(() => dataWorktracks, [dataWorktracks]);
 
 	return (
@@ -302,7 +323,9 @@ const PendingWorktrackPage = () => {
 												icon='FormatListBulleted'
 												iconColor='primary'>
 												<CardTitle>
-													<CardLabel>Danh sách nhiệm vụ</CardLabel>
+													<CardLabel>
+														Danh sách công việc chờ duyệt
+													</CardLabel>
 												</CardTitle>
 											</CardLabel>
 										</CardHeader>
@@ -351,6 +374,7 @@ const PendingWorktrackPage = () => {
 					<NotPermission />,
 				)}
 			</Page>
+			<DetailPendingWorkTrack data={item} handleClose={handleCloseForm} show={toggleForm} />
 		</PageWrapper>
 	);
 };

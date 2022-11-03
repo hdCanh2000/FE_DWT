@@ -106,7 +106,6 @@ const DailyWorkTrackingMe = () => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [worktrack]);
-
 	return (
 		<PageWrapper title='Công việc hàng ngày'>
 			<Page container='fluid'>

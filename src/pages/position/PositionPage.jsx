@@ -317,7 +317,7 @@ const PositionPage = () => {
 													<CardActions>
 														<Button
 															color='info'
-															icon='PostAdd'
+															icon='AddCircleOutline'
 															tag='button'
 															onClick={() => handleOpenForm(null)}>
 															Thêm mới

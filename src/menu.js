@@ -48,22 +48,23 @@ export const demoPages = {
 		path: '/giao-viec',
 		icon: 'CustomBriefCase',
 		subMenu: {
-			kpiNorm: {
-				id: 'kpiNorm',
-				text: 'Danh mục định mức lao động',
-				path: '/khai-bao-nhiem-vu',
+			assign: {
+				id: 'assign',
+				text: 'Giao việc',
+				path: '/giao-viec',
 				roles: ['admin', 'manager'],
 			},
+
 			pendingAccepted: {
 				id: 'pendingAccepted',
 				text: 'Công việc chờ duyệt',
 				path: '/cong-viec-cho-duyet',
 				roles: ['admin', 'manager'],
 			},
-			assign: {
-				id: 'assign',
-				text: 'Giao việc',
-				path: '/giao-viec',
+			kpiNorm: {
+				id: 'kpiNorm',
+				text: 'Danh mục định mức lao động',
+				path: '/khai-bao-nhiem-vu',
 				roles: ['admin', 'manager'],
 			},
 		},
