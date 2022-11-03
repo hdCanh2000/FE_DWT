@@ -8,6 +8,7 @@ import { useTable, useRowSelect } from 'react-table';
 import Select from 'react-select';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -211,6 +212,10 @@ const PendingWorktrackPage = () => {
 		updateStatusWorktrack(dataSubmit)
 			.then(() => {
 				fetchDataWorktracksByStatus(statusOption.value);
+				toast.success('Duyệt công việc thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 			})
 			.catch((error) => {
 				// eslint-disable-next-line no-console

@@ -296,7 +296,7 @@ const KpiNormPage = () => {
 														Thêm mới
 													</Button>
 													<Button
-														color='info'
+														color='primary'
 														icon='FileDownload'
 														tag='button'
 														onClick={() => handleExportExcel()}>
