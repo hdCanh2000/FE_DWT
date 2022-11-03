@@ -65,18 +65,13 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									list={[
 										{
 											id: 1,
-											text: 'Đang thực hiện',
+											text: 'Đã nhận',
 											value: 'inProgress',
 										},
 										{
 											id: 2,
 											text: 'Đã hoàn thành',
 											value: 'completed',
-										},
-										{
-											id: 3,
-											text: 'Quá hạn',
-											value: 'expired',
 										},
 									]}
 									name='status'

@@ -38,9 +38,8 @@ const DetailPendingWorkTrack =({ data, show, handleClose })=>{
 									{item?.note}
 								</td>
 								<td style={{ width: '200px' }}>
-									{item?.status === 'expired' && 'Quá hạn'}
-									{item?.status === 'completed' && 'Hoàn thành'}
-									{item?.status === 'inProgress' && 'Đang thực hiện'}
+									{item?.status === 'completed' && 'Đã hoàn thành'}
+									{item?.status === 'inProgress' && 'Đã nhận'}
 								</td>
 							</tr>
 						))}
