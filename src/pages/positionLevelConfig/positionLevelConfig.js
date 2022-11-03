@@ -227,7 +227,7 @@ const PositionLevelPage = () => {
 													<CardActions>
 														<Button
 															color='info'
-															icon='GroupAdd'
+															icon='AddCircleOutline'
 															tag='button'
 															onClick={() => handleOpenForm(null)}>
 															Thêm mới

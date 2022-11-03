@@ -30,6 +30,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import './style.css';
 import KPINormForm from './KPINormForm';
 import Loading from '../../components/Loading/Loading';
+import { fetchUnitList } from '../../redux/slice/unitSlice';
 
 L10n.load({
 	'vi-VI': {
@@ -43,6 +44,7 @@ L10n.load({
 const KpiNormPage = () => {
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
+	const units = useSelector((state) => state.unit.units);
 	const loading = useSelector((state) => state.kpiNorm.loading);
 	const positions = useSelector((state) => state.position.positions);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -61,8 +63,9 @@ const KpiNormPage = () => {
 	useEffect(() => {
 		dispatch(fetchPositionList());
 		dispatch(fetchKpiNormList());
+		dispatch(fetchUnitList());
 	}, [dispatch]);
-
+	console.log(kpiNorm);
 	const [treeValue, setTreeValue] = React.useState([]);
 
 	const fixForm = () => {
@@ -108,6 +111,17 @@ const KpiNormPage = () => {
 			col: 6,
 		},
 		{
+			title: 'Đơn vị tính',
+			id: 'unit',
+			key: 'unit',
+			type: 'select',
+			align: 'center',
+			options: units,
+			isShow: true,
+			isMulti: false,
+			col: 3,
+		},
+		{
 			title: 'Vị trí đảm nhiệm',
 			id: 'position',
 			key: 'position',
@@ -116,7 +130,7 @@ const KpiNormPage = () => {
 			isShow: true,
 			options: positions,
 			isMulti: false,
-			col: 6,
+			col: 3,
 		},
 		{
 			title: 'Thuộc nhiệm vụ cha (nếu có)',
@@ -171,7 +185,7 @@ const KpiNormPage = () => {
 			description: data?.description,
 			descriptionKpiValue: data.descriptionKpiValue,
 			position_id: parseInt(data.position.id, 10) || null,
-			department_id: parseInt(data.position.department.id, 10) || null,
+			// department_id: parseInt(data.position.department.id, 10) || null,
 			parent_id: parseInt(data.parent?.id, 10) || null,
 			kpi_value: parseInt(data.kpi_value, 10) || null,
 			quantity: parseInt(data.quantity, 10) || null,
@@ -276,14 +290,14 @@ const KpiNormPage = () => {
 												<CardActions>
 													<Button
 														color='info'
-														icon='PlaylistAdd'
+														icon='AddCircleOutline'
 														tag='button'
 														onClick={() => handleOpenForm(null)}>
 														Thêm mới
 													</Button>
 													<Button
 														color='info'
-														icon='IosShare'
+														icon='FileDownload'
 														tag='button'
 														onClick={() => handleExportExcel()}>
 														Xuất Excel

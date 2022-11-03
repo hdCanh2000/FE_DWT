@@ -2,10 +2,10 @@
 /* eslint-disable no-shadow */
 import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import _ from 'lodash';
 import { toast } from 'react-toastify';
 import SelectComponent from 'react-select';
 import { Modal } from 'react-bootstrap';
+import { get, isEmpty } from 'lodash';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Select from '../../../components/bootstrap/forms/Select';
@@ -16,9 +16,9 @@ import Button from '../../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import { addWorktrack, updateWorktrack } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import { fetchAssignTask } from '../../../redux/slice/worktrackSlice';
 
 const customStyles = {
 	control: (provided) => ({
@@ -33,7 +33,9 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const dispatch = useDispatch();
 	const users = useSelector((state) => state.employee.employees);
 	const missions = useSelector((state) => state.mission.missions);
+	const tasks = useSelector((state) => state.worktrack.tasks);
 	const [missionOption, setMissionOption] = useState({});
+	const [parentOption, setParentOption] = useState({});
 	const [userOption, setUserOption] = useState({});
 	const [mission, setMission] = React.useState({
 		quantity: '',
@@ -46,27 +48,32 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	useEffect(() => {
 		dispatch(fetchMissionList());
 		dispatch(fetchEmployeeList());
+		dispatch(fetchAssignTask());
 	}, [dispatch]);
-
 	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
-
+		const dataParent = tasks.filter((ele) => ele.id === item?.parent_id);
+		setParentOption({
+			...dataParent[0],
+			label: get(dataParent[0], 'kpiNorm.name'),
+			value: get(dataParent[0], 'id'),
+		});
+		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
+	},[tasks , item])
 	useEffect(() => {
 		if (item.id) setMission({ ...item });
 		setMissionOption({
 			...item.mission,
-			label: _.get(item, 'mission.name'),
-			value: _.get(item, 'mission.name'),
+			label: get(item, 'mission.name'),
+			value: get(item, 'mission.name'),
 		});
-		if (!_.isEmpty(item?.users)) {
+		if (!isEmpty(item?.users)) {
 			const userResponsible = item?.users.filter(
 				(items) => items?.workTrackUsers?.isResponsible === true,
 			);
 			setUserOption({
-				label: _.get(userResponsible, '[0].name'),
-				value: _.get(userResponsible, '[0].name'),
-				id: _.get(userResponsible, '[0].id'),
+				label: get(userResponsible, '[0].name'),
+				value: get(userResponsible, '[0].name'),
+				id: get(userResponsible, '[0].id'),
 			});
 		}
 	}, [item]);
@@ -84,6 +91,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		setMission({});
 		setMissionOption({});
 		setUserOption({});
+		setParentOption({});
 	};
 
 	const role = localStorage.getItem('roles');
@@ -92,6 +100,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const handleSubmit = async () => {
 		if (item.id) {
 			const dataValue = {
+				parent_id: parentOption?.id,
 				id: item.id,
 				kpiNorm_id: item.kpiNorm_id,
 				mission_id: missionOption.id || null,
@@ -122,6 +131,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 				});
 		} else {
 			const dataValue = {
+				parent_id: parentOption?.id,
 				kpiNorm_id: item.kpiNorm_id,
 				mission_id: missionOption.id || null,
 				quantity: parseInt(mission.quantity, 10) || null,
@@ -151,9 +161,8 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 				});
 		}
 	};
-
 	return (
-		<Modal show={show} onHide={handleClose} centered size='lg'>
+		<Modal show={show} onHide={handleClose} centered size='xl'>
 			<div className='row px-3'>
 				<Card className='px-0 w-100 m-auto'>
 					<CardHeader className='py-2'>
@@ -176,20 +185,20 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 									<tr>
 										<td className='p-3 border text-left'>
 											<b>
-												{_.get(item, 'kpiNorm_name')
-													? _.get(item, 'kpiNorm_name')
-													: _.get(mission, 'kpiNorm.name')}
+												{get(item, 'kpiNorm_name')
+													? get(item, 'kpiNorm_name')
+													: get(mission, 'kpiNorm.name')}
 											</b>
 										</td>
 										<td className='p-3 border text-center'>
-											<b>{_.get(item, 'kpi_value', '--')}</b>
+											<b>{get(item, 'kpi_value', '--')}</b>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 							{/* Thuộc mục tiêu */}
 							<div className='row g-2'>
-								<div className='col-5'>
+								<div className='col-4'>
 									<FormGroup id='task' label='Thuộc mục tiêu'>
 										<SelectComponent
 											placeholder='Thuộc mục tiêu'
@@ -197,6 +206,19 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											defaultValue={missionOption}
 											onChange={setMissionOption}
 											options={missions}
+										/>
+									</FormGroup>
+								</div>
+								<div className='col-4'>
+									<FormGroup id='parent' label='Thuộc nhiệm vụ cha'>
+										<SelectComponent
+											placeholder='Thuộc nhiệm vụ cha'
+											value={parentOption}
+											defaultValue={parentOption}
+											onChange={setParentOption}
+											options={tasks.filter(
+												(item) => item.id !== parentOption?.id,
+											)}
 										/>
 									</FormGroup>
 								</div>
@@ -215,20 +237,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 									</div>,
 									['admin', 'manager'],
 								)}
-
 								<div className='col-3'>
-									<FormGroup id='quantity' label='Số lượng'>
-										<Input
-											type='text'
-											name='quantity'
-											onChange={handleChange}
-											value={mission.quantity || ''}
-											placeholder='Số lượng'
-											className='border border-2 rounded-0 shadow-none'
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-4'>
 									<FormGroup id='startDate' label='Ngày bắt đầu'>
 										<Input
 											name='startDate'
@@ -241,7 +250,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										/>
 									</FormGroup>
 								</div>
-								<div className='col-4'>
+								<div className='col-3'>
 									<FormGroup id='deadline' label='Hạn ngày hoàn thành'>
 										<Input
 											name='deadline'
@@ -254,7 +263,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										/>
 									</FormGroup>
 								</div>
-								<div className='col-4'>
+								<div className='col-3'>
 									<FormGroup id='priority' label='Độ ưu tiên'>
 										<Select
 											name='priority'
@@ -269,6 +278,18 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 												</Option>
 											))}
 										</Select>
+									</FormGroup>
+								</div>
+								<div className='col-3'>
+									<FormGroup id='quantity' label='Số lượng'>
+										<Input
+											type='text'
+											name='quantity'
+											onChange={handleChange}
+											value={mission.quantity || ''}
+											placeholder='Số lượng'
+											className='border border-2 rounded-0 shadow-none'
+										/>
 									</FormGroup>
 								</div>
 							</div>

@@ -220,7 +220,7 @@ const UnitPage = () => {
 												<CardActions>
 													<Button
 														color='info'
-														icon='ReceiptLong'
+														icon='AddCircleOutline'
 														tag='button'
 														onClick={() =>
 															handleOpenForm({ name: '', code: '' })

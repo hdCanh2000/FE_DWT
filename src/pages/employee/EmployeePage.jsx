@@ -441,7 +441,7 @@ const EmployeePage = () => {
 															<CardActions>
 																<Button
 																	color='info'
-																	icon='PersonPlusFill'
+																	icon='AddCircleOutline'
 																	tag='button'
 																	onClick={() =>
 																		handleOpenForm(null)
@@ -450,7 +450,7 @@ const EmployeePage = () => {
 																</Button>
 																<Button
 																	color='info'
-																	icon='IosShare'
+																	icon='FileDownload'
 																	tag='button'
 																	onClick={() =>
 																		handleExportExcel()
