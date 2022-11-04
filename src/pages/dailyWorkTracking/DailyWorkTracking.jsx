@@ -14,7 +14,6 @@ import {
 	Filter,
 	Toolbar,
 	Resize,
-	Sort,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
@@ -280,7 +279,6 @@ const DailyWorkTracking = () => {
 													dataSource={treeValue}
 													treeColumnIndex={0}
 													allowResizing
-													allowSorting
 													toolbar={toolbarOptions}
 													searchSettings={searchOptions}
 													className='cursor-pointer user-select-none'
@@ -326,9 +324,7 @@ const DailyWorkTracking = () => {
 															template={treegridTemplate}
 														/>
 													</ColumnsDirective>
-													<Inject
-														services={[Filter, Toolbar, Sort, Resize]}
-													/>
+													<Inject services={[Filter, Toolbar]} />
 												</TreeGridComponent>
 											</div>
 										</div>

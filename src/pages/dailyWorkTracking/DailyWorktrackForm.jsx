@@ -50,7 +50,7 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									className='border border-2 rounded-0 shadow-none'
 									onChange={formik.handleChange}
 									onBlur={formik.handleBlur}
-									value={formik.values.note}
+									value={formik.values.note || ''}
 									isValid={formik.isValid}
 									disabled={data.row?.status}
 								/>
@@ -79,7 +79,7 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									className='border border-2 rounded-0 shadow-none'
 									onChange={formik.handleChange}
 									onBlur={formik.handleBlur}
-									value={formik.values.status}
+									value={formik.values.status || 'inProgress'}
 									isValid={formik.isValid}
 								/>
 							</FormGroup>
