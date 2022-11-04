@@ -10,8 +10,8 @@ import Textarea from '../../components/bootstrap/forms/Textarea';
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
 		initialValues: {
-			note: data?.row?.note || '',
-			status: data?.row?.status || 'inProgress',
+			note: data.row?.note ? data.row?.note : '',
+			status: data.row?.status ? data.row?.status : 'inProgress',
 		},
 		enableReinitialize: true,
 		onSubmit: (values, { resetForm }) => {

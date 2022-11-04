@@ -122,3 +122,23 @@
 .cp_tree-table_row .cp_tree-table_cell:nth-child(2) {
     min-width: 300px;
 }
+
+.e-treegrid .e-rowcell.customcss {
+    padding-top: 5px;
+    padding-bottom: 5px;
+	width: 100%;
+}
+
+.e-treegrid .e-rowcell.customcss_log {
+    padding: 5px;
+	padding-left: 0;
+	padding-right: 1px;
+	width: 100%;
+}
+
+.e-rowcell.customcss_log .e-treecolumn-container {
+    display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	margin-top: -20px;
+}

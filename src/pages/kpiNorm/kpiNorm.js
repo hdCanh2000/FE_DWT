@@ -65,7 +65,7 @@ const KpiNormPage = () => {
 		dispatch(fetchKpiNormList());
 		dispatch(fetchUnitList());
 	}, [dispatch]);
-	console.log(kpiNorm);
+
 	const [treeValue, setTreeValue] = React.useState([]);
 
 	const fixForm = () => {
