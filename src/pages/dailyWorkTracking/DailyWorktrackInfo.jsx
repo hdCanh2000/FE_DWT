@@ -168,7 +168,7 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 											name='startDate'
 											placeholder='Ngày bắt đầu'
 											onChange={handleChange}
-											value={mission.startDate}
+											value={mission.startDate || ''}
 											type='date'
 											ariaLabel='Ngày bắt đầu'
 											className='border border-2 rounded-0 shadow-none'
@@ -182,7 +182,7 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 											name='deadline'
 											placeholder='Hạn ngày hoàn thành'
 											onChange={handleChange}
-											value={mission.deadline}
+											value={mission.deadline || ''}
 											type='date'
 											ariaLabel='Hạn ngày hoàn thành'
 											className='border border-2 rounded-0 shadow-none'

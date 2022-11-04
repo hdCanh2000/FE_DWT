@@ -3,8 +3,8 @@ import moment from 'moment';
 import {
 	addWorktrack,
 	getAllWorktrack,
-	getAllWorktrackByUser,
 	getAllWorktrackByUserId,
+	getAllWorktrackMe,
 	updateWorktrack,
 } from '../../pages/dailyWorkTracking/services';
 import { getAllWorktrackByStatus } from '../../pages/pendingWorktrack/services';
@@ -96,20 +96,8 @@ export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async 
 });
 
 export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async () => {
-	const response = await getAllWorktrackByUser();
-	return response.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			unit: {
-				...item.unit,
-				label: item?.unit?.name,
-				value: item?.unit?.id,
-			},
-		};
-	});
+	const response = await getAllWorktrackMe();
+	return response.data.data;
 });
 
 export const onAddWorktrack = createAsyncThunk('worktrack/addNew', async (data) => {
@@ -176,13 +164,13 @@ export const worktrackSlice = createSlice({
 			state.loading = false;
 			state.error = action.error;
 		},
-		// fetch list
+		// fetch list me
 		[fetchWorktrackListMe.pending]: (state) => {
 			state.loading = true;
 		},
 		[fetchWorktrackListMe.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktracks = [...action.payload];
+			state.worktrack = { ...action.payload };
 		},
 		[fetchWorktrackListMe.rejected]: (state, action) => {
 			state.loading = false;

@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import moment from 'moment';
+/* eslint-disable react/prop-types */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -9,21 +11,19 @@ import {
 	Inject,
 	Filter,
 	Toolbar,
+	Resize,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
-import _, { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import CommonSalePerformance from '../../common/CRMDashboard/CommonSalePerformance';
 import CommonApprovedAppointmentChart from '../../common/SubHeaders/CommonApprovedAppointmentChart';
-import { getAllWorktrackByUserId } from '../../dailyWorkTracking/services';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
-import DailyWorktrackingModal from '../../dailyWorkTracking/DailyWorktrackingModal';
-import PaginationButtons, {
-	dataPagination,
-	PER_COUNT,
-} from '../../../components/PaginationButtons';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { LIST_STATUS } from '../../../utils/constants';
+import DailyWorktrackInfo from '../../dailyWorkTracking/DailyWorktrackInfo';
+import DailyWorktrackForm from '../../dailyWorkTracking/DailyWorktrackForm';
+import Button from '../../../components/bootstrap/Button';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -32,13 +32,39 @@ const createDataTree = (dataset) => {
 	});
 	const dataTree = [];
 	dataset.forEach((aData) => {
-		if (!_.isEmpty(aData.parentId)) {
-			hashTable[aData.parentId].children.push(hashTable[aData.id]);
+		if (aData.parentId) {
+			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
 		} else {
 			dataTree.push(hashTable[aData.id]);
 		}
 	});
 	return dataTree;
+};
+
+const columns = () => {
+	const date = new Date();
+	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+	const result = [];
+	for (let i = 1; i <= days; i += 1) {
+		result.push({
+			day: i,
+			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
+		});
+	}
+	return result;
+};
+
+const renderColor = (status) => {
+	switch (status) {
+		case 'inProgress':
+			return '#ffc000';
+		case 'completed':
+			return '#c5e0b3';
+		case 'expired':
+			return '#f97875';
+		default:
+			return 'transparent';
+	}
 };
 
 const toolbarOptions = ['Search'];
@@ -60,58 +86,36 @@ L10n.load({
 
 const ManagerDashboard = () => {
 	const dispatch = useDispatch();
-	const [worktrack, setWorktrack] = useState({});
 	const [treeValue, setTreeValue] = React.useState([]);
+	const [showForm, setShowForm] = React.useState(false);
+	const [dataShow, setDataShow] = React.useState({
+		row: {},
+		column: {},
+		valueForm: {},
+	});
 
+	const worktrack = useSelector((state) => state.worktrack.worktrack);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const users = useSelector((state) => state.employee.employees);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [perPage, setPerPage] = useState(PER_COUNT['10']);
-	const items = dataPagination(users, currentPage, perPage);
+
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
 	}, [dispatch]);
-
-	const id = localStorage.getItem('userId');
-
-	useEffect(() => {
-		async function fetchData() {
-			getAllWorktrackByUserId(id)
-				.then((res) => {
-					setWorktrack(res.data.data);
-				})
-				.catch((err) => {
-					throw err;
-				});
-		}
-		fetchData();
-	}, [dispatch, id]);
 
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
 			const treeData = createDataTree(
 				worktrack?.workTracks
-					?.filter((item) => {
-						return item?.workTrackUsers?.isResponsible === true;
-					})
+					?.filter((item) => item.workTrackUsers.isResponsible === true)
 					?.map((item) => {
 						return {
 							...item,
-							label: item.name,
-							value: item.id,
-							text: item.name,
 							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
-							deadline: item.deadline
-								? moment(item.deadline).format('DD-MM-YYYY')
-								: '--',
 							parentId: item.parent_id,
-							department: {
-								name: _.get(worktrack, 'department.name', '--'),
-							},
 						};
 					}),
 			);
@@ -119,6 +123,79 @@ const ManagerDashboard = () => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [worktrack]);
+
+	const handleShowForm = (row, item, dataWorktrack) => {
+		setShowForm(true);
+		setDataShow({
+			valueForm: item,
+			row,
+			dataWorktrack,
+		});
+	};
+
+	const handleClose = () => {
+		setShowForm(false);
+		setDataShow({
+			valueForm: {},
+			row: {},
+		});
+	};
+
+	const customAttributesLog = { class: 'customcss_log' };
+	const customAttributes = { class: 'customcss' };
+
+	const treegridTemplate = (props) => {
+		const { workTrackLogs } = props.data;
+		return (
+			<div className='d-flex'>
+				{columns().map((item) => {
+					return (
+						<div
+							key={item?.day}
+							style={{
+								border: '1px solid #c8c7c7',
+								width: 48,
+								height: 36,
+								backgroundColor: renderColor(
+									workTrackLogs?.find((i) => i?.date === item?.date)?.status,
+								),
+								borderRadius: 0,
+							}}
+							onClick={() =>
+								handleShowForm(
+									workTrackLogs?.find((i) => i?.date === item?.date),
+									item,
+									props.data,
+								)
+							}
+							className='rounded-none cursor-pointer d-flex justify-content-center align-items-center'>
+							{item?.day}
+						</div>
+					);
+				})}
+			</div>
+		);
+	};
+
+	const viewTemplate = (props) => {
+		const { data } = props;
+		return (
+			<Button
+				type='button'
+				isOutline={false}
+				color='info'
+				isLight
+				className='text-nowrap mx-2'
+				icon='Eye'
+				onClick={() =>
+					handleOpenForm({
+						...data,
+						parent: worktrack.workTracks?.find((i) => i.id === data.parentId),
+					})
+				}
+			/>
+		);
+	};
 
 	return (
 		<>
@@ -152,7 +229,7 @@ const ManagerDashboard = () => {
 									</tr>
 								</thead>
 								<tbody>
-									{items?.map((item) => (
+									{users?.map((item) => (
 										<React.Fragment key={item.id}>
 											<tr>
 												<td>
@@ -182,16 +259,6 @@ const ManagerDashboard = () => {
 									))}
 								</tbody>
 							</table>
-							<hr />
-							<footer>
-								<PaginationButtons
-									data={users}
-									setCurrentPage={setCurrentPage}
-									currentPage={currentPage}
-									perPage={perPage}
-									setPerPage={setPerPage}
-								/>
-							</footer>
 						</div>
 					</Card>
 				</div>
@@ -214,7 +281,6 @@ const ManagerDashboard = () => {
 										dataSource={treeValue}
 										treeColumnIndex={0}
 										allowResizing
-										allowReordering
 										toolbar={toolbarOptions}
 										searchSettings={searchOptions}
 										className='cursor-pointer user-select-none'
@@ -227,25 +293,13 @@ const ManagerDashboard = () => {
 											});
 										}}
 										childMapping='children'
-										height='410'>
+										height='500'>
+										<Inject services={[Resize]} />
 										<ColumnsDirective>
 											<ColumnDirective
 												field='data.kpiNorm.name'
 												headerText='Tên nhiệm vụ'
 												width='200'
-											/>
-											<ColumnDirective
-												field='data.mission.name'
-												headerText='Thuộc mục tiêu'
-												width='90'
-												textAlign='Left'
-											/>
-											<ColumnDirective
-												field='data.deadline'
-												headerText='Hạn hoàn thành'
-												format='yMd'
-												width='90'
-												textAlign='Center'
 											/>
 											<ColumnDirective
 												field='data.statusName'
@@ -254,10 +308,19 @@ const ManagerDashboard = () => {
 												textAlign='Center'
 											/>
 											<ColumnDirective
-												field='data.quantity'
-												headerText='Số lượng'
-												width='90'
-												textAlign='Right'
+												headerText='Chi tiết'
+												textAlign='Center'
+												width='100'
+												customAttributes={customAttributes}
+												template={viewTemplate}
+											/>
+											<ColumnDirective
+												headerText='Nhật trình công việc'
+												textAlign='Left'
+												width='900'
+												minWidth='600'
+												customAttributes={customAttributesLog}
+												template={treegridTemplate}
 											/>
 										</ColumnsDirective>
 										<Inject services={[Filter, Toolbar]} />
@@ -267,12 +330,13 @@ const ManagerDashboard = () => {
 						</div>
 					</Card>
 				</div>
-				<DailyWorktrackingModal
-					data={itemEdit}
+				<DailyWorktrackInfo
+					item={itemEdit}
 					worktrack={worktrack}
-					handleClose={handleCloseForm}
+					onClose={handleCloseForm}
 					show={toggleForm}
 				/>
+				<DailyWorktrackForm data={dataShow} show={showForm} handleClose={handleClose} />
 			</div>
 		</>
 	);
