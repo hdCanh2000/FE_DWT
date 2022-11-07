@@ -71,6 +71,7 @@ const CommonForm = ({
 											/>
 										</FormGroup>
 										<div className='text-danger mt-1'>
+											{console.log(formik.values[field.id],'formik')}
 											{formik.errors[field.id] && (
 												<span className='error'>
 													{formik.errors[field.id]}

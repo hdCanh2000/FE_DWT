@@ -39,6 +39,9 @@ const PROFILE = {
 const UNIT = {
 	UNIT: lazy(() => import('../pages/unit/unitPage')),
 };
+const KEY = {
+	KEY: lazy(() => import('../pages/keys/keys')),
+};
 
 const KPINORM = {
 	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
@@ -106,6 +109,10 @@ const presentation = [
 	{
 		path: demoPages.cauHinh.subMenu.unit.path,
 		element: <UNIT.UNIT />,
+	},
+	{
+		path: demoPages.cauHinh.subMenu.keys.path,
+		element: <KEY.KEY />,
 	},
 	{
 		path: demoPages.taskAndAssign.subMenu.kpiNorm.path,
