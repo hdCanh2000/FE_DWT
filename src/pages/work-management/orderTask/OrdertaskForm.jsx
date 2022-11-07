@@ -19,6 +19,7 @@ import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { addWorktrack, updateWorktrack } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import { fetchAssignTask } from '../../../redux/slice/worktrackSlice';
+import { fetchKeyList } from '../../../redux/slice/keySlice';
 
 const customStyles = {
 	control: (provided) => ({
@@ -31,12 +32,15 @@ const customStyles = {
 
 const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const dispatch = useDispatch();
+	const keys = useSelector((state) => state.key.keys);
 	const users = useSelector((state) => state.employee.employees);
 	const missions = useSelector((state) => state.mission.missions);
 	const tasks = useSelector((state) => state.worktrack.tasks);
 	const [missionOption, setMissionOption] = useState({});
+	const [keyOption, setKeyOption] = useState([]);
 	const [parentOption, setParentOption] = useState({});
 	const [userOption, setUserOption] = useState({});
+	const [checkValidate, setCheckValidate] = useState(false);
 	const [mission, setMission] = React.useState({
 		quantity: '',
 		startDate: '',
@@ -46,6 +50,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	});
 
 	useEffect(() => {
+		dispatch(fetchKeyList());
 		dispatch(fetchMissionList());
 		dispatch(fetchEmployeeList());
 		dispatch(fetchAssignTask());
@@ -87,6 +92,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	};
 
 	const handleClose = () => {
+		setCheckValidate(false)
 		onClose();
 		setMission({});
 		setMissionOption({});
@@ -98,6 +104,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const userId = localStorage.getItem('userId');
 
 	const handleSubmit = async () => {
+		setCheckValidate(true)
 		if (item.id) {
 			const dataValue = {
 				parent_id: parentOption?.id,
@@ -119,6 +126,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 						position: toast.POSITION.TOP_RIGHT,
 						autoClose: 1000,
 					});
+					setCheckValidate(false)
 					handleClose();
 					fetch();
 				})
@@ -149,11 +157,12 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 						position: toast.POSITION.TOP_RIGHT,
 						autoClose: 1000,
 					});
+					setCheckValidate(false)
 					handleClose();
 					fetch();
 				})
 				.catch((err) => {
-					toast.success('Thêm công việc thành công!', {
+					toast.error('Thêm công việc thất bại !', {
 						position: toast.POSITION.TOP_RIGHT,
 						autoClose: 1000,
 					});
@@ -234,10 +243,17 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 												options={users}
 											/>
 										</FormGroup>
+										<div className='text-danger mt-1'>
+											{ checkValidate && isEmpty(userOption) && (
+												<span className='error'>
+													Vui lòng chọn người phụ trách
+												</span>
+											)}
+										</div>
 									</div>,
 									['admin', 'manager'],
 								)}
-								<div className='col-3'>
+								<div className='col-4'>
 									<FormGroup id='startDate' label='Ngày bắt đầu'>
 										<Input
 											name='startDate'
@@ -250,7 +266,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										/>
 									</FormGroup>
 								</div>
-								<div className='col-3'>
+								<div className='col-4'>
 									<FormGroup id='deadline' label='Hạn ngày hoàn thành'>
 										<Input
 											name='deadline'
@@ -263,7 +279,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										/>
 									</FormGroup>
 								</div>
-								<div className='col-3'>
+								<div className='col-4'>
 									<FormGroup id='priority' label='Độ ưu tiên'>
 										<Select
 											name='priority'
@@ -280,7 +296,18 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										</Select>
 									</FormGroup>
 								</div>
-								<div className='col-3'>
+								<div className='col-8'>
+								<FormGroup id='keys' label='Chỉ số key'>
+										<SelectComponent
+											placeholder='Chỉ số key'
+											value={keyOption}
+											defaultValue={keyOption}
+											onChange={setKeyOption}
+											options={keys}
+										/>
+									</FormGroup>
+								</div>
+								<div className='col-4'>
 									<FormGroup id='quantity' label='Số lượng'>
 										<Input
 											type='text'

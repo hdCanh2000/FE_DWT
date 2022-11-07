@@ -205,10 +205,8 @@ const UnitPage = () => {
 				) : (
 					<div>
 						{verifyPermissionHOC(
-							<div
-								className='row mb-0'
-								style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
-								<div className='col-12'>
+							<div className='row mb-0'>
+								<div className='col-8' style={{ margin: '0 auto' , height : '90vh' }}>
 									<Card className='w-100'>
 										<div style={{ margin: '24px 24px 0' }}>
 											<CardHeader>

@@ -110,17 +110,17 @@ const KpiNormPage = () => {
 			isShow: true,
 			col: 6,
 		},
-		{
-			title: 'Đơn vị tính',
-			id: 'unit',
-			key: 'unit',
-			type: 'select',
-			align: 'center',
-			options: units,
-			isShow: true,
-			isMulti: false,
-			col: 3,
-		},
+		// {
+		// 	title: 'Đơn vị tính',
+		// 	id: 'unit',
+		// 	key: 'unit',
+		// 	type: 'select',
+		// 	align: 'center',
+		// 	options: units,
+		// 	isShow: true,
+		// 	isMulti: false,
+		// 	col: 3,
+		// },
 		{
 			title: 'Vị trí đảm nhiệm',
 			id: 'position',
@@ -130,7 +130,7 @@ const KpiNormPage = () => {
 			isShow: true,
 			options: positions,
 			isMulti: false,
-			col: 3,
+			col: 6,
 		},
 		{
 			title: 'Thuộc nhiệm vụ cha (nếu có)',
@@ -180,12 +180,12 @@ const KpiNormPage = () => {
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
+			unit_id: data?.unit?.id,
 			id: parseInt(data?.id, 10),
 			name: data?.name,
 			description: data?.description,
 			descriptionKpiValue: data.descriptionKpiValue,
 			position_id: parseInt(data.position.id, 10) || null,
-			// department_id: parseInt(data.position.department.id, 10) || null,
 			parent_id: parseInt(data.parent?.id, 10) || null,
 			kpi_value: parseInt(data.kpi_value, 10) || null,
 			quantity: parseInt(data.quantity, 10) || null,
@@ -371,6 +371,7 @@ const KpiNormPage = () => {
 					fields={columns}
 					validate={validate}
 					size='xl'
+					units={units}
 				/>
 			</Page>
 		</PageWrapper>

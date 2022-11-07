@@ -137,14 +137,14 @@ const MissionFormModal = ({ show, onClose, item }) => {
 			try {
 				const response = await updateMissionById(data);
 				await response.data;
-				toast.success('Xoá mục tiêu thành công!', {
+				toast.success('Cập nhật mục tiêu thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
 				dispatch(fetchMissionList());
 				handleCloseForm();
 			} catch (error) {
-				toast.error('Xoá mục tiêu không thành công!', {
+				toast.error('Cập nhật mục tiêu không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
@@ -153,14 +153,14 @@ const MissionFormModal = ({ show, onClose, item }) => {
 			try {
 				const response = await addNewMission(data);
 				await response.data;
-				toast.success('Xoá mục tiêu thành công!', {
+				toast.success('Thêm mục tiêu thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
 				dispatch(fetchMissionList());
 				handleCloseForm();
 			} catch (error) {
-				toast.error('Xoá mục tiêu không thành công!', {
+				toast.error('Thêm mục tiêu không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
