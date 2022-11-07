@@ -30,6 +30,7 @@ const KPINormForm = ({
 	validate,
 	disable,
 	size,
+	units,
 	handleDelete,
 	...props
 }) => {
@@ -296,7 +297,7 @@ const KPINormForm = ({
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-6'>
+										<div className='col-3'>
 											<FormGroup
 												id='descriptionKpiValue'
 												label='Tương đương với kết quả'>
@@ -323,6 +324,18 @@ const KPINormForm = ({
 													placeholder='Số lượng'
 													className='border border-2 rounded-0 shadow-none'
 													onBlur={formik.handleBlur}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-3'>
+											<FormGroup id='unit' label='Đơn vị tính'>
+												<CustomSelect
+													placeholder='Chọn đơn vị tính'
+													value={formik.values.unit}
+													onChange={(value) => {
+														formik.setFieldValue('unit', value);
+													}}
+													options={units}
 												/>
 											</FormGroup>
 										</div>
@@ -367,6 +380,8 @@ KPINormForm.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
 	// eslint-disable-next-line react/forbid-prop-types
+	units: PropTypes.array,
+	// eslint-disable-next-line react/forbid-prop-types
 	options: PropTypes.array,
 	// eslint-disable-next-line react/forbid-prop-types
 	item: PropTypes.object,
@@ -381,6 +396,7 @@ KPINormForm.propTypes = {
 	size: PropTypes.string,
 };
 KPINormForm.defaultProps = {
+	units: [],
 	className: null,
 	disable: null,
 	show: false,
