@@ -98,7 +98,7 @@ const DepartmentPage = () => {
 			col: 8,
 		},
 		{
-			title: 'Mã',
+			title: 'Mã phòng ban',
 			id: 'code',
 			key: 'code',
 			type: 'text',
