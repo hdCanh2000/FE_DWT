@@ -178,6 +178,12 @@ export const demoPages = {
 				path: '/yeu-cau-tuyen-dung',
 				roles: ['admin'],
 			},
+			keys: {
+				id: 'keys',
+				text: 'Chỉ số key',
+				path: '/chi-so-key',
+				roles: ['admin'],
+			},
 			overall: {
 				id: 'overall',
 				text: 'Cấu hình chung',

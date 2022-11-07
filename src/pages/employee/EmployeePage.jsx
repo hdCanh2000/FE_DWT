@@ -32,12 +32,10 @@ import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
+	const text = searchParams.get('text') || '';
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-
-	const text = searchParams.get('text') || '';
-
 	const localtion = useLocation();
 
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -96,7 +94,7 @@ const EmployeePage = () => {
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
-
+console.log(itemEdit);
 	const columns = [
 		{
 			title: 'Họ và tên',
