@@ -16,7 +16,6 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-// import { addKey, getAllKeys, updateKey, deleteKey } from './services';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -25,6 +24,7 @@ import { changeCurrentPage, fetchKeyList } from '../../redux/slice/keySlice';
 import { addkey, deleteKey, updateKey } from './services';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import validate from './validate';
+import { fetchPositionList } from '../../redux/slice/positionSlice';
 
 const Keys = () => {
 	const [searchParams] = useSearchParams();
@@ -35,18 +35,18 @@ const Keys = () => {
 
 	const { darkModeStatus } = useDarkMode();
 	const units = useSelector((state) => state.unit.units);
+	const positions = useSelector((state) => state.position.positions);
 	const keys = useSelector((state) => state.key.keys);
 	const currentPage = useSelector((state) => state.key.currentPage);
 	const pagination = useSelector((state) => state.key.pagination);
-	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-	// const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
 	const fetch = () => {
 		const query = {};
@@ -55,13 +55,17 @@ const Keys = () => {
 		query.limit = 10;
 		dispatch(fetchKeyList(query));
 	};
+
 	useEffect(() => {
 		fetch();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch, currentPage, text]);
+
 	useEffect(() => {
 		dispatch(fetchUnitList());
+		dispatch(fetchPositionList());
 	}, [dispatch]);
+
 	const columns = [
 		{
 			title: 'Tên chỉ số key',
@@ -70,7 +74,7 @@ const Keys = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+			col: 5,
 		},
 		{
 			title: 'Đơn vị',
@@ -81,7 +85,19 @@ const Keys = () => {
 			isShow: true,
 			render: (item) => <span>{item?.unit?.name}</span>,
 			options: units,
-			col: 6,
+			col: 3,
+		},
+		{
+			title: 'Vị trí',
+			id: 'position',
+			key: 'position',
+			type: 'select',
+			align: 'left',
+			isShow: true,
+			options: positions,
+			render: (item) => <span>{item?.position?.name}</span>,
+			isMulti: false,
+			col: 4,
 		},
 		{
 			title: 'Mô tả',
@@ -119,9 +135,11 @@ const Keys = () => {
 			isShow: false,
 		},
 	];
+
 	const setCurrentPage = (page) => {
 		dispatch(changeCurrentPage(page));
 	};
+
 	const handleSubmitSearch = (searchValue) => {
 		if (searchValue.text === '') {
 			searchParams.delete('text');
@@ -138,13 +156,15 @@ const Keys = () => {
 		}
 		setCurrentPage(1);
 	};
+
 	const handleSubmitForm = async (data) => {
 		const newValue = {
 			id: get(itemEdit, 'id', null),
 			name: data?.name,
 			description: data?.description,
 			unit_id: data?.unit?.id,
-			unit: data.unit,
+			position_id: data?.position?.id,
+			department_id: data?.position?.department?.id,
 		};
 		if (isEmpty(itemEdit)) {
 			try {
@@ -153,6 +173,8 @@ const Keys = () => {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
+				fetch();
+				handleCloseForm();
 			} catch (error) {
 				toast.error('Thêm chỉ số key không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -166,6 +188,8 @@ const Keys = () => {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
+				fetch();
+				handleCloseForm();
 			} catch (error) {
 				toast.error('Thay đổi chỉ số key không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -173,9 +197,8 @@ const Keys = () => {
 				});
 			}
 		}
-		fetch();
-		handleCloseForm();
 	};
+
 	const handleDelete = async (data) => {
 		try {
 			await deleteKey(data?.id);
@@ -192,9 +215,11 @@ const Keys = () => {
 		fetch();
 		handleCloseForm();
 	};
+
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
+
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.keys.text}>
 			<Page container='fluid'>
@@ -245,13 +270,14 @@ const Keys = () => {
 							label={itemEdit?.id ? 'Cập nhật key' : 'Tạo key mới'}
 							fields={columns}
 							validate={validate}
+							size='xl'
 						/>
 						<AlertConfirm
 							openModal={toggleFormDelete}
 							onCloseModal={handleCloseForm}
 							onConfirm={() => handleDelete(itemEdit)}
-							title='Xoá nhân viên'
-							content={`Xác nhận xoá nhân viên <strong>${itemEdit?.name}</strong> ?`}
+							title='Xoá chỉ số key'
+							content={`Xác nhận xoá chỉ số key <strong>${itemEdit?.name}</strong> ?`}
 						/>
 					</>,
 					['admin'],
