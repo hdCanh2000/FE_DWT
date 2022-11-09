@@ -22,7 +22,7 @@ import { changeCurrentPage, fetchPositionList } from '../../redux/slice/position
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
-import { addPosition, updatePosition, deletePositions } from './services';
+import { addPosition, updatePosition, deletePositions, getAllPosition } from './services';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 import CommonForm from '../common/ComponentCommon/CommonForm';
@@ -66,6 +66,16 @@ const PositionPage = () => {
 		dispatch(changeCurrentPage(page));
 	};
 
+	const [allPositions, setAllPositions] = React.useState([]);
+	const fetch = async () => {
+		const response = await getAllPosition();
+		setAllPositions(
+			response.data.data.map((ele) => ({ ...ele, label: ele?.name, value: ele?.id })),
+		);
+	};
+	useEffect(() => {
+		fetch();
+	}, [itemEdit]);
 	useEffect(() => {
 		const query = {};
 		query.text = text;
@@ -148,11 +158,11 @@ const PositionPage = () => {
 			title: 'Quản lý cấp trên',
 			id: 'manager',
 			key: 'manager',
-			type: 'singleSelect',
+			type: 'select',
 			align: 'left',
 			isShow: false,
 			render: (item) => <span>{item?.positions?.name || ''}</span>,
-			options: positions,
+			options: allPositions,
 			col: 6,
 		},
 		{
