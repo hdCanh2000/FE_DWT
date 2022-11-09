@@ -211,7 +211,7 @@ const ManagerDashboard = () => {
 			status: item.status,
 			date: dataShow.valueForm.date,
 			note: item.note,
-			quantity: item.quantity,
+			quantity: item.quantity || null,
 			workTrack_id: item.data.dataWorktrack.id || null,
 		};
 		addWorktrackLog(dataSubmit)

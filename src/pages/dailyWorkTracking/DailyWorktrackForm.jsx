@@ -7,6 +7,7 @@ import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Select from '../../components/bootstrap/forms/Select';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import Input from '../../components/bootstrap/forms/Input';
+import validate from './validate';
 
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
@@ -16,6 +17,7 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 			status: data.row?.status ? data.row?.status : 'inProgress',
 		},
 		enableReinitialize: true,
+		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
 			handleSubmit({
 				...values,
@@ -57,6 +59,11 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									disabled={data.row?.status}
 								/>
 							</FormGroup>
+							<div className='text-danger mt-1'>
+								{formik.errors.note && (
+									<span className='error'>{formik.errors.note}</span>
+								)}
+							</div>
 						</div>
 						<div className='col-6'>
 							<FormGroup id='quantity' label='Số lượng'>
@@ -74,6 +81,11 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									isValid={formik.isValid}
 								/>
 							</FormGroup>
+							<div className='text-danger mt-1'>
+								{formik.errors.quantity && (
+									<span className='error'>{formik.errors.quantity}</span>
+								)}
+							</div>
 						</div>
 						<div className='col-6'>
 							<FormGroup id='status' label='Trạng thái'>
@@ -102,6 +114,11 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									isValid={formik.isValid}
 								/>
 							</FormGroup>
+							<div className='text-danger mt-1'>
+								{formik.errors.status && (
+									<span className='error'>{formik.errors.status}</span>
+								)}
+							</div>
 						</div>
 					</div>
 				</form>
