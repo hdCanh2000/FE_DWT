@@ -25,9 +25,10 @@ import { addEmployee, exportExcel, updateEmployee } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
-import CommonForm from '../common/ComponentCommon/CommonForm';
+// import CommonForm from '../common/ComponentCommon/CommonForm';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
+import EmployeeForm from './EmployeeForm';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -94,7 +95,6 @@ const EmployeePage = () => {
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
-console.log(itemEdit);
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -148,7 +148,7 @@ console.log(itemEdit);
 			align: 'center',
 			isShow: false,
 			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			col: 6,
+			col: 4,
 		},
 		{
 			title: 'Email liên hệ',
@@ -158,6 +158,8 @@ console.log(itemEdit);
 			align: 'left',
 			isShow: true,
 			col: 6,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
 		},
 		{
 			title: 'SĐT',
@@ -166,7 +168,7 @@ console.log(itemEdit);
 			type: 'text',
 			align: 'center',
 			isShow: false,
-			col: 6,
+			col: 4,
 		},
 		{
 			title: 'Phòng ban công tác',
@@ -188,7 +190,7 @@ console.log(itemEdit);
 			align: 'center',
 			isShow: false,
 			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			col: 6,
+			col: 4,
 		},
 		{
 			title: 'Vị trí làm việc',
@@ -483,8 +485,8 @@ console.log(itemEdit);
 									['admin', 'manager'],
 								)}
 
-								<CommonForm
-									size='lg'
+								<EmployeeForm
+									size='xl'
 									show={toggleForm}
 									onClose={handleCloseForm}
 									handleSubmit={handleSubmitForm}

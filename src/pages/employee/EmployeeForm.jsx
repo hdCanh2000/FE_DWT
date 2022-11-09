@@ -48,7 +48,7 @@ const EmployeeForm = ({
 			className={classNames(className, 'p-4')}
 			show={show}
 			onHide={onClose}
-			size='lg'
+			size='xl'
 			scrollable
 			centered
 			{...props}>
@@ -67,7 +67,7 @@ const EmployeeForm = ({
 										</CardTitle>
 									</CardLabel>
 								</CardHeader>
-								<div className='p-4'>
+								<div className='p-4 row'>
 									{fields?.map((field) => {
 										if (field.id === 'name') {
 											return (
@@ -170,6 +170,7 @@ const EmployeeForm = ({
 													}>
 													<FormGroup id={field.id} label={field.title}>
 														<Input
+															disabled={field?.isDisabled}
 															type={field.type || 'text'}
 															name={field.id}
 															onChange={formik.handleChange}
@@ -349,7 +350,7 @@ const EmployeeForm = ({
 										/>
 									</CardActions>
 								</CardHeader>
-								<div className='p-4'>
+								<div className='p-4 row'>
 									{isOpen &&
 										fields?.map((field) => {
 											if (field.id === 'phone') {
