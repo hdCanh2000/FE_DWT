@@ -29,7 +29,6 @@ const customStyles = {
 		borderRadius: '1.25rem',
 	}),
 };
-
 const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const dispatch = useDispatch();
 	const keys = useSelector((state) => state.key.keys);
@@ -48,7 +47,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		priority: 2,
 		note: '',
 	});
-
 	useEffect(() => {
 		dispatch(fetchKeyList());
 		dispatch(fetchMissionList());
@@ -90,7 +88,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			[name]: value,
 		});
 	};
-
 	const handleClose = () => {
 		setCheckValidate(false);
 		onClose();
@@ -106,71 +103,73 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const handleSubmit = async () => {
 		setCheckValidate(true);
 		fetch();
-		if (item.id) {
-			const dataValue = {
-				parent_id: parentOption?.id || null,
-				id: item.id,
-				kpiNorm_id: item.kpiNorm_id,
-				mission_id: missionOption.id || null,
-				key_id: keyOption.id || null,
-				quantity: parseInt(mission.quantity, 10) || null,
-				user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
-				priority: parseInt(mission.priority, 10) || null,
-				note: mission.note || null,
-				description: item.description || null,
-				deadline: mission.deadline || null,
-				startDate: mission.startDate || null,
-				status: role.includes('user') ? 'pending' : 'accepted',
-			};
-			updateWorktrack(dataValue)
-				.then(() => {
-					toast.success('Cập nhật công việc thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
+		if (!isEmpty(mission.startDate) && !isEmpty(mission.deadline)) {
+			if (item.id) {
+				const dataValue = {
+					parent_id: parentOption?.id || null,
+					id: item.id,
+					kpiNorm_id: item.kpiNorm_id,
+					mission_id: missionOption.id || null,
+					key_id: keyOption.id || null,
+					quantity: parseInt(mission.quantity, 10) || null,
+					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
+					priority: parseInt(mission.priority, 10) || null,
+					note: mission.note || null,
+					description: item.description || null,
+					deadline: mission.deadline || null,
+					startDate: mission.startDate || null,
+					status: role.includes('user') ? 'pending' : 'accepted',
+				};
+				updateWorktrack(dataValue)
+					.then(() => {
+						toast.success('Cập nhật công việc thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						setCheckValidate(false);
+						handleClose();
+						fetch();
+					})
+					.catch((err) => {
+						toast.success('Cập nhật công việc thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						throw err;
 					});
-					setCheckValidate(false);
-					handleClose();
-					fetch();
-				})
-				.catch((err) => {
-					toast.success('Cập nhật công việc thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
+			} else {
+				const dataValue = {
+					parent_id: parentOption?.id || null,
+					kpiNorm_id: item.kpiNorm_id,
+					mission_id: missionOption.id || null,
+					key_id: keyOption.id || null,
+					quantity: parseInt(mission.quantity, 10) || null,
+					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
+					priority: parseInt(mission.priority, 10) || null,
+					note: mission.note || null,
+					description: item.description || null,
+					deadline: mission.deadline || null,
+					startDate: mission.startDate || null,
+					status: role.includes('user') ? 'pending' : 'accepted',
+				};
+				addWorktrack(dataValue)
+					.then(() => {
+						toast.success('Thêm công việc thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						setCheckValidate(false);
+						handleClose();
+						fetch();
+					})
+					.catch((err) => {
+						toast.error('Thêm công việc thất bại !', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						throw err;
 					});
-					throw err;
-				});
-		} else {
-			const dataValue = {
-				parent_id: parentOption?.id || null,
-				kpiNorm_id: item.kpiNorm_id,
-				mission_id: missionOption.id || null,
-				key_id: keyOption.id || null,
-				quantity: parseInt(mission.quantity, 10) || null,
-				user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
-				priority: parseInt(mission.priority, 10) || null,
-				note: mission.note || null,
-				description: item.description || null,
-				deadline: mission.deadline || null,
-				startDate: mission.startDate || null,
-				status: role.includes('user') ? 'pending' : 'accepted',
-			};
-			addWorktrack(dataValue)
-				.then(() => {
-					toast.success('Thêm công việc thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					setCheckValidate(false);
-					handleClose();
-					fetch();
-				})
-				.catch((err) => {
-					toast.error('Thêm công việc thất bại !', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw err;
-				});
+			}
 		}
 	};
 	return (
@@ -268,6 +267,13 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											className='border border-2 rounded-0 shadow-none'
 										/>
 									</FormGroup>
+									<div className='text-danger mt-1'>
+										{checkValidate && isEmpty(mission.startDate) && (
+											<span className='error'>
+												Vui lòng điền ngày bắt đầu
+											</span>
+										)}
+									</div>
 								</div>
 								<div className='col-4'>
 									<FormGroup id='deadline' label='Hạn ngày hoàn thành'>
@@ -281,6 +287,13 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											className='border border-2 rounded-0 shadow-none'
 										/>
 									</FormGroup>
+									<div className='text-danger mt-1'>
+										{checkValidate && isEmpty(mission.deadline) && (
+											<span className='error'>
+												Vui lòng điền ngày kết thúc
+											</span>
+										)}
+									</div>
 								</div>
 								<div className='col-4'>
 									<FormGroup id='priority' label='Độ ưu tiên'>
@@ -299,7 +312,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										</Select>
 									</FormGroup>
 								</div>
-								<div className='col-8'>
+								<div className='col-4'>
 									<FormGroup id='keys' label='Chỉ số key'>
 										<SelectComponent
 											placeholder='Chỉ số key'
@@ -318,6 +331,18 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											onChange={handleChange}
 											value={mission.quantity || ''}
 											placeholder='Số lượng'
+											className='border border-2 rounded-0 shadow-none'
+										/>
+									</FormGroup>
+								</div>
+								<div className='col-4'>
+									<FormGroup id='unit' label='Đơn vị'>
+										<Input
+										disabled
+											type='text'
+											name='unit'
+											value={item?.unit}
+											placeholder='Đơn vị'
 											className='border border-2 rounded-0 shadow-none'
 										/>
 									</FormGroup>
