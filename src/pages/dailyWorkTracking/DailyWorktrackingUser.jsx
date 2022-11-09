@@ -16,7 +16,13 @@ import {
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { useParams } from 'react-router-dom';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import Card, {
+	CardActions,
+	CardBody,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
@@ -209,6 +215,7 @@ const DailyWorkTracking = () => {
 			status: item.status,
 			date: dataShow.valueForm.date,
 			note: item.note,
+			quantity: item.quantity,
 			workTrack_id: item.data.dataWorktrack.id,
 		};
 		addWorktrackLog(dataSubmit)
@@ -250,6 +257,18 @@ const DailyWorkTracking = () => {
 												</CardLabel>
 											</CardTitle>
 										</CardLabel>
+										<CardActions>
+											<Button
+												color='info'
+												icon='ChangeCircle'
+												tag='button'
+												type='button'
+												isOutline={false}
+												isLight
+												onClick={() => dispatch(fetchWorktrackList(id))}>
+												Tải lại
+											</Button>
+										</CardActions>
 									</CardHeader>
 									<CardBody>
 										<div className='control-pane'>

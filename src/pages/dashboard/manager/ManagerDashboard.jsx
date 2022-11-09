@@ -16,7 +16,12 @@ import {
 import { L10n } from '@syncfusion/ej2-base';
 import { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
-import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
+import Card, {
+	CardActions,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../../components/bootstrap/Card';
 import CommonSalePerformance from '../../common/CRMDashboard/CommonSalePerformance';
 import CommonApprovedAppointmentChart from '../../common/SubHeaders/CommonApprovedAppointmentChart';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
@@ -206,6 +211,7 @@ const ManagerDashboard = () => {
 			status: item.status,
 			date: dataShow.valueForm.date,
 			note: item.note,
+			quantity: item.quantity,
 			workTrack_id: item.data.dataWorktrack.id || null,
 		};
 		addWorktrackLog(dataSubmit)
@@ -301,6 +307,18 @@ const ManagerDashboard = () => {
 									<CardLabel>Danh sách công việc đang thực hiện</CardLabel>
 								</CardTitle>
 							</CardLabel>
+							<CardActions>
+								<Button
+									color='info'
+									icon='ChangeCircle'
+									tag='button'
+									type='button'
+									isOutline={false}
+									isLight
+									onClick={() => dispatch(fetchWorktrackListMe())}>
+									Tải lại
+								</Button>
+							</CardActions>
 						</CardHeader>
 						<div className='p-4'>
 							<div className='control-pane'>

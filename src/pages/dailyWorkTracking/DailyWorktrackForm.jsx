@@ -6,11 +6,13 @@ import Modal from 'react-bootstrap/Modal';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Select from '../../components/bootstrap/forms/Select';
 import Textarea from '../../components/bootstrap/forms/Textarea';
+import Input from '../../components/bootstrap/forms/Input';
 
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
 		initialValues: {
 			note: data.row?.note ? data.row?.note : '',
+			quantity: data.row?.quantity ? data.row?.quantity : '',
 			status: data.row?.status ? data.row?.status : 'inProgress',
 		},
 		enableReinitialize: true,
@@ -56,7 +58,24 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 								/>
 							</FormGroup>
 						</div>
-						<div className='col-12'>
+						<div className='col-6'>
+							<FormGroup id='quantity' label='Số lượng'>
+								<Input
+									ariaLabel='Số lượng'
+									placeholder='Số lượng'
+									disabled={data.row?.quantity}
+									name='quantity'
+									size='lg'
+									type='number'
+									className='border border-2 rounded-0 shadow-none'
+									onChange={formik.handleChange}
+									onBlur={formik.handleBlur}
+									value={formik.values.quantity || ''}
+									isValid={formik.isValid}
+								/>
+							</FormGroup>
+						</div>
+						<div className='col-6'>
 							<FormGroup id='status' label='Trạng thái'>
 								<Select
 									ariaLabel='Trạng thái'
