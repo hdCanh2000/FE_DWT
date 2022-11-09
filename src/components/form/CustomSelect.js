@@ -6,6 +6,7 @@ const customStyles = {
 	control: (provided) => ({
 		...provided,
 	}),
+	menuPortal: (base) => ({ ...base, zIndex: 9999 }),
 };
 
 const CustomSelect = ({
@@ -20,6 +21,7 @@ const CustomSelect = ({
 }) => {
 	return (
 		<Select
+			menuPortalTarget={document.body}
 			isDisabled={disabled}
 			value={value}
 			defaultValue={value}
