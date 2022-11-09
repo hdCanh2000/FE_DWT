@@ -4,6 +4,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import _, { isEmpty } from 'lodash';
+import { toast } from 'react-toastify';
 import {
 	TreeGridComponent,
 	ColumnsDirective,
@@ -26,6 +27,7 @@ import Loading from '../../components/Loading/Loading';
 import Button from '../../components/bootstrap/Button';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import DailyWorktrackForm from './DailyWorktrackForm';
+import { addWorktrackLog } from './services';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -202,6 +204,31 @@ const DailyWorkTracking = () => {
 		);
 	};
 
+	const handleSubmit = (item) => {
+		const dataSubmit = {
+			status: item.status,
+			date: dataShow.valueForm.date,
+			note: item.note,
+			workTrack_id: item.data.dataWorktrack.id,
+		};
+		addWorktrackLog(dataSubmit)
+			.then(() => {
+				handleClose();
+				dispatch(fetchWorktrackList(id));
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			})
+			.catch((err) => {
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw err;
+			});
+	};
+
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -282,7 +309,12 @@ const DailyWorkTracking = () => {
 					onClose={handleCloseForm}
 					show={toggleForm}
 				/>
-				<DailyWorktrackForm data={dataShow} show={showForm} handleClose={handleClose} />
+				<DailyWorktrackForm
+					data={dataShow}
+					show={showForm}
+					handleClose={handleClose}
+					handleSubmit={handleSubmit}
+				/>
 			</Page>
 		</PageWrapper>
 	);
