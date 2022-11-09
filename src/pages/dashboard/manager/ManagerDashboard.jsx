@@ -15,7 +15,13 @@ import {
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { isEmpty } from 'lodash';
-import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
+import { toast } from 'react-toastify';
+import Card, {
+	CardActions,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../../components/bootstrap/Card';
 import CommonSalePerformance from '../../common/CRMDashboard/CommonSalePerformance';
 import CommonApprovedAppointmentChart from '../../common/SubHeaders/CommonApprovedAppointmentChart';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
@@ -24,6 +30,8 @@ import { LIST_STATUS } from '../../../utils/constants';
 import DailyWorktrackInfo from '../../dailyWorkTracking/DailyWorktrackInfo';
 import DailyWorktrackForm from '../../dailyWorkTracking/DailyWorktrackForm';
 import Button from '../../../components/bootstrap/Button';
+import { addWorktrackLog } from '../../dailyWorkTracking/services';
+import { fetchWorktrackListMe } from '../../../redux/slice/worktrackSlice';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -104,6 +112,7 @@ const ManagerDashboard = () => {
 
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
+		dispatch(fetchWorktrackListMe());
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -197,6 +206,32 @@ const ManagerDashboard = () => {
 		);
 	};
 
+	const handleSubmit = (item) => {
+		const dataSubmit = {
+			status: item.status,
+			date: dataShow.valueForm.date,
+			note: item.note,
+			quantity: item.quantity,
+			workTrack_id: item.data.dataWorktrack.id || null,
+		};
+		addWorktrackLog(dataSubmit)
+			.then(() => {
+				handleClose();
+				dispatch(fetchWorktrackListMe());
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			})
+			.catch((err) => {
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw err;
+			});
+	};
+
 	return (
 		<>
 			<div className='row mt-0'>
@@ -272,6 +307,18 @@ const ManagerDashboard = () => {
 									<CardLabel>Danh sách công việc đang thực hiện</CardLabel>
 								</CardTitle>
 							</CardLabel>
+							<CardActions>
+								<Button
+									color='info'
+									icon='ChangeCircle'
+									tag='button'
+									type='button'
+									isOutline={false}
+									isLight
+									onClick={() => dispatch(fetchWorktrackListMe())}>
+									Tải lại
+								</Button>
+							</CardActions>
 						</CardHeader>
 						<div className='p-4'>
 							<div className='control-pane'>
@@ -336,7 +383,12 @@ const ManagerDashboard = () => {
 					onClose={handleCloseForm}
 					show={toggleForm}
 				/>
-				<DailyWorktrackForm data={dataShow} show={showForm} handleClose={handleClose} />
+				<DailyWorktrackForm
+					data={dataShow}
+					show={showForm}
+					handleClose={handleClose}
+					handleSubmit={handleSubmit}
+				/>
 			</div>
 		</>
 	);

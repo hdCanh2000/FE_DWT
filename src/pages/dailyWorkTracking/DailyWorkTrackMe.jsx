@@ -14,7 +14,14 @@ import {
 	Resize,
 } from '@syncfusion/ej2-react-treegrid';
 import { isEmpty } from 'lodash';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import { toast } from 'react-toastify';
+import Card, {
+	CardActions,
+	CardBody,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
@@ -25,6 +32,9 @@ import DailyWorktrackInfo from './DailyWorktrackInfo';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import Button from '../../components/bootstrap/Button';
 import { fetchWorktrackListMe } from '../../redux/slice/worktrackSlice';
+import { addWorktrackLog } from './services';
+import { updateStatusWorktrack } from '../pendingWorktrack/services';
+import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -90,8 +100,10 @@ const DailyWorkTrackingMe = () => {
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
 	const loading = useSelector((state) => state.worktrack.loading);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	// const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const [treeValue, setTreeValue] = React.useState([]);
 	const [showForm, setShowForm] = React.useState(false);
@@ -176,21 +188,95 @@ const DailyWorkTrackingMe = () => {
 	const viewTemplate = (props) => {
 		const { data } = props;
 		return (
-			<Button
-				type='button'
-				isOutline={false}
-				color='info'
-				isLight
-				className='text-nowrap mx-2'
-				icon='Eye'
-				onClick={() =>
-					handleOpenForm({
-						...data,
-						parent: worktrack.workTracks?.find((i) => i.id === data.parentId),
-					})
-				}
-			/>
+			<div className=''>
+				{/* <Button
+					type='button'
+					isOutline={false}
+					color='info'
+					isLight
+					className='text-nowrap'
+					icon='Eye'
+					onClick={() =>
+						handleOpenForm({
+							...data,
+							parent: worktrack.workTracks?.find((i) => i.id === data.parentId),
+						})
+					}>
+					Xem
+				</Button> */}
+				{/* {(data.status === 'accepted' || data.status === 'completed') && (
+					<Button
+						type='button'
+						isOutline={false}
+						color='success'
+						isLight
+						className='text-nowrap ms-2'
+						onClick={() => handleOpenFormDelete(data)}
+						icon='Check'>
+						Báo cáo
+					</Button>
+				)} */}
+				<Button
+					type='button'
+					isOutline={false}
+					color='success'
+					isLight
+					className='text-nowrap ms-2'
+					onClick={() => handleOpenFormDelete(data)}
+					icon='Check'>
+					Báo cáo
+				</Button>
+			</div>
 		);
+	};
+
+	const handleSubmit = (item) => {
+		const dataSubmit = {
+			status: item.status,
+			date: dataShow.valueForm.date,
+			note: item.note,
+			quantity: item.quantity,
+			workTrack_id: item.data.dataWorktrack.id,
+		};
+		addWorktrackLog(dataSubmit)
+			.then(() => {
+				handleClose();
+				dispatch(fetchWorktrackListMe());
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			})
+			.catch((err) => {
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw err;
+			});
+	};
+
+	const handleChangeStatus = (worktrackSubmit) => {
+		const dataSubmit = {
+			id: worktrackSubmit?.id,
+			status: 'completed',
+		};
+		updateStatusWorktrack(dataSubmit)
+			.then(() => {
+				dispatch(fetchWorktrackListMe());
+				handleCloseForm();
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			})
+			.catch((error) => {
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
+			});
 	};
 
 	return (
@@ -211,6 +297,18 @@ const DailyWorkTrackingMe = () => {
 												<CardLabel>Danh sách nhiệm vụ</CardLabel>
 											</CardTitle>
 										</CardLabel>
+										<CardActions>
+											<Button
+												color='info'
+												icon='ChangeCircle'
+												tag='button'
+												type='button'
+												isOutline={false}
+												isLight
+												onClick={() => dispatch(fetchWorktrackListMe())}>
+												Tải lại
+											</Button>
+										</CardActions>
 									</CardHeader>
 									<CardBody>
 										<div className='control-pane'>
@@ -235,13 +333,13 @@ const DailyWorkTrackingMe = () => {
 														<ColumnDirective
 															field='data.statusName'
 															headerText='Trạng thái'
-															width='100'
+															width='200'
 															textAlign='Center'
 														/>
 														<ColumnDirective
-															headerText='Chi tiết'
+															headerText='Báo cáo'
 															textAlign='Center'
-															width='100'
+															width='200'
 															customAttributes={customAttributes}
 															template={viewTemplate}
 														/>
@@ -270,7 +368,19 @@ const DailyWorkTrackingMe = () => {
 					onClose={handleCloseForm}
 					show={toggleForm}
 				/>
-				<DailyWorktrackForm data={dataShow} show={showForm} handleClose={handleClose} />
+				<DailyWorktrackForm
+					data={dataShow}
+					show={showForm}
+					handleClose={handleClose}
+					handleSubmit={handleSubmit}
+				/>
+				<AlertConfirm
+					openModal={toggleFormDelete}
+					onCloseModal={handleCloseForm}
+					onConfirm={() => handleChangeStatus(itemEdit)}
+					title='Báo cáo công việc'
+					content='Xác nhận báo cáo công việc?'
+				/>
 			</Page>
 		</PageWrapper>
 	);

@@ -4,6 +4,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import _, { isEmpty } from 'lodash';
+import { toast } from 'react-toastify';
 import {
 	TreeGridComponent,
 	ColumnsDirective,
@@ -15,7 +16,13 @@ import {
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { useParams } from 'react-router-dom';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import Card, {
+	CardActions,
+	CardBody,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
@@ -26,6 +33,7 @@ import Loading from '../../components/Loading/Loading';
 import Button from '../../components/bootstrap/Button';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import DailyWorktrackForm from './DailyWorktrackForm';
+import { addWorktrackLog } from './services';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -202,6 +210,32 @@ const DailyWorkTracking = () => {
 		);
 	};
 
+	const handleSubmit = (item) => {
+		const dataSubmit = {
+			status: item.status,
+			date: dataShow.valueForm.date,
+			note: item.note,
+			quantity: item.quantity,
+			workTrack_id: item.data.dataWorktrack.id,
+		};
+		addWorktrackLog(dataSubmit)
+			.then(() => {
+				handleClose();
+				dispatch(fetchWorktrackList(id));
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			})
+			.catch((err) => {
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw err;
+			});
+	};
+
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -223,6 +257,18 @@ const DailyWorkTracking = () => {
 												</CardLabel>
 											</CardTitle>
 										</CardLabel>
+										<CardActions>
+											<Button
+												color='info'
+												icon='ChangeCircle'
+												tag='button'
+												type='button'
+												isOutline={false}
+												isLight
+												onClick={() => dispatch(fetchWorktrackList(id))}>
+												Tải lại
+											</Button>
+										</CardActions>
 									</CardHeader>
 									<CardBody>
 										<div className='control-pane'>
@@ -282,7 +328,12 @@ const DailyWorkTracking = () => {
 					onClose={handleCloseForm}
 					show={toggleForm}
 				/>
-				<DailyWorktrackForm data={dataShow} show={showForm} handleClose={handleClose} />
+				<DailyWorktrackForm
+					data={dataShow}
+					show={showForm}
+					handleClose={handleClose}
+					handleSubmit={handleSubmit}
+				/>
 			</Page>
 		</PageWrapper>
 	);

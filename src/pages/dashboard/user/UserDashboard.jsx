@@ -14,7 +14,13 @@ import {
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { isEmpty } from 'lodash';
-import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
+import { toast } from 'react-toastify';
+import Card, {
+	CardActions,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../../components/bootstrap/Card';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { LIST_STATUS } from '../../../utils/constants';
@@ -22,6 +28,8 @@ import Button from '../../../components/bootstrap/Button';
 import DailyWorktrackInfo from '../../dailyWorkTracking/DailyWorktrackInfo';
 import DailyWorktrackForm from '../../dailyWorkTracking/DailyWorktrackForm';
 import Loading from '../../../components/Loading/Loading';
+import { fetchWorktrackListMe } from '../../../redux/slice/worktrackSlice';
+import { addWorktrackLog } from '../../dailyWorkTracking/services';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -101,6 +109,7 @@ const UserDashboard = () => {
 
 	useEffect(() => {
 		dispatch(fetchEmployeeList());
+		dispatch(fetchWorktrackListMe());
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -195,6 +204,32 @@ const UserDashboard = () => {
 		);
 	};
 
+	const handleSubmit = (item) => {
+		const dataSubmit = {
+			status: item.status,
+			date: dataShow.valueForm.date,
+			note: item.note,
+			quantity: item.quantity,
+			workTrack_id: item.data.dataWorktrack.id || null,
+		};
+		addWorktrackLog(dataSubmit)
+			.then(() => {
+				handleClose();
+				dispatch(fetchWorktrackListMe());
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			})
+			.catch((err) => {
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw err;
+			});
+	};
+
 	return (
 		<div className='row mt-4'>
 			{loading ? (
@@ -208,6 +243,18 @@ const UserDashboard = () => {
 									<CardLabel>Danh sách công việc đang thực hiện</CardLabel>
 								</CardTitle>
 							</CardLabel>
+							<CardActions>
+								<Button
+									color='info'
+									icon='ChangeCircle'
+									tag='button'
+									type='button'
+									isOutline={false}
+									isLight
+									onClick={() => dispatch(fetchWorktrackListMe())}>
+									Tải lại
+								</Button>
+							</CardActions>
 						</CardHeader>
 						<div className='p-4'>
 							<div className='control-pane'>
@@ -265,7 +312,12 @@ const UserDashboard = () => {
 				onClose={handleCloseForm}
 				show={toggleForm}
 			/>
-			<DailyWorktrackForm data={dataShow} show={showForm} handleClose={handleClose} />
+			<DailyWorktrackForm
+				data={dataShow}
+				show={showForm}
+				handleClose={handleClose}
+				handleSubmit={handleSubmit}
+			/>
 		</div>
 	);
 };
