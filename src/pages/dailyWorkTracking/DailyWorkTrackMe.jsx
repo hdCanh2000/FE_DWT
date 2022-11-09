@@ -15,7 +15,13 @@ import {
 } from '@syncfusion/ej2-react-treegrid';
 import { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import Card, {
+	CardActions,
+	CardBody,
+	CardHeader,
+	CardLabel,
+	CardTitle,
+} from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
@@ -229,6 +235,7 @@ const DailyWorkTrackingMe = () => {
 			status: item.status,
 			date: dataShow.valueForm.date,
 			note: item.note,
+			quantity: item.quantity,
 			workTrack_id: item.data.dataWorktrack.id,
 		};
 		addWorktrackLog(dataSubmit)
@@ -290,6 +297,18 @@ const DailyWorkTrackingMe = () => {
 												<CardLabel>Danh sách nhiệm vụ</CardLabel>
 											</CardTitle>
 										</CardLabel>
+										<CardActions>
+											<Button
+												color='info'
+												icon='ChangeCircle'
+												tag='button'
+												type='button'
+												isOutline={false}
+												isLight
+												onClick={() => dispatch(fetchWorktrackListMe())}>
+												Tải lại
+											</Button>
+										</CardActions>
 									</CardHeader>
 									<CardBody>
 										<div className='control-pane'>
