@@ -191,7 +191,6 @@ const OrderTask = () => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
 		return newKpiNorm.length !== 0 ? newKpiNorm[0].label : null;
 	};
-
 	return (
 		<PageWrapper title='Giao việc'>
 			<Page container='fluid'>

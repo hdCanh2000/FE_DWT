@@ -177,7 +177,7 @@ const CommonForm = ({
 									className={field.col ? `col-${field.col}` : 'col-12'}>
 									<FormGroup id={field.id} label={field.title}>
 										<Input
-											disabled={disabled}
+											disabled={field?.isDisabled}
 											type={field.type || 'text'}
 											name={field.id}
 											onChange={formik.handleChange}
