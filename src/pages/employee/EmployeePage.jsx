@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { useToasts } from 'react-toast-notifications';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -14,75 +15,86 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
-import { addEmployee, updateEmployee } from './services';
-import { getAllDepartment } from '../department/services';
-import { fetchDepartmentWithUserList } from '../../redux/slice/departmentSlice';
-import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
-import EmployeeForm from './EmployeeForm';
+import { fetchEmployeeList, changeCurrentPage } from '../../redux/slice/employeeSlice';
+import { addEmployee, exportExcel, updateEmployee } from './services';
+import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import NotPermission from '../presentation/auth/NotPermission';
-import { getAllPosition } from '../position/services';
+import Loading from '../../components/Loading/Loading';
+// import CommonForm from '../common/ComponentCommon/CommonForm';
+import { fetchPositionList } from '../../redux/slice/positionSlice';
+import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
+import EmployeeForm from './EmployeeForm';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
+	const [searchParams] = useSearchParams();
+	const text = searchParams.get('text') || '';
+
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const localtion = useLocation();
+
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const users = useSelector((state) => state.employee.employees);
-	const [departments, setDepartments] = React.useState([]);
-	const [positions, setPositions] = React.useState([]);
-	const [openDelete, setOpenDelete] = React.useState(false);
-	const [dataDelete, setDataDelete] = React.useState({});
+	const departments = useSelector((state) => state.department.departments);
+	const positions = useSelector((state) => state.position.positions);
+	const pagination = useSelector((state) => state.employee.pagination);
+	const currentPage = useSelector((state) => state.employee.currentPage);
+	const loading = useSelector((state) => state.employee.loading);
+
 	const fetchUser = () => {
 		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
 	};
-	useEffect(() => {
-		const fecth = async () => {
-			const response = await getAllDepartment();
-			const result = await response.data;
-			setDepartments(
-				result.data.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-					};
-				}),
-			);
-		};
-		fecth();
-	}, []);
-	useEffect(() => {
-		const fecth = async () => {
-			const response = await getAllPosition();
-			const result = await response.data;
-			setPositions(
-				result.data.map((item) => {
-					return {
-						...item,
-						label: item.name,
-						value: item.id,
-					};
-				}),
-			);
-		};
-		fecth();
-	}, []);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
 
 	useEffect(() => {
-		dispatch(fetchEmployeeList());
+		const query = {};
+		query.text = text;
+		query.page = currentPage;
+		query.limit = 10;
+		dispatch(fetchEmployeeList(query));
+	}, [dispatch, currentPage, text]);
+
+	useEffect(() => {
+		dispatch(fetchDepartmentList());
+		dispatch(fetchPositionList());
 	}, [dispatch]);
+
+	const handleSubmitSearch = (searchValue) => {
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		setCurrentPage(searchValue.page);
+	};
 	const columns = [
 		{
 			title: 'Họ và tên',
@@ -91,6 +103,7 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 6,
 		},
 		{
 			title: 'Mã nhân sự',
@@ -99,14 +112,43 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'center',
 			isShow: true,
+			col: 6,
 		},
 		{
-			title: 'SĐT',
-			id: 'phone',
-			key: 'phone',
-			type: 'text',
+			title: 'Giới tính',
+			id: 'sex',
+			key: 'sex',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: false,
+			format: (value) =>
+				// eslint-disable-next-line no-nested-ternary
+				value === 'male' ? 'Nam' : 'Nữ',
+			options: [
+				{
+					id: 1,
+					text: 'Nam',
+					label: 'Nam',
+					value: 'male',
+				},
+				{
+					id: 2,
+					text: 'Nữ',
+					label: 'Nữ',
+					value: 'female',
+				},
+			],
+			col: 6,
+		},
+		{
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
 			align: 'center',
 			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 4,
 		},
 		{
 			title: 'Email liên hệ',
@@ -115,6 +157,18 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			col: 6,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		},
+		{
+			title: 'SĐT',
+			id: 'phone',
+			key: 'phone',
+			type: 'text',
+			align: 'center',
+			isShow: false,
+			col: 4,
 		},
 		{
 			title: 'Phòng ban công tác',
@@ -126,6 +180,17 @@ const EmployeePage = () => {
 			render: (item) => <span>{item?.department?.name || ''} </span>,
 			options: departments,
 			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 4,
 		},
 		{
 			title: 'Vị trí làm việc',
@@ -137,6 +202,39 @@ const EmployeePage = () => {
 			render: (item) => <span>{item?.position?.name || ''}</span>,
 			options: positions,
 			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Chức vụ',
+			id: 'role',
+			key: 'role',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: false,
+			format: (value) =>
+				// eslint-disable-next-line no-nested-ternary
+				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
+			options: [
+				{
+					id: 1,
+					text: 'Admin',
+					label: 'Admin',
+					value: 'admin',
+				},
+				{
+					id: 2,
+					text: 'Quản lý',
+					label: 'Quản lý',
+					value: 'manager',
+				},
+				{
+					id: 3,
+					text: 'Nhân viên',
+					label: 'Nhân viên',
+					value: 'user',
+				},
+			],
+			col: 6,
 		},
 		{
 			title: 'Địa chỉ',
@@ -162,55 +260,6 @@ const EmployeePage = () => {
 			),
 		},
 		{
-			title: 'Ngày sinh',
-			id: 'dateOfBirth',
-			key: 'dateOfBirth',
-			type: 'date',
-			align: 'center',
-			isShow: false,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'Ngày tham gia',
-			id: 'dateOfJoin',
-			key: 'dateOfJoin',
-			type: 'date',
-			align: 'center',
-			isShow: false,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-		},
-		{
-			title: 'Chức vụ',
-			id: 'role',
-			key: 'role',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: true,
-			format: (value) =>
-				// eslint-disable-next-line no-nested-ternary
-				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
-			options: [
-				{
-					id: 1,
-					text: 'Admin',
-					label: 'Admin',
-					value: 'admin',
-				},
-				{
-					id: 2,
-					text: 'Quản lý',
-					label: 'Quản lý',
-					value: 'manager',
-				},
-				{
-					id: 3,
-					text: 'Nhân viên',
-					label: 'Nhân viên',
-					value: 'user',
-				},
-			],
-		},
-		{
 			title: 'Hành Động',
 			id: 'action',
 			key: 'action',
@@ -233,7 +282,7 @@ const EmployeePage = () => {
 								isLight={darkModeStatus}
 								className='text-nowrap mx-2'
 								icon='Trash'
-								onClick={() => handleOpenDelete(item)}
+								onClick={() => handleOpenFormDelete(item)}
 							/>
 						</div>,
 						['admin'],
@@ -243,10 +292,7 @@ const EmployeePage = () => {
 			isShow: false,
 		},
 	];
-	const handleOpenDelete = (item) => {
-		setDataDelete(item);
-		setOpenDelete(!openDelete);
-	};
+
 	const handleDelete = async (data) => {
 		const dataSubmit = {
 			id: data?.id,
@@ -255,24 +301,22 @@ const EmployeePage = () => {
 		try {
 			const response = await updateEmployee(dataSubmit);
 			await response.data;
-			dispatch(fetchEmployeeList());
-			dispatch(fetchDepartmentWithUserList());
+			toast.success('Xoá nhân viên thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			dispatch(fetchEmployeeList(query));
 			handleCloseForm();
-			handleShowToast(`Xóa nhân viên!`, `Xóa nhân viên thành công thành công!`);
 		} catch (error) {
-			handleShowToast(`Xóa nhân viên`, `Xóa nhật nhân viên không thành công!`);
+			toast.error('Xoá nhân viên không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
-	};
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
 	};
 
 	const handleSubmitForm = async (data) => {
@@ -282,114 +326,190 @@ const EmployeePage = () => {
 			department_id: data?.department?.value,
 			code: data?.code,
 			email: data?.email,
-			password: '123456',
 			dateOfBirth: data?.dateOfBirth,
 			dateOfJoin: data?.dateOfJoin,
 			phone: data?.phone,
 			address: data?.address,
 			position_id: data?.position?.value,
 			role: data?.role,
+			sex: data?.sex,
 		};
 		if (data?.id) {
 			try {
 				const response = await updateEmployee(dataSubmit);
 				await response.data;
+				toast.success('Cập nhật nhân viên thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
-				handleShowToast(`Cập nhật nhân viên!`, `Cập nhật nhân viên thành công!`);
 			} catch (error) {
-				handleShowToast(`Cập nhật nhân viên`, `Cập nhật nhân viên không thành công!`);
+				toast.error('Cập nhật nhân viên không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		} else {
 			try {
-				const response = await addEmployee(dataSubmit);
+				const response = await addEmployee({
+					...dataSubmit,
+					password: '123456',
+				});
 				await response.data;
+				toast.success('Thêm nhân viên thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchEmployeeList());
 				handleCloseForm();
-				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm nhân viên`, `Thêm nhân viên không thành công!`);
+				toast.error('Thêm nhân viên không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		}
 	};
 
+	const handleExportExcel = async () => {
+		try {
+			const response = await exportExcel();
+			// If you want to download file automatically using link attribute.
+			let filename = 'danh-sach-nhan-vien.xlsx';
+			const disposition = _.get(response.headers, 'content-disposition');
+			if (disposition && disposition.indexOf('attachment') !== -1) {
+				const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+				const matches = filenameRegex.exec(disposition);
+				if (matches != null && matches[1]) {
+					filename = matches[1].replace(/['"]/g, '');
+				}
+			}
+			const url = window.URL.createObjectURL(
+				new Blob([response.data], { type: _.get(response.headers, 'content-type') }),
+			);
+			const link = document.createElement('a');
+			link.href = url;
+			link.setAttribute('download', filename);
+			document.body.appendChild(link);
+			link.click();
+			toast.success('Xuất Excel thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+		} catch (error) {
+			toast.error('Xuất Excel không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
+		}
+	};
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.hrList.text}>
 			<Page container='fluid'>
-				<div>
-					{verifyPermissionHOC(
-						<div>
-							{verifyPermissionHOC(
-								<div
-									className='row mb-0'
-									style={{
-										maxWidth: '80%',
-										minWidth: '60%',
-										margin: '0 auto',
-									}}>
-									<div className='col-12'>
-										<Card className='w-100'>
-											<div style={{ margin: '24px 24px 0' }}>
-												<CardHeader>
-													<CardLabel
-														icon='AccountCircle'
-														iconColor='primary'>
-														<CardTitle>
-															<CardLabel>Danh sách nhân sự</CardLabel>
-														</CardTitle>
-													</CardLabel>
-													{verifyPermissionHOC(
-														<CardActions>
-															<Button
-																color='info'
-																icon='PersonPlusFill'
-																tag='button'
-																onClick={() =>
-																	handleOpenForm(null)
-																}>
-																Thêm mới
-															</Button>
-														</CardActions>,
-														['admin'],
-													)}
-												</CardHeader>
-												<div className='p-4'>
-													<TableCommon
-														className='table table-modern mb-0'
-														columns={columns}
-														data={fetchUser()}
-													/>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<div>
+								{verifyPermissionHOC(
+									<div
+										className='row mb-0'
+										style={{
+											maxWidth: '95%',
+											minWidth: '60%',
+											margin: '0 auto',
+										}}>
+										<div className='col-12'>
+											<Card className='w-100'>
+												<div style={{ margin: '24px 24px 0' }}>
+													<CardHeader>
+														<CardLabel
+															icon='AccountCircle'
+															iconColor='primary'>
+															<CardTitle>
+																<CardLabel>
+																	Danh sách nhân sự
+																</CardLabel>
+															</CardTitle>
+														</CardLabel>
+														{verifyPermissionHOC(
+															<CardActions>
+																<Button
+																	color='info'
+																	icon='AddCircleOutline'
+																	tag='button'
+																	onClick={() =>
+																		handleOpenForm(null)
+																	}>
+																	Thêm mới
+																</Button>
+																<Button
+																	color='primary'
+																	icon='FileDownload'
+																	tag='button'
+																	onClick={() =>
+																		handleExportExcel()
+																	}>
+																	Xuất Excel
+																</Button>
+															</CardActions>,
+															['admin'],
+														)}
+													</CardHeader>
+													<div className='p-4'>
+														<TableCommon
+															className='table table-modern mb-0'
+															columns={columns}
+															data={fetchUser()}
+															onSubmitSearch={handleSubmitSearch}
+															onChangeCurrentPage={
+																handleChangeCurrentPage
+															}
+															currentPage={parseInt(currentPage, 10)}
+															totalItem={pagination?.totalRows}
+															total={pagination?.total}
+															setCurrentPage={setCurrentPage}
+															searchvalue={text}
+															isSearch
+														/>
+													</div>
 												</div>
-											</div>
-										</Card>
-									</div>
-								</div>,
-								['admin', 'manager'],
-							)}
+											</Card>
+										</div>
+									</div>,
+									['admin', 'manager'],
+								)}
 
-							<EmployeeForm
-								show={toggleForm}
-								onClose={handleCloseForm}
-								handleSubmit={handleSubmitForm}
-								item={itemEdit}
-								label={itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'}
-								fields={columns}
-								validate={validate}
-							/>
-							<ComfirmSubtask
-								openModal={openDelete}
-								onCloseModal={handleOpenDelete}
-								onConfirm={() => handleDelete(dataDelete)}
-								title='Xoá nhân viên'
-								content={`Xác nhận xoá nhân viên <strong>${dataDelete?.name}</strong> ?`}
-							/>
-						</div>,
-						['admin', 'manager'],
-						<NotPermission />,
-					)}
-				</div>
+								<EmployeeForm
+									size='xl'
+									show={toggleForm}
+									onClose={handleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={itemEdit}
+									label={
+										itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'
+									}
+									fields={columns}
+									validate={validate}
+								/>
+								<AlertConfirm
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDelete(itemEdit)}
+									title='Xoá nhân viên'
+									content={`Xác nhận xoá nhân viên <strong>${itemEdit?.name}</strong> ?`}
+								/>
+							</div>,
+							['admin', 'manager'],
+							<NotPermission />,
+						)}
+					</div>
+				)}
 			</Page>
 		</PageWrapper>
 	);

@@ -330,34 +330,40 @@ const Navigation = forwardRef(({ menu, horizontal, id, className, ...props }, re
 
 	const { t } = useTranslation('menu');
 
+	const roles = JSON.parse(localStorage.getItem('roles'));
+
 	function fillMenu(data, parentId, rootId, isHorizontal, isMore) {
 		if (!data) return null;
-		return Object.keys(data).map((item) => {
-			if (!data[item]) return null;
-			const { path } = data[item];
-			return path ? (
-				<Item
-					key={data[item].id}
-					rootId={rootId}
-					id={data[item].id}
-					title={data[item].text}
-					icon={data[item].icon}
-					to={`${data[item].path}`}
-					parentId={parentId}
-					isHorizontal={isHorizontal}
-					setActiveItem={setActiveItem}
-					activeItem={activeItem}
-					notification={data[item].notification}
-					hide={data[item].hide}>
-					{!!data[item].subMenu &&
-						fillMenu(data[item].subMenu, data[item].id, rootId, isHorizontal)}
-				</Item>
-			) : (
-				!isMore && !isHorizontal && (
-					<NavigationTitle key={data[item].id}>{t(data[item].text)}</NavigationTitle>
-				)
-			);
-		});
+		return Object.keys(data)
+			.filter((item) => {
+				return data[item]?.roles?.filter((role) => role?.includes(roles?.[0]))?.length > 0;
+			})
+			.map((item) => {
+				if (!data[item]) return null;
+				const { path } = data[item];
+				return path ? (
+					<Item
+						key={data[item].id}
+						rootId={rootId}
+						id={data[item].id}
+						title={data[item].text}
+						icon={data[item].icon}
+						to={`${data[item].path}`}
+						parentId={parentId}
+						isHorizontal={isHorizontal}
+						setActiveItem={setActiveItem}
+						activeItem={activeItem}
+						notification={data[item].notification}
+						hide={data[item].hide}>
+						{!!data[item].subMenu &&
+							fillMenu(data[item].subMenu, data[item].id, rootId, isHorizontal)}
+					</Item>
+				) : (
+					!isMore && !isHorizontal && (
+						<NavigationTitle key={data[item].id}>{t(data[item].text)}</NavigationTitle>
+					)
+				);
+			});
 	}
 
 	return (

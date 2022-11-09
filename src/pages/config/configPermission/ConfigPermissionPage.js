@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useToasts } from 'react-toast-notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -11,7 +10,6 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Button from '../../../components/bootstrap/Button';
-import Toasts from '../../../components/bootstrap/Toasts';
 import useDarkMode from '../../../hooks/useDarkMode';
 import CommonForm from '../../common/ComponentCommon/CommonForm';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
@@ -81,7 +79,6 @@ const permissions = [
 
 const ConfigPermissionPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
 	const dispatch = useDispatch();
 	const [openListPermission, setOpenListPermission] = useState(false);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
@@ -152,25 +149,13 @@ const ConfigPermissionPage = () => {
 		},
 	];
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
 	const handleDelete = async (data) => {
+		// eslint-disable-next-line no-useless-catch
 		try {
 			dispatch(onDeleteRole(data));
 			dispatch(fetchRoleList());
 			handleCloseForm();
-			handleShowToast(`Xoá vai trò!`, `Xoá vai trò thành công!`);
 		} catch (error) {
-			handleShowToast(`Xoá vai trò`, `Xoá vai trò không thành công!`);
 			throw error;
 		}
 	};
@@ -182,21 +167,19 @@ const ConfigPermissionPage = () => {
 			code: data?.code,
 		};
 		if (data?.id) {
+			// eslint-disable-next-line no-useless-catch
 			try {
 				dispatch(onUpdateRole(dataSubmit));
 				handleCloseForm();
-				handleShowToast(`Cập nhật vai trò!`, `Cập nhật vai trò thành công!`);
 			} catch (error) {
-				handleShowToast(`Cập nhật vai trò`, `Cập nhật vai trò không thành công!`);
 				throw error;
 			}
 		} else {
+			// eslint-disable-next-line no-useless-catch
 			try {
 				dispatch(onAddRole(dataSubmit));
 				handleCloseForm();
-				handleShowToast(`Thêm vai trò`, `Thêm vai trò thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm vai trò`, `Thêm vai trò không thành công!`);
 				throw error;
 			}
 		}

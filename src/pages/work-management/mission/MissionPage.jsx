@@ -2,7 +2,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
-import { useToasts } from 'react-toast-notifications';
+import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../../menu';
@@ -15,54 +16,70 @@ import Card, {
 import Button from '../../../components/bootstrap/Button';
 import MissionFormModal from './MissionFormModal';
 import Alert from '../../../components/bootstrap/Alert';
-import Toasts from '../../../components/bootstrap/Toasts';
 import useDarkMode from '../../../hooks/useDarkMode';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
-import { fetchMissionList } from '../../../redux/slice/missionSlice';
+import { fetchMissionList, changeCurrentPage } from '../../../redux/slice/missionSlice';
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import NotPermission from '../../presentation/auth/NotPermission';
 import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
 import { deleteMissionById } from './services';
+import Loading from '../../../components/Loading/Loading';
 
 const MissionPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
+	const [searchParams] = useSearchParams();
+	const navigate = useNavigate();
+	const localtion = useLocation();
+
+	const text = searchParams.get('text') || '';
+
 	const dispatch = useDispatch();
-	const missions = useSelector((state) => state.mission?.missions);
+	const missions = useSelector((state) => state.mission.missions);
+	const pagination = useSelector((state) => state.mission.pagination);
+	const loading = useSelector((state) => state.mission.loading);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
 	const confirmForm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
+	const currentPage = useSelector((state) => state.mission.currentPage);
+
 	useEffect(() => {
-		dispatch(fetchMissionList());
-	}, [dispatch]);
+		const query = {};
+		query.text = text;
+		query.page = currentPage;
+		query.limit = 10;
+		dispatch(fetchMissionList(query));
+	}, [dispatch, currentPage, text]);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
 
 	const handleOpenFormEdit = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
 	const handleDelete = async (data) => {
 		try {
 			await deleteMissionById(data?.id);
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+			toast.success('Xoá mục tiêu thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			handleCloseForm();
+			const query = {};
+			query.text = text;
+			query.page = currentPage;
+			query.limit = 10;
+			dispatch(fetchMissionList(query));
 		} catch (error) {
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+			toast.error('Xoá mục tiêu không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
-		dispatch(fetchMissionList());
 	};
 
 	const columns = [
@@ -82,7 +99,7 @@ const MissionPage = () => {
 				'--',
 		},
 		{
-			title: 'Thời gian bắt đầu',
+			title: 'Ngày bắt đầu',
 			id: 'startTime',
 			key: 'startTime',
 			type: 'text',
@@ -90,7 +107,7 @@ const MissionPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Thời gian kết thúc',
+			title: 'Ngày kết thúc',
 			id: 'endTime',
 			key: 'endTime',
 			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : '--'),
@@ -102,6 +119,7 @@ const MissionPage = () => {
 			key: 'quantity',
 			type: 'number',
 			align: 'center',
+			format: (value) => value || '--',
 		},
 		{
 			title: 'Số ngày công',
@@ -111,7 +129,7 @@ const MissionPage = () => {
 			align: 'center',
 		},
 		{
-			title: '',
+			title: 'Hành động',
 			id: 'action',
 			key: 'action',
 			render: (item) =>
@@ -139,77 +157,114 @@ const MissionPage = () => {
 		},
 	];
 
+	const handleSubmitSearch = (searchValue) => {
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		setCurrentPage(searchValue.page);
+	};
+
 	return (
 		<PageWrapper title={demoPages.mucTieu?.text}>
 			<Page container='fluid'>
-				<div>
-					{verifyPermissionHOC(
-						<>
-							<div
-								className='row'
-								style={{ maxWidth: '75%', minWidth: '60%', margin: '0 auto' }}>
-								<div className='col-12'>
-									<Card>
-										<div style={{ margin: '24px 24px 0' }}>
-											<CardHeader>
-												<CardLabel icon='Task' iconColor='danger'>
-													<CardTitle>
-														<CardLabel>Danh sách mục tiêu</CardLabel>
-													</CardTitle>
-												</CardLabel>
-												{verifyPermissionHOC(
-													<CardActions>
-														<Button
-															color='info'
-															icon='Plus'
-															tag='button'
-															onClick={() =>
-																handleOpenFormEdit(null)
-															}>
-															Thêm mới
-														</Button>
-													</CardActions>,
-													['admin'],
-												)}
-											</CardHeader>
-											<div className='p-4'>
-												<TableCommon
-													className='table table-modern mb-0'
-													columns={columns}
-													data={missions}
-												/>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row'
+									style={{ maxWidth: '95%', minWidth: '60%', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel icon='Task' iconColor='danger'>
+														<CardTitle>
+															<CardLabel>
+																Danh sách mục tiêu
+															</CardLabel>
+														</CardTitle>
+													</CardLabel>
+													{verifyPermissionHOC(
+														<CardActions>
+															<Button
+																color='info'
+																icon='AddCircleOutline'
+																tag='button'
+																onClick={() =>
+																	handleOpenFormEdit(null)
+																}>
+																Thêm mới
+															</Button>
+														</CardActions>,
+														['admin'],
+													)}
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={missions}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
 											</div>
-										</div>
 
-										{!missions?.length && (
-											<Alert
-												color='warning'
-												isLight
-												icon='Report'
-												className='mt-3'>
-												Không có mục tiêu!
-											</Alert>
-										)}
-									</Card>
+											{!missions?.length && (
+												<Alert
+													color='warning'
+													isLight
+													icon='Report'
+													className='mt-3'>
+													Không có mục tiêu!
+												</Alert>
+											)}
+										</Card>
+									</div>
 								</div>
-							</div>
-							<MissionFormModal
-								show={toggleFormEdit}
-								onClose={handleCloseForm}
-								item={itemEdit}
-							/>
-							<AlertConfirm
-								openModal={confirmForm}
-								onCloseModal={handleCloseForm}
-								onConfirm={() => handleDelete(itemEdit)}
-								title='Xoá mục tiêu'
-								content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
-							/>
-						</>,
-						['admin', 'manager'],
-						<NotPermission />,
-					)}
-				</div>
+								<MissionFormModal
+									show={toggleFormEdit}
+									onClose={handleCloseForm}
+									item={itemEdit}
+								/>
+								<AlertConfirm
+									openModal={confirmForm}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDelete(itemEdit)}
+									title='Xoá mục tiêu'
+									content={`Xác nhận xoá mục tiêu <strong>${itemEdit?.name}</strong> ?`}
+								/>
+							</>,
+							['admin', 'manager'],
+							<NotPermission />,
+						)}
+					</div>
+				)}
 			</Page>
 		</PageWrapper>
 	);

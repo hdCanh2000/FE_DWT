@@ -2,30 +2,24 @@
 /* eslint-disable no-shadow */
 import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import moment from 'moment';
-import _ from 'lodash';
+import { toast } from 'react-toastify';
 import SelectComponent from 'react-select';
-import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
+import { get, isEmpty } from 'lodash';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
-import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
 import Select from '../../../components/bootstrap/forms/Select';
 import { PRIORITIES } from '../../../utils/constants';
 import Option from '../../../components/bootstrap/Option';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import Button from '../../../components/bootstrap/Button';
-import Card, {
-	CardActions,
-	CardHeader,
-	CardLabel,
-	CardTitle,
-} from '../../../components/bootstrap/Card';
+import Card, { CardHeader, CardLabel, CardTitle } from '../../../components/bootstrap/Card';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
-import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
-import { fetchUnitList } from '../../../redux/slice/unitSlice';
-import ListPickKpiNorm from './ListPickKpiNorm';
-import { addWorktrack } from '../../dailyWorkTracking/services';
+import { addWorktrack, updateWorktrack } from '../../dailyWorkTracking/services';
+import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
+import { fetchAssignTask } from '../../../redux/slice/worktrackSlice';
+import { fetchKeyList } from '../../../redux/slice/keySlice';
 
 const customStyles = {
 	control: (provided) => ({
@@ -35,48 +29,58 @@ const customStyles = {
 		borderRadius: '1.25rem',
 	}),
 };
-// eslint-disable-next-line react/prop-types, no-unused-vars
 const OrderTaskForm = ({ show, onClose, item, fetch }) => {
-	const [dataSubMission, setDataSubMission] = React.useState([]);
 	const dispatch = useDispatch();
+	const keys = useSelector((state) => state.key.keys);
 	const users = useSelector((state) => state.employee.employees);
-	const kpiNorms = useSelector((state) => state.kpiNorm.kpiNorms);
 	const missions = useSelector((state) => state.mission.missions);
+	const tasks = useSelector((state) => state.worktrack.tasks);
 	const [missionOption, setMissionOption] = useState({});
+	const [keyOption, setKeyOption] = useState([]);
+	const [parentOption, setParentOption] = useState({});
 	const [userOption, setUserOption] = useState({});
+	const [checkValidate, setCheckValidate] = useState(false);
 	const [mission, setMission] = React.useState({
 		quantity: '',
 		startDate: '',
-		deadlineDate: '',
+		deadline: '',
 		priority: 2,
 		note: '',
 	});
-	const [isOpen, setIsOpen] = React.useState(false);
 	useEffect(() => {
-		dispatch(fetchDepartmentList());
+		dispatch(fetchKeyList());
 		dispatch(fetchMissionList());
 		dispatch(fetchEmployeeList());
-		dispatch(fetchUnitList());
+		dispatch(fetchAssignTask());
 	}, [dispatch]);
-
 	useEffect(() => {
-		dispatch(fetchKpiNormList());
-	}, [dispatch]);
-
+		const dataParent = tasks.filter((ele) => ele.id === item?.parent_id);
+		setParentOption({
+			...dataParent[0],
+			label: get(dataParent[0], 'kpiNorm.name'),
+			value: get(dataParent[0], 'id'),
+		});
+		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
+	},[tasks , item])
 	useEffect(() => {
-		setMission({ ...item });
+		if (item.id) setMission({ ...item });
 		setMissionOption({
 			...item.mission,
-			label: _.get(item, 'mission.name'),
-			value: _.get(item, 'mission.name'),
+			label: get(item, 'mission.name'),
+			value: get(item, 'mission.name'),
 		});
-		setUserOption({
-			label: _.get(item.users, '.name'),
-			value: _.get(item.users, '.name'),
-			id: _.get(item.users, '.id'),
-		});
+		if (!isEmpty(item?.users)) {
+			const userResponsible = item?.users.filter(
+				(items) => items?.workTrackUsers?.isResponsible === true,
+			);
+			setUserOption({
+				label: get(userResponsible, '[0].name'),
+				value: get(userResponsible, '[0].name'),
+				id: get(userResponsible, '[0].id'),
+			});
+		}
 	}, [item]);
-	// show toast
+
 	const handleChange = (e) => {
 		const { value, name } = e.target;
 		setMission({
@@ -84,98 +88,128 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			[name]: value,
 		});
 	};
-	const handleSubmit = async () => {
-		const dataValue = {
-			kpiNorm_id: item.id,
-			mission_id: missionOption.id || null,
-			quantity: parseInt(mission.quantity, 10) || null,
-			user_id: userOption.id || null,
-			priority: parseInt(mission.priority, 10) || null,
-			note: mission.note || null,
-			description: item.description || null,
-			deadline: mission.deadline || null,
-			startDate: mission.startDate || null,
-		};
-		addWorktrack(dataValue).then((res) => {
-			dataSubMission.forEach(async (item) => {
-				await addWorktrack({
-					mission_id: missionOption.id || null,
-					priority: parseInt(mission.priority, 10) || null,
-					note: mission.note || null,
-					description: item.description || null,
-					deadline: mission.deadlineDate || null,
-					startDate: mission.startDate || null,
-					kpiNorm_id: item.id,
-					parent_id: res.data.data.id,
-					quantity: parseInt(mission.quantity, 10) || null,
-					user_id: userOption.id || null,
-				});
-			});
-			fetch();
-		});
+	const handleClose = () => {
+		setCheckValidate(false);
 		onClose();
 		setMission({});
 		setMissionOption({});
 		setUserOption({});
+		setParentOption({});
 	};
-	const handleShowPickListKpiNorm = () => {
-		setIsOpen(!isOpen);
+
+	const role = localStorage.getItem('roles');
+	const userId = localStorage.getItem('userId');
+
+	const handleSubmit = async () => {
+		setCheckValidate(true);
+		fetch();
+		if (!isEmpty(mission.startDate) && !isEmpty(mission.deadline)) {
+			if (item.id) {
+				const dataValue = {
+					parent_id: parentOption?.id || null,
+					id: item.id,
+					kpiNorm_id: item.kpiNorm_id,
+					mission_id: missionOption.id || null,
+					key_id: keyOption.id || null,
+					quantity: parseInt(mission.quantity, 10) || null,
+					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
+					priority: parseInt(mission.priority, 10) || null,
+					note: mission.note || null,
+					description: item.description || null,
+					deadline: mission.deadline || null,
+					startDate: mission.startDate || null,
+					status: role.includes('user') ? 'pending' : 'accepted',
+				};
+				updateWorktrack(dataValue)
+					.then(() => {
+						toast.success('Cập nhật công việc thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						setCheckValidate(false);
+						handleClose();
+						fetch();
+					})
+					.catch((err) => {
+						toast.success('Cập nhật công việc thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						throw err;
+					});
+			} else {
+				const dataValue = {
+					parent_id: parentOption?.id || null,
+					kpiNorm_id: item.kpiNorm_id,
+					mission_id: missionOption.id || null,
+					key_id: keyOption.id || null,
+					quantity: parseInt(mission.quantity, 10) || null,
+					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
+					priority: parseInt(mission.priority, 10) || null,
+					note: mission.note || null,
+					description: item.description || null,
+					deadline: mission.deadline || null,
+					startDate: mission.startDate || null,
+					status: role.includes('user') ? 'pending' : 'accepted',
+				};
+				addWorktrack(dataValue)
+					.then(() => {
+						toast.success('Thêm công việc thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						setCheckValidate(false);
+						handleClose();
+						fetch();
+					})
+					.catch((err) => {
+						toast.error('Thêm công việc thất bại !', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						throw err;
+					});
+			}
+		}
 	};
 	return (
-		<Modal show={show} onHide={onClose} centered size='lg'>
+		<Modal show={show} onHide={handleClose} centered size='xl'>
 			<div className='row px-3'>
 				<Card className='px-0 w-100 m-auto'>
 					<CardHeader className='py-2'>
 						<CardLabel>
 							<CardTitle className='fs-4 ml-0'>
-								{item?.id ? 'Chỉnh sửa nhiệm vụ ' : 'Giao nhiệm vụ'}
+								{item?.kpiNorm ? 'Chỉnh sửa nhiệm vụ ' : 'Giao nhiệm vụ'}
 							</CardTitle>
 						</CardLabel>
-						<CardActions>
-							<FormGroup>
-								<OverlayTrigger
-									overlay={
-										<Tooltip id='addSubMission'>Thêm nhiệm vụ con</Tooltip>
-									}>
-									<Button
-										color='success'
-										type='button'
-										icon='Plus'
-										className='d-block w-10'
-										onClick={handleShowPickListKpiNorm}>
-										Thêm nhiệm vụ con
-									</Button>
-								</OverlayTrigger>
-							</FormGroup>
-						</CardActions>
 					</CardHeader>
 					<div className='col-12 p-4'>
 						<div className='row'>
-							<table
-								style={{
-									width: '100%',
-									marginLeft: '20px',
-									marginBottom: '20px',
-								}}>
+							<table className='w-100 mb-4 border'>
+								<thead>
+									<tr>
+										<th className='p-3 border text-left'>Tên nhiệm vụ</th>
+										<th className='p-3 border text-center'>Định mức KPI</th>
+									</tr>
+								</thead>
 								<tbody>
-									<tr style={{ height: '30px' }}>
-										<td>
-											Tên nhiệm vụ:{' '}
-											<b>{mission?.name || mission?.kpiNorm?.name}</b>
+									<tr>
+										<td className='p-3 border text-left'>
+											<b>
+												{get(item, 'kpiNorm_name')
+													? get(item, 'kpiNorm_name')
+													: get(mission, 'kpiNorm.name')}
+											</b>
 										</td>
-										<td>
-											Định mức KPI: <b>{mission.kpiValue || 'Không'}</b>
-										</td>
-										<td>
-											Loại nhiệm vụ:{' '}
-											<b>{mission.taskType || 'Thường xuyên'}</b>
+										<td className='p-3 border text-center'>
+											<b>{get(item, 'kpi_value', '--')}</b>
 										</td>
 									</tr>
 								</tbody>
 							</table>
 							{/* Thuộc mục tiêu */}
 							<div className='row g-2'>
-								<div className='col-5'>
+								<div className='col-4'>
 									<FormGroup id='task' label='Thuộc mục tiêu'>
 										<SelectComponent
 											placeholder='Thuộc mục tiêu'
@@ -187,46 +221,59 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 									</FormGroup>
 								</div>
 								<div className='col-4'>
-									<FormGroup id='userOption' label='Nguời phụ trách'>
+									<FormGroup id='parent' label='Thuộc nhiệm vụ cha'>
 										<SelectComponent
-											style={customStyles}
-											placeholder='Chọn nguời phụ trách'
-											value={userOption}
-											defaultValue={userOption}
-											onChange={setUserOption}
-											options={users}
+											placeholder='Thuộc nhiệm vụ cha'
+											value={parentOption}
+											defaultValue={parentOption}
+											onChange={setParentOption}
+											options={tasks.filter(
+												(item) => item.id !== parentOption?.id,
+											)}
 										/>
 									</FormGroup>
 								</div>
-								<div className='col-3'>
-									<FormGroup id='quantity' label='Số lượng'>
-										<Input
-											type='text'
-											name='quantity'
-											onChange={handleChange}
-											value={mission.quantity || ''}
-											placeholder='Số lượng'
-											className='border border-2 rounded-0 shadow-none'
-										/>
-									</FormGroup>
-								</div>
-							</div>
-							<div className='row g-2'>
+								{verifyPermissionHOC(
+									<div className='col-4'>
+										<FormGroup id='userOption' label='Nguời phụ trách'>
+											<SelectComponent
+												style={customStyles}
+												placeholder='Chọn nguời phụ trách'
+												value={userOption}
+												defaultValue={userOption}
+												onChange={setUserOption}
+												options={users}
+											/>
+										</FormGroup>
+										<div className='text-danger mt-1'>
+											{checkValidate && isEmpty(userOption) && (
+												<span className='error'>
+													Vui lòng chọn người phụ trách
+												</span>
+											)}
+										</div>
+									</div>,
+									['admin', 'manager'],
+								)}
 								<div className='col-4'>
 									<FormGroup id='startDate' label='Ngày bắt đầu'>
 										<Input
 											name='startDate'
 											placeholder='Ngày bắt đầu'
 											onChange={handleChange}
-											value={
-												mission.startDate ||
-												moment().add(0, 'days').format('YYYY-MM-DD')
-											}
+											value={mission.startDate}
 											type='date'
 											ariaLabel='Ngày bắt đầu'
 											className='border border-2 rounded-0 shadow-none'
 										/>
 									</FormGroup>
+									<div className='text-danger mt-1'>
+										{checkValidate && isEmpty(mission.startDate) && (
+											<span className='error'>
+												Vui lòng điền ngày bắt đầu
+											</span>
+										)}
+									</div>
 								</div>
 								<div className='col-4'>
 									<FormGroup id='deadline' label='Hạn ngày hoàn thành'>
@@ -234,15 +281,19 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											name='deadline'
 											placeholder='Hạn ngày hoàn thành'
 											onChange={handleChange}
-											value={
-												mission.deadline
-												// moment().add(1, 'days').format('YYYY-MM-DD')
-											}
+											value={mission.deadline}
 											type='date'
 											ariaLabel='Hạn ngày hoàn thành'
 											className='border border-2 rounded-0 shadow-none'
 										/>
 									</FormGroup>
+									<div className='text-danger mt-1'>
+										{checkValidate && isEmpty(mission.deadline) && (
+											<span className='error'>
+												Vui lòng điền ngày kết thúc
+											</span>
+										)}
+									</div>
 								</div>
 								<div className='col-4'>
 									<FormGroup id='priority' label='Độ ưu tiên'>
@@ -259,6 +310,41 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 												</Option>
 											))}
 										</Select>
+									</FormGroup>
+								</div>
+								<div className='col-4'>
+									<FormGroup id='keys' label='Chỉ số key'>
+										<SelectComponent
+											placeholder='Chỉ số key'
+											value={keyOption}
+											defaultValue={keyOption}
+											onChange={setKeyOption}
+											options={keys}
+										/>
+									</FormGroup>
+								</div>
+								<div className='col-4'>
+									<FormGroup id='quantity' label='Số lượng'>
+										<Input
+											type='text'
+											name='quantity'
+											onChange={handleChange}
+											value={mission.quantity || ''}
+											placeholder='Số lượng'
+											className='border border-2 rounded-0 shadow-none'
+										/>
+									</FormGroup>
+								</div>
+								<div className='col-4'>
+									<FormGroup id='unit' label='Đơn vị'>
+										<Input
+										disabled
+											type='text'
+											name='unit'
+											value={item?.unit}
+											placeholder='Đơn vị'
+											className='border border-2 rounded-0 shadow-none'
+										/>
 									</FormGroup>
 								</div>
 							</div>
@@ -286,7 +372,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 								color='danger'
 								className='w-15 p-3 m-1'
 								type='button'
-								onClick={onClose}>
+								onClick={handleClose}>
 								Đóng
 							</Button>
 							<Button
@@ -299,21 +385,9 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 						</div>
 					</div>
 				</Card>
-				<ListPickKpiNorm
-					setDataSubMission={setDataSubMission}
-					show={isOpen}
-					data={kpiNorms}
-					handleClose={handleShowPickListKpiNorm}
-					initItem={item}
-				/>
 			</div>
 		</Modal>
 	);
 };
-// OrderTaskForm.propTypes = {
-// 	isEdit: PropTypes.bool,
-// };
-// OrderTaskForm.defaultProps = {
-// 	isEdit: false,
-// };
+
 export default memo(OrderTaskForm);

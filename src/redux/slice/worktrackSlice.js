@@ -1,24 +1,27 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import moment from 'moment';
 import {
 	addWorktrack,
 	getAllWorktrack,
-	getAllWorktrackByUser,
 	getAllWorktrackByUserId,
-	// getAllWorktrackByUser,
+	getAllWorktrackMe,
 	updateWorktrack,
 } from '../../pages/dailyWorkTracking/services';
+import { getAllWorktrackByStatus } from '../../pages/pendingWorktrack/services';
+import { LIST_STATUS_PENDING } from '../../utils/constants';
 
 const initialState = {
 	worktracks: [],
+	tasks: [],
+	worktracksByStatus: [],
 	worktrack: {},
 	loading: false,
 	error: false,
 };
 
-// Đầu tiên, tạo thunk
 export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async () => {
 	const response = await getAllWorktrack();
-	return response.data.data?.role === 'manager'
+	return response.data.data?.role === 'manager' || response.data.data?.role === 'user'
 		? response.data.data.workTracks.map((item) => {
 				return {
 					...item,
@@ -39,26 +42,62 @@ export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', 
 		  });
 });
 
+export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', async () => {
+	const response = await getAllWorktrack();
+	return response.data.data?.role === 'manager' || response.data.data?.role === 'user'
+		? response.data.data.workTracks
+				?.filter((item) => {
+					return item.workTrackUsers.isCreated === true;
+				})
+				?.map((item) => {
+					return {
+						...item,
+						label: item?.kpiNorm?.name,
+						value: item.id,
+						text: item.name,
+						parentId: item.parent_id,
+					};
+				})
+		: response.data.data?.map((item) => {
+				return {
+					...item,
+					label: item?.kpiNorm?.name,
+					value: item.id,
+					text: item.name,
+					parentId: item.parent_id,
+				};
+		  });
+});
+
+// Đầu tiên, tạo thunk
+export const fetchWorktrackListByStatus = createAsyncThunk(
+	'worktrack/fetchListByStatus',
+	async (status) => {
+		const response = await getAllWorktrackByStatus(status);
+		return response.data.data.map((item) => {
+			return {
+				...item,
+				label: item.name,
+				value: item.id,
+				text: item.name,
+				parentId: item.parent_id,
+				deadlineText: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
+				statusName: LIST_STATUS_PENDING.find((st) => st.value === item.status).label,
+				userResponsible: item.users.find((u) => u?.workTrackUsers?.isResponsible === true)
+					?.name,
+			};
+		});
+	},
+);
+
 export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
 	const response = await getAllWorktrackByUserId(id);
 	return response.data.data;
 });
 
 export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async () => {
-	const response = await getAllWorktrackByUser();
-	return response.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			unit: {
-				...item.unit,
-				label: item?.unit?.name,
-				value: item?.unit?.id,
-			},
-		};
-	});
+	const response = await getAllWorktrackMe();
+	return response.data.data;
 });
 
 export const onAddWorktrack = createAsyncThunk('worktrack/addNew', async (data) => {
@@ -89,6 +128,30 @@ export const worktrackSlice = createSlice({
 			state.loading = false;
 			state.error = action.error;
 		},
+		// fetch list assign
+		[fetchAssignTask.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchAssignTask.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.tasks = [...action.payload];
+		},
+		[fetchAssignTask.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch list all by status
+		[fetchWorktrackListByStatus.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchWorktrackListByStatus.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.worktracksByStatus = [...action.payload];
+		},
+		[fetchWorktrackListByStatus.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
 		// fetch list
 		[fetchWorktrackList.pending]: (state) => {
 			state.loading = true;
@@ -101,13 +164,13 @@ export const worktrackSlice = createSlice({
 			state.loading = false;
 			state.error = action.error;
 		},
-		// fetch list
+		// fetch list me
 		[fetchWorktrackListMe.pending]: (state) => {
 			state.loading = true;
 		},
 		[fetchWorktrackListMe.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktracks = [...action.payload];
+			state.worktrack = { ...action.payload };
 		},
 		[fetchWorktrackListMe.rejected]: (state, action) => {
 			state.loading = false;

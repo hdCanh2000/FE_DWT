@@ -6,14 +6,18 @@ import Modal from 'react-bootstrap/Modal';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Select from '../../components/bootstrap/forms/Select';
 import Textarea from '../../components/bootstrap/forms/Textarea';
+import Input from '../../components/bootstrap/forms/Input';
+import validate from './validate';
 
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
 		initialValues: {
-			note: data?.row?.note || '',
-			status: data?.row?.status || 'inProgress',
+			note: data.row?.note ? data.row?.note : '',
+			quantity: data.row?.quantity ? data.row?.quantity : '',
+			status: data.row?.status ? data.row?.status : 'inProgress',
 		},
 		enableReinitialize: true,
+		validationSchema: validate,
 		onSubmit: (values, { resetForm }) => {
 			handleSubmit({
 				...values,
@@ -50,13 +54,40 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									className='border border-2 rounded-0 shadow-none'
 									onChange={formik.handleChange}
 									onBlur={formik.handleBlur}
-									value={formik.values.note}
+									value={formik.values.note || ''}
 									isValid={formik.isValid}
 									disabled={data.row?.status}
 								/>
 							</FormGroup>
+							<div className='text-danger mt-1'>
+								{formik.errors.note && (
+									<span className='error'>{formik.errors.note}</span>
+								)}
+							</div>
 						</div>
-						<div className='col-12'>
+						<div className='col-6'>
+							<FormGroup id='quantity' label='Số lượng'>
+								<Input
+									ariaLabel='Số lượng'
+									placeholder='Số lượng'
+									disabled={data.row?.quantity}
+									name='quantity'
+									size='lg'
+									type='number'
+									className='border border-2 rounded-0 shadow-none'
+									onChange={formik.handleChange}
+									onBlur={formik.handleBlur}
+									value={formik.values.quantity || ''}
+									isValid={formik.isValid}
+								/>
+							</FormGroup>
+							<div className='text-danger mt-1'>
+								{formik.errors.quantity && (
+									<span className='error'>{formik.errors.quantity}</span>
+								)}
+							</div>
+						</div>
+						<div className='col-6'>
 							<FormGroup id='status' label='Trạng thái'>
 								<Select
 									ariaLabel='Trạng thái'
@@ -65,7 +96,7 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									list={[
 										{
 											id: 1,
-											text: 'Đang thực hiện',
+											text: 'Đã nhận',
 											value: 'inProgress',
 										},
 										{
@@ -73,21 +104,21 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 											text: 'Đã hoàn thành',
 											value: 'completed',
 										},
-										{
-											id: 3,
-											text: 'Quá hạn',
-											value: 'expired',
-										},
 									]}
 									name='status'
 									size='lg'
 									className='border border-2 rounded-0 shadow-none'
 									onChange={formik.handleChange}
 									onBlur={formik.handleBlur}
-									value={formik.values.status}
+									value={formik.values.status || 'inProgress'}
 									isValid={formik.isValid}
 								/>
 							</FormGroup>
+							<div className='text-danger mt-1'>
+								{formik.errors.status && (
+									<span className='error'>{formik.errors.status}</span>
+								)}
+							</div>
 						</div>
 					</div>
 				</form>

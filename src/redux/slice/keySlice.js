@@ -1,31 +1,39 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllKeys } from '../../pages/work-management/mission/services';
+import { addkey, getAllKey, updateKey } from '../../pages/keys/services';
 
 const initialState = {
 	keys: [],
 	key: {},
 	loading: false,
 	error: false,
+	currentPage: 1,
+	pagination: {},
 };
 
 // Đầu tiên, tạo thunk
-export const fetchKeyList = createAsyncThunk('key/fetchList', async () => {
-	const response = await getAllKeys();
-	return response.data.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			text: item.name,
-			value: item.id,
-		};
-	});
+export const fetchKeyList = createAsyncThunk('key/fetchList', async (params) => {
+	const response = await getAllKey(params);
+	return response.data;
+});
+export const onAddKey = createAsyncThunk('key/addNew', async (data) => {
+	const response = await addkey(data);
+	return response.data;
+});
+
+export const onUpdateKey = createAsyncThunk('key/update', async (data) => {
+	const response = await updateKey(data);
+	return response.data;
 });
 
 // eslint-disable-next-line import/prefer-default-export
 export const keySlice = createSlice({
 	name: 'keySlice',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch list
 		[fetchKeyList.pending]: (state) => {
@@ -33,11 +41,58 @@ export const keySlice = createSlice({
 		},
 		[fetchKeyList.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.keys = [...action.payload];
+			state.keys = [
+				...action.payload.data.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						text: item.name,
+						value: item.id,
+						unit: {
+							...item?.unit,
+							label: item?.unit?.name,
+							value: item?.unit?.id,
+						},
+					};
+				}),
+			];
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchKeyList.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
+		// add new
+		[onAddKey.pending]: (state) => {
+			state.loading = true;
+		},
+		[onAddKey.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.keys = [...state.keys, ...action.payload];
+		},
+		[onAddKey.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// update
+		[onUpdateKey.pending]: (state) => {
+			state.loading = true;
+		},
+		[onUpdateKey.fulfilled]: (state, action) => {
+			const {
+				arg: { id },
+			} = action.meta;
+			state.loading = false;
+			if (id) {
+				state.keys = state.keys.map((item) =>
+					item.id === id ? Object.assign(item, action.payload) : item,
+				);
+			}
+		},
+		[onUpdateKey.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
 	},
 });
+export const { changeCurrentPage } = keySlice.actions;

@@ -10,35 +10,20 @@ const initialState = {
 	employees: [],
 	loading: false,
 	error: false,
+	pagination: {},
+	currentPage: 1,
 };
 
 // Đầu tiên, tạo thunk
-export const fetchEmployeeList = createAsyncThunk('employee/fetchList', async () => {
-	const response = await getAllEmployee();
-	return response.data?.data?.map((item) => {
-		return {
-			...item,
-			label: item.name,
-			value: item.id,
-			text: item.name,
-			department: {
-				...item?.department,
-				label: item?.department?.name,
-				value: item?.department?.id,
-			},
-			position: {
-				...item?.position,
-				label: item?.position?.name,
-				value: item?.position?.id,
-			},
-		};
-	});
+export const fetchEmployeeList = createAsyncThunk('employee/fetchList', async (params) => {
+	const response = await getAllEmployee(params);
+	return response.data;
 });
 
 export const fetchEmployeeListByDepartment = createAsyncThunk(
 	'employee/fetchListByDepartment',
-	async (id) => {
-		const response = await getAllEmployeeByDepartment(id);
+	async (id, params) => {
+		const response = await getAllEmployeeByDepartment(id, params);
 		return response.data?.data?.map((item) => {
 			return {
 				...item,
@@ -74,7 +59,11 @@ export const onUpdateEmployee = createAsyncThunk('employee/update', async (data)
 export const employeeSlice = createSlice({
 	name: 'employeeSlice',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch list
 		[fetchEmployeeList.pending]: (state) => {
@@ -82,7 +71,25 @@ export const employeeSlice = createSlice({
 		},
 		[fetchEmployeeList.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.employees = [...action.payload];
+			state.employees = [...action.payload.data].map((item) => {
+				return {
+					...item,
+					label: item.name,
+					value: item.id,
+					text: item.name,
+					department: {
+						...item?.department,
+						label: item?.department?.name,
+						value: item?.department?.id,
+					},
+					position: {
+						...item?.position,
+						label: item?.position?.name,
+						value: item?.position?.id,
+					},
+				};
+			});
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchEmployeeList.rejected]: (state, action) => {
 			state.loading = false;
@@ -133,3 +140,5 @@ export const employeeSlice = createSlice({
 		},
 	},
 });
+
+export const { changeCurrentPage } = employeeSlice.actions;

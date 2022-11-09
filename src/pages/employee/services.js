@@ -1,18 +1,20 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllEmployee = () => {
+const getAllEmployee = (params) => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
 		url: `/api/users`,
+		params,
 	});
 };
 
-const getAllEmployeeByDepartment = (id) => {
+const getAllEmployeeByDepartment = (id, params) => {
 	// lấy danh sách nhân viên
 	return axiosClient({
 		method: 'GET',
 		url: `/api/users/department/${id}`,
+		params,
 	});
 };
 
@@ -38,6 +40,13 @@ const updateEmployee = (data) => {
 		data,
 	});
 };
+const exportExcel = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/api/users/exportExcel`,
+		responseType: 'blob',
+	});
+};
 
 const deleteEmployee = (id) => {
 	return axiosClient({
@@ -53,4 +62,5 @@ export {
 	addEmployee,
 	updateEmployee,
 	deleteEmployee,
+	exportExcel,
 };

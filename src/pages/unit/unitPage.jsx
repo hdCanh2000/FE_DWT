@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation, createSearchParams, useSearchParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -12,65 +13,90 @@ import Card, {
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
-import Toasts from '../../components/bootstrap/Toasts';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
-import { getAllUnits, addUnit, updateUnit, deleteUnit } from './services';
-import validate from './validate';
+import { addUnit, updateUnit, deleteUnit } from './services';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
+import Loading from '../../components/Loading/Loading';
+import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import { changeCurrentPage, fetchUnitList } from '../../redux/slice/unitSlice';
+import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 
 const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const { addToast } = useToasts();
-	const params = useParams();
-	const [openForm, setOpenForm] = useState(false);
-	const [itemEdit, setItemEdit] = useState({});
-	const [units, setUnits] = useState([]);
-	const [deletes, setDeletes] = React.useState({});
-	const [openConfirm, set0penConfirm] = React.useState(false);
+	const navigate = useNavigate();
+	const localtion = useLocation();
+	const [searchParams] = useSearchParams();
+	const dispatch = useDispatch();
 
-	async function getUnit() {
-		try {
-			const response = await getAllUnits();
-			const data = await response.data?.data;
-			setUnits(data);
-		} catch (error) {
-			setUnits([]);
-		}
-	}
+	const units = useSelector((state) => state.unit.units);
+	const pagination = useSelector((state) => state.unit.pagination);
+	const loading = useSelector((state) => state.unit.loading);
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+
+	const currentPage = useSelector((state) => state.unit.currentPage);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
+
+	const text = searchParams.get('text') || '';
 
 	useEffect(() => {
-		getUnit();
-	}, []);
+		const query = {};
+		query.text = text;
+		query.page = currentPage;
+		query.limit = 10;
+		dispatch(fetchUnitList(query));
+	}, [dispatch, currentPage, text]);
 
-	const handleOpenConfirm = (item) => {
-		setDeletes({
-			id: item.id,
-			name: item.name,
-		});
-		set0penConfirm(true);
+	const handleSubmitSearch = (searchValue) => {
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
 	};
 
-	const handleCloseDeleteComfirm = () => {
-		setDeletes({});
-		set0penConfirm(false);
+	const handleChangeCurrentPage = (searchValue) => {
+		setCurrentPage(searchValue.page);
 	};
-
-	async function fetchUnits() {
-		const res = await getAllUnits();
-		setUnits(res.data.data);
-	}
 
 	const handleDelete = async (valueDelete) => {
 		try {
 			await deleteUnit(valueDelete?.id);
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thành công!`);
+			toast.success('Xoá đơn vị thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			const query = {};
+			query.text = text;
+			query.page = currentPage;
+			query.limit = 10;
+			dispatch(fetchUnitList(query));
+			handleCloseForm();
 		} catch (error) {
-			handleShowToast(`Xoá đơn vị`, `Xoá đơn vị thất bại!`);
+			toast.error('Xoá đơn vị không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
 		}
-		fetchUnits(params?.id);
 	};
 
 	const columns = [
@@ -103,7 +129,7 @@ const UnitPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenActionForm(item)}
+						onClick={() => handleOpenForm(item)}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -111,7 +137,7 @@ const UnitPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2 '
 						icon='Delete'
-						onClick={() => handleOpenConfirm(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
@@ -119,69 +145,53 @@ const UnitPage = () => {
 		},
 	];
 
-	const handleOpenActionForm = (item) => {
-		setOpenForm(true);
-		setItemEdit({ ...item });
-	};
-
-	const hanleCloseForm = () => {
-		setOpenForm(false);
-		setItemEdit(null);
-	};
-
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-
-	const handleClearValueForm = () => {
-		setItemEdit(null);
-	};
-
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
-			id: data?.id,
 			name: data.name,
 			code: data.code,
 			status: Number(data.status),
 		};
 		if (data.id) {
 			try {
-				const response = await updateUnit(dataSubmit);
-				const result = await response.data;
-				const newUnits = [...units];
-				setUnits(newUnits.map((item) => (item.id === data.id ? { ...result } : item)));
-				handleClearValueForm();
-				hanleCloseForm();
-				getUnit();
-				handleShowToast(
-					`Cập nhật đơn vị!`,
-					`Đơn vị ${result.data.name} được cập nhật thành công!`,
-				);
+				const response = await updateUnit({ id: data?.id, ...dataSubmit });
+				await response.data;
+				toast.success('Cập nhật đơn vị thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				handleCloseForm();
+				const query = {};
+				query.text = text;
+				query.page = currentPage;
+				query.limit = 10;
+				dispatch(fetchUnitList(query));
 			} catch (error) {
-				setUnits(units);
-				handleShowToast(`Cập nhật đơn vị`, `Cập nhật đơn vị không thành công!`);
+				toast.error('Cập nhật đơn vị không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
 			}
 		} else {
 			try {
 				const response = await addUnit(dataSubmit);
-				const result = await response.data;
-				const newUnits = [...units];
-				newUnits.push(result);
-				setUnits(newUnits);
-				handleClearValueForm();
-				hanleCloseForm();
-				getUnit();
-				handleShowToast(`Thêm đơn vị`, `Đơn vị ${result.data.name} được thêm thành công!`);
+				await response.data;
+				toast.success('Thêm đơn vị thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				handleCloseForm();
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				query.limit = 10;
+				dispatch(fetchUnitList(query));
 			} catch (error) {
-				setUnits(units);
-				handleShowToast(`Thêm đơn vị`, `Thêm đơn vị không thành công!`);
+				toast.error('Thêm đơn vị không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
 			}
 		}
 	};
@@ -189,60 +199,71 @@ const UnitPage = () => {
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.unit.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<>
-						<div
-							className='row mb-0'
-							style={{ maxWidth: '60%', minWidth: '60%', margin: '0 auto' }}>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<div style={{ margin: '24px 24px 0' }}>
-										<CardHeader>
-											<CardLabel icon='ReceiptLong' iconColor='primary'>
-												<CardTitle>
-													<CardLabel>Danh sách đơn vị tính</CardLabel>
-												</CardTitle>
-											</CardLabel>
-											<CardActions>
-												<Button
-													color='info'
-													icon='ReceiptLong'
-													tag='button'
-													onClick={() => handleOpenActionForm(null)}>
-													Thêm mới
-												</Button>
-											</CardActions>
-										</CardHeader>
-										<div className='p-4'>
-											<TableCommon
-												className='table table-modern mb-0'
-												columns={columns}
-												data={units}
-											/>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<div className='row mb-0'>
+								<div className='col-8' style={{ margin: '0 auto', height: '90vh' }}>
+									<Card className='w-100'>
+										<div style={{ margin: '24px 24px 0' }}>
+											<CardHeader>
+												<CardLabel icon='ReceiptLong' iconColor='primary'>
+													<CardTitle>
+														<CardLabel>Danh sách đơn vị tính</CardLabel>
+													</CardTitle>
+												</CardLabel>
+												<CardActions>
+													<Button
+														color='info'
+														icon='AddCircleOutline'
+														tag='button'
+														onClick={() =>
+															handleOpenForm({ name: '', code: '' })
+														}>
+														Thêm mới
+													</Button>
+												</CardActions>
+											</CardHeader>
+											<div className='p-4'>
+												<TableCommon
+													className='table table-modern mb-0'
+													columns={columns}
+													data={units}
+													onSubmitSearch={handleSubmitSearch}
+													onChangeCurrentPage={handleChangeCurrentPage}
+													currentPage={parseInt(currentPage, 10)}
+													totalItem={pagination?.totalRows}
+													total={pagination?.total}
+													setCurrentPage={setCurrentPage}
+													searchvalue={text}
+													isSearch
+												/>
+											</div>
 										</div>
-									</div>
-								</Card>
-							</div>
-						</div>
-						<CommonForm
-							show={openForm}
-							onClose={hanleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật đơn vị tính' : 'Tạo đơn vị mới tính'}
-							fields={columns}
-							validate={validate}
-						/>
-					</>,
-					['admin'],
-					<NotPermission />,
+									</Card>
+								</div>
+							</div>,
+							['admin'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
-				<ComfirmSubtask
-					openModal={openConfirm}
-					onCloseModal={handleCloseDeleteComfirm}
-					onConfirm={() => handleDelete(deletes)}
+				<CommonForm
+					show={toggleForm}
+					onClose={handleCloseForm}
+					handleSubmit={handleSubmitForm}
+					item={itemEdit}
+					label={itemEdit?.id ? 'Cập nhật đơn vị tính' : 'Tạo đơn vị mới tính'}
+					fields={columns}
+				/>
+				<AlertConfirm
+					openModal={toggleFormDelete}
+					onCloseModal={handleCloseForm}
+					onConfirm={() => handleDelete(itemEdit)}
 					title='Xoá đơn vị tính'
-					content={`Xác nhận xoá đơn vị tính <strong>${deletes?.name}</strong> ?`}
+					content={`Xác nhận xoá đơn vị tính <strong>${itemEdit?.name}</strong> ?`}
 				/>
 			</Page>
 		</PageWrapper>

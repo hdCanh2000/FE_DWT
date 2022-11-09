@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import classNames from 'classnames';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'react-bootstrap/Form';
 import { Button, Modal } from 'react-bootstrap';
@@ -29,6 +30,7 @@ const KPINormForm = ({
 	validate,
 	disable,
 	size,
+	units,
 	handleDelete,
 	...props
 }) => {
@@ -59,20 +61,26 @@ const KPINormForm = ({
 		},
 		validationSchema: validate,
 		enableReinitialize: true,
-		onSubmit: (values, { resetForm }) => {
+		onSubmit: (values) => {
 			handleSubmit(values);
-			resetForm();
 		},
 	});
 
 	const [showForm, setShowForm] = useState(1);
 
 	const handleDeleteKpiNorm = async (id) => {
-		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteKpiNorm(id);
+			toast.success('Xoá định mức lao động thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			dispatch(fetchKpiNormList());
 		} catch (error) {
+			toast.error('Xoá định mức lao động không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
 		handleCloseForm();
@@ -289,7 +297,7 @@ const KPINormForm = ({
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-6'>
+										<div className='col-3'>
 											<FormGroup
 												id='descriptionKpiValue'
 												label='Tương đương với kết quả'>
@@ -316,6 +324,18 @@ const KPINormForm = ({
 													placeholder='Số lượng'
 													className='border border-2 rounded-0 shadow-none'
 													onBlur={formik.handleBlur}
+												/>
+											</FormGroup>
+										</div>
+										<div className='col-3'>
+											<FormGroup id='unit' label='Đơn vị tính'>
+												<CustomSelect
+													placeholder='Chọn đơn vị tính'
+													value={formik.values.unit}
+													onChange={(value) => {
+														formik.setFieldValue('unit', value);
+													}}
+													options={units}
 												/>
 											</FormGroup>
 										</div>
@@ -360,6 +380,8 @@ KPINormForm.propTypes = {
 	// eslint-disable-next-line react/forbid-prop-types
 	columns: PropTypes.array,
 	// eslint-disable-next-line react/forbid-prop-types
+	units: PropTypes.array,
+	// eslint-disable-next-line react/forbid-prop-types
 	options: PropTypes.array,
 	// eslint-disable-next-line react/forbid-prop-types
 	item: PropTypes.object,
@@ -374,6 +396,7 @@ KPINormForm.propTypes = {
 	size: PropTypes.string,
 };
 KPINormForm.defaultProps = {
+	units: [],
 	className: null,
 	disable: null,
 	show: false,

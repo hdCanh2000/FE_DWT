@@ -11,9 +11,9 @@ import CustomSelect from '../../components/form/CustomSelect';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import Checks from '../../components/bootstrap/forms/Checks';
 import Input from '../../components/bootstrap/forms/Input';
-import ComfirmSubtask from '../work-management/TaskDetail/TaskDetailForm/ComfirmSubtask';
 import Icon from '../../components/icon/Icon';
 import DeleteDepartment from './deleteDepartment';
+import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 
 const DepartmentForm = ({
 	className,
@@ -37,9 +37,8 @@ const DepartmentForm = ({
 		initialValues: { ...item },
 		validationSchema: validate,
 		enableReinitialize: true,
-		onSubmit: (values, { resetForm }) => {
+		onSubmit: (values) => {
 			handleSubmit(values);
-			resetForm();
 		},
 	});
 	const handleDelete = () => {
@@ -235,15 +234,15 @@ const DepartmentForm = ({
 					Xác nhận
 				</Button>
 			</Modal.Footer>
-			<ComfirmSubtask
+			<AlertConfirm
 				openModal={isDelete}
 				onCloseModal={handleDelete}
 				onConfirm={() => {
 					onDelete(item);
 					onClose();
 				}}
-				title='Xoá đơn vị tính'
-				content={`Xác nhận xoá đơn vị tính <strong>${item?.name}</strong> ?`}
+				title='Xoá phòng ban'
+				content={`Xác nhận xoá phòng ban <strong>${item?.name}</strong> ?`}
 			/>
 			<DeleteDepartment openModal={isNotDelete} onCloseModal={setIsNotDelete} />
 		</Modal>

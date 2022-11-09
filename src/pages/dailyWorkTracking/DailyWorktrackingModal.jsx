@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
 import Card from '../../components/bootstrap/Card';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog, getWorktrackById, updateWorktrackLog } from './services';
-import { fetchWorktrackList, fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
+import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
+import Button from '../../components/bootstrap/Button';
+import useDarkMode from '../../hooks/useDarkMode';
+import { updateStatusWorktrack } from '../pendingWorktrack/services';
 
 const styleHead = {
 	border: '1px solid #c8c7c7',
@@ -42,6 +46,7 @@ const renderColor = (status) => {
 };
 
 const DailyWorktrackingModal = ({ data, show, handleClose }) => {
+	const { darkModeStatus } = useDarkMode();
 	const dispatch = useDispatch();
 	const [worktrack, setWorktrack] = useState({});
 	const [showForm, setShowForm] = useState(false);
@@ -91,28 +96,66 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 		if (item?.data?.row?.id) {
 			updateWorktrackLog(dataSubmit)
 				.then(() => {
+					toast.success('Báo cáo nhiệm vụ thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 					handleCloseForm();
-					dispatch(fetchWorktrackList(worktrack.user_id));
 					dispatch(fetchWorktrackListAll());
 					getById(worktrack.id);
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
 					console.log(err);
+					toast.error('Báo cáo nhiệm vụ không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 				});
 		} else {
 			addWorktrackLog(dataSubmit)
 				.then(() => {
 					handleCloseForm();
-					dispatch(fetchWorktrackList(worktrack.user_id));
 					getById(worktrack.id);
 					dispatch(fetchWorktrackListAll());
+					toast.success('Báo cáo nhiệm vụ thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
 					console.log(err);
+					toast.error('Báo cáo nhiệm vụ không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
 				});
 		}
+	};
+
+	const handleChangeStatus = (worktrackSubmit) => {
+		const dataSubmit = {
+			id: worktrackSubmit?.id,
+			status: 'completed',
+		};
+		updateStatusWorktrack(dataSubmit)
+			.then(() => {
+				dispatch(fetchWorktrackListAll());
+				getById(worktrack.id);
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			})
+			.catch((error) => {
+				// eslint-disable-next-line no-console
+				console.log(error);
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+			});
 	};
 
 	return (
@@ -120,7 +163,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 			show={show}
 			onHide={handleClose}
 			aria-labelledby='contained-modal-title-vcenter'
-			size='xl'
+			size='lg'
 			keyboard={false}
 			centered>
 			<Modal.Header closeButton className='text-center pb-0'>
@@ -132,8 +175,20 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 				<Card className='w-100 h-100 p-4'>
 					<div
 						style={styleHead}
-						className='d-flex justify-content-center align-items-center'>
-						<p className='m-0 d-block text-center fs-4 fw-bold'>Nhật trình công việc</p>
+						className='d-flex justify-content-between align-items-center'>
+						<p className='m-0 d-block fs-4 fw-bold'>Nhật trình công việc</p>
+						{worktrack.status === 'accepted' && (
+							<Button
+								color='info'
+								isOutline={!darkModeStatus}
+								isLight={darkModeStatus}
+								onClick={() => handleChangeStatus(worktrack)}
+								isDisable={worktrack.status === 'closed'}
+								className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
+								icon='Check'>
+								Xác nhận hoàn thành
+							</Button>
+						)}
 					</div>
 					<table className='table table-modern mb-0 py-4'>
 						<thead>
@@ -149,6 +204,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 														(i) => i?.date === item?.date,
 													)?.status,
 												),
+												borderRadius: 0,
 											}}
 											onClick={() =>
 												handleShowForm(
@@ -158,7 +214,7 @@ const DailyWorktrackingModal = ({ data, show, handleClose }) => {
 													item,
 												)
 											}
-											className='text-center mb-2 rounded-0 cursor-pointer'>
+											className='text-center mb-2 rounded-none cursor-pointer'>
 											<span className='d-block'>Ngày</span>
 											{item?.day}
 										</th>

@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import TableCommon from '../common/ComponentCommon/TableCommon';
@@ -15,29 +17,69 @@ import useDarkMode from '../../hooks/useDarkMode';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchRequirementList } from '../../redux/slice/requirementSlice';
+import { fetchRequirementList, changeCurrentPage } from '../../redux/slice/requirementSlice';
 import { addRequirement, updateRequirement, deleteRequirement } from './services';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
+import AlertConfirm from '../work-management/mission/AlertConfirm';
 import NotPermission from '../presentation/auth/NotPermission';
+import Loading from '../../components/Loading/Loading';
 
 const RecruitmentRequirementPage = () => {
 	const { darkModeStatus } = useDarkMode();
+	const [searchParams] = useSearchParams();
+
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
+
+	const text = searchParams.get('text') || '';
+
+	const localtion = useLocation();
+
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const requirements = useSelector((state) => state.requirement.requirements);
-
-	const [itemDelete, setItemDelete] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
+	const currentPage = useSelector((state) => state.requirement.currentPage);
+	const pagination = useSelector((state) => state.requirement.pagination);
+	const loading = useSelector((state) => state.requirement.loading);
 
 	useEffect(() => {
-		dispatch(fetchRequirementList());
-	}, [dispatch]);
+		const query = {};
+		query.text = text;
+		query.limit = 10;
+		query.page = currentPage;
+		dispatch(fetchRequirementList(query));
+	}, [dispatch, currentPage, text]);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
+
+	const handleSubmitSearch = (searchValue) => {
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		setCurrentPage(searchValue.page);
+	};
 
 	const columns = [
 		{
@@ -79,7 +121,7 @@ const RecruitmentRequirementPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
@@ -94,110 +136,153 @@ const RecruitmentRequirementPage = () => {
 			description: data?.description,
 		};
 		if (data.id) {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await updateRequirement(dataSubmit);
 				await response.data;
+				toast.success('Cập nhật yêu cầu thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchRequirementList());
 				handleCloseForm();
+				const query = {};
+				query.text = text;
+				query.page = currentPage;
+				query.limit = 10;
+				dispatch(fetchRequirementList(query));
 			} catch (error) {
+				toast.error('Cập nhật yêu cầu không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		} else {
-			// eslint-disable-next-line no-useless-catch
 			try {
 				const response = await addRequirement(dataSubmit);
 				await response.data;
-				dispatch(fetchRequirementList());
+				toast.success('Cập nhật yêu cầu thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				query.limit = 10;
+				dispatch(fetchRequirementList(query));
 				handleCloseForm();
 			} catch (error) {
+				toast.error('Cập nhật yêu cầu không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				throw error;
 			}
 		}
 	};
 
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
-	};
-	const handleCloseDelete = () => {
-		setIsDelete(false);
-	};
-
 	const handleDeleteRequirement = async (data) => {
-		// eslint-disable-next-line no-useless-catch
 		try {
 			await deleteRequirement(data);
-			dispatch(fetchRequirementList());
+			toast.success('Xoá yêu cầu thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			const query = {};
+			query.text = text;
+			query.page = currentPage;
+			dispatch(fetchRequirementList(query));
+			handleCloseForm();
 		} catch (error) {
+			toast.error('Xoá yêu cầu không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
 			throw error;
 		}
-		handleCloseDelete();
 	};
 
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.recruitmentRequirements.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<>
-						<div
-							className='row mb-0'
-							style={{ maxWidth: '60%', minWidth: '60%', margin: '0 auto' }}>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<div style={{ margin: '24px 24px 0' }}>
-										<CardHeader>
-											<CardLabel icon='AccountCircle' iconColor='primary'>
-												<CardTitle>
-													<CardLabel>
-														Danh sách yêu cầu tuyển dụng
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row mb-0'
+									style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card className='w-100'>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel
+														icon='AccountCircle'
+														iconColor='primary'>
+														<CardTitle>
+															<CardLabel>
+																Danh sách yêu cầu tuyển dụng
+															</CardLabel>
+														</CardTitle>
 													</CardLabel>
-												</CardTitle>
-											</CardLabel>
-											<CardActions>
-												<Button
-													color='info'
-													icon='PersonPlusFill'
-													tag='button'
-													onClick={() => handleOpenForm(null)}>
-													Thêm mới
-												</Button>
-											</CardActions>
-										</CardHeader>
-										<div className='p-4'>
-											<TableCommon
-												className='table table-modern mb-0'
-												columns={columns}
-												data={requirements}
-											/>
-										</div>
+													<CardActions>
+														<Button
+															color='info'
+															icon='AddCircleOutline'
+															tag='button'
+															onClick={() => handleOpenForm(null)}>
+															Thêm mới
+														</Button>
+													</CardActions>
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={requirements}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
+											</div>
+										</Card>
 									</div>
-								</Card>
-							</div>
-						</div>
-						<CommonForm
-							show={toggleForm}
-							onClose={handleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label={
-								itemEdit?.id
-									? 'Cập nhật yêu cầu năng lực'
-									: 'Thêm mới yêu cầu năng lực'
-							}
-							fields={columns}
-							validate={validate}
-						/>
-						<TaskAlertConfirm
-							openModal={isDelete}
-							onCloseModal={handleCloseDelete}
-							onConfirm={() => handleDeleteRequirement(itemDelete?.id)}
-							title='Xoá yêu cầu năng lực'
-							content={`Xác nhận xoá yêu cầu năng lực <strong>${itemDelete?.name}</strong> ?`}
-						/>
-					</>,
-					['admin'],
-					<NotPermission />,
+								</div>
+								<CommonForm
+									show={toggleForm}
+									onClose={handleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={itemEdit}
+									label={
+										itemEdit?.id
+											? 'Cập nhật yêu cầu năng lực'
+											: 'Thêm mới yêu cầu năng lực'
+									}
+									fields={columns}
+									validate={validate}
+								/>
+								<AlertConfirm
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDeleteRequirement(itemEdit?.id)}
+									title='Xoá yêu cầu năng lực'
+									content={`Xác nhận xoá yêu cầu năng lực <strong>${itemEdit?.name}</strong> ?`}
+								/>
+							</>,
+							['admin'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
 			</Page>
 		</PageWrapper>

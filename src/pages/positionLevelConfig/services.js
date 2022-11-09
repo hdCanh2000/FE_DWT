@@ -1,10 +1,11 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllPositionLevel = () => {
+const getAllPositionLevel = (params) => {
 	// lấy danh sách quản lí nhân sự
 	return axiosClient({
 		method: 'GET',
 		url: `/api/positionLevels`,
+		params,
 	});
 };
 const addPositionLevel = (data) => {

@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useRef, useState, memo } from 'react';
 import _ from 'lodash';
+import { toast } from 'react-toastify';
 import { Button, Modal } from 'react-bootstrap';
 import SelectComponent from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { useToasts } from 'react-toast-notifications';
 import Card, { CardBody } from '../../../components/bootstrap/Card';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
@@ -14,7 +14,6 @@ import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
 import { addNewMission, updateMissionById } from './services';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
-import Toasts from '../../../components/bootstrap/Toasts';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -36,7 +35,6 @@ const MissionFormModal = ({ show, onClose, item }) => {
 		name: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
 	});
-	const { addToast } = useToasts();
 	const nameRef = useRef(null);
 	const departmentRef = useRef(null);
 
@@ -126,16 +124,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 		setDepartmentRelatedOption({});
 		setErrors({});
 	};
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
+
 	const handleSubmitMissionForm = async () => {
 		const data = { ...mission };
 		data.quantity = parseInt(mission.quantity, 10) || null;
@@ -148,21 +137,33 @@ const MissionFormModal = ({ show, onClose, item }) => {
 			try {
 				const response = await updateMissionById(data);
 				await response.data;
+				toast.success('Cập nhật mục tiêu thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchMissionList());
 				handleCloseForm();
-				handleShowToast(`Cập nhật mục tiêu!`, `Cập nhật mục tiêu thành công!`);
 			} catch (error) {
-				handleShowToast(`Cập nhật mục tiêu`, `Cập nhật mục tiêu không thành công!`);
+				toast.error('Cập nhật mục tiêu không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 			}
 		} else {
 			try {
 				const response = await addNewMission(data);
 				await response.data;
+				toast.success('Thêm mục tiêu thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 				dispatch(fetchMissionList());
 				handleCloseForm();
-				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu thành công!`);
 			} catch (error) {
-				handleShowToast(`Thêm mục tiêu`, `Thêm mục tiêu không thành công!`);
+				toast.error('Thêm mục tiêu không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
 			}
 		}
 	};

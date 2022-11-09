@@ -5,24 +5,26 @@ const initialState = {
 	positionLevels: [],
 	loading: false,
 	error: false,
+	pagination: {},
+	currentPage: 1,
 };
 
-export const fetchPositionLevelList = createAsyncThunk('positionLevel/fetchLevelList', async () => {
-	const response = await getAllPositionLevel();
-	return response.data?.data?.map((positionLevel) => {
-		return {
-			...positionLevel,
-			id: positionLevel?.id,
-			value: positionLevel?.id,
-			label: positionLevel?.name,
-		};
-	});
-});
+export const fetchPositionLevelList = createAsyncThunk(
+	'positionLevel/fetchLevelList',
+	async (params) => {
+		const response = await getAllPositionLevel(params);
+		return response.data;
+	},
+);
 
 export const positionLevelSlice = createSlice({
 	name: 'positionLevelSlice',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch level list
 		[fetchPositionLevelList.pending]: (state) => {
@@ -30,7 +32,15 @@ export const positionLevelSlice = createSlice({
 		},
 		[fetchPositionLevelList.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.positionLevels = [...action.payload];
+			state.positionLevels = [...action.payload.data].map((positionLevel) => {
+				return {
+					...positionLevel,
+					id: positionLevel?.id,
+					value: positionLevel?.id,
+					label: positionLevel?.name,
+				};
+			});
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchPositionLevelList.rejected]: (state, action) => {
 			state.loading = false;
@@ -38,3 +48,5 @@ export const positionLevelSlice = createSlice({
 		},
 	},
 });
+
+export const { changeCurrentPage } = positionLevelSlice.actions;

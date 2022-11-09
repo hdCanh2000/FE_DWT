@@ -27,6 +27,13 @@ const getAllWorktrackByUser = () => {
 	});
 };
 
+const getAllWorktrackMe = () => {
+	return axiosClient({
+		method: 'GET',
+		url: `/api/worktracks/workTrackMe`,
+	});
+};
+
 const getWorktrackById = (id) => {
 	return axiosClient({
 		method: 'GET',
@@ -45,7 +52,7 @@ const addWorktrack = (data) => {
 const updateWorktrack = (data) => {
 	return axiosClient({
 		method: 'PUT',
-		url: `/worktracks/${data.id}`,
+		url: `/api/worktracks/${data.id}`,
 		data,
 	});
 };
@@ -76,4 +83,5 @@ export {
 	getAllWorktrack,
 	getWorktrackById,
 	deleteWorkTrack,
+	getAllWorktrackMe,
 };

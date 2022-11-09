@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
-import { useToasts } from 'react-toast-notifications';
-
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import Card, {
 	CardActions,
@@ -14,24 +13,43 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { addPositionLevel, deletePositionLevel, updatePositionLevel } from './services';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import Toasts from '../../components/bootstrap/Toasts';
-import TaskAlertConfirm from '../work-management/mission/TaskAlertConfirm';
 import validate from './validate';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import Page from '../../layout/Page/Page';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
+import { fetchPositionLevelList, changeCurrentPage } from '../../redux/slice/positionLevelSlice';
 import NotPermission from '../presentation/auth/NotPermission';
+import Loading from '../../components/Loading/Loading';
+import AlertConfirm from '../work-management/mission/AlertConfirm';
 
-const KeyPage = () => {
+const PositionLevelPage = () => {
 	const { darkModeStatus } = useDarkMode();
-	const [itemDelete, setItemDelete] = React.useState({});
-	const [isDelete, setIsDelete] = React.useState(false);
+	const [searchParams] = useSearchParams();
+	const navigate = useNavigate();
 	const dispatch = useDispatch();
+
+	const text = searchParams.get('text') || '';
+
+	const localtion = useLocation();
+
+	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const pagination = useSelector((state) => state.positionLevel.pagination);
+	const loading = useSelector((state) => state.positionLevel.loading);
+	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
+
+	const currentPage = useSelector((state) => state.positionLevel.currentPage);
+
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
+
 	const columns = [
 		{
 			title: 'Tên cấp nhân sự',
@@ -70,143 +88,194 @@ const KeyPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenDelete(item)}
+						onClick={() => handleOpenFormDelete(item)}
 					/>
 				</>
 			),
 			isShow: false,
 		},
 	];
+
 	useEffect(() => {
-		dispatch(fetchPositionLevelList());
-	}, [dispatch]);
-	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-	useEffect(() => {
-		setData(datas.filter((item) => item?.id !== 0));
-		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
-	},[datas])
-	const { addToast } = useToasts();
-	const [data, setData] = useState([]);
-	const datas = useSelector((state) => state.positionLevel.positionLevels);
-	useEffect(() => {
-		setData(datas.filter((item) => item?.id !== 0));
-		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
-	},[datas])
-	const handleShowToast = (title, content) => {
-		addToast(
-			<Toasts title={title} icon='Check2Circle' iconColor='success' time='Now' isDismiss>
-				{content}
-			</Toasts>,
-			{
-				autoDismiss: true,
-			},
-		);
-	};
-	const handleSubmitForm = async (itemSubmit) => {
-		// const itemSubmit = {
-		// 	id: items?.id,
-		// 	code: items?.value,
-		// 	label: items?.label,
-		// }
-		if (!itemSubmit.id) {
-			const reponse = await addPositionLevel(itemSubmit);
-			const result = reponse.data;
-			dispatch(fetchPositionLevelList());
-			handleCloseForm();
-			handleShowToast(
-				'Thêm cấp nhân sự',
-				`Thêm cấp nhân sự ${result.data.name} thành công !`,
-			);
+		const query = {};
+		query.text = text;
+		query.page = currentPage;
+		query.limit = 10;
+		dispatch(fetchPositionLevelList(query));
+	}, [dispatch, currentPage, text]);
+
+	const handleSubmitSearch = (searchValue) => {
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
 		} else {
-			const reponse = await updatePositionLevel(itemSubmit);
-			const result = reponse.data;
-			dispatch(fetchPositionLevelList());
-			handleCloseForm();
-			handleShowToast(
-				'Chỉnh sửa cấp nhân sự',
-				`Chỉnh sửa cấp nhân sự ${result.data.name} thành công !`,
-			);
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
 		}
+		setCurrentPage(1);
 	};
-	const handleOpenDelete = (item) => {
-		setIsDelete(true);
-		setItemDelete({ ...item });
+
+	const handleChangeCurrentPage = (searchValue) => {
+		setCurrentPage(searchValue.page);
 	};
-	const handleCloseDelete = () => {
-		setIsDelete(false);
+
+	const handleSubmitForm = async (itemSubmit) => {
+		if (!itemSubmit.id) {
+			try {
+				const reponse = await addPositionLevel(itemSubmit);
+				await reponse.data;
+				toast.success('Thêm cấp nhân sự thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				query.limit = 10;
+				dispatch(fetchPositionLevelList(query));
+				handleCloseForm();
+			} catch (error) {
+				toast.error('Thêm cấp nhân sự không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
+			}
+		} else {
+			try {
+				const reponse = await updatePositionLevel(itemSubmit);
+				await reponse.data;
+				toast.success('Cập nhật cấp nhân sự thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				const query = {};
+				query.text = text;
+				query.page = currentPage;
+				query.limit = 10;
+				dispatch(fetchPositionLevelList(query));
+				handleCloseForm();
+			} catch (error) {
+				toast.error('Cập nhật cấp nhân sự không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
+				});
+				throw error;
+			}
+		}
 	};
 	const handleDeletePositionLevel = async (item) => {
 		try {
 			await deletePositionLevel(item);
-			dispatch(fetchPositionLevelList());
-			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự thành công!`);
+			toast.success('Xoá cấp nhân sự thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			const query = {};
+			query.text = text;
+			query.page = 1;
+			dispatch(fetchPositionLevelList(query));
+			handleCloseForm();
 		} catch (error) {
-			handleShowToast(`Xoá cấp nhân sự`, `Xoá cấp nhân sự không thành công!`);
+			toast.error('Xoá cấp nhân sự không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+			throw error;
 		}
-		handleCloseDelete();
 	};
+
 	return (
 		<PageWrapper title={demoPages.hrRecords.subMenu.positionLevelConfig.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<>
-						<div
-							className='row mb-0'
-							style={{ maxWidth: '60%', minWidth: '60%', margin: '0 auto' }}>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<div style={{ margin: '24px 24px 0' }}>
-										<CardHeader>
-											<CardLabel icon='SupervisorAccount' iconColor='primary'>
-												<CardTitle>
-													<CardLabel>Danh sách cấp nhân sự</CardLabel>
-												</CardTitle>
-											</CardLabel>
-											<CardActions>
-												<Button
-													color='info'
-													icon='GroupAdd'
-													tag='button'
-													onClick={() => handleOpenForm(null)}>
-													Thêm mới
-												</Button>
-											</CardActions>
-										</CardHeader>
-										<div className='p-4'>
-											<TableCommon
-												className='table table-modern mb-0'
-												columns={columns}
-												data={data}
-											/>
-										</div>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row mb-0'
+									style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card className='w-100'>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel
+														icon='SupervisorAccount'
+														iconColor='primary'>
+														<CardTitle>
+															<CardLabel>
+																Danh sách cấp nhân sự
+															</CardLabel>
+														</CardTitle>
+													</CardLabel>
+													<CardActions>
+														<Button
+															color='info'
+															icon='AddCircleOutline'
+															tag='button'
+															onClick={() => handleOpenForm(null)}>
+															Thêm mới
+														</Button>
+													</CardActions>
+												</CardHeader>
+												<div className='p-4'>
+													<TableCommon
+														className='table table-modern mb-0'
+														columns={columns}
+														data={positionLevels}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
+											</div>
+										</Card>
 									</div>
-								</Card>
-							</div>
-						</div>
-						<CommonForm
-							show={toggleForm}
-							onClose={handleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label={itemEdit?.id ? 'Cập nhật cấp nhân sự' : 'Thêm mới cấp nhân sự'}
-							fields={columns}
-							validate={validate}
-						/>
-						<TaskAlertConfirm
-							openModal={isDelete}
-							onCloseModal={handleCloseDelete}
-							onConfirm={() => handleDeletePositionLevel(itemDelete?.id)}
-							title='Xoá cấp nhân sự'
-							content={`Xác nhận xoá cấp nhân sự <strong>${itemDelete?.name}</strong> ?`}
-						/>
-					</>,
-					['admin'],
-					<NotPermission />,
+								</div>
+								<CommonForm
+									show={toggleForm}
+									onClose={handleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={itemEdit}
+									label={
+										itemEdit?.id
+											? 'Cập nhật cấp nhân sự'
+											: 'Thêm mới cấp nhân sự'
+									}
+									fields={columns}
+									validate={validate}
+								/>
+								<AlertConfirm
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDeletePositionLevel(itemEdit?.id)}
+									title='Xoá cấp nhân sự'
+									content={`Xác nhận xoá cấp nhân sự <strong>${itemEdit?.name}</strong> ?`}
+								/>
+							</>,
+							['admin'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
 			</Page>
 		</PageWrapper>
 	);
 };
 
-export default KeyPage;
+export default PositionLevelPage;
