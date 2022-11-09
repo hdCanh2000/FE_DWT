@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import moment from 'moment';
-import _, { isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
 import {
 	TreeGridComponent,
@@ -13,7 +12,6 @@ import {
 	Inject,
 	Filter,
 	Toolbar,
-	Resize,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
@@ -25,7 +23,7 @@ import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
 import DailyWorktrackForm from './DailyWorktrackForm';
-import { addWorktrackLog, updateWorktrackLog } from './services';
+import { addWorktrackLog } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import Button from '../../components/bootstrap/Button';
 
@@ -36,8 +34,8 @@ const createDataTree = (dataset) => {
 	});
 	const dataTree = [];
 	dataset.forEach((aData) => {
-		if (aData?.parentId) {
-			hashTable[aData?.parentId]?.children.push(hashTable[aData?.id]);
+		if (aData.parentId) {
+			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
 		} else {
 			dataTree.push(hashTable[aData.id]);
 		}
@@ -111,24 +109,21 @@ const DailyWorkTracking = () => {
 		operator: 'contains',
 	};
 
-	const fixForm = () => {
+	const fixForm = useCallback(() => {
 		return worktrack.map((item) => ({
 			...item,
 			user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
-			missionValue: _.isEmpty(item.mission) ? '--' : item.mission.name,
-			deadline: item.deadline ? moment(item.deadline).format('DD-MM-YYYY') : '--',
 			statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 			parentId: item.parent_id,
 		}));
-	};
+	}, [worktrack]);
 
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
 			const treeData = createDataTree(fixForm());
 			setTreeValue(treeData);
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [worktrack]);
+	}, [fixForm, worktrack]);
 
 	useEffect(() => {
 		dispatch(fetchWorktrackListAll());
@@ -153,47 +148,27 @@ const DailyWorkTracking = () => {
 
 	const handleSubmit = (item) => {
 		const dataSubmit = {
-			id: item.data?.row?.id,
 			status: item.status,
 			date: dataShow.valueForm.date,
 			note: item.note,
 			workTrack_id: item.data.dataWorktrack.id || null,
 		};
-		if (item?.data?.row?.id) {
-			updateWorktrackLog(dataSubmit)
-				.then(() => {
-					toast.success('Báo cáo nhiệm vụ thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					handleClose();
-					dispatch(fetchWorktrackListAll());
-				})
-				.catch((err) => {
-					toast.error('Báo cáo nhiệm vụ không thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw err;
+		addWorktrackLog(dataSubmit)
+			.then(() => {
+				handleClose();
+				dispatch(fetchWorktrackListAll());
+				toast.success('Báo cáo nhiệm vụ thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
 				});
-		} else {
-			addWorktrackLog(dataSubmit)
-				.then(() => {
-					handleClose();
-					dispatch(fetchWorktrackListAll());
-					toast.success('Báo cáo nhiệm vụ thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-				})
-				.catch((err) => {
-					toast.error('Báo cáo nhiệm vụ không thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw err;
+			})
+			.catch((err) => {
+				toast.error('Báo cáo nhiệm vụ không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
 				});
-		}
+				throw err;
+			});
 	};
 
 	const customAttributesLog = { class: 'customcss_log' };
@@ -278,7 +253,6 @@ const DailyWorkTracking = () => {
 													locale='vi-VI'
 													dataSource={treeValue}
 													treeColumnIndex={0}
-													allowResizing
 													toolbar={toolbarOptions}
 													searchSettings={searchOptions}
 													className='cursor-pointer user-select-none'
@@ -294,7 +268,6 @@ const DailyWorkTracking = () => {
 													// }}
 													childMapping='children'
 													height='400'>
-													<Inject services={[Resize]} />
 													<ColumnsDirective>
 														<ColumnDirective
 															field='data.kpiNorm.name'

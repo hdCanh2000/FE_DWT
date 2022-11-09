@@ -92,7 +92,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	};
 
 	const handleClose = () => {
-		setCheckValidate(false)
+		setCheckValidate(false);
 		onClose();
 		setMission({});
 		setMissionOption({});
@@ -104,13 +104,15 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const userId = localStorage.getItem('userId');
 
 	const handleSubmit = async () => {
-		setCheckValidate(true)
+		setCheckValidate(true);
+		fetch();
 		if (item.id) {
 			const dataValue = {
-				parent_id: parentOption?.id,
+				parent_id: parentOption?.id || null,
 				id: item.id,
 				kpiNorm_id: item.kpiNorm_id,
 				mission_id: missionOption.id || null,
+				key_id: keyOption.id || null,
 				quantity: parseInt(mission.quantity, 10) || null,
 				user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
 				priority: parseInt(mission.priority, 10) || null,
@@ -126,7 +128,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 						position: toast.POSITION.TOP_RIGHT,
 						autoClose: 1000,
 					});
-					setCheckValidate(false)
+					setCheckValidate(false);
 					handleClose();
 					fetch();
 				})
@@ -139,9 +141,10 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 				});
 		} else {
 			const dataValue = {
-				parent_id: parentOption?.id,
+				parent_id: parentOption?.id || null,
 				kpiNorm_id: item.kpiNorm_id,
 				mission_id: missionOption.id || null,
+				key_id: keyOption.id || null,
 				quantity: parseInt(mission.quantity, 10) || null,
 				user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
 				priority: parseInt(mission.priority, 10) || null,
@@ -157,7 +160,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 						position: toast.POSITION.TOP_RIGHT,
 						autoClose: 1000,
 					});
-					setCheckValidate(false)
+					setCheckValidate(false);
 					handleClose();
 					fetch();
 				})
@@ -244,7 +247,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											/>
 										</FormGroup>
 										<div className='text-danger mt-1'>
-											{ checkValidate && isEmpty(userOption) && (
+											{checkValidate && isEmpty(userOption) && (
 												<span className='error'>
 													Vui lòng chọn người phụ trách
 												</span>
@@ -297,7 +300,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 									</FormGroup>
 								</div>
 								<div className='col-8'>
-								<FormGroup id='keys' label='Chỉ số key'>
+									<FormGroup id='keys' label='Chỉ số key'>
 										<SelectComponent
 											placeholder='Chỉ số key'
 											value={keyOption}

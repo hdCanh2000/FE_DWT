@@ -94,7 +94,7 @@ const EmployeePage = () => {
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
-console.log(itemEdit);
+
 	const columns = [
 		{
 			title: 'Họ và tên',

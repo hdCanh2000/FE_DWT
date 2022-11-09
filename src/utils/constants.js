@@ -180,7 +180,7 @@ export const LIST_STATUS = [
 	},
 	{
 		id: 5,
-		label: 'Đóng',
+		label: 'Hoàn tất',
 		value: 'closed',
 	},
 ];
