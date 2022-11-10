@@ -19,8 +19,8 @@ const initialState = {
 	error: false,
 };
 
-export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async () => {
-	const response = await getAllWorktrack();
+export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async (params) => {
+	const response = await getAllWorktrack(params);
 	return response.data.data?.role === 'manager' || response.data.data?.role === 'user'
 		? response.data.data.workTracks.map((item) => {
 				return {

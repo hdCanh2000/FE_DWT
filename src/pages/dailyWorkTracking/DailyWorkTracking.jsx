@@ -14,6 +14,8 @@ import {
 	Toolbar,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
+import moment from 'moment';
+import { Dropdown } from 'react-bootstrap';
 import Card, {
 	CardActions,
 	CardBody,
@@ -143,10 +145,6 @@ const DailyWorkTracking = () => {
 		}
 	}, [fixForm, worktrack]);
 
-	useEffect(() => {
-		dispatch(fetchWorktrackListAll());
-	}, [dispatch]);
-
 	const handleShowForm = (row, item, dataWorktrack) => {
 		setShowForm(true);
 		setDataShow({
@@ -245,7 +243,41 @@ const DailyWorkTracking = () => {
 			/>
 		);
 	};
-
+	const handleDate = (month) => {
+		if (month === '/') {
+			return '/';
+		}
+		const date = new Date();
+		const y = date.getFullYear();
+		const m = date.getMonth();
+		const start = new Date(y, m - month, 1);
+		const end = new Date(y, m + 1 - month, 0);
+		const startDate = moment(start).format('YYYY-MM-DD');
+		const endDate = moment(end).format('YYYY-MM-DD');
+		return `?startDate=${startDate}&endDate=${endDate}`;
+	};
+	useEffect(() => {
+		dispatch(fetchWorktrackListAll(handleDate(0)));
+	}, [dispatch]);
+	const selectDate = [
+		{
+			label: 'Tháng này',
+			value: '0',
+		},
+		{
+			label: 'Tháng trước',
+			value: '1',
+		},
+		{
+			label: 'Tất cả',
+			value: '/',
+		},
+	];
+	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
+	const handleChangeDate = (data) => {
+		setLabelDropdow(data.label);
+		dispatch(fetchWorktrackListAll(`${handleDate(data.value)}`));
+	};
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -262,7 +294,7 @@ const DailyWorkTracking = () => {
 												<CardLabel>Danh sách nhiệm vụ</CardLabel>
 											</CardTitle>
 										</CardLabel>
-										<CardActions>
+										<CardActions style={{ display: 'inline-flex' }}>
 											<Button
 												color='info'
 												icon='ChangeCircle'
@@ -273,6 +305,21 @@ const DailyWorkTracking = () => {
 												onClick={() => dispatch(fetchWorktrackListAll())}>
 												Tải lại
 											</Button>
+											<Dropdown>
+												<Dropdown.Toggle
+													variant='primary'
+													id='dropdown-basic'>
+													{labelDropdow}
+												</Dropdown.Toggle>
+												<Dropdown.Menu>
+													{selectDate.map((ele) => (
+														<Dropdown.Item
+															onClick={() => handleChangeDate(ele)}>
+															{ele.label}
+														</Dropdown.Item>
+													))}
+												</Dropdown.Menu>
+											</Dropdown>
 										</CardActions>
 									</CardHeader>
 									<CardBody>
