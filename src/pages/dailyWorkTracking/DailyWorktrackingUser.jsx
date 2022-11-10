@@ -298,7 +298,7 @@ const DailyWorkTracking = () => {
 											</CardLabel>
 										</CardTitle>
 									</CardLabel>
-									<CardActions>
+									<CardActions style={{ display: 'inline-flex' }}>
 										<Button
 											color='info'
 											icon='ChangeCircle'
