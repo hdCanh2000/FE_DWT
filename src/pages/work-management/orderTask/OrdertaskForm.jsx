@@ -190,6 +190,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 									<tr>
 										<th className='p-3 border text-left'>Tên nhiệm vụ</th>
 										<th className='p-3 border text-center'>Định mức KPI</th>
+										<th className='p-3 border text-center'>Số lượng</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -203,6 +204,9 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 										</td>
 										<td className='p-3 border text-center'>
 											<b>{get(item, 'kpi_value', '--')}</b>
+										</td>
+										<td className='p-3 border text-center'>
+											<b>{get(item, 'quantity', '--')}</b>
 										</td>
 									</tr>
 								</tbody>
