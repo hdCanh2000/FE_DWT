@@ -255,6 +255,8 @@ const OrderTask = () => {
 																handleOpenForm({
 																	kpiNorm_id: item.data.data.id,
 																	unit: item.data.data?.unit,
+																	quantity:
+																		item.data.data?.quantity,
 																	kpi_value:
 																		item.data.data.kpi_value,
 																	kpiNorm_name:

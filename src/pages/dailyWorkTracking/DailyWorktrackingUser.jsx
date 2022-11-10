@@ -16,6 +16,8 @@ import {
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { useParams } from 'react-router-dom';
+import { Dropdown } from 'react-bootstrap';
+import moment from 'moment';
 import Card, {
 	CardActions,
 	CardBody,
@@ -235,7 +237,38 @@ const DailyWorkTracking = () => {
 				throw err;
 			});
 	};
-
+	const handleDate = (month) => {
+		if (month === '/') {
+			return '/';
+		}
+		const date = new Date();
+		const y = date.getFullYear();
+		const m = date.getMonth();
+		const start = new Date(y, m - month, 1);
+		const end = new Date(y, m + 1 - month, 0);
+		const startDate = moment(start).format('YYYY-MM-DD');
+		const endDate = moment(end).format('YYYY-MM-DD');
+		return `?startDate=${startDate}&endDate=${endDate}`;
+	};
+	const selectDate = [
+		{
+			label: 'Tất cả',
+			value: '/',
+		},
+		{
+			label: 'Tháng này',
+			value: '0',
+		},
+		{
+			label: 'Tháng trước',
+			value: '1',
+		},
+	];
+	const [labelDropdow, setLabelDropdow] = React.useState('Tất cả');
+	const handleChangeDate = (data) => {
+		setLabelDropdow(data.label);
+		dispatch(fetchWorktrackList(`${id}${handleDate(data.value)}`));
+	};
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -257,7 +290,7 @@ const DailyWorkTracking = () => {
 												</CardLabel>
 											</CardTitle>
 										</CardLabel>
-										<CardActions>
+										<CardActions style={{ display: 'inline-flex' }}>
 											<Button
 												color='info'
 												icon='ChangeCircle'
@@ -268,6 +301,21 @@ const DailyWorkTracking = () => {
 												onClick={() => dispatch(fetchWorktrackList(id))}>
 												Tải lại
 											</Button>
+											<Dropdown>
+												<Dropdown.Toggle
+													variant='primary'
+													id='dropdown-basic'>
+													{labelDropdow}
+												</Dropdown.Toggle>
+												<Dropdown.Menu>
+													{selectDate.map((ele) => (
+														<Dropdown.Item
+															onClick={() => handleChangeDate(ele)}>
+															{ele.label}
+														</Dropdown.Item>
+													))}
+												</Dropdown.Menu>
+											</Dropdown>
 										</CardActions>
 									</CardHeader>
 									<CardBody>
