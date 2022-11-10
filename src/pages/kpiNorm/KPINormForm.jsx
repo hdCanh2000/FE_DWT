@@ -58,11 +58,15 @@ const KPINormForm = ({
 			descriptionKpiValue: _.get(item, 'descriptionKpiValue') || '',
 			quantity: _.get(item, 'quantity') || '',
 			kpi_value: _.get(item, 'kpi_value') || '',
+			manday: _.get(item, 'manday') || '',
 		},
 		validationSchema: validate,
 		enableReinitialize: true,
-		onSubmit: (values) => {
+		onSubmit: (values, { resetForm }) => {
 			handleSubmit(values);
+			setTimeout(() => {
+				resetForm();
+			}, 1000);
 		},
 	});
 
@@ -283,10 +287,10 @@ const KPINormForm = ({
 							<div className='mb-4'>
 								{showForm === 1 && (
 									<div className='row g-4'>
-										<div className='col-3'>
+										<div className='col-2'>
 											<FormGroup id='kpi_value' label='Thang điểm'>
 												<Input
-													type='number'
+													type='text'
 													name='kpi_value'
 													onChange={formik.handleChange}
 													value={formik.values.kpi_value || ''}
@@ -296,6 +300,30 @@ const KPINormForm = ({
 													onBlur={formik.handleBlur}
 												/>
 											</FormGroup>
+											{formik.errors.kpi_value && (
+												<span className='error text-danger'>
+													{formik.errors.kpi_value}
+												</span>
+											)}
+										</div>
+										<div className='col-2'>
+											<FormGroup id='manday' label='Manday'>
+												<Input
+													type='text'
+													name='manday'
+													onChange={formik.handleChange}
+													value={formik.values.manday || ''}
+													size='lg'
+													placeholder='Manday'
+													className='border border-2 rounded-0 shadow-none'
+													onBlur={formik.handleBlur}
+												/>
+											</FormGroup>
+											{formik.errors.manday && (
+												<span className='error text-danger'>
+													{formik.errors.manday}
+												</span>
+											)}
 										</div>
 										<div className='col-3'>
 											<FormGroup
@@ -313,7 +341,7 @@ const KPINormForm = ({
 												/>
 											</FormGroup>
 										</div>
-										<div className='col-3'>
+										<div className='col-2'>
 											<FormGroup id='quantity' label='Số lượng'>
 												<Input
 													type='number'
