@@ -55,7 +55,6 @@ const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 	const handleOpen = () => {
 		setOpen(true);
 	};
-
 	const userResponsible = _.get(
 		_.filter(users, (user) => {
 			return _.get(user, 'workTrackUsers.isResponsible') === true;
@@ -156,7 +155,6 @@ const OrderTask = () => {
 	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
 	const createDataTree = useCallback((dataset) => {
 		const hashTable = Object.create(null);
 		dataset.forEach((aData) => {
@@ -181,6 +179,7 @@ const OrderTask = () => {
 						...item,
 						quantity: !_.isNumber(item.quantity) ? '--' : item.quantity,
 						kpi_value: !_.isNumber(item.kpi_value) ? '--' : item.kpi_value,
+						unit: item?.unit?.name,
 					};
 				}),
 			);
@@ -255,6 +254,7 @@ const OrderTask = () => {
 															rowSelected={(item) => {
 																handleOpenForm({
 																	kpiNorm_id: item.data.data.id,
+																	unit: item.data.data?.unit,
 																	kpi_value:
 																		item.data.data.kpi_value,
 																	kpiNorm_name:

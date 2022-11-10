@@ -16,7 +16,6 @@ import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addUnit, updateUnit, deleteUnit } from './services';
-import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
@@ -258,7 +257,6 @@ const UnitPage = () => {
 					item={itemEdit}
 					label={itemEdit?.id ? 'Cập nhật đơn vị tính' : 'Tạo đơn vị mới tính'}
 					fields={columns}
-					validate={validate}
 				/>
 				<AlertConfirm
 					openModal={toggleFormDelete}
