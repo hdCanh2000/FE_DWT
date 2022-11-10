@@ -21,6 +21,8 @@ import moment from 'moment';
 import Card, {
 	CardActions,
 	CardBody,
+	CardFooter,
+	CardFooterRight,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -36,6 +38,13 @@ import Button from '../../components/bootstrap/Button';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog } from './services';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcTotalCurrentKPIWorkTrackByUser,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIOfWorkTrack,
+	calcTotalKPIWorkTrackByUser,
+} from '../../utils/function';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -131,6 +140,9 @@ const DailyWorkTracking = () => {
 						return {
 							...item,
 							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+							totalKPI: calcTotalKPIOfWorkTrack(item),
+							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+							currentKPI: calcCurrentKPIOfWorkTrack(item),
 							parentId: item.parent_id,
 						};
 					}),
@@ -275,97 +287,130 @@ const DailyWorkTracking = () => {
 				{loading ? (
 					<Loading />
 				) : (
-					<div
-						className='row mb-0'
-						style={{ maxWidth: '90%', minWidth: '60%', margin: '0 auto' }}>
+					<div className='row mb-0'>
 						<div className='col-12'>
 							<Card className='w-100'>
-								<div style={{ margin: '24px 24px 0' }}>
-									<CardHeader>
-										<CardLabel icon='TaskAlt' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>
-													Danh sách nhiệm vụ của{' '}
-													{_.get(worktrack, 'name')}
-												</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions style={{ display: 'inline-flex' }}>
-											<Button
-												color='info'
-												icon='ChangeCircle'
-												tag='button'
-												type='button'
-												isOutline={false}
-												isLight
-												onClick={() => dispatch(fetchWorktrackList(id))}>
-												Tải lại
-											</Button>
-											<Dropdown>
-												<Dropdown.Toggle
-													variant='primary'
-													id='dropdown-basic'>
-													{labelDropdow}
-												</Dropdown.Toggle>
-												<Dropdown.Menu>
-													{selectDate.map((ele) => (
-														<Dropdown.Item
-															onClick={() => handleChangeDate(ele)}>
-															{ele.label}
-														</Dropdown.Item>
-													))}
-												</Dropdown.Menu>
-											</Dropdown>
-										</CardActions>
-									</CardHeader>
-									<CardBody>
-										<div className='control-pane'>
-											<div className='control-section'>
-												<TreeGridComponent
-													locale='vi-VI'
-													dataSource={treeValue}
-													treeColumnIndex={0}
-													allowResizing
-													toolbar={toolbarOptions}
-													searchSettings={searchOptions}
-													className='cursor-pointer user-select-none'
-													childMapping='children'
-													height='500'>
-													<Inject services={[Resize]} />
-													<ColumnsDirective>
-														<ColumnDirective
-															field='data.kpiNorm.name'
-															headerText='Tên nhiệm vụ'
-															width='400'
-														/>
-														<ColumnDirective
-															field='data.statusName'
-															headerText='Trạng thái'
-															width='100'
-															textAlign='Center'
-														/>
-														<ColumnDirective
-															headerText='Chi tiết'
-															textAlign='Center'
-															width='100'
-															customAttributes={customAttributes}
-															template={viewTemplate}
-														/>
-														<ColumnDirective
-															headerText='Nhật trình công việc'
-															textAlign='Left'
-															width='900'
-															minWidth='600'
-															customAttributes={customAttributesLog}
-															template={treegridTemplate}
-														/>
-													</ColumnsDirective>
-													<Inject services={[Filter, Toolbar]} />
-												</TreeGridComponent>
-											</div>
+								<CardHeader>
+									<CardLabel icon='TaskAlt' iconColor='primary'>
+										<CardTitle>
+											<CardLabel>
+												Danh sách nhiệm vụ của {_.get(worktrack, 'name')}
+											</CardLabel>
+										</CardTitle>
+									</CardLabel>
+									<CardActions>
+										<Button
+											color='info'
+											icon='ChangeCircle'
+											tag='button'
+											type='button'
+											isOutline={false}
+											isLight
+											onClick={() => dispatch(fetchWorktrackList(id))}>
+											Tải lại
+										</Button>
+										<Dropdown>
+											<Dropdown.Toggle variant='primary' id='dropdown-basic'>
+												{labelDropdow}
+											</Dropdown.Toggle>
+											<Dropdown.Menu>
+												{selectDate.map((ele) => (
+													<Dropdown.Item
+														onClick={() => handleChangeDate(ele)}>
+														{ele.label}
+													</Dropdown.Item>
+												))}
+											</Dropdown.Menu>
+										</Dropdown>
+									</CardActions>
+								</CardHeader>
+								<CardBody>
+									<div className='control-pane'>
+										<div className='control-section'>
+											<TreeGridComponent
+												locale='vi-VI'
+												dataSource={treeValue}
+												treeColumnIndex={0}
+												allowResizing
+												toolbar={toolbarOptions}
+												searchSettings={searchOptions}
+												className='cursor-pointer user-select-none'
+												childMapping='children'
+												height='400'>
+												<Inject services={[Resize]} />
+												<ColumnsDirective>
+													<ColumnDirective
+														field='data.kpiNorm.name'
+														headerText='Tên nhiệm vụ'
+														width='400'
+													/>
+													<ColumnDirective
+														field='data.totalKPI'
+														headerText='Tổng điểm KPI'
+														textAlign='Right'
+														customAttributes={customAttributes}
+														width='150'
+													/>
+													<ColumnDirective
+														field='data.currentKPI'
+														headerText='KPI đạt được'
+														textAlign='Right'
+														customAttributes={customAttributes}
+														width='150'
+													/>
+													<ColumnDirective
+														field='data.totalQuantity'
+														headerText='Số lượng hoàn thành'
+														textAlign='Right'
+														customAttributes={customAttributes}
+														width='150'
+													/>
+													<ColumnDirective
+														field='data.statusName'
+														headerText='Trạng thái'
+														width='100'
+														textAlign='Center'
+													/>
+													<ColumnDirective
+														headerText='Chi tiết'
+														textAlign='Center'
+														width='100'
+														customAttributes={customAttributes}
+														template={viewTemplate}
+													/>
+													<ColumnDirective
+														headerText='Nhật trình công việc'
+														textAlign='Left'
+														width='900'
+														minWidth='600'
+														customAttributes={customAttributesLog}
+														template={treegridTemplate}
+													/>
+												</ColumnsDirective>
+												<Inject services={[Filter, Toolbar]} />
+											</TreeGridComponent>
 										</div>
-									</CardBody>
-								</div>
+									</div>
+									<CardFooter
+										tag='div'
+										className=''
+										size='lg'
+										borderSize={1}
+										borderColor='primary'>
+										<CardFooterRight tag='div' className='fw-bold fs-5'>
+											Tổng điểm KPI:
+											<span className='text-primary ms-2'>
+												{calcTotalKPIWorkTrackByUser(worktrack)}
+											</span>
+										</CardFooterRight>
+										<CardFooterRight tag='div' className='fw-bold fs-5'>
+											Tổng điểm KPI hiện tại:
+											<span className='text-primary ms-2'>
+												{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
+											</span>
+										</CardFooterRight>
+									</CardFooter>
+								</CardBody>
 							</Card>
 						</div>
 					</div>

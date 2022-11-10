@@ -2,18 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import Select from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
-// import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import Loading from '../../components/Loading/Loading';
-// import NotPermission from '../presentation/auth/NotPermission';
 
 const roles = [
 	{
@@ -194,7 +191,10 @@ const TaskByUser = () => {
 													<th className='text-center'>
 														Số nhiệm vụ đang có
 													</th>
-													<th>Chức vụ</th>
+													<th className='text-center'>Tổng điểm KPI</th>
+													<th className='text-center'>
+														Điểm KPI hiện tại
+													</th>
 												</tr>
 											</thead>
 											<tbody>
@@ -202,11 +202,11 @@ const TaskByUser = () => {
 													<React.Fragment key={item.id}>
 														<tr>
 															<td>
-																<Link
+																<a
 																	className='text-underline'
-																	to={`/cong-viec-cua-nhan-vien/${item.id}`}>
+																	href={`/cong-viec-cua-nhan-vien/${item.id}`}>
 																	{item.name}
-																</Link>
+																</a>
 															</td>
 															<td>{item?.department?.name}</td>
 															<td>{item?.position?.name}</td>
@@ -218,12 +218,11 @@ const TaskByUser = () => {
 																	);
 																})?.length || 0}
 															</td>
-															<td>
-																{item?.role === 'manager' &&
-																	'Quản lý '}
-																{item?.role === 'admin' && 'Admin '}
-																{item?.role === 'user' &&
-																	'Nhân viên'}
+															<td className='text-center'>
+																{item?.position?.name}
+															</td>
+															<td className='text-center'>
+																{item?.position?.name}
 															</td>
 														</tr>
 													</React.Fragment>

@@ -30,6 +30,11 @@ import DailyWorktrackForm from '../../dailyWorkTracking/DailyWorktrackForm';
 import Loading from '../../../components/Loading/Loading';
 import { fetchWorktrackListMe } from '../../../redux/slice/worktrackSlice';
 import { addWorktrackLog } from '../../dailyWorkTracking/services';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIOfWorkTrack,
+} from '../../../utils/function';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -124,6 +129,9 @@ const UserDashboard = () => {
 							...item,
 							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 							parentId: item.parent_id,
+							totalKPI: calcTotalKPIOfWorkTrack(item),
+							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+							currentKPI: calcCurrentKPIOfWorkTrack(item),
 						};
 					}),
 			);
@@ -275,6 +283,27 @@ const UserDashboard = () => {
 												field='data.kpiNorm.name'
 												headerText='Tên nhiệm vụ'
 												width='200'
+											/>
+											<ColumnDirective
+												field='data.totalKPI'
+												headerText='Tổng điểm KPI'
+												textAlign='Right'
+												customAttributes={customAttributes}
+												width='150'
+											/>
+											<ColumnDirective
+												field='data.currentKPI'
+												headerText='KPI đạt được'
+												textAlign='Right'
+												customAttributes={customAttributes}
+												width='150'
+											/>
+											<ColumnDirective
+												field='data.totalQuantity'
+												headerText='Số lượng hoàn thành'
+												textAlign='Right'
+												customAttributes={customAttributes}
+												width='150'
 											/>
 											<ColumnDirective
 												field='data.statusName'

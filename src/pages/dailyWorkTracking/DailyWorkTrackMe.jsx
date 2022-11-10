@@ -18,6 +18,8 @@ import { toast } from 'react-toastify';
 import Card, {
 	CardActions,
 	CardBody,
+	CardFooter,
+	CardFooterRight,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -35,6 +37,13 @@ import { fetchWorktrackListMe } from '../../redux/slice/worktrackSlice';
 import { addWorktrackLog } from './services';
 import { updateStatusWorktrack } from '../pendingWorktrack/services';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcTotalCurrentKPIWorkTrackByUser,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIOfWorkTrack,
+	calcTotalKPIWorkTrackByUser,
+} from '../../utils/function';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -125,6 +134,9 @@ const DailyWorkTrackingMe = () => {
 						...item,
 						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 						parentId: item.parent_id,
+						totalKPI: calcTotalKPIOfWorkTrack(item),
+						totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+						currentKPI: calcCurrentKPIOfWorkTrack(item),
 					};
 				}),
 			);
@@ -285,9 +297,7 @@ const DailyWorkTrackingMe = () => {
 				{loading ? (
 					<Loading />
 				) : (
-					<div
-						className='row mb-0 h-100'
-						style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+					<div className='row mb-0 h-100'>
 						<div className='col-12'>
 							<Card className='w-100'>
 								<div style={{ margin: '24px 24px 0' }}>
@@ -331,6 +341,27 @@ const DailyWorkTrackingMe = () => {
 															width='400'
 														/>
 														<ColumnDirective
+															field='data.totalKPI'
+															headerText='Tổng điểm KPI'
+															textAlign='Right'
+															customAttributes={customAttributes}
+															width='150'
+														/>
+														<ColumnDirective
+															field='data.currentKPI'
+															headerText='KPI đạt được'
+															textAlign='Right'
+															customAttributes={customAttributes}
+															width='150'
+														/>
+														<ColumnDirective
+															field='data.totalQuantity'
+															headerText='Số lượng hoàn thành'
+															textAlign='Right'
+															customAttributes={customAttributes}
+															width='150'
+														/>
+														<ColumnDirective
 															field='data.statusName'
 															headerText='Trạng thái'
 															width='200'
@@ -356,6 +387,25 @@ const DailyWorkTrackingMe = () => {
 												</TreeGridComponent>
 											</div>
 										</div>
+										<CardFooter
+											tag='div'
+											className=''
+											size='lg'
+											borderSize={1}
+											borderColor='primary'>
+											<CardFooterRight tag='div' className='fw-bold fs-5'>
+												Tổng điểm KPI:
+												<span className='text-primary ms-2'>
+													{calcTotalKPIWorkTrackByUser(worktrack)}
+												</span>
+											</CardFooterRight>
+											<CardFooterRight tag='div' className='fw-bold fs-5'>
+												Tổng điểm KPI hiện tại:
+												<span className='text-primary ms-2'>
+													{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
+												</span>
+											</CardFooterRight>
+										</CardFooter>
 									</CardBody>
 								</div>
 							</Card>
