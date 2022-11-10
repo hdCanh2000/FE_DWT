@@ -206,7 +206,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											<b>{get(item, 'kpi_value', '--')}</b>
 										</td>
 										<td className='p-3 border text-center'>
-											<b>{get(item, 'quantity', '--')}{console.log(item)}</b>
+											<b>{get(item, 'quantity', '--')}</b>
 										</td>
 									</tr>
 								</tbody>
