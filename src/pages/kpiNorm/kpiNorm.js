@@ -327,14 +327,20 @@ const KpiNormPage = () => {
 																textAlign='Left'
 															/>
 															<ColumnDirective
-																field='data.quantity'
-																headerText='Số lượng'
+																field='data.manday'
+																headerText='Ngày công cần thiết'
 																width='90'
 																textAlign='Center'
 															/>
 															<ColumnDirective
 																field='data.kpi_value'
 																headerText='Giá trị KPI'
+																width='90'
+																textAlign='Center'
+															/>
+															<ColumnDirective
+																field='data.quantity'
+																headerText='Số lượng'
 																width='90'
 																textAlign='Center'
 															/>
