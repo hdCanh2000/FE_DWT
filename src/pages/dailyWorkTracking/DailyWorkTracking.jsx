@@ -17,6 +17,8 @@ import { L10n } from '@syncfusion/ej2-base';
 import Card, {
 	CardActions,
 	CardBody,
+	CardFooter,
+	CardFooterRight,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -32,6 +34,13 @@ import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import Button from '../../components/bootstrap/Button';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcTotalCurrentKPIAllWorkTrack,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIAllWorkTrack,
+	calcTotalKPIOfWorkTrack,
+} from '../../utils/function';
 
 const createDataTree = (dataset) => {
 	const hashTable = Object.create(null);
@@ -121,6 +130,9 @@ const DailyWorkTracking = () => {
 			user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
 			statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 			parentId: item.parent_id,
+			totalKPI: calcTotalKPIOfWorkTrack(item),
+			totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+			currentKPI: calcCurrentKPIOfWorkTrack(item),
 		}));
 	}, [worktrack]);
 
@@ -240,9 +252,7 @@ const DailyWorkTracking = () => {
 				{loading ? (
 					<Loading />
 				) : (
-					<div
-						className='row mb-0'
-						style={{ maxWidth: '90%', minWidth: '60%', margin: '0 auto' }}>
+					<div className='row mb-0'>
 						<div className='col-12'>
 							<Card className='w-100'>
 								<div style={{ margin: '24px 24px 0' }}>
@@ -301,6 +311,27 @@ const DailyWorkTracking = () => {
 															width='200'
 														/>
 														<ColumnDirective
+															field='data.totalKPI'
+															headerText='Tổng điểm KPI'
+															textAlign='Right'
+															customAttributes={customAttributes}
+															width='150'
+														/>
+														<ColumnDirective
+															field='data.currentKPI'
+															headerText='KPI đạt được'
+															textAlign='Right'
+															customAttributes={customAttributes}
+															width='150'
+														/>
+														<ColumnDirective
+															field='data.totalQuantity'
+															headerText='Số lượng hoàn thành'
+															textAlign='Right'
+															customAttributes={customAttributes}
+															width='150'
+														/>
+														<ColumnDirective
 															headerText='Chi tiết'
 															textAlign='Center'
 															width='100'
@@ -320,6 +351,25 @@ const DailyWorkTracking = () => {
 												</TreeGridComponent>
 											</div>
 										</div>
+										<CardFooter
+											tag='div'
+											className=''
+											size='lg'
+											borderSize={1}
+											borderColor='primary'>
+											<CardFooterRight tag='div' className='fw-bold fs-5'>
+												Tổng điểm KPI:
+												<span className='text-primary ms-2'>
+													{calcTotalKPIAllWorkTrack(worktrack)}
+												</span>
+											</CardFooterRight>
+											<CardFooterRight tag='div' className='fw-bold fs-5'>
+												Tổng điểm KPI hiện tại:
+												<span className='text-primary ms-2'>
+													{calcTotalCurrentKPIAllWorkTrack(worktrack)}
+												</span>
+											</CardFooterRight>
+										</CardFooter>
 									</CardBody>
 								</div>
 							</Card>
