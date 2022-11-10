@@ -13,10 +13,10 @@ const deleteWorkTrack = (id) => {
 	});
 };
 
-const getAllWorktrack = () => {
+const getAllWorktrack = (params) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/worktracks`,
+		url: `/api/worktracks${params}`,
 	});
 };
 

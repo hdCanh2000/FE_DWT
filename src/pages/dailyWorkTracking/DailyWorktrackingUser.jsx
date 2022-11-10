@@ -126,7 +126,7 @@ const DailyWorkTracking = () => {
 	};
 
 	useEffect(() => {
-		dispatch(fetchWorktrackList(id));
+		dispatch(fetchWorktrackList(`${id}${handleDate(0)}`));
 	}, [dispatch, id]);
 
 	useEffect(() => {
@@ -264,10 +264,6 @@ const DailyWorkTracking = () => {
 	};
 	const selectDate = [
 		{
-			label: 'Tất cả',
-			value: '/',
-		},
-		{
 			label: 'Tháng này',
 			value: '0',
 		},
@@ -275,8 +271,12 @@ const DailyWorkTracking = () => {
 			label: 'Tháng trước',
 			value: '1',
 		},
+		{
+			label: 'Tất cả',
+			value: '/',
+		},
 	];
-	const [labelDropdow, setLabelDropdow] = React.useState('Tất cả');
+	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
 	const handleChangeDate = (data) => {
 		setLabelDropdow(data.label);
 		dispatch(fetchWorktrackList(`${id}${handleDate(data.value)}`));
