@@ -1,23 +1,20 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-	TreeGridComponent,
-	ColumnsDirective,
-	ColumnDirective,
-	Inject,
-	Filter,
-	Toolbar,
-	Resize,
-} from '@syncfusion/ej2-react-treegrid';
+import { useTable, useExpanded } from 'react-table';
+import styled from 'styled-components';
 import { L10n } from '@syncfusion/ej2-base';
 import { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
 import Card, {
 	CardActions,
+	CardBody,
+	CardFooter,
+	CardFooterRight,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -32,22 +29,79 @@ import DailyWorktrackForm from '../../dailyWorkTracking/DailyWorktrackForm';
 import Button from '../../../components/bootstrap/Button';
 import { addWorktrackLog } from '../../dailyWorkTracking/services';
 import { fetchWorktrackListMe } from '../../../redux/slice/worktrackSlice';
+import Icon from '../../../components/icon/Icon';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcTotalCurrentKPIWorkTrackByUser,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIOfWorkTrack,
+	calcTotalKPIWorkTrackByUser,
+} from '../../../utils/function';
 
-const createDataTree = (dataset) => {
+const createDataTreeTable = (dataset) => {
 	const hashTable = Object.create(null);
 	dataset.forEach((aData) => {
-		hashTable[aData.id] = { data: aData, children: [] };
+		hashTable[aData.id] = { ...aData, subRows: [] };
 	});
 	const dataTree = [];
 	dataset.forEach((aData) => {
 		if (aData.parentId) {
-			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
+			hashTable[aData.parentId]?.subRows.push(hashTable[aData.id]);
 		} else {
 			dataTree.push(hashTable[aData.id]);
 		}
 	});
 	return dataTree;
 };
+
+const Styles = styled.div`
+	table {
+		border-spacing: 0;
+		border: 1px solid black;
+		width: 100%;
+		margin-left: 5px;
+		margin-right: 5px;
+		&::-webkit-scrollbar {
+			height: 1px;
+			border: 1px solid #d5d5d5;
+		}
+		tbody {
+			overflow-y: auto;
+		}
+		tr {
+			:last-child {
+				td {
+					border-bottom: 0;
+				}
+			}
+		}
+
+		th,
+		td {
+			margin: 0;
+			padding: 0.5rem;
+			border-bottom: 1px solid black;
+			border-right: 1px solid black;
+
+			:last-child {
+				border-right: 1px;
+			}
+		}
+	}
+`;
+
+const TableContainerOuter = styled.div`
+	width: 100%;
+	height: 100%;
+	overflow-y: hidden;
+	padding-bottom: 20px;
+`;
+
+const TableContainer = styled.div`
+	width: 100%;
+	height: 100%;
+	min-width: 900px;
+`;
 
 const columns = () => {
 	const date = new Date();
@@ -75,14 +129,6 @@ const renderColor = (status) => {
 	}
 };
 
-const toolbarOptions = ['Search'];
-const searchOptions = {
-	fields: ['data.kpiNorm.name', 'data.mission.name'],
-	ignoreCase: true,
-	key: '',
-	operator: 'contains',
-};
-
 L10n.load({
 	'vi-VI': {
 		grid: {
@@ -91,6 +137,73 @@ L10n.load({
 		},
 	},
 });
+
+const Table = ({ columns: userColumns, data }) => {
+	const {
+		getTableProps,
+		getTableBodyProps,
+		headerGroups,
+		rows,
+		prepareRow,
+		// eslint-disable-next-line no-unused-vars
+		state: { expanded },
+	} = useTable(
+		{
+			columns: userColumns,
+			data,
+			initialState: { expanded: { 0: true } },
+		},
+		useExpanded,
+	);
+
+	return (
+		<>
+			<table {...getTableProps()}>
+				<thead>
+					{headerGroups.map((headerGroup) => (
+						<tr {...headerGroup.getHeaderGroupProps()}>
+							{headerGroup.headers.map((column) => (
+								<th
+									{...column.getHeaderProps({
+										style: { minWidth: column.minWidth, width: column.width },
+									})}>
+									{column.render('Header')}
+								</th>
+							))}
+						</tr>
+					))}
+				</thead>
+				<tbody {...getTableBodyProps()}>
+					{rows.map((row) => {
+						prepareRow(row);
+						return (
+							<tr {...row.getRowProps()}>
+								{row.cells.map((cell) => {
+									return (
+										<td
+											{...cell.getCellProps({
+												style: {
+													minWidth: cell.column.minWidth,
+													width: cell.column.width,
+												},
+											})}>
+											{cell.render('Cell')}
+										</td>
+									);
+								})}
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
+			{/* <br />
+			<div>Showing the first 1 results of {rows.length} rows</div>
+			<pre>
+				<code>{JSON.stringify({ expanded }, null, 2)}</code>
+			</pre> */}
+		</>
+	);
+};
 
 const ManagerDashboard = () => {
 	const dispatch = useDispatch();
@@ -117,7 +230,7 @@ const ManagerDashboard = () => {
 
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
-			const treeData = createDataTree(
+			const treeData = createDataTreeTable(
 				worktrack?.workTracks
 					?.filter((item) => item.workTrackUsers.isResponsible === true)
 					?.map((item) => {
@@ -125,6 +238,9 @@ const ManagerDashboard = () => {
 							...item,
 							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
 							parentId: item.parent_id,
+							totalKPI: calcTotalKPIOfWorkTrack(item),
+							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+							currentKPI: calcCurrentKPIOfWorkTrack(item),
 						};
 					}),
 			);
@@ -148,62 +264,6 @@ const ManagerDashboard = () => {
 			valueForm: {},
 			row: {},
 		});
-	};
-
-	const customAttributesLog = { class: 'customcss_log' };
-	const customAttributes = { class: 'customcss' };
-
-	const treegridTemplate = (props) => {
-		const { workTrackLogs } = props.data;
-		return (
-			<div className='d-flex'>
-				{columns().map((item) => {
-					return (
-						<div
-							key={item?.day}
-							style={{
-								border: '1px solid #c8c7c7',
-								width: 48,
-								height: 36,
-								backgroundColor: renderColor(
-									workTrackLogs?.find((i) => i?.date === item?.date)?.status,
-								),
-								borderRadius: 0,
-							}}
-							onClick={() =>
-								handleShowForm(
-									workTrackLogs?.find((i) => i?.date === item?.date),
-									item,
-									props.data,
-								)
-							}
-							className='rounded-none cursor-pointer d-flex justify-content-center align-items-center'>
-							{item?.day}
-						</div>
-					);
-				})}
-			</div>
-		);
-	};
-
-	const viewTemplate = (props) => {
-		const { data } = props;
-		return (
-			<Button
-				type='button'
-				isOutline={false}
-				color='info'
-				isLight
-				className='text-nowrap mx-2'
-				icon='Eye'
-				onClick={() =>
-					handleOpenForm({
-						...data,
-						parent: worktrack.workTracks?.find((i) => i.id === data.parentId),
-					})
-				}
-			/>
-		);
 	};
 
 	const handleSubmit = (item) => {
@@ -231,6 +291,114 @@ const ManagerDashboard = () => {
 				throw err;
 			});
 	};
+
+	const columnTables = [
+		{
+			id: 'expander',
+			Cell: ({ row }) =>
+				row.canExpand ? (
+					<span
+						{...row.getToggleRowExpandedProps({
+							style: {
+								paddingLeft: `${row.depth * 2}rem`,
+							},
+						})}>
+						{row.isExpanded ? (
+							<Icon icon='KeyboardArrowDown' color='dark' size='md' />
+						) : (
+							<Icon icon='KeyboardArrowRight' color='dark' size='md' />
+						)}
+					</span>
+				) : null,
+			maxWidth: 25,
+			minWidth: 25,
+		},
+		{
+			Header: 'Tên nhiệm vụ',
+			accessor: 'name',
+			maxWidth: 400,
+			minWidth: 400,
+			Cell: ({ row }) => {
+				return (
+					<div className='d-flex'>
+						<span
+							className='cursor-pointer d-block w-100 fw-bold fs-6'
+							onClick={() =>
+								handleOpenForm({
+									...row.original,
+									parent: worktrack.workTracks?.find(
+										(i) => i.id === row.original.parentId,
+									),
+								})
+							}>
+							{row.original.kpiNorm.name}
+						</span>
+					</div>
+				);
+			},
+		},
+		{
+			Header: 'Trạng thái',
+			accessor: 'statusName',
+			maxWidth: 200,
+			minWidth: 200,
+		},
+		{
+			Header: 'Tổng điểm KPI',
+			accessor: 'totalKPI',
+			maxWidth: 200,
+			minWidth: 200,
+		},
+		{
+			Header: 'KPI đạt được',
+			accessor: 'currentKPI',
+			maxWidth: 200,
+			minWidth: 200,
+		},
+		{
+			Header: 'Số lượng hoàn thành',
+			accessor: 'totalQuantity',
+			maxWidth: 200,
+			minWidth: 200,
+		},
+		{
+			Header: 'Nhật trình công việc',
+			accessor: 'log',
+			Cell: ({ row }) => {
+				const { workTrackLogs } = row.original;
+				return (
+					<div className='d-flex'>
+						{columns().map((item) => {
+							return (
+								<div
+									key={item?.day}
+									style={{
+										border: '1px solid #c8c7c7',
+										width: 48,
+										height: 36,
+										backgroundColor: renderColor(
+											workTrackLogs?.find((i) => i?.date === item?.date)
+												?.status,
+										),
+										borderRadius: 0,
+									}}
+									onClick={() =>
+										handleShowForm(
+											workTrackLogs?.find((i) => i?.date === item?.date),
+											item,
+											row.original,
+										)
+									}
+									className='rounded-none cursor-pointer d-flex justify-content-center align-items-center'>
+									{item?.day}
+								</div>
+							);
+						})}
+					</div>
+				);
+			},
+		},
+	];
 
 	return (
 		<>
@@ -320,61 +488,34 @@ const ManagerDashboard = () => {
 								</Button>
 							</CardActions>
 						</CardHeader>
-						<div className='p-4'>
-							<div className='control-pane'>
-								<div className='control-section'>
-									<TreeGridComponent
-										locale='vi-VI'
-										dataSource={treeValue}
-										treeColumnIndex={0}
-										allowResizing
-										toolbar={toolbarOptions}
-										searchSettings={searchOptions}
-										className='cursor-pointer user-select-none'
-										rowSelected={(item) => {
-											handleOpenForm({
-												...item.data.data,
-												parent: worktrack?.workTracks?.find(
-													(i) => i.id === item.data.data.parentId,
-												),
-											});
-										}}
-										childMapping='children'
-										height='500'>
-										<Inject services={[Resize]} />
-										<ColumnsDirective>
-											<ColumnDirective
-												field='data.kpiNorm.name'
-												headerText='Tên nhiệm vụ'
-												width='200'
-											/>
-											<ColumnDirective
-												field='data.statusName'
-												headerText='Trạng thái'
-												width='100'
-												textAlign='Center'
-											/>
-											<ColumnDirective
-												headerText='Chi tiết'
-												textAlign='Center'
-												width='100'
-												customAttributes={customAttributes}
-												template={viewTemplate}
-											/>
-											<ColumnDirective
-												headerText='Nhật trình công việc'
-												textAlign='Left'
-												width='900'
-												minWidth='600'
-												customAttributes={customAttributesLog}
-												template={treegridTemplate}
-											/>
-										</ColumnsDirective>
-										<Inject services={[Filter, Toolbar]} />
-									</TreeGridComponent>
-								</div>
-							</div>
-						</div>
+						<CardBody>
+							<TableContainerOuter>
+								<TableContainer>
+									<Styles>
+										<Table columns={columnTables} data={treeValue} />
+									</Styles>
+								</TableContainer>
+							</TableContainerOuter>
+							<CardFooter
+								tag='div'
+								className=''
+								size='lg'
+								borderSize={1}
+								borderColor='primary'>
+								<CardFooterRight tag='div' className='fw-bold fs-5'>
+									Tổng điểm KPI:
+									<span className='text-primary ms-2'>
+										{calcTotalKPIWorkTrackByUser(worktrack)}
+									</span>
+								</CardFooterRight>
+								<CardFooterRight tag='div' className='fw-bold fs-5'>
+									Tổng điểm KPI hiện tại:
+									<span className='text-primary ms-2'>
+										{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
+									</span>
+								</CardFooterRight>
+							</CardFooter>
+						</CardBody>
 					</Card>
 				</div>
 				<DailyWorktrackInfo
