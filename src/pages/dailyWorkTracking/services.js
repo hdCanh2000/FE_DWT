@@ -16,7 +16,8 @@ const deleteWorkTrack = (id) => {
 const getAllWorktrack = (params) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/worktracks${params}`,
+		url: `/api/worktracks`,
+		params,
 	});
 };
 
