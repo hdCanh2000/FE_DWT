@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import moment from 'moment';
+import { get } from 'lodash';
 import {
 	addWorktrack,
 	getAllWorktrack,
@@ -52,7 +53,7 @@ export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', asyn
 				?.map((item) => {
 					return {
 						...item,
-						label: item?.kpiNorm?.name,
+						label: `${get(item, 'kpiNorm.name')} - ${get(item, 'users[0].name')}`,
 						value: item.id,
 						text: item.name,
 						parentId: item.parent_id,
@@ -61,7 +62,7 @@ export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', asyn
 		: response.data.data?.map((item) => {
 				return {
 					...item,
-					label: item?.kpiNorm?.name,
+					label: `${get(item, 'kpiNorm.name')} - ${get(item, 'users[0].name')}`,
 					value: item.id,
 					text: item.name,
 					parentId: item.parent_id,
