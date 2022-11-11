@@ -90,13 +90,13 @@ export const fetchWorktrackListByStatus = createAsyncThunk(
 	},
 );
 
-export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (id) => {
-	const response = await getAllWorktrackByUserId(id);
+export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async (data) => {
+	const response = await getAllWorktrackByUserId({ id: data.id, params: data.query });
 	return response.data.data;
 });
 
-export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async () => {
-	const response = await getAllWorktrackMe();
+export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async (params) => {
+	const response = await getAllWorktrackMe(params);
 	return response.data.data;
 });
 
