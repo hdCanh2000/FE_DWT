@@ -1,9 +1,10 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllWorktrackByUserId = (id) => {
+const getAllWorktrackByUserId = (data) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/worktracks/user/${id}`,
+		url: `/api/worktracks/user/${data.id}`,
+		params: data.params,
 	});
 };
 const deleteWorkTrack = (id) => {
@@ -28,10 +29,11 @@ const getAllWorktrackByUser = () => {
 	});
 };
 
-const getAllWorktrackMe = () => {
+const getAllWorktrackMe = (params) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/api/worktracks/workTrackMe`,
+		params,
 	});
 };
 

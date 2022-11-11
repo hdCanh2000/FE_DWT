@@ -2,14 +2,11 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { isEmpty } from 'lodash';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { useTable, useExpanded } from 'react-table';
-import { L10n } from '@syncfusion/ej2-base';
-import moment from 'moment';
 import { Dropdown } from 'react-bootstrap';
 import Card, {
 	CardActions,
@@ -38,6 +35,7 @@ import {
 	calcTotalKPIOfWorkTrack,
 } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
+import { getQueryDate } from '../../utils/utils';
 
 const createDataTreeTable = (dataset) => {
 	const hashTable = Object.create(null);
@@ -103,15 +101,6 @@ const TableContainer = styled.div`
 	height: 100%;
 	min-width: 900px;
 `;
-
-L10n.load({
-	'vi-VI': {
-		grid: {
-			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
-			EmptyRecord: 'Không có dữ liệu nhiệm vụ.',
-		},
-	},
-});
 
 const Table = ({ columns: userColumns, data }) => {
 	const {
@@ -223,24 +212,20 @@ const DailyWorkTracking = () => {
 		valueForm: {},
 	});
 
-	const fixForm = useCallback(() => {
-		return worktrack.map((item) => ({
-			...item,
-			user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
-			statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
-			parentId: item.parent_id,
-			totalKPI: calcTotalKPIOfWorkTrack(item),
-			totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
-			currentKPI: calcCurrentKPIOfWorkTrack(item),
-		}));
-	}, [worktrack]);
-
 	useEffect(() => {
-		if (!isEmpty(worktrack)) {
-			const treeData = createDataTreeTable(fixForm());
-			setTreeValue(treeData);
-		}
-	}, [fixForm, worktrack]);
+		const treeData = createDataTreeTable(
+			worktrack.map((item) => ({
+				...item,
+				user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
+				statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+				parentId: item.parent_id,
+				totalKPI: calcTotalKPIOfWorkTrack(item),
+				totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+				currentKPI: calcCurrentKPIOfWorkTrack(item),
+			})),
+		);
+		setTreeValue(treeData);
+	}, [worktrack]);
 
 	const handleShowForm = (row, item, dataWorktrack) => {
 		setShowForm(true);
@@ -285,22 +270,9 @@ const DailyWorkTracking = () => {
 			});
 	};
 
-	const handleDate = (month) => {
-		if (month === '/') {
-			return '/';
-		}
-		const date = new Date();
-		const y = date.getFullYear();
-		const m = date.getMonth();
-		const start = new Date(y, m - month, 1);
-		const end = new Date(y, m + 1 - month, 0);
-		const startDate = moment(start).format('YYYY-MM-DD');
-		const endDate = moment(end).format('YYYY-MM-DD');
-		return `?startDate=${startDate}&endDate=${endDate}`;
-	};
-
 	useEffect(() => {
-		dispatch(fetchWorktrackListAll(handleDate(0)));
+		const { startDate, endDate } = getQueryDate(0);
+		dispatch(fetchWorktrackListAll({ startDate, endDate }));
 	}, [dispatch]);
 
 	const selectDate = [
@@ -314,14 +286,15 @@ const DailyWorkTracking = () => {
 		},
 		{
 			label: 'Tất cả',
-			value: '/',
+			value: '',
 		},
 	];
 
 	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
 	const handleChangeDate = (data) => {
 		setLabelDropdow(data.label);
-		dispatch(fetchWorktrackListAll(`${handleDate(data.value)}`));
+		const { startDate, endDate } = getQueryDate(data.value);
+		dispatch(fetchWorktrackListAll({ startDate, endDate }));
 	};
 
 	const columnTables = [

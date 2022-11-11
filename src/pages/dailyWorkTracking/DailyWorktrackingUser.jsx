@@ -8,10 +8,8 @@ import _, { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
 import { useTable, useExpanded } from 'react-table';
 import styled from 'styled-components';
-import { L10n } from '@syncfusion/ej2-base';
 import { useParams } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
-import moment from 'moment';
 import Card, {
 	CardActions,
 	CardBody,
@@ -40,6 +38,7 @@ import {
 	calcTotalKPIWorkTrackByUser,
 } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
+import { getQueryDate } from '../../utils/utils';
 
 const createDataTreeTable = (dataset) => {
 	const hashTable = Object.create(null);
@@ -105,15 +104,6 @@ const TableContainer = styled.div`
 	height: 100%;
 	min-width: 900px;
 `;
-
-L10n.load({
-	'vi-VI': {
-		grid: {
-			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
-			EmptyRecord: 'Không có dữ liệu nhiệm vụ.',
-		},
-	},
-});
 
 const columns = () => {
 	const date = new Date();
@@ -229,7 +219,12 @@ const DailyWorkTracking = () => {
 	const { id } = params;
 
 	useEffect(() => {
-		dispatch(fetchWorktrackList(`${id}${handleDate(0)}`));
+		const query = getQueryDate(0);
+		const data = {
+			id,
+			query,
+		};
+		dispatch(fetchWorktrackList(data));
 	}, [dispatch, id]);
 
 	useEffect(() => {
@@ -296,19 +291,7 @@ const DailyWorkTracking = () => {
 				throw err;
 			});
 	};
-	const handleDate = (month) => {
-		if (month === '/') {
-			return '/';
-		}
-		const date = new Date();
-		const y = date.getFullYear();
-		const m = date.getMonth();
-		const start = new Date(y, m - month, 1);
-		const end = new Date(y, m + 1 - month, 0);
-		const startDate = moment(start).format('YYYY-MM-DD');
-		const endDate = moment(end).format('YYYY-MM-DD');
-		return `?startDate=${startDate}&endDate=${endDate}`;
-	};
+
 	const selectDate = [
 		{
 			label: 'Tháng này',
@@ -320,13 +303,20 @@ const DailyWorkTracking = () => {
 		},
 		{
 			label: 'Tất cả',
-			value: '/',
+			value: '',
 		},
 	];
+
 	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
+
 	const handleChangeDate = (data) => {
 		setLabelDropdow(data.label);
-		dispatch(fetchWorktrackList(`${id}${handleDate(data.value)}`));
+		const query = getQueryDate(data.value);
+		const dataQuery = {
+			id,
+			query,
+		};
+		dispatch(fetchWorktrackList(dataQuery));
 	};
 
 	const columnTables = [

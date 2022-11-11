@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const mapOrder = (array, order, key) => {
 	array.sort((a, b) => order.indexOf(a[key] - order.indexOf(b[key])));
 	return array;
@@ -48,4 +50,21 @@ export const handleLogout = () => {
 	localStorage.removeItem('email');
 	localStorage.removeItem('name');
 	localStorage.removeItem('roles');
+};
+
+export const getQueryDate = (month) => {
+	if (month === '' || month === '/') {
+		return '/';
+	}
+	const date = new Date();
+	const y = date.getFullYear();
+	const m = date.getMonth();
+	const start = new Date(y, m - month, 1);
+	const end = new Date(y, m + 1 - month, 0);
+	const startDate = moment(start).format('YYYY-MM-DD');
+	const endDate = moment(end).format('YYYY-MM-DD');
+	return {
+		startDate,
+		endDate,
+	};
 };

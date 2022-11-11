@@ -4,8 +4,8 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { L10n } from '@syncfusion/ej2-base';
 import { isEmpty } from 'lodash';
+import { Dropdown } from 'react-bootstrap';
 import styled from 'styled-components';
 import { useTable, useExpanded } from 'react-table';
 import { toast } from 'react-toastify';
@@ -39,6 +39,7 @@ import {
 	calcTotalKPIWorkTrackByUser,
 } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
+import { getQueryDate } from '../../utils/utils';
 
 // const createDataTree = (dataset) => {
 // 	const hashTable = Object.create(null);
@@ -121,15 +122,6 @@ const TableContainer = styled.div`
 	min-width: 900px;
 `;
 
-L10n.load({
-	'vi-VI': {
-		grid: {
-			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
-			EmptyRecord: 'Hiện tại chưa có công việc.',
-		},
-	},
-});
-
 const columns = () => {
 	const date = new Date();
 	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -175,51 +167,44 @@ const Table = ({ columns: userColumns, data }) => {
 	);
 
 	return (
-		<>
-			<table {...getTableProps()}>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th
-									{...column.getHeaderProps({
-										style: { minWidth: column.minWidth, width: column.width },
-									})}>
-									{column.render('Header')}
-								</th>
-							))}
+		<table {...getTableProps()}>
+			<thead>
+				{headerGroups.map((headerGroup) => (
+					<tr {...headerGroup.getHeaderGroupProps()}>
+						{headerGroup.headers.map((column) => (
+							<th
+								{...column.getHeaderProps({
+									style: { minWidth: column.minWidth, width: column.width },
+								})}>
+								{column.render('Header')}
+							</th>
+						))}
+					</tr>
+				))}
+			</thead>
+			<tbody {...getTableBodyProps()}>
+				{rows.map((row) => {
+					prepareRow(row);
+					return (
+						<tr {...row.getRowProps()}>
+							{row.cells.map((cell) => {
+								return (
+									<td
+										{...cell.getCellProps({
+											style: {
+												minWidth: cell.column.minWidth,
+												width: cell.column.width,
+											},
+										})}>
+										{cell.render('Cell')}
+									</td>
+								);
+							})}
 						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
-					{rows.map((row) => {
-						prepareRow(row);
-						return (
-							<tr {...row.getRowProps()}>
-								{row.cells.map((cell) => {
-									return (
-										<td
-											{...cell.getCellProps({
-												style: {
-													minWidth: cell.column.minWidth,
-													width: cell.column.width,
-												},
-											})}>
-											{cell.render('Cell')}
-										</td>
-									);
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			{/* <br />
-			<div>Showing the first 1 results of {rows.length} rows</div>
-			<pre>
-				<code>{JSON.stringify({ expanded }, null, 2)}</code>
-			</pre> */}
-		</>
+					);
+				})}
+			</tbody>
+		</table>
 	);
 };
 
@@ -242,7 +227,8 @@ const DailyWorkTrackingMe = () => {
 	});
 
 	useEffect(() => {
-		dispatch(fetchWorktrackListMe());
+		const query = getQueryDate(0);
+		dispatch(fetchWorktrackListMe(query));
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -304,6 +290,29 @@ const DailyWorkTrackingMe = () => {
 				});
 				throw err;
 			});
+	};
+
+	const selectDate = [
+		{
+			label: 'Tháng này',
+			value: '0',
+		},
+		{
+			label: 'Tháng trước',
+			value: '1',
+		},
+		{
+			label: 'Tất cả',
+			value: '',
+		},
+	];
+
+	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
+
+	const handleChangeDate = (data) => {
+		setLabelDropdow(data.label);
+		const query = getQueryDate(data.value);
+		dispatch(fetchWorktrackListMe(query));
 	};
 
 	const handleChangeStatus = (worktrackSubmit) => {
@@ -475,17 +484,22 @@ const DailyWorkTrackingMe = () => {
 												<CardLabel>Danh sách nhiệm vụ</CardLabel>
 											</CardTitle>
 										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='ChangeCircle'
-												tag='button'
-												type='button'
-												isOutline={false}
-												isLight
-												onClick={() => dispatch(fetchWorktrackListMe())}>
-												Tải lại
-											</Button>
+										<CardActions style={{ display: 'inline-flex' }}>
+											<Dropdown>
+												<Dropdown.Toggle
+													variant='primary'
+													id='dropdown-basic'>
+													{labelDropdow}
+												</Dropdown.Toggle>
+												<Dropdown.Menu>
+													{selectDate.map((ele) => (
+														<Dropdown.Item
+															onClick={() => handleChangeDate(ele)}>
+															{ele.label}
+														</Dropdown.Item>
+													))}
+												</Dropdown.Menu>
+											</Dropdown>
 										</CardActions>
 									</CardHeader>
 									<CardBody>
