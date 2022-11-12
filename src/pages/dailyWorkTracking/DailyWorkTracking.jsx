@@ -6,7 +6,6 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import { useTable, useExpanded } from 'react-table';
 import { Dropdown } from 'react-bootstrap';
 import Card, {
 	CardActions,
@@ -20,38 +19,20 @@ import Card, {
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
-import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import {
-	calcCurrentKPIOfWorkTrack,
 	calcTotalCurrentKPIAllWorkTrack,
-	calcTotalFromWorkTrackLogs,
 	calcTotalKPIAllWorkTrack,
-	calcTotalKPIOfWorkTrack,
+	columns,
+	renderColor,
 } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
+import Table from './Table';
 import { getQueryDate } from '../../utils/utils';
-
-const createDataTreeTable = (dataset) => {
-	const hashTable = Object.create(null);
-	dataset.forEach((aData) => {
-		hashTable[aData.id] = { ...aData, subRows: [] };
-	});
-	const dataTree = [];
-	dataset.forEach((aData) => {
-		if (aData.parentId) {
-			hashTable[aData.parentId]?.subRows.push(hashTable[aData.id]);
-		} else {
-			dataTree.push(hashTable[aData.id]);
-		}
-	});
-	return dataTree;
-};
 
 const Styles = styled.div`
 	table {
@@ -102,99 +83,6 @@ const TableContainer = styled.div`
 	min-width: 900px;
 `;
 
-const Table = ({ columns: userColumns, data }) => {
-	const {
-		getTableProps,
-		getTableBodyProps,
-		headerGroups,
-		rows,
-		prepareRow,
-		// eslint-disable-next-line no-unused-vars
-		state: { expanded },
-	} = useTable(
-		{
-			columns: userColumns,
-			data,
-			initialState: { expanded: { 0: true } },
-		},
-		useExpanded,
-	);
-
-	return (
-		<>
-			<table {...getTableProps()}>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th
-									{...column.getHeaderProps({
-										style: { minWidth: column.minWidth, width: column.width },
-									})}>
-									{column.render('Header')}
-								</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
-					{rows.map((row) => {
-						prepareRow(row);
-						return (
-							<tr {...row.getRowProps()}>
-								{row.cells.map((cell) => {
-									return (
-										<td
-											{...cell.getCellProps({
-												style: {
-													minWidth: cell.column.minWidth,
-													width: cell.column.width,
-												},
-											})}>
-											{cell.render('Cell')}
-										</td>
-									);
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			{/* <br />
-			<div>Showing the first 1 results of {rows.length} rows</div>
-			<pre>
-				<code>{JSON.stringify({ expanded }, null, 2)}</code>
-			</pre> */}
-		</>
-	);
-};
-
-const columns = () => {
-	const date = new Date();
-	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-	const result = [];
-	for (let i = 1; i <= days; i += 1) {
-		result.push({
-			day: i,
-			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
-		});
-	}
-	return result;
-};
-
-const renderColor = (status) => {
-	switch (status) {
-		case 'inProgress':
-			return '#ffc000';
-		case 'completed':
-			return '#c5e0b3';
-		case 'expired':
-			return '#f97875';
-		default:
-			return 'transparent';
-	}
-};
-
 const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
 
@@ -204,7 +92,6 @@ const DailyWorkTracking = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
-	const [treeValue, setTreeValue] = React.useState([]);
 	const [showForm, setShowForm] = React.useState(false);
 	const [dataShow, setDataShow] = React.useState({
 		row: {},
@@ -213,19 +100,9 @@ const DailyWorkTracking = () => {
 	});
 
 	useEffect(() => {
-		const treeData = createDataTreeTable(
-			worktrack.map((item) => ({
-				...item,
-				user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
-				statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
-				parentId: item.parent_id,
-				totalKPI: calcTotalKPIOfWorkTrack(item),
-				totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
-				currentKPI: calcCurrentKPIOfWorkTrack(item),
-			})),
-		);
-		setTreeValue(treeData);
-	}, [worktrack]);
+		const { startDate, endDate } = getQueryDate(0);
+		dispatch(fetchWorktrackListAll({ startDate, endDate }));
+	}, [dispatch]);
 
 	const handleShowForm = (row, item, dataWorktrack) => {
 		setShowForm(true);
@@ -270,11 +147,6 @@ const DailyWorkTracking = () => {
 			});
 	};
 
-	useEffect(() => {
-		const { startDate, endDate } = getQueryDate(0);
-		dispatch(fetchWorktrackListAll({ startDate, endDate }));
-	}, [dispatch]);
-
 	const selectDate = [
 		{
 			label: 'Tháng này',
@@ -291,6 +163,7 @@ const DailyWorkTracking = () => {
 	];
 
 	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
+
 	const handleChangeDate = (data) => {
 		setLabelDropdow(data.label);
 		const { startDate, endDate } = getQueryDate(data.value);
@@ -396,62 +269,56 @@ const DailyWorkTracking = () => {
 					<div className='row mb-0'>
 						<div className='col-12'>
 							<Card className='w-100'>
-								<div style={{ margin: '24px 24px 0' }}>
-									<CardHeader>
-										<CardLabel icon='TaskAlt' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách nhiệm vụ</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions style={{ display: 'inline-flex' }}>
-											<Dropdown>
-												<Dropdown.Toggle
-													variant='primary'
-													id='dropdown-basic'>
-													{labelDropdow}
-												</Dropdown.Toggle>
-												<Dropdown.Menu>
-													{selectDate.map((ele) => (
-														<Dropdown.Item
-															onClick={() => handleChangeDate(ele)}>
-															{ele.label}
-														</Dropdown.Item>
-													))}
-												</Dropdown.Menu>
-											</Dropdown>
-										</CardActions>
-									</CardHeader>
-									<CardBody className='w-100'>
-										<TableContainerOuter>
-											<TableContainer>
-												<Styles>
-													<Table
-														columns={columnTables}
-														data={treeValue}
-													/>
-												</Styles>
-											</TableContainer>
-										</TableContainerOuter>
-										<CardFooter
-											tag='div'
-											className=''
-											size='lg'
-											borderColor='primary'>
-											<CardFooterRight tag='div' className='fw-bold fs-5'>
-												Tổng điểm KPI:
-												<span className='text-primary ms-2'>
-													{calcTotalKPIAllWorkTrack(worktrack)}
-												</span>
-											</CardFooterRight>
-											<CardFooterRight tag='div' className='fw-bold fs-5'>
-												Tổng điểm KPI hiện tại:
-												<span className='text-primary ms-2'>
-													{calcTotalCurrentKPIAllWorkTrack(worktrack)}
-												</span>
-											</CardFooterRight>
-										</CardFooter>
-									</CardBody>
-								</div>
+								<CardHeader>
+									<CardLabel icon='TaskAlt' iconColor='primary'>
+										<CardTitle>
+											<CardLabel>Danh sách nhiệm vụ</CardLabel>
+										</CardTitle>
+									</CardLabel>
+									<CardActions style={{ display: 'inline-flex' }}>
+										<Dropdown>
+											<Dropdown.Toggle variant='primary' id='dropdown-basic'>
+												{labelDropdow}
+											</Dropdown.Toggle>
+											<Dropdown.Menu>
+												{selectDate.map((ele) => (
+													<Dropdown.Item
+														key={ele.label}
+														onClick={() => handleChangeDate(ele)}>
+														{ele.label}
+													</Dropdown.Item>
+												))}
+											</Dropdown.Menu>
+										</Dropdown>
+									</CardActions>
+								</CardHeader>
+								<CardBody className='w-100'>
+									<TableContainerOuter>
+										<TableContainer>
+											<Styles>
+												<Table columns={columnTables} data={worktrack} />
+											</Styles>
+										</TableContainer>
+									</TableContainerOuter>
+									<CardFooter
+										tag='div'
+										className=''
+										size='lg'
+										borderColor='primary'>
+										<CardFooterRight tag='div' className='fw-bold fs-5'>
+											Tổng điểm KPI:
+											<span className='text-primary ms-2'>
+												{calcTotalKPIAllWorkTrack(worktrack)}
+											</span>
+										</CardFooterRight>
+										<CardFooterRight tag='div' className='fw-bold fs-5'>
+											Tổng điểm KPI hiện tại:
+											<span className='text-primary ms-2'>
+												{calcTotalCurrentKPIAllWorkTrack(worktrack)}
+											</span>
+										</CardFooterRight>
+									</CardFooter>
+								</CardBody>
 							</Card>
 						</div>
 					</div>

@@ -30,7 +30,7 @@
 		"react/jsx-props-no-spreading": "off",
 		"react/no-unescaped-entities": ["error", { "forbid": [">", "}"] }],
 		"jsx-a11y/label-has-associated-control": [
-			"warn",
+			"off",
 			{
 				"depth": 3
 			}

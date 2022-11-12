@@ -1,13 +1,12 @@
-/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/prop-types */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 import { Dropdown } from 'react-bootstrap';
 import styled from 'styled-components';
-import { useTable, useExpanded } from 'react-table';
 import { toast } from 'react-toastify';
 import Card, {
 	CardActions,
@@ -21,7 +20,6 @@ import Card, {
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import './style.css';
 import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
@@ -37,41 +35,13 @@ import {
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
 	calcTotalKPIWorkTrackByUser,
+	columns,
+	createDataTreeTable,
+	renderColor,
 } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
 import { getQueryDate } from '../../utils/utils';
-
-// const createDataTree = (dataset) => {
-// 	const hashTable = Object.create(null);
-// 	dataset.forEach((aData) => {
-// 		hashTable[aData.id] = { data: aData, children: [] };
-// 	});
-// 	const dataTree = [];
-// 	dataset.forEach((aData) => {
-// 		if (aData.parentId) {
-// 			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
-// 		} else {
-// 			dataTree.push(hashTable[aData.id]);
-// 		}
-// 	});
-// 	return dataTree;
-// };
-
-const createDataTreeTable = (dataset) => {
-	const hashTable = Object.create(null);
-	dataset.forEach((aData) => {
-		hashTable[aData.id] = { ...aData, subRows: [] };
-	});
-	const dataTree = [];
-	dataset.forEach((aData) => {
-		if (aData.parentId) {
-			hashTable[aData.parentId]?.subRows.push(hashTable[aData.id]);
-		} else {
-			dataTree.push(hashTable[aData.id]);
-		}
-	});
-	return dataTree;
-};
+import Table from './Table';
 
 const Styles = styled.div`
 	table {
@@ -122,92 +92,6 @@ const TableContainer = styled.div`
 	min-width: 900px;
 `;
 
-const columns = () => {
-	const date = new Date();
-	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-	const result = [];
-	for (let i = 1; i <= days; i += 1) {
-		result.push({
-			day: i,
-			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
-		});
-	}
-	return result;
-};
-
-const renderColor = (status) => {
-	switch (status) {
-		case 'inProgress':
-			return '#ffc000';
-		case 'completed':
-			return '#c5e0b3';
-		case 'expired':
-			return '#f97875';
-		default:
-			return 'transparent';
-	}
-};
-
-const Table = ({ columns: userColumns, data }) => {
-	const {
-		getTableProps,
-		getTableBodyProps,
-		headerGroups,
-		rows,
-		prepareRow,
-		// eslint-disable-next-line no-unused-vars
-		state: { expanded },
-	} = useTable(
-		{
-			columns: userColumns,
-			data,
-			initialState: { expanded: { 0: true } },
-		},
-		useExpanded,
-	);
-
-	return (
-		<table {...getTableProps()}>
-			<thead>
-				{headerGroups.map((headerGroup) => (
-					<tr {...headerGroup.getHeaderGroupProps()}>
-						{headerGroup.headers.map((column) => (
-							<th
-								{...column.getHeaderProps({
-									style: { minWidth: column.minWidth, width: column.width },
-								})}>
-								{column.render('Header')}
-							</th>
-						))}
-					</tr>
-				))}
-			</thead>
-			<tbody {...getTableBodyProps()}>
-				{rows.map((row) => {
-					prepareRow(row);
-					return (
-						<tr {...row.getRowProps()}>
-							{row.cells.map((cell) => {
-								return (
-									<td
-										{...cell.getCellProps({
-											style: {
-												minWidth: cell.column.minWidth,
-												width: cell.column.width,
-											},
-										})}>
-										{cell.render('Cell')}
-									</td>
-								);
-							})}
-						</tr>
-					);
-				})}
-			</tbody>
-		</table>
-	);
-};
-
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
@@ -246,6 +130,8 @@ const DailyWorkTrackingMe = () => {
 				}),
 			);
 			setTreeValue(treeData);
+		} else {
+			setTreeValue([]);
 		}
 	}, [worktrack]);
 
@@ -450,14 +336,14 @@ const DailyWorkTrackingMe = () => {
 										),
 										borderRadius: 0,
 									}}
+									className='rounded-none cursor-pointer d-flex justify-content-center align-items-center'
 									onClick={() =>
 										handleShowForm(
 											workTrackLogs?.find((i) => i?.date === item?.date),
 											item,
 											row.original,
 										)
-									}
-									className='rounded-none cursor-pointer d-flex justify-content-center align-items-center'>
+									}>
 									{item?.day}
 								</div>
 							);
@@ -494,6 +380,7 @@ const DailyWorkTrackingMe = () => {
 												<Dropdown.Menu>
 													{selectDate.map((ele) => (
 														<Dropdown.Item
+															key={ele.label}
 															onClick={() => handleChangeDate(ele)}>
 															{ele.label}
 														</Dropdown.Item>
@@ -513,12 +400,7 @@ const DailyWorkTrackingMe = () => {
 												</Styles>
 											</TableContainer>
 										</TableContainerOuter>
-										<CardFooter
-											tag='div'
-											className=''
-											size='lg'
-											borderSize={1}
-											borderColor='primary'>
+										<CardFooter tag='div' className='' size='lg'>
 											<CardFooterRight tag='div' className='fw-bold fs-5'>
 												Tổng điểm KPI:
 												<span className='text-primary ms-2'>
@@ -526,7 +408,7 @@ const DailyWorkTrackingMe = () => {
 												</span>
 											</CardFooterRight>
 											<CardFooterRight tag='div' className='fw-bold fs-5'>
-												Tổng điểm KPI hiện tại:
+												Tổng điểm KPI hoàn thành:
 												<span className='text-primary ms-2'>
 													{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
 												</span>

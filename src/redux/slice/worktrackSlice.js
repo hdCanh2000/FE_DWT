@@ -2,14 +2,18 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import moment from 'moment';
 import { get } from 'lodash';
 import {
-	addWorktrack,
 	getAllWorktrack,
 	getAllWorktrackByUserId,
 	getAllWorktrackMe,
-	updateWorktrack,
 } from '../../pages/dailyWorkTracking/services';
 import { getAllWorktrackByStatus } from '../../pages/pendingWorktrack/services';
-import { LIST_STATUS_PENDING } from '../../utils/constants';
+import { LIST_STATUS, LIST_STATUS_PENDING } from '../../utils/constants';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIOfWorkTrack,
+	createDataTreeTable,
+} from '../../utils/function';
 
 const initialState = {
 	worktracks: [],
@@ -23,24 +27,38 @@ const initialState = {
 export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', async (params) => {
 	const response = await getAllWorktrack(params);
 	return response.data.data?.role === 'manager' || response.data.data?.role === 'user'
-		? response.data.data.workTracks.map((item) => {
-				return {
-					...item,
-					label: item.name,
-					value: item.id,
-					text: item.name,
-					parentId: item.parent_id,
-				};
-		  })
-		: response.data.data.map((item) => {
-				return {
-					...item,
-					label: item.name,
-					value: item.id,
-					text: item.name,
-					parentId: item.parent_id,
-				};
-		  });
+		? createDataTreeTable(
+				response.data.data.workTracks.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						parentId: item.parent_id,
+						user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
+						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+						totalKPI: calcTotalKPIOfWorkTrack(item),
+						totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+						currentKPI: calcCurrentKPIOfWorkTrack(item),
+					};
+				}),
+		  )
+		: createDataTreeTable(
+				response.data.data.map((item) => {
+					return {
+						...item,
+						label: item.name,
+						value: item.id,
+						text: item.name,
+						parentId: item.parent_id,
+						user: item?.users?.find((u) => u?.workTrackUsers?.isResponsible === true),
+						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+						totalKPI: calcTotalKPIOfWorkTrack(item),
+						totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+						currentKPI: calcCurrentKPIOfWorkTrack(item),
+					};
+				}),
+		  );
 });
 
 export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', async () => {
@@ -70,7 +88,6 @@ export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', asyn
 		  });
 });
 
-// Đầu tiên, tạo thunk
 export const fetchWorktrackListByStatus = createAsyncThunk(
 	'worktrack/fetchListByStatus',
 	async (status) => {
@@ -99,16 +116,6 @@ export const fetchWorktrackList = createAsyncThunk('worktrack/fetchList', async 
 export const fetchWorktrackListMe = createAsyncThunk('worktrack/fetchListMe', async (params) => {
 	const response = await getAllWorktrackMe(params);
 	return response.data.data;
-});
-
-export const onAddWorktrack = createAsyncThunk('worktrack/addNew', async (data) => {
-	const response = await addWorktrack(data);
-	return response.data;
-});
-
-export const onUpdateWorktrack = createAsyncThunk('worktrack/update', async (data) => {
-	const response = await updateWorktrack(data);
-	return response.data;
 });
 
 // eslint-disable-next-line import/prefer-default-export
@@ -174,37 +181,6 @@ export const worktrackSlice = createSlice({
 			state.worktrack = { ...action.payload };
 		},
 		[fetchWorktrackListMe.rejected]: (state, action) => {
-			state.loading = false;
-			state.error = action.error;
-		},
-		// add new
-		[onAddWorktrack.pending]: (state) => {
-			state.loading = true;
-		},
-		[onAddWorktrack.fulfilled]: (state, action) => {
-			state.loading = false;
-			state.worktracks = [...state.worktracks, ...action.payload];
-		},
-		[onAddWorktrack.rejected]: (state, action) => {
-			state.loading = false;
-			state.error = action.error;
-		},
-		// update
-		[onUpdateWorktrack.pending]: (state) => {
-			state.loading = true;
-		},
-		[onUpdateWorktrack.fulfilled]: (state, action) => {
-			const {
-				arg: { id },
-			} = action.meta;
-			state.loading = false;
-			if (id) {
-				state.worktracks = state.worktracks.map((item) =>
-					item.id === id ? Object.assign(item, action.payload) : item,
-				);
-			}
-		},
-		[onUpdateWorktrack.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
