@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { addkey, getAllKey, updateKey } from '../../pages/keys/services';
+import { getAllResource, addResource, updateResouce } from '../../api/fetchApi';
 
 const initialState = {
 	keys: [],
@@ -10,18 +10,17 @@ const initialState = {
 	pagination: {},
 };
 
-// Đầu tiên, tạo thunk
 export const fetchKeyList = createAsyncThunk('key/fetchList', async (params) => {
-	const response = await getAllKey(params);
+	const response = await getAllResource('/api/keys', params);
 	return response.data;
 });
 export const onAddKey = createAsyncThunk('key/addNew', async (data) => {
-	const response = await addkey(data);
+	const response = await addResource('/api/keys', data);
 	return response.data;
 });
 
 export const onUpdateKey = createAsyncThunk('key/update', async (data) => {
-	const response = await updateKey(data);
+	const response = await updateResouce('/api/keys', data);
 	return response.data;
 });
 

@@ -26,7 +26,7 @@ const MANAGEMENT = {
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
 const POSITION_LEVEL_CONFIG = {
-	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
+	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/PositionLevelConfig')),
 };
 
 const AUTH = {
@@ -37,10 +37,10 @@ const PROFILE = {
 	PROFILE: lazy(() => import('../pages/information/Information')),
 };
 const UNIT = {
-	UNIT: lazy(() => import('../pages/unit/unitPage')),
+	UNIT: lazy(() => import('../pages/unit/UnitPage')),
 };
 const KEY = {
-	KEY: lazy(() => import('../pages/keys/keys')),
+	KEY: lazy(() => import('../pages/keys/Keys')),
 };
 
 const KPINORM = {
