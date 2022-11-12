@@ -12,6 +12,7 @@ import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import Loading from '../../components/Loading/Loading';
+// import { calcCurrentKPIOfWorkTrack, calcTotalKPIOfWorkTrack } from '../../utils/function';
 
 const roles = [
 	{
@@ -192,10 +193,10 @@ const TaskByUser = () => {
 													<th className='text-center'>
 														Số nhiệm vụ đang có
 													</th>
-													<th className='text-center'>Tổng điểm KPI</th>
+													{/* <th className='text-center'>Tổng điểm KPI</th>
 													<th className='text-center'>
 														Điểm KPI hiện tại
-													</th>
+													</th> */}
 												</tr>
 											</thead>
 											<tbody>
@@ -219,12 +220,34 @@ const TaskByUser = () => {
 																	);
 																})?.length || 0}
 															</td>
-															<td className='text-center'>
-																{item?.position?.name}
+															{/* <td className='text-center'>
+																{calcTotalKPIOfWorkTrack(
+																	item.workTracks.map((wt) => ({
+																		totalKPI:
+																			calcTotalKPIOfWorkTrack(
+																				wt,
+																			),
+																		currentKPI:
+																			calcCurrentKPIOfWorkTrack(
+																				wt,
+																			),
+																	})),
+																) || 0}
 															</td>
 															<td className='text-center'>
-																{item?.position?.name}
-															</td>
+																{calcCurrentKPIOfWorkTrack(
+																	item.workTracks.map((wt) => ({
+																		totalKPI:
+																			calcTotalKPIOfWorkTrack(
+																				wt,
+																			),
+																		currentKPI:
+																			calcCurrentKPIOfWorkTrack(
+																				wt,
+																			),
+																	})),
+																) || 0}
+															</td> */}
 														</tr>
 													</React.Fragment>
 												))}
