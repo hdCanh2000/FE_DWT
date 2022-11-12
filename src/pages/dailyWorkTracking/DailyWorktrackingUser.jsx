@@ -1,12 +1,11 @@
-/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/prop-types */
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import _, { isEmpty } from 'lodash';
+import _ from 'lodash';
 import { toast } from 'react-toastify';
-import { useTable, useExpanded } from 'react-table';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
@@ -22,11 +21,9 @@ import Card, {
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
-import './style.css';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
-import Button from '../../components/bootstrap/Button';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog } from './services';
@@ -36,25 +33,13 @@ import {
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
 	calcTotalKPIWorkTrackByUser,
+	columns,
+	createDataTreeTable,
+	renderColor,
 } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
 import { getQueryDate } from '../../utils/utils';
-
-const createDataTreeTable = (dataset) => {
-	const hashTable = Object.create(null);
-	dataset.forEach((aData) => {
-		hashTable[aData.id] = { ...aData, subRows: [] };
-	});
-	const dataTree = [];
-	dataset.forEach((aData) => {
-		if (aData.parentId) {
-			hashTable[aData.parentId]?.subRows.push(hashTable[aData.id]);
-		} else {
-			dataTree.push(hashTable[aData.id]);
-		}
-	});
-	return dataTree;
-};
+import Table from './Table';
 
 const Styles = styled.div`
 	table {
@@ -105,99 +90,6 @@ const TableContainer = styled.div`
 	min-width: 900px;
 `;
 
-const columns = () => {
-	const date = new Date();
-	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-	const result = [];
-	for (let i = 1; i <= days; i += 1) {
-		result.push({
-			day: i,
-			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
-		});
-	}
-	return result;
-};
-
-const renderColor = (status) => {
-	switch (status) {
-		case 'inProgress':
-			return '#ffc000';
-		case 'completed':
-			return '#c5e0b3';
-		case 'expired':
-			return '#f97875';
-		default:
-			return 'transparent';
-	}
-};
-
-const Table = ({ columns: userColumns, data }) => {
-	const {
-		getTableProps,
-		getTableBodyProps,
-		headerGroups,
-		rows,
-		prepareRow,
-		// eslint-disable-next-line no-unused-vars
-		state: { expanded },
-	} = useTable(
-		{
-			columns: userColumns,
-			data,
-			initialState: { expanded: { 0: true } },
-		},
-		useExpanded,
-	);
-
-	return (
-		<>
-			<table {...getTableProps()}>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th
-									{...column.getHeaderProps({
-										style: { minWidth: column.minWidth, width: column.width },
-									})}>
-									{column.render('Header')}
-								</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
-					{rows.map((row) => {
-						prepareRow(row);
-						return (
-							<tr {...row.getRowProps()}>
-								{row.cells.map((cell) => {
-									return (
-										<td
-											{...cell.getCellProps({
-												style: {
-													minWidth: cell.column.minWidth,
-													width: cell.column.width,
-												},
-											})}>
-											{cell.render('Cell')}
-										</td>
-									);
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			{/* <br />
-			<div>Showing the first 1 results of {rows.length} rows</div>
-			<pre>
-				<code>{JSON.stringify({ expanded }, null, 2)}</code>
-			</pre> */}
-		</>
-	);
-};
-
 const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
@@ -228,7 +120,7 @@ const DailyWorkTracking = () => {
 	}, [dispatch, id]);
 
 	useEffect(() => {
-		if (!isEmpty(worktrack)) {
+		if (!_.isEmpty(worktrack)) {
 			const treeData = createDataTreeTable(
 				worktrack.workTracks
 					?.filter((item) => {
@@ -246,6 +138,8 @@ const DailyWorkTracking = () => {
 					}),
 			);
 			setTreeValue(treeData);
+		} else {
+			setTreeValue([]);
 		}
 	}, [worktrack]);
 
@@ -445,16 +339,6 @@ const DailyWorkTracking = () => {
 										</CardTitle>
 									</CardLabel>
 									<CardActions style={{ display: 'inline-flex' }}>
-										<Button
-											color='info'
-											icon='ChangeCircle'
-											tag='button'
-											type='button'
-											isOutline={false}
-											isLight
-											onClick={() => dispatch(fetchWorktrackList(id))}>
-											Tải lại
-										</Button>
 										<Dropdown>
 											<Dropdown.Toggle variant='primary' id='dropdown-basic'>
 												{labelDropdow}
@@ -491,7 +375,7 @@ const DailyWorkTracking = () => {
 											</span>
 										</CardFooterRight>
 										<CardFooterRight tag='div' className='fw-bold fs-5'>
-											Tổng điểm KPI hiện tại:
+											Tổng điểm KPI hoàn thành:
 											<span className='text-primary ms-2'>
 												{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
 											</span>
