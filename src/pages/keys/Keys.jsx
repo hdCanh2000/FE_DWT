@@ -124,9 +124,8 @@ const Keys = () => {
 							handleOpenForm({
 								...item,
 								position: {
-									...item?.position,
 									label: item?.position?.name,
-									value: item?.position?.value,
+									value: item?.position?.id,
 								},
 							})
 						}
