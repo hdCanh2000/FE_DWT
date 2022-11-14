@@ -25,7 +25,6 @@ import { addEmployee, exportExcel, updateEmployee } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
-// import CommonForm from '../common/ComponentCommon/CommonForm';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import EmployeeForm from './EmployeeForm';

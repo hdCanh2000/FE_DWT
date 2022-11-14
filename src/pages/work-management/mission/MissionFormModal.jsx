@@ -12,8 +12,8 @@ import Input from '../../../components/bootstrap/forms/Input';
 import Textarea from '../../../components/bootstrap/forms/Textarea';
 import { fetchDepartmentList } from '../../../redux/slice/departmentSlice';
 import { fetchUnitList } from '../../../redux/slice/unitSlice';
-import { addNewMission, updateMissionById } from './services';
 import { fetchMissionList } from '../../../redux/slice/missionSlice';
+import { addResource, updateResouce } from '../../../api/fetchApi';
 
 const ErrorText = styled.span`
 	font-size: 14px;
@@ -135,7 +135,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 		data.unit_id = unitOption.id || null;
 		if (data.id) {
 			try {
-				const response = await updateMissionById(data);
+				const response = await updateResouce('/api/missions', data);
 				await response.data;
 				toast.success('Cập nhật mục tiêu thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -151,7 +151,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 			}
 		} else {
 			try {
-				const response = await addNewMission(data);
+				const response = await addResource('/api/missions', data);
 				await response.data;
 				toast.success('Thêm mục tiêu thành công!', {
 					position: toast.POSITION.TOP_RIGHT,

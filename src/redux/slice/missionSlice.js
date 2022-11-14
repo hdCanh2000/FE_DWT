@@ -1,10 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getReportMisson } from '../../pages/dashboard/services';
-import {
-	getAllMission,
-	getMissionById,
-	updateMissionById,
-} from '../../pages/work-management/mission/services';
+import { getAllResource, getResourceById, updateResouce } from '../../api/fetchApi';
 
 const initialState = {
 	missions: [],
@@ -17,22 +12,17 @@ const initialState = {
 };
 
 export const fetchMissionList = createAsyncThunk('mission/fetchList', async (params) => {
-	const response = await getAllMission(params);
+	const response = await getAllResource('/api/missions', params);
 	return response.data;
 });
 
 export const fetchMissionById = createAsyncThunk('mission/fetchId', async (id) => {
-	const response = await getMissionById(id);
-	return response.data;
-});
-
-export const fetchMissionReport = createAsyncThunk('mission/fetchReport', async () => {
-	const response = await getReportMisson();
+	const response = await getResourceById('/api/missions', id);
 	return response.data;
 });
 
 export const AddMissionList = createAsyncThunk('mission/AddList', async (data) => {
-	const response = await updateMissionById(data);
+	const response = await updateResouce('/api/missions', data);
 	return response.data;
 });
 
@@ -74,18 +64,6 @@ export const missionSlice = createSlice({
 			state.mission = { ...action.payload };
 		},
 		[fetchMissionById.rejected]: (state, action) => {
-			state.loading = false;
-			state.error = action.error;
-		},
-		// fetch report
-		[fetchMissionReport.pending]: (state) => {
-			state.loading = true;
-		},
-		[fetchMissionReport.fulfilled]: (state, action) => {
-			state.loading = false;
-			state.missionReport = { ...action.payload };
-		},
-		[fetchMissionReport.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},

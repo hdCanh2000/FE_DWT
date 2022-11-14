@@ -23,8 +23,8 @@ import { fetchMissionList, changeCurrentPage } from '../../../redux/slice/missio
 import { toggleFormSlice } from '../../../redux/common/toggleFormSlice';
 import NotPermission from '../../presentation/auth/NotPermission';
 import AlertConfirm from '../../common/ComponentCommon/AlertConfirm';
-import { deleteMissionById } from './services';
 import Loading from '../../../components/Loading/Loading';
+import { deleteResouce } from '../../../api/fetchApi';
 
 const MissionPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -62,7 +62,7 @@ const MissionPage = () => {
 
 	const handleDelete = async (data) => {
 		try {
-			await deleteMissionById(data?.id);
+			await deleteResouce('/api/missions', data?.id);
 			toast.success('Xoá mục tiêu thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
