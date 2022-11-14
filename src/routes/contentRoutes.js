@@ -37,7 +37,7 @@ const PROFILE = {
 	PROFILE: lazy(() => import('../pages/information/Information')),
 };
 const UNIT = {
-	UNIT: lazy(() => import('../pages/unit/UnitPage')),
+	UNIT: lazy(() => import('../pages/unit/unitPage')),
 };
 const KEY = {
 	KEY: lazy(() => import('../pages/keys/Keys')),
