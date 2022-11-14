@@ -367,7 +367,7 @@ const DailyWorkTrackingMe = () => {
 									<CardHeader>
 										<CardLabel icon='FormatListBulleted' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách nhiệm vụ</CardLabel>
+												<CardLabel>Nhiệm vụ của tôi</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										<CardActions style={{ display: 'inline-flex' }}>

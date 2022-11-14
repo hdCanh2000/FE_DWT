@@ -47,11 +47,9 @@ L10n.load({
 const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
 	const [open, setOpen] = useState(false);
-
 	const handleClose = () => {
 		setOpen(false);
 	};
-
 	const handleOpen = () => {
 		setOpen(true);
 	};
@@ -61,7 +59,6 @@ const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 		})[0],
 		'name',
 	);
-
 	const handlDeleteItem = async (ele) => {
 		try {
 			await deleteWorkTrack(ele.id);
@@ -147,12 +144,8 @@ const OrderTask = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = useState([]);
-
 	useEffect(() => {
 		dispatch(fetchAssignTask());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
 	const createDataTree = useCallback((dataset) => {

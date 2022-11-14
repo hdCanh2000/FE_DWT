@@ -233,7 +233,7 @@ const Keys = () => {
 				{verifyPermissionHOC(
 					<>
 						<div className='row mb-0'>
-							<div className='col-8' style={{ margin: '0 auto', height: '90vh' }}>
+							<div className='col-9' style={{ margin: '0 auto', height: '90vh' }}>
 								<Card className='w-100'>
 									<CardHeader>
 										<CardLabel icon='VpnKey' iconColor='primary'>

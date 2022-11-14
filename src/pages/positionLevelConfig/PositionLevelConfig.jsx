@@ -202,7 +202,7 @@ const PositionLevelConfigPage = () => {
 							<>
 								<div
 									className='row mb-0'
-									style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+									style={{ maxWidth: '70%', minWidth: '70%', margin: '0 auto' }}>
 									<div className='col-12'>
 										<Card className='w-100'>
 											<div style={{ margin: '24px 24px 0' }}>
