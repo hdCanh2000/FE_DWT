@@ -48,4 +48,20 @@ const deleteResouce = (url, id) => {
 	});
 };
 
-export { fetchAPI, getAllResource, getResourceById, addResource, updateResouce, deleteResouce };
+const exportExcel = (url, responseType = 'blob') => {
+	return axiosClient({
+		method: 'GET',
+		url,
+		responseType,
+	});
+};
+
+export {
+	fetchAPI,
+	getAllResource,
+	getResourceById,
+	addResource,
+	updateResouce,
+	deleteResouce,
+	exportExcel,
+};

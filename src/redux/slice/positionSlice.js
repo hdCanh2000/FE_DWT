@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getPositionById, getAllPosition } from '../../pages/position/services';
+import { getAllResource, getResourceById } from '../../api/fetchApi';
 
 const initialState = {
 	positions: [],
@@ -11,12 +11,12 @@ const initialState = {
 };
 
 export const fetchPositionList = createAsyncThunk('position/fetchList', async (params) => {
-	const response = await getAllPosition(params);
+	const response = await getAllResource('/api/positions', params);
 	return response.data;
 });
 
 export const fetchPositionById = createAsyncThunk('position/fetchId', async (id) => {
-	const response = await getPositionById(id);
+	const response = await getResourceById('/api/positions', id);
 	return response.data;
 });
 

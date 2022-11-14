@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllUnits } from '../../pages/unit/services';
+import { getAllResource } from '../../api/fetchApi';
 
 const initialState = {
 	units: [],
@@ -9,8 +9,13 @@ const initialState = {
 	error: false,
 };
 
+// export const fetchUnitList = createAsyncThunk('unit/fetchList', async (params) => {
+// 	const response = await fetchAPI('GET', '/api/units', null, params);
+// 	return response.data;
+// });
+
 export const fetchUnitList = createAsyncThunk('unit/fetchList', async (params) => {
-	const response = await getAllUnits(params);
+	const response = await getAllResource('/api/units', params);
 	return response.data;
 });
 

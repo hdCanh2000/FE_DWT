@@ -21,10 +21,10 @@ import { fetchUnitList } from '../../redux/slice/unitSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { changeCurrentPage, fetchKeyList } from '../../redux/slice/keySlice';
-import { addkey, deleteKey, updateKey } from './services';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import validate from './validate';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
+import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
 const Keys = () => {
 	const [searchParams] = useSearchParams();
@@ -177,7 +177,7 @@ const Keys = () => {
 		};
 		if (isEmpty(itemEdit)) {
 			try {
-				await addkey(newValue);
+				await addResource('/api/keys', newValue);
 				toast.success('Thêm chỉ số key thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
@@ -192,15 +192,15 @@ const Keys = () => {
 			}
 		} else {
 			try {
-				await updateKey(newValue);
-				toast.success('Thay đổi chỉ số key thành công!', {
+				await updateResouce('/api/keys', newValue);
+				toast.success('Cập nhật chỉ số key thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
 				fetch();
 				handleCloseForm();
 			} catch (error) {
-				toast.error('Thay đổi chỉ số key không thành công!', {
+				toast.error('Cập nhật chỉ số key không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
@@ -210,7 +210,7 @@ const Keys = () => {
 
 	const handleDelete = async (data) => {
 		try {
-			await deleteKey(data?.id);
+			await deleteResouce('/api/keys', data?.id);
 			toast.success('Xóa chỉ số key thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
@@ -285,7 +285,7 @@ const Keys = () => {
 							onCloseModal={handleCloseForm}
 							onConfirm={() => handleDelete(itemEdit)}
 							title='Xoá chỉ số key'
-							content={`Xác nhận xoá chỉ số key <strong>${itemEdit?.name}</strong> ?`}
+							content='Xác nhận xoá chỉ số key?'
 						/>
 					</>,
 					['admin'],

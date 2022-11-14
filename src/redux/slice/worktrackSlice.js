@@ -130,7 +130,7 @@ export const worktrackSlice = createSlice({
 		},
 		[fetchWorktrackListAll.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktracks = [...action.payload];
+			state.worktracks = action.payload ? [...action.payload] : [];
 		},
 		[fetchWorktrackListAll.rejected]: (state, action) => {
 			state.loading = false;
@@ -142,7 +142,7 @@ export const worktrackSlice = createSlice({
 		},
 		[fetchAssignTask.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.tasks = [...action.payload];
+			state.tasks = action.payload ? [...action.payload] : [];
 		},
 		[fetchAssignTask.rejected]: (state, action) => {
 			state.loading = false;
@@ -154,7 +154,7 @@ export const worktrackSlice = createSlice({
 		},
 		[fetchWorktrackListByStatus.fulfilled]: (state, action) => {
 			state.loading = false;
-			state.worktracksByStatus = [...action.payload];
+			state.worktracksByStatus = action.payload ? [...action.payload] : [];
 		},
 		[fetchWorktrackListByStatus.rejected]: (state, action) => {
 			state.loading = false;
