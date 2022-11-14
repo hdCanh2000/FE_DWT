@@ -36,7 +36,7 @@ const DepartmentPage = () => {
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const [toggle, setToggle] = useState(true);
-	const [dataDepartment, setDepartmentId] = useState(true);
+	const [dataDepartment, setDataDepartment] = useState({});
 	const [valueSearch, setValueSearch] = useState('');
 	const [department, setDepartment] = React.useState([]);
 	const [treeValue, setTreeValue] = React.useState(
@@ -226,7 +226,7 @@ const DepartmentPage = () => {
 					minWidth: 360,
 					fontSize: 14,
 				}}
-				onClick={() => setDepartmentId(row.data)}
+				onClick={() => setDataDepartment(row.data)}
 				onDoubleClick={() =>
 					handleOpenForm({
 						...row.data,

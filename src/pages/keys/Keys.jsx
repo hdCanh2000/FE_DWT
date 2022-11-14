@@ -120,7 +120,15 @@ const Keys = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={() =>
+							handleOpenForm({
+								...item,
+								position: {
+									label: item?.position?.name,
+									value: item?.position?.id,
+								},
+							})
+						}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -219,7 +227,6 @@ const Keys = () => {
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
-
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.keys.text}>
 			<Page container='fluid'>

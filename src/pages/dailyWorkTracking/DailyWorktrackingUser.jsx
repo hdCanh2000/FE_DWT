@@ -90,7 +90,7 @@ const TableContainer = styled.div`
 	min-width: 900px;
 `;
 
-const DailyWorkTracking = () => {
+const DailyWorkTrackingUser = () => {
 	const dispatch = useDispatch();
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
 	const loading = useSelector((state) => state.worktrack.loading);
@@ -185,7 +185,6 @@ const DailyWorkTracking = () => {
 				throw err;
 			});
 	};
-
 	const selectDate = [
 		{
 			label: 'Tháng này',
@@ -402,4 +401,4 @@ const DailyWorkTracking = () => {
 		</PageWrapper>
 	);
 };
-export default DailyWorkTracking;
+export default DailyWorkTrackingUser;
