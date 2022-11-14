@@ -44,7 +44,7 @@ const KEY = {
 };
 
 const KPINORM = {
-	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
+	KPINORM: lazy(() => import('../pages/kpiNorm/KpiNorm')),
 };
 
 const MISSION = {
