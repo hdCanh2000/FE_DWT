@@ -97,7 +97,7 @@ const renderColor = (status) => {
 	}
 };
 
-const DailyWorkTracking = () => {
+const DailyWorkTrackingUser = () => {
 	const dispatch = useDispatch();
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
 	const loading = useSelector((state) => state.worktrack.loading);
@@ -125,6 +125,19 @@ const DailyWorkTracking = () => {
 		operator: 'contains',
 	};
 
+	const handleDate = (month) => {
+		if (month === '/') {
+			return '/';
+		}
+		const date = new Date();
+		const y = date.getFullYear();
+		const m = date.getMonth();
+		const start = new Date(y, m - month, 1);
+		const end = new Date(y, m + 1 - month, 0);
+		const startDate = moment(start).format('YYYY-MM-DD');
+		const endDate = moment(end).format('YYYY-MM-DD');
+		return `?startDate=${startDate}&endDate=${endDate}`;
+	};
 	useEffect(() => {
 		dispatch(fetchWorktrackList(`${id}${handleDate(0)}`));
 	}, [dispatch, id]);
@@ -248,19 +261,6 @@ const DailyWorkTracking = () => {
 				});
 				throw err;
 			});
-	};
-	const handleDate = (month) => {
-		if (month === '/') {
-			return '/';
-		}
-		const date = new Date();
-		const y = date.getFullYear();
-		const m = date.getMonth();
-		const start = new Date(y, m - month, 1);
-		const end = new Date(y, m + 1 - month, 0);
-		const startDate = moment(start).format('YYYY-MM-DD');
-		const endDate = moment(end).format('YYYY-MM-DD');
-		return `?startDate=${startDate}&endDate=${endDate}`;
 	};
 	const selectDate = [
 		{
@@ -431,4 +431,4 @@ const DailyWorkTracking = () => {
 		</PageWrapper>
 	);
 };
-export default DailyWorkTracking;
+export default DailyWorkTrackingUser;
