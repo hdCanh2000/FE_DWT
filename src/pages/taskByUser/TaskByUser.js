@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import Select from 'react-select';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
@@ -11,6 +12,7 @@ import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import Loading from '../../components/Loading/Loading';
+// import { calcCurrentKPIOfWorkTrack, calcTotalKPIOfWorkTrack } from '../../utils/function';
 
 const roles = [
 	{
@@ -191,10 +193,10 @@ const TaskByUser = () => {
 													<th className='text-center'>
 														Số nhiệm vụ đang có
 													</th>
-													<th className='text-center'>Tổng điểm KPI</th>
+													{/* <th className='text-center'>Tổng điểm KPI</th>
 													<th className='text-center'>
 														Điểm KPI hiện tại
-													</th>
+													</th> */}
 												</tr>
 											</thead>
 											<tbody>
@@ -202,11 +204,11 @@ const TaskByUser = () => {
 													<React.Fragment key={item.id}>
 														<tr>
 															<td>
-																<a
+																<Link
 																	className='text-underline'
-																	href={`/cong-viec-cua-nhan-vien/${item.id}`}>
+																	to={`/cong-viec-cua-nhan-vien/${item.id}`}>
 																	{item.name}
-																</a>
+																</Link>
 															</td>
 															<td>{item?.department?.name}</td>
 															<td>{item?.position?.name}</td>
@@ -218,12 +220,34 @@ const TaskByUser = () => {
 																	);
 																})?.length || 0}
 															</td>
-															<td className='text-center'>
-																{item?.position?.name}
+															{/* <td className='text-center'>
+																{calcTotalKPIOfWorkTrack(
+																	item.workTracks.map((wt) => ({
+																		totalKPI:
+																			calcTotalKPIOfWorkTrack(
+																				wt,
+																			),
+																		currentKPI:
+																			calcCurrentKPIOfWorkTrack(
+																				wt,
+																			),
+																	})),
+																) || 0}
 															</td>
 															<td className='text-center'>
-																{item?.position?.name}
-															</td>
+																{calcCurrentKPIOfWorkTrack(
+																	item.workTracks.map((wt) => ({
+																		totalKPI:
+																			calcTotalKPIOfWorkTrack(
+																				wt,
+																			),
+																		currentKPI:
+																			calcCurrentKPIOfWorkTrack(
+																				wt,
+																			),
+																	})),
+																) || 0}
+															</td> */}
 														</tr>
 													</React.Fragment>
 												))}

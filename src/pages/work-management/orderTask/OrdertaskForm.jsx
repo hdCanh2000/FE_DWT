@@ -203,10 +203,18 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											</b>
 										</td>
 										<td className='p-3 border text-center'>
-											<b>{get(item, 'kpi_value', '--')}</b>
+											<b>
+												{item.id
+													? get(item, 'kpiNorm.kpi_value')
+													: get(item, 'kpi_value')}
+											</b>
 										</td>
 										<td className='p-3 border text-center'>
-											<b>{get(item, 'quantity', '--')}</b>
+											<b>
+												{item.id
+													? get(item, 'kpiNorm.quantity')
+													: get(item, 'quantity')}
+											</b>
 										</td>
 									</tr>
 								</tbody>
