@@ -46,6 +46,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		deadline: '',
 		priority: 2,
 		note: '',
+		name: '',
 	});
 	useEffect(() => {
 		dispatch(fetchKeyList());
@@ -119,6 +120,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					deadline: mission.deadline || null,
 					startDate: mission.startDate || null,
 					status: role.includes('user') ? 'pending' : 'accepted',
+					name: mission.name || null,
 				};
 				updateWorktrack(dataValue)
 					.then(() => {
@@ -151,6 +153,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					deadline: mission.deadline || null,
 					startDate: mission.startDate || null,
 					status: role.includes('user') ? 'pending' : 'accepted',
+					name: mission.name || null,
 				};
 				addWorktrack(dataValue)
 					.then(() => {
@@ -188,7 +191,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 							<table className='w-100 mb-4 border'>
 								<thead>
 									<tr>
-										<th className='p-3 border text-left'>Tên nhiệm vụ</th>
+										<th className='p-3 border text-left'>Nhiệm vụ</th>
 										<th className='p-3 border text-center'>Định mức KPI</th>
 										<th className='p-3 border text-center'>Số lượng</th>
 									</tr>
@@ -221,6 +224,19 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 							</table>
 							{/* Thuộc mục tiêu */}
 							<div className='row g-2'>
+							<div className='col-12'>
+									<FormGroup id='name' label='Tên nhiệm vụ'>
+										<Input
+											name='name'
+											placeholder='Tên nhiệm vụ'
+											onChange={handleChange}
+											value={mission.name}
+											type='text'
+											ariaLabel='Tên nhiệm vụ'
+											className='border border-2 rounded-0 shadow-none'
+										/>
+									</FormGroup>
+								</div>
 								<div className='col-4'>
 									<FormGroup id='task' label='Thuộc mục tiêu'>
 										<SelectComponent
