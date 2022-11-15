@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import SelectComponent from 'react-select';
 import { Modal } from 'react-bootstrap';
 import { get, isEmpty } from 'lodash';
+import moment from 'moment';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Select from '../../../components/bootstrap/forms/Select';
@@ -42,7 +43,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const [checkValidate, setCheckValidate] = useState(false);
 	const [mission, setMission] = React.useState({
 		quantity: '',
-		startDate: '',
+		startDate: moment().add(0, 'days').format('YYYY-MM-DD'),
 		deadline: '',
 		priority: 2,
 		note: '',
@@ -273,7 +274,13 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											name='startDate'
 											placeholder='Ngày bắt đầu'
 											onChange={handleChange}
-											value={mission.startDate}
+											defaultValue={moment()
+												.add(0, 'days')
+												.format('YYYY-MM-DD')}
+											value={
+												mission.startDate ||
+												moment().add(0, 'days').format('YYYY-MM-DD')
+											}
 											type='date'
 											ariaLabel='Ngày bắt đầu'
 											className='border border-2 rounded-0 shadow-none'

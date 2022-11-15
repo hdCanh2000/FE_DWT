@@ -13,8 +13,8 @@ import moment from 'moment/moment';
 import Card, {
 	CardActions,
 	CardBody,
-	CardFooter,
-	CardFooterRight,
+	// CardFooter,
+	// CardFooterRight,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -28,8 +28,8 @@ import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import {
-	calcTotalCurrentKPIAllWorkTrack,
-	calcTotalKPIAllWorkTrack,
+	// calcTotalCurrentKPIAllWorkTrack,
+	// calcTotalKPIAllWorkTrack,
 	columns,
 	renderColor,
 } from '../../utils/function';
@@ -320,7 +320,7 @@ const DailyWorkTracking = () => {
 											</Styles>
 										</TableContainer>
 									</TableContainerOuter>
-									<CardFooter
+									{/* <CardFooter
 										tag='div'
 										className=''
 										size='lg'
@@ -337,7 +337,7 @@ const DailyWorkTracking = () => {
 												{calcTotalCurrentKPIAllWorkTrack(worktrack)}
 											</span>
 										</CardFooterRight>
-									</CardFooter>
+									</CardFooter> */}
 								</CardBody>
 							</Card>
 						</div>

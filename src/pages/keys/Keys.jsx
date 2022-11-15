@@ -83,8 +83,27 @@ const Keys = () => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
+			isShowNested: true,
 			render: (item) => <span>{item?.unit?.name}</span>,
 			options: units,
+			fields: [
+				{
+					title: 'Tên đơn vị',
+					id: 'name',
+					key: 'name',
+					isShow: true,
+					name: 'name',
+					type: 'text',
+				},
+				{
+					title: 'Mã đơn vị',
+					id: 'code',
+					key: 'code',
+					isShow: true,
+					name: 'code',
+					type: 'text',
+				},
+			],
 			col: 3,
 		},
 		{
@@ -227,13 +246,37 @@ const Keys = () => {
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
+
+	const handleSubmitNestedForm = async (itemSubmit, model) => {
+		switch (model) {
+			case 'unit':
+				try {
+					const response = await addResource('/api/units', itemSubmit);
+					await response.data;
+					toast.success('Thêm đơn vị thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+				} catch (error) {
+					toast.error('Thêm đơn vị không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					throw error;
+				}
+				break;
+			default:
+				break;
+		}
+	};
+
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.keys.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
 						<div className='row mb-0'>
-							<div className='col-9' style={{ margin: '0 auto', height: '90vh' }}>
+							<div className='col-12'>
 								<Card className='w-100'>
 									<CardHeader>
 										<CardLabel icon='VpnKey' iconColor='primary'>
@@ -244,7 +287,7 @@ const Keys = () => {
 										<CardActions>
 											<Button
 												color='info'
-												icon='VpnKey'
+												icon='Add'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
 												Thêm mới
@@ -277,7 +320,8 @@ const Keys = () => {
 							label={itemEdit?.id ? 'Cập nhật key' : 'Tạo key mới'}
 							fields={columns}
 							validate={validate}
-							size='xl'
+							size='lg'
+							onSubmitNestedForm={handleSubmitNestedForm}
 						/>
 						<AlertConfirm
 							openModal={toggleFormDelete}

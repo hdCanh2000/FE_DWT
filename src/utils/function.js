@@ -3,7 +3,10 @@ import { isArray, isEmpty } from 'lodash';
 export const calcTotalKPIOfWorkTrack = (worktrack) => {
 	const { kpiNorm } = worktrack;
 	if (isEmpty(kpiNorm)) return 0;
-	return ((kpiNorm.kpi_value / kpiNorm.quantity) * worktrack.quantity).toFixed(2);
+	return (
+		(kpiNorm.kpi_value / (kpiNorm.quantity ? kpiNorm.quantity : 1)) *
+		worktrack.quantity
+	).toFixed(2);
 };
 
 export const calcTotalFromWorkTrackLogs = (workTrackLogs) => {
@@ -38,7 +41,7 @@ export const calcProgressWokTrack = (worktrack) => {
 const calcTotalKPIOfWorkTrackItem = (worktrack) => {
 	const { kpiNorm } = worktrack;
 	if (isEmpty(kpiNorm)) return 0;
-	return (kpiNorm.kpi_value / kpiNorm.quantity) * worktrack.quantity;
+	return (kpiNorm.kpi_value / (kpiNorm.quantity ? kpiNorm.quantity : 1)) * worktrack.quantity;
 };
 
 const calcCurrentKPIOfWorkTrackItem = (worktrack) => {

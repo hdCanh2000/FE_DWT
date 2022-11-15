@@ -72,7 +72,7 @@ export const demoPages = {
 	},
 	employeeAssignTask: {
 		id: 'employeeAssignTask',
-		text: 'Giao việc',
+		text: 'Lập kế hoạch công việc',
 		path: '/giao-viec',
 		icon: 'CustomBriefCase',
 		roles: ['user'],
