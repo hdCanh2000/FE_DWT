@@ -2,13 +2,16 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/prop-types */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
-import { Dropdown } from 'react-bootstrap';
+import { Toast } from 'react-bootstrap';
+import { addDays } from 'date-fns';
+import moment from 'moment/moment';
+import { DateRangePicker } from 'react-date-range';
 import Card, {
 	CardActions,
 	CardBody,
@@ -40,6 +43,7 @@ import {
 import Icon from '../../components/icon/Icon';
 import { getQueryDate } from '../../utils/utils';
 import Table from './Table';
+import Button from '../../components/bootstrap/Button';
 
 const Styles = styled.div`
 	table {
@@ -109,7 +113,14 @@ const DailyWorkTrackingUser = () => {
 
 	const params = useParams();
 	const { id } = params;
-
+	const [open, setOpen] = useState(false);
+	const [state, setState] = useState([
+		{
+			startDate: new Date(),
+			endDate: addDays(new Date(), 7),
+			key: 'selection',
+		},
+	]);
 	useEffect(() => {
 		const query = getQueryDate(0);
 		const data = {
@@ -185,31 +196,20 @@ const DailyWorkTrackingUser = () => {
 				throw err;
 			});
 	};
-	const selectDate = [
-		{
-			label: 'Tháng này',
-			value: '0',
-		},
-		{
-			label: 'Tháng trước',
-			value: '1',
-		},
-		{
-			label: 'Tất cả',
-			value: '',
-		},
-	];
 
-	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
-
-	const handleChangeDate = (data) => {
-		setLabelDropdow(data.label);
-		const query = getQueryDate(data.value);
+	const handleChangeDate = () => {
+		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
+		const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
+		const query = {
+			startDate,
+			endDate,
+		};
 		const dataQuery = {
 			id,
 			query,
 		};
 		dispatch(fetchWorktrackList(dataQuery));
+		setOpen(false);
 	};
 
 	const columnTables = [
@@ -338,19 +338,48 @@ const DailyWorkTrackingUser = () => {
 										</CardTitle>
 									</CardLabel>
 									<CardActions style={{ display: 'inline-flex' }}>
-										<Dropdown>
-											<Dropdown.Toggle variant='primary' id='dropdown-basic'>
-												{labelDropdow}
-											</Dropdown.Toggle>
-											<Dropdown.Menu>
-												{selectDate.map((ele) => (
-													<Dropdown.Item
-														onClick={() => handleChangeDate(ele)}>
-														{ele.label}
-													</Dropdown.Item>
-												))}
-											</Dropdown.Menu>
-										</Dropdown>
+										<Toast
+											style={{
+												width: 'auto',
+												right: '10%',
+												position: 'absolute',
+											}}
+											onClose={() => setOpen(false)}
+											show={open}
+											animation={false}>
+											<Toast.Header closeButton={false}>
+												<DateRangePicker
+													onChange={(item) => setState([item.selection])}
+													showSelectionPreview
+													moveRangeOnFirstSelection={false}
+													months={1}
+													ranges={state}
+													direction='horizontal'
+												/>
+											</Toast.Header>
+											<Toast.Body>
+												<div
+													style={{ float: 'right', marginBottom: '5px' }}>
+													<Button
+														onClick={() => setOpen(!open)}
+														color='danger'>
+														Close
+													</Button>
+													<Button
+														style={{ marginLeft: '5px' }}
+														onClick={() => handleChangeDate()}
+														color='info'>
+														Chấp nhận
+													</Button>
+												</div>
+											</Toast.Body>
+										</Toast>
+										<Button
+											icon='DateRange'
+											onClick={() => setOpen(!open)}
+											color='primary'>
+											Lọc theo ngày
+										</Button>
 									</CardActions>
 								</CardHeader>
 								<CardBody>

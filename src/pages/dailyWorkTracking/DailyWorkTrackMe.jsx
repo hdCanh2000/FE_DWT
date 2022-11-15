@@ -2,12 +2,15 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/prop-types */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
-import { Dropdown } from 'react-bootstrap';
+import { Toast } from 'react-bootstrap';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
+import { DateRangePicker } from 'react-date-range';
+import moment from 'moment/moment';
+import { addDays } from 'date-fns';
 import Card, {
 	CardActions,
 	CardBody,
@@ -177,30 +180,20 @@ const DailyWorkTrackingMe = () => {
 				throw err;
 			});
 	};
-
-	const selectDate = [
+	const [open, setOpen] = useState(false);
+	const [state, setState] = useState([
 		{
-			label: 'Tháng này',
-			value: '0',
+			startDate: new Date(),
+			endDate: addDays(new Date(), 7),
+			key: 'selection',
 		},
-		{
-			label: 'Tháng trước',
-			value: '1',
-		},
-		{
-			label: 'Tất cả',
-			value: '',
-		},
-	];
-
-	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
-
-	const handleChangeDate = (data) => {
-		setLabelDropdow(data.label);
-		const query = getQueryDate(data.value);
-		dispatch(fetchWorktrackListMe(query));
+	]);
+	const handleChangeDate = () => {
+		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
+		const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
+		dispatch(fetchWorktrackListMe({ startDate, endDate }));
+		setOpen(false);
 	};
-
 	const handleChangeStatus = (worktrackSubmit) => {
 		const dataSubmit = {
 			id: worktrackSubmit?.id,
@@ -371,22 +364,53 @@ const DailyWorkTrackingMe = () => {
 											</CardTitle>
 										</CardLabel>
 										<CardActions style={{ display: 'inline-flex' }}>
-											<Dropdown>
-												<Dropdown.Toggle
-													variant='primary'
-													id='dropdown-basic'>
-													{labelDropdow}
-												</Dropdown.Toggle>
-												<Dropdown.Menu>
-													{selectDate.map((ele) => (
-														<Dropdown.Item
-															key={ele.label}
-															onClick={() => handleChangeDate(ele)}>
-															{ele.label}
-														</Dropdown.Item>
-													))}
-												</Dropdown.Menu>
-											</Dropdown>
+											<Toast
+												style={{
+													width: 'auto',
+													right: '10%',
+													position: 'absolute',
+												}}
+												onClose={() => setOpen(false)}
+												show={open}
+												animation={false}>
+												<Toast.Header closeButton={false}>
+													<DateRangePicker
+														onChange={(item) =>
+															setState([item.selection])
+														}
+														showSelectionPreview
+														moveRangeOnFirstSelection={false}
+														months={1}
+														ranges={state}
+														direction='horizontal'
+													/>
+												</Toast.Header>
+												<Toast.Body>
+													<div
+														style={{
+															float: 'right',
+															marginBottom: '5px',
+														}}>
+														<Button
+															onClick={() => setOpen(!open)}
+															color='danger'>
+															Close
+														</Button>
+														<Button
+															style={{ marginLeft: '5px' }}
+															onClick={() => handleChangeDate()}
+															color='info'>
+															Chấp nhận
+														</Button>
+													</div>
+												</Toast.Body>
+											</Toast>
+											<Button
+												icon='DateRange'
+												onClick={() => setOpen(!open)}
+												color='primary'>
+												Lọc theo ngày
+											</Button>
 										</CardActions>
 									</CardHeader>
 									<CardBody>

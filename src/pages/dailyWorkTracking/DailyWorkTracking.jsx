@@ -2,11 +2,14 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import { Dropdown } from 'react-bootstrap';
+import { Toast } from 'react-bootstrap';
+import { addDays } from 'date-fns';
+import { DateRangePicker } from 'react-date-range';
+import moment from 'moment/moment';
 import Card, {
 	CardActions,
 	CardBody,
@@ -33,6 +36,7 @@ import {
 import Icon from '../../components/icon/Icon';
 import Table from './Table';
 import { getQueryDate } from '../../utils/utils';
+import Button from '../../components/bootstrap/Button';
 
 const Styles = styled.div`
 	table {
@@ -103,7 +107,14 @@ const DailyWorkTracking = () => {
 		const { startDate, endDate } = getQueryDate(0);
 		dispatch(fetchWorktrackListAll({ startDate, endDate }));
 	}, [dispatch]);
-
+	const [open, setOpen] = useState(false);
+	const [state, setState] = useState([
+		{
+			startDate: new Date(),
+			endDate: addDays(new Date(), 7),
+			key: 'selection',
+		},
+	]);
 	const handleShowForm = (row, item, dataWorktrack) => {
 		setShowForm(true);
 		setDataShow({
@@ -146,30 +157,12 @@ const DailyWorkTracking = () => {
 				throw err;
 			});
 	};
-
-	const selectDate = [
-		{
-			label: 'Tháng này',
-			value: '0',
-		},
-		{
-			label: 'Tháng trước',
-			value: '1',
-		},
-		{
-			label: 'Tất cả',
-			value: '',
-		},
-	];
-
-	const [labelDropdow, setLabelDropdow] = React.useState('Tháng này');
-
-	const handleChangeDate = (data) => {
-		setLabelDropdow(data.label);
-		const { startDate, endDate } = getQueryDate(data.value);
+	const handleChangeDate = () => {
+		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
+		const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
 		dispatch(fetchWorktrackListAll({ startDate, endDate }));
+		setOpen(false);
 	};
-
 	const columnTables = [
 		{
 			id: 'expander',
@@ -259,7 +252,6 @@ const DailyWorkTracking = () => {
 			},
 		},
 	];
-
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -276,20 +268,48 @@ const DailyWorkTracking = () => {
 										</CardTitle>
 									</CardLabel>
 									<CardActions style={{ display: 'inline-flex' }}>
-										<Dropdown>
-											<Dropdown.Toggle variant='primary' id='dropdown-basic'>
-												{labelDropdow}
-											</Dropdown.Toggle>
-											<Dropdown.Menu>
-												{selectDate.map((ele) => (
-													<Dropdown.Item
-														key={ele.label}
-														onClick={() => handleChangeDate(ele)}>
-														{ele.label}
-													</Dropdown.Item>
-												))}
-											</Dropdown.Menu>
-										</Dropdown>
+										<Toast
+											style={{
+												width: 'auto',
+												right: '10%',
+												position: 'absolute',
+											}}
+											onClose={() => setOpen(false)}
+											show={open}
+											animation={false}>
+											<Toast.Header closeButton={false}>
+												<DateRangePicker
+													onChange={(item) => setState([item.selection])}
+													showSelectionPreview
+													moveRangeOnFirstSelection={false}
+													months={1}
+													ranges={state}
+													direction='horizontal'
+												/>
+											</Toast.Header>
+											<Toast.Body>
+												<div
+													style={{ float: 'right', marginBottom: '5px' }}>
+													<Button
+														onClick={() => setOpen(!open)}
+														color='danger'>
+														Close
+													</Button>
+													<Button
+														style={{ marginLeft: '5px' }}
+														onClick={() => handleChangeDate()}
+														color='info'>
+														Chấp nhận
+													</Button>
+												</div>
+											</Toast.Body>
+										</Toast>
+										<Button
+											icon='DateRange'
+											onClick={() => setOpen(!open)}
+											color='primary'>
+											Lọc theo ngày
+										</Button>
 									</CardActions>
 								</CardHeader>
 								<CardBody className='w-100'>
