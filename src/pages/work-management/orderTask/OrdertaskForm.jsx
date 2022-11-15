@@ -105,7 +105,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const handleSubmit = async () => {
 		setCheckValidate(true);
 		fetch();
-		if (!isEmpty(mission.startDate) && !isEmpty(mission.deadline)) {
+		if (!isEmpty(mission.deadline)) {
 			if (item.id) {
 				const dataValue = {
 					parent_id: parentOption?.id || null,
@@ -152,7 +152,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					note: mission.note || null,
 					description: item.description || null,
 					deadline: mission.deadline || null,
-					startDate: mission.startDate || null,
+					startDate: mission.startDate || moment().add(0, 'days').format('YYYY-MM-DD'),
 					status: role.includes('user') ? 'pending' : 'accepted',
 					name: mission.name || null,
 				};
@@ -225,7 +225,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 							</table>
 							{/* Thuộc mục tiêu */}
 							<div className='row g-2'>
-							<div className='col-12'>
+								<div className='col-12'>
 									<FormGroup id='name' label='Tên nhiệm vụ'>
 										<Input
 											name='name'

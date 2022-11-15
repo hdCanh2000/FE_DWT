@@ -251,7 +251,6 @@ const DailyWorkTracking = () => {
 			},
 		},
 	];
-	console.log(worktrack);
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
