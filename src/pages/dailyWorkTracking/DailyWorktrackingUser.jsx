@@ -251,7 +251,7 @@ const DailyWorkTrackingUser = () => {
 									),
 								})
 							}>
-							{row.original.kpiNorm.name}
+							{row.original.name}
 						</span>
 					</div>
 				);
@@ -319,7 +319,6 @@ const DailyWorkTrackingUser = () => {
 			},
 		},
 	];
-
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>

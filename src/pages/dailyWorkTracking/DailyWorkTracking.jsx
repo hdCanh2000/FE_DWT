@@ -123,7 +123,6 @@ const DailyWorkTracking = () => {
 			dataWorktrack,
 		});
 	};
-
 	const handleClose = () => {
 		setShowForm(false);
 		setDataShow({
@@ -186,7 +185,7 @@ const DailyWorkTracking = () => {
 		},
 		{
 			Header: 'Tên nhiệm vụ',
-			accessor: 'kpiNorm.name',
+			accessor: 'name',
 			maxWidth: 400,
 			minWidth: 400,
 		},
@@ -252,6 +251,7 @@ const DailyWorkTracking = () => {
 			},
 		},
 	];
+	console.log(worktrack);
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
