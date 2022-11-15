@@ -121,16 +121,20 @@ const DailyWorkTrackingMe = () => {
 	useEffect(() => {
 		if (!isEmpty(worktrack)) {
 			const treeData = createDataTreeTable(
-				worktrack.workTracks.map((item) => {
-					return {
-						...item,
-						statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
-						parentId: item.parent_id,
-						totalKPI: calcTotalKPIOfWorkTrack(item),
-						totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
-						currentKPI: calcCurrentKPIOfWorkTrack(item),
-					};
-				}),
+				worktrack.workTracks
+					?.filter((item) => {
+						return item?.workTrackUsers?.isResponsible === true;
+					})
+					?.map((item) => {
+						return {
+							...item,
+							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+							parentId: item.parent_id,
+							totalKPI: calcTotalKPIOfWorkTrack(item),
+							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+							currentKPI: calcCurrentKPIOfWorkTrack(item),
+						};
+					}),
 			);
 			setTreeValue(treeData);
 		} else {
