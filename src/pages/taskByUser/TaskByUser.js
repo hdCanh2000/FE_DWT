@@ -95,7 +95,7 @@ const TaskByUser = () => {
 										<CardLabel icon='Task' iconColor='danger'>
 											<CardTitle>
 												<CardLabel>
-													Danh sách công việc của nhân viên
+													Danh sách công việc theo nhân viên
 												</CardLabel>
 											</CardTitle>
 										</CardLabel>
