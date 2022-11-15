@@ -143,15 +143,10 @@ const OrderTask = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = useState([]);
-
 	useEffect(() => {
 		dispatch(fetchAssignTask());
-	}, [dispatch]);
-
-	useEffect(() => {
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-
 	const createDataTree = useCallback((dataset) => {
 		const hashTable = Object.create(null);
 		dataset.forEach((aData) => {
@@ -183,12 +178,10 @@ const OrderTask = () => {
 			setTreeValue(treeData);
 		}
 	}, [createDataTree, kpiNorm]);
-
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
 		return newKpiNorm.length !== 0 ? newKpiNorm[0].label : null;
 	};
-
 	return (
 		<PageWrapper title='Giao việc'>
 			<Page container='fluid'>
@@ -301,15 +294,15 @@ const OrderTask = () => {
 							['admin', 'manager', 'user'],
 							<NotPermission />,
 						)}
-						<OrderTaskForm
-							fetch={() => dispatch(fetchAssignTask())}
-							show={toggleForm}
-							onClose={handleCloseForm}
-							item={itemEdit}
-						/>
 					</div>
 				)}
 			</Page>
+			<OrderTaskForm
+				fetch={() => dispatch(fetchAssignTask())}
+				show={toggleForm}
+				onClose={handleCloseForm}
+				item={itemEdit}
+			/>
 		</PageWrapper>
 	);
 };
