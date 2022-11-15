@@ -44,7 +44,7 @@ L10n.load({
 	},
 });
 
-const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
+const Item = memo(({ data, fetch, onOpen }) => {
 	const { quantity, deadline, users } = data;
 	const [open, setOpen] = useState(false);
 	const handleClose = () => {
@@ -75,14 +75,13 @@ const Item = memo(({ data, showKpiNorm, fetch, onOpen }) => {
 			throw error;
 		}
 	};
-
 	return (
 		<>
 			<Card>
 				<CardHeader className='pb-1 cursor-pointer w-100'>
 					<CardLabel className='w-100 cursor-pointer' onClick={() => onOpen(data)}>
 						<CardTitle>
-							<CardLabel>{showKpiNorm(_.get(data, 'kpiNorm_id'))}</CardLabel>
+							<CardLabel>{_.get(data, 'name')}</CardLabel>
 						</CardTitle>
 					</CardLabel>
 					<CardActions onClick={handleOpen}>
