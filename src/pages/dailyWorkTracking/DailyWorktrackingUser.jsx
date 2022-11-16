@@ -44,6 +44,7 @@ import Icon from '../../components/icon/Icon';
 import { getQueryDate } from '../../utils/utils';
 import Table from './Table';
 import Button from '../../components/bootstrap/Button';
+import { inputRanges, staticRanges } from './customReactDateRange';
 
 const Styles = styled.div`
 	table {
@@ -211,7 +212,6 @@ const DailyWorkTrackingUser = () => {
 		dispatch(fetchWorktrackList(dataQuery));
 		setOpen(false);
 	};
-
 	const columnTables = [
 		{
 			id: 'expander',
@@ -220,7 +220,7 @@ const DailyWorkTrackingUser = () => {
 					<span
 						{...row.getToggleRowExpandedProps({
 							style: {
-								paddingLeft: `${row.depth * 2}rem`,
+								paddingLeft: `${row.depth * 1}rem`,
 							},
 						})}>
 						{row.isExpanded ? (
@@ -249,9 +249,12 @@ const DailyWorkTrackingUser = () => {
 									parent: worktrack.workTracks?.find(
 										(i) => i.id === row.original.parentId,
 									),
+									user: { name: worktrack?.name, id: worktrack?.id },
 								})
 							}>
-							{row.original.name}
+							<div style={{ marginLeft: `${row.depth * 1}rem` }}>
+								{row.original.name}
+							</div>
 						</span>
 					</div>
 				);
@@ -347,13 +350,15 @@ const DailyWorkTrackingUser = () => {
 											show={open}
 											animation={false}>
 											<Toast.Header closeButton={false}>
-												<DateRangePicker
+											<DateRangePicker
 													onChange={(item) => setState([item.selection])}
 													showSelectionPreview
 													moveRangeOnFirstSelection={false}
 													months={1}
 													ranges={state}
 													direction='horizontal'
+													staticRanges={staticRanges}
+													inputRanges={inputRanges}
 												/>
 											</Toast.Header>
 											<Toast.Body>
@@ -362,7 +367,7 @@ const DailyWorkTrackingUser = () => {
 													<Button
 														onClick={() => setOpen(!open)}
 														color='danger'>
-														Close
+														Đóng
 													</Button>
 													<Button
 														style={{ marginLeft: '5px' }}
