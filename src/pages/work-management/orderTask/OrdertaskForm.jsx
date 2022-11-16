@@ -30,6 +30,7 @@ const customStyles = {
 		borderRadius: '1.25rem',
 	}),
 };
+
 const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const dispatch = useDispatch();
 	const keys = useSelector((state) => state.key.keys);
@@ -49,21 +50,29 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		note: '',
 		name: '',
 	});
+
 	useEffect(() => {
 		dispatch(fetchKeyList());
 		dispatch(fetchMissionList());
 		dispatch(fetchEmployeeList());
 		dispatch(fetchAssignTask());
 	}, [dispatch]);
+
 	useEffect(() => {
-		const dataParent = tasks.filter((ele) => ele.id === item?.parent_id);
-		setParentOption({
-			...dataParent[0],
-			label: get(dataParent[0], 'kpiNorm.name'),
-			value: get(dataParent[0], 'id'),
-		});
-		// eslint-disable-next-line prettier/prettier, react-hooks/exhaustive-deps
-	},[tasks , item])
+		const dataParent = tasks?.find((ele) => ele.id === item?.parent_id);
+		if (dataParent) {
+			const userResponsible = dataParent?.users?.find(
+				(user) => user.workTrackUsers.isResponsible === true,
+			);
+			setParentOption({
+				...dataParent,
+				// label: get(dataParent, 'kpiNorm.name'),
+				label: `${get(dataParent, 'kpiNorm.name')} - ${get(userResponsible, 'name')}`,
+				value: get(dataParent, 'id'),
+			});
+		}
+	}, [tasks, item]);
+
 	useEffect(() => {
 		if (item.id) setMission({ ...item });
 		setMissionOption({
@@ -90,6 +99,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			[name]: value,
 		});
 	};
+
 	const handleClose = () => {
 		setCheckValidate(false);
 		onClose();
@@ -105,7 +115,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const handleSubmit = async () => {
 		setCheckValidate(true);
 		fetch();
-		if (!isEmpty(mission.startDate) && !isEmpty(mission.deadline)) {
+		if (!isEmpty(mission.deadline)) {
 			if (item.id) {
 				const dataValue = {
 					parent_id: parentOption?.id || null,
@@ -152,7 +162,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					note: mission.note || null,
 					description: item.description || null,
 					deadline: mission.deadline || null,
-					startDate: mission.startDate || null,
+					startDate: mission.startDate || moment().add(0, 'days').format('YYYY-MM-DD'),
 					status: role.includes('user') ? 'pending' : 'accepted',
 					name: mission.name || null,
 				};
@@ -176,6 +186,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			}
 		}
 	};
+
 	return (
 		<Modal show={show} onHide={handleClose} centered size='xl'>
 			<div className='row px-3'>
@@ -225,7 +236,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 							</table>
 							{/* Thuộc mục tiêu */}
 							<div className='row g-2'>
-							<div className='col-12'>
+								<div className='col-12'>
 									<FormGroup id='name' label='Tên nhiệm vụ'>
 										<Input
 											name='name'
@@ -302,13 +313,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											className='border border-2 rounded-0 shadow-none'
 										/>
 									</FormGroup>
-									<div className='text-danger mt-1'>
-										{checkValidate && isEmpty(mission.startDate) && (
-											<span className='error'>
-												Vui lòng điền ngày bắt đầu
-											</span>
-										)}
-									</div>
 								</div>
 								<div className='col-4'>
 									<FormGroup id='deadline' label='Hạn ngày hoàn thành'>

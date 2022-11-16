@@ -300,7 +300,7 @@ const DailyWorkTracking = () => {
 											show={open}
 											animation={false}>
 											<Toast.Header closeButton={false}>
-												<DateRangePicker
+											<DateRangePicker
 													onChange={(item) => setState([item.selection])}
 													showSelectionPreview
 													moveRangeOnFirstSelection={false}
