@@ -69,18 +69,24 @@ export const fetchAssignTask = createAsyncThunk('worktrack/fetchListAsign', asyn
 					return item.workTrackUsers.isCreated === true;
 				})
 				?.map((item) => {
+					const userResponsible = item.users.find(
+						(user) => user.workTrackUsers.isResponsible === true,
+					);
 					return {
 						...item,
-						label: `${get(item, 'kpiNorm.name')} - ${get(item, 'users[0].name')}`,
+						label: `${get(item, 'kpiNorm.name')} - ${get(userResponsible, 'name')}`,
 						value: item.id,
 						text: item.name,
 						parentId: item.parent_id,
 					};
 				})
 		: response.data.data?.map((item) => {
+				const userResponsible = item.users.find(
+					(user) => user.workTrackUsers.isResponsible === true,
+				);
 				return {
 					...item,
-					label: `${get(item, 'kpiNorm.name')} - ${get(item, 'users[0].name')}`,
+					label: `${get(item, 'kpiNorm.name')} - ${get(userResponsible, 'name')}`,
 					value: item.id,
 					text: item.name,
 					parentId: item.parent_id,
