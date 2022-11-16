@@ -45,6 +45,7 @@ import {
 import Icon from '../../components/icon/Icon';
 import { getQueryDate } from '../../utils/utils';
 import Table from './Table';
+import { inputRanges, staticRanges } from './customReactDateRange';
 
 const Styles = styled.div`
 	table {
@@ -387,6 +388,8 @@ const DailyWorkTrackingMe = () => {
 														months={1}
 														ranges={state}
 														direction='horizontal'
+														staticRanges={staticRanges}
+														inputRanges={inputRanges}
 													/>
 												</Toast.Header>
 												<Toast.Body>
@@ -398,7 +401,7 @@ const DailyWorkTrackingMe = () => {
 														<Button
 															onClick={() => setOpen(!open)}
 															color='danger'>
-															Close
+															Đóng
 														</Button>
 														<Button
 															style={{ marginLeft: '5px' }}

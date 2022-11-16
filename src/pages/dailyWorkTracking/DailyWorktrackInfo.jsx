@@ -70,6 +70,12 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 				value: get(userResponsible, '[0].name'),
 				id: get(userResponsible, '[0].id'),
 			});
+		} else {
+			setUserOption({
+				label: get(item, 'user.name'),
+				value: get(item, 'user.name'),
+				id: get(item, 'user.id'),
+			});
 		}
 	}, [item]);
 
@@ -109,8 +115,8 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 									<tr>
 										<td className='p-3 border text-left'>
 											<b>
-												{get(item, 'kpiNorm_name')
-													? get(item, 'kpiNorm_name')
+												{get(item, 'name')
+													? get(item, 'name')
 													: get(mission, 'kpiNorm.name')}
 											</b>
 										</td>
