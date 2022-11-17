@@ -8,6 +8,7 @@ import {
 	Filter,
 	Toolbar,
 	Inject,
+	Resize,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import _, { isEmpty } from 'lodash';
@@ -314,6 +315,7 @@ const KpiNormPage = () => {
 														}}
 														childMapping='children'
 														height='600'>
+														<Inject services={[Resize]} />
 														<ColumnsDirective>
 															<ColumnDirective
 																field='data.name'
