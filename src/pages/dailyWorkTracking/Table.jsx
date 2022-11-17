@@ -15,7 +15,7 @@ const Table = ({ columns: userColumns, data }) => {
 		{
 			columns: userColumns,
 			data,
-			initialState: { expanded: { 0: true } },
+			initialState: {},
 		},
 		useExpanded,
 	);

@@ -208,6 +208,15 @@ const OrderTaskPage = () => {
 													<CardLabel>Nhiệm vụ đã giao</CardLabel>
 												</CardTitle>
 											</CardLabel>
+											<CardActions style={{ display: 'inline-flex' }}>
+												<Button
+													icon='ChangeCircle'
+													size='sm'
+													onClick={() => dispatch(fetchAssignTask())}
+													color='primary'>
+													Tải lại
+												</Button>
+											</CardActions>
 										</CardHeader>
 										<div className='p-4' style={{ overflow: 'scroll' }}>
 											<div>
