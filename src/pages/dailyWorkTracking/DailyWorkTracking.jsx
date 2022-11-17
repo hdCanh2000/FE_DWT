@@ -13,8 +13,8 @@ import moment from 'moment/moment';
 import Card, {
 	CardActions,
 	CardBody,
-	// CardFooter,
-	// CardFooterRight,
+	CardFooter,
+	CardFooterRight,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -28,8 +28,8 @@ import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import {
-	// calcTotalCurrentKPIAllWorkTrack,
-	// calcTotalKPIAllWorkTrack,
+	calcTotalCurrentKPIAllWorkTrack,
+	calcTotalKPIAllWorkTrack,
 	columns,
 	renderColor,
 } from '../../utils/function';
@@ -37,6 +37,7 @@ import Icon from '../../components/icon/Icon';
 import Table from './Table';
 import { getQueryDate } from '../../utils/utils';
 import Button from '../../components/bootstrap/Button';
+import { inputRanges, staticRanges } from './customReactDateRange';
 
 const Styles = styled.div`
 	table {
@@ -95,6 +96,7 @@ const DailyWorkTracking = () => {
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 
 	const [showForm, setShowForm] = React.useState(false);
 	const [dataShow, setDataShow] = React.useState({
@@ -170,7 +172,7 @@ const DailyWorkTracking = () => {
 					<span
 						{...row.getToggleRowExpandedProps({
 							style: {
-								paddingLeft: `${row.depth * 2}rem`,
+								paddingLeft: `${row.depth * 1}rem`,
 							},
 						})}>
 						{row.isExpanded ? (
@@ -188,6 +190,26 @@ const DailyWorkTracking = () => {
 			accessor: 'name',
 			maxWidth: 400,
 			minWidth: 400,
+			Cell: ({ row }) => {
+				return (
+					<div className='d-flex'>
+						<span
+							className='cursor-pointer d-block w-100 fw-bold fs-6'
+							onClick={() =>
+								handleOpenForm({
+									...row.original,
+									parent: worktrack.workTracks?.find(
+										(i) => i.id === row.original.parentId,
+									),
+								})
+							}>
+							<div style={{ marginLeft: `${row.depth * 1}rem` }}>
+								{row.original.name}
+							</div>
+						</span>
+					</div>
+				);
+			},
 		},
 		{
 			Header: 'Người phụ trách',
@@ -251,6 +273,7 @@ const DailyWorkTracking = () => {
 			},
 		},
 	];
+
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -277,13 +300,15 @@ const DailyWorkTracking = () => {
 											show={open}
 											animation={false}>
 											<Toast.Header closeButton={false}>
-												<DateRangePicker
+											<DateRangePicker
 													onChange={(item) => setState([item.selection])}
 													showSelectionPreview
 													moveRangeOnFirstSelection={false}
 													months={1}
 													ranges={state}
 													direction='horizontal'
+													staticRanges={staticRanges}
+													inputRanges={inputRanges}
 												/>
 											</Toast.Header>
 											<Toast.Body>
@@ -292,7 +317,7 @@ const DailyWorkTracking = () => {
 													<Button
 														onClick={() => setOpen(!open)}
 														color='danger'>
-														Close
+														Đóng
 													</Button>
 													<Button
 														style={{ marginLeft: '5px' }}
@@ -319,7 +344,7 @@ const DailyWorkTracking = () => {
 											</Styles>
 										</TableContainer>
 									</TableContainerOuter>
-									{/* <CardFooter
+									<CardFooter
 										tag='div'
 										className=''
 										size='lg'
@@ -336,7 +361,7 @@ const DailyWorkTracking = () => {
 												{calcTotalCurrentKPIAllWorkTrack(worktrack)}
 											</span>
 										</CardFooterRight>
-									</CardFooter> */}
+									</CardFooter>
 								</CardBody>
 							</Card>
 						</div>
