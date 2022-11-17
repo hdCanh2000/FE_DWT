@@ -138,7 +138,7 @@ const DailyWorkTrackingUser = () => {
 					?.filter((item) => {
 						return item?.workTrackUsers?.isResponsible === true;
 					})
-					.map((item) => {
+					?.map((item) => {
 						return {
 							...item,
 							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
@@ -325,7 +325,7 @@ const DailyWorkTrackingUser = () => {
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
-				{loading ? (
+				{loading && !_.isEmpty(worktrack) ? (
 					<Loading />
 				) : (
 					<div className='row mb-0'>
