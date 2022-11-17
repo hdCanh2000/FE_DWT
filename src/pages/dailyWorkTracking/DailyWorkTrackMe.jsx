@@ -261,7 +261,7 @@ const DailyWorkTrackingMe = () => {
 									),
 								})
 							}>
-							{row.original.kpiNorm.name}
+							{row.original.name || row.original.kpiNorm.name}
 						</span>
 					</div>
 				);
