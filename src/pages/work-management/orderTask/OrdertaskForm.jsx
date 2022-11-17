@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-shadow */
 import React, { useState, useEffect, memo } from 'react';
@@ -7,6 +8,7 @@ import SelectComponent from 'react-select';
 import { Modal } from 'react-bootstrap';
 import { get, isEmpty } from 'lodash';
 import moment from 'moment';
+import styled from 'styled-components';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Input from '../../../components/bootstrap/forms/Input';
 import Select from '../../../components/bootstrap/forms/Select';
@@ -21,6 +23,7 @@ import { addWorktrack, updateWorktrack } from '../../dailyWorkTracking/services'
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
 import { fetchAssignTask } from '../../../redux/slice/worktrackSlice';
 import { fetchKeyList } from '../../../redux/slice/keySlice';
+import Table from './ChildTaskTable';
 
 const customStyles = {
 	control: (provided) => ({
@@ -31,7 +34,49 @@ const customStyles = {
 	}),
 };
 
-const OrderTaskForm = ({ show, onClose, item, fetch }) => {
+const Styles = styled.div`
+	table {
+		border-spacing: 0;
+		border: 1px solid black;
+		width: 100%;
+		tr {
+			:last-child {
+				td {
+					border-bottom: 0;
+				}
+			}
+		}
+
+		th,
+		td {
+			margin: 0;
+			padding: 0.5rem;
+			border-bottom: 1px solid black;
+			border-right: 1px solid black;
+
+			:last-child {
+				border-right: 1px;
+			}
+		}
+	}
+`;
+
+const TableContainerOuter = styled.div`
+	width: 100%;
+	height: 100%;
+	overflow-y: hidden;
+	padding-bottom: 20px;
+	margin-top: 20px;
+	padding-left: 4px;
+`;
+
+const TableContainer = styled.div`
+	width: 100%;
+	height: 100%;
+	min-width: 900px;
+`;
+
+const OrderTaskForm = ({ show, onClose, item }) => {
 	const dispatch = useDispatch();
 	const keys = useSelector((state) => state.key.keys);
 	const users = useSelector((state) => state.employee.employees);
@@ -50,6 +95,34 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 		note: '',
 		name: '',
 	});
+	const [data, setData] = React.useState([]);
+
+	useEffect(() => {
+		setData(
+			item?.children?.map((i) => {
+				return {
+					id: i?.data?.id,
+					kpiNorm_name: i?.data?.name,
+					kpi_value: i?.data?.kpi_value,
+					manday: i?.data?.manday,
+				};
+			}),
+		);
+	}, [item?.children]);
+
+	const updateMyData = (rowIndex, columnId, value) => {
+		setData((old) =>
+			old.map((row, index) => {
+				if (index === rowIndex) {
+					return {
+						...old[rowIndex],
+						[columnId]: value,
+					};
+				}
+				return row;
+			}),
+		);
+	};
 
 	useEffect(() => {
 		dispatch(fetchKeyList());
@@ -112,9 +185,10 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 	const role = localStorage.getItem('roles');
 	const userId = localStorage.getItem('userId');
 
+	const [selectedRows, setSelectedRows] = useState([]);
+
 	const handleSubmit = async () => {
 		setCheckValidate(true);
-		fetch();
 		if (!isEmpty(mission.deadline)) {
 			if (item.id) {
 				const dataValue = {
@@ -141,7 +215,7 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 						});
 						setCheckValidate(false);
 						handleClose();
-						fetch();
+						dispatch(fetchAssignTask());
 					})
 					.catch((err) => {
 						toast.success('Cập nhật công việc thành công!', {
@@ -167,14 +241,31 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 					name: mission.name || null,
 				};
 				addWorktrack(dataValue)
-					.then(() => {
+					.then((res) => {
 						toast.success('Thêm công việc thành công!', {
 							position: toast.POSITION.TOP_RIGHT,
 							autoClose: 1000,
 						});
+						selectedRows.forEach((selectedRow) => {
+							addWorktrack({
+								parent_id: res.data?.data?.id || null,
+								kpiNorm_id: selectedRow.id || null,
+								mission_id: res.data?.data?.mission_id || null,
+								key_id: res.data?.data?.key_id || null,
+								quantity: parseInt(selectedRow.quantity, 10) || null,
+								user_id: role.includes('user')
+									? parseInt(userId, 10)
+									: userOption.id,
+								priority: parseInt(mission.priority, 10) || null,
+								deadline: res.data?.data?.deadline || null,
+								startDate: res.data?.data?.startDate,
+								status: res.data?.data?.status,
+								name: selectedRow.name || null,
+							});
+						});
+						dispatch(fetchAssignTask());
 						setCheckValidate(false);
 						handleClose();
-						fetch();
 					})
 					.catch((err) => {
 						toast.error('Thêm công việc thất bại !', {
@@ -186,6 +277,83 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 			}
 		}
 	};
+
+	const EditableCell = ({
+		value: initialValue,
+		row: { index },
+		column: { id },
+		updateMyData,
+	}) => {
+		const [value, setValue] = React.useState(initialValue);
+
+		const onChange = (e) => {
+			setValue(e.target.value);
+		};
+		const onBlur = () => {
+			updateMyData(index, id, value);
+		};
+		React.useEffect(() => {
+			setValue(initialValue);
+		}, [initialValue]);
+
+		return (
+			<input value={value} onChange={onChange} onBlur={onBlur} style={{ width: '100%' }} />
+		);
+	};
+
+	const columnTables = React.useMemo(
+		() => [
+			{
+				id: 'selection',
+				accessor: 'selection',
+				Header: ({ getToggleAllRowsSelectedProps }) => (
+					<div>
+						<input type='checkbox' {...getToggleAllRowsSelectedProps()} />
+					</div>
+				),
+				Cell: ({ row }) => (
+					<div>
+						<input type='checkbox' {...row.getToggleRowSelectedProps()} />
+					</div>
+				),
+			},
+			{
+				Header: 'Tên định mức',
+				accessor: 'kpiNorm_name',
+				maxWidth: 300,
+				minWidth: 300,
+			},
+			{
+				Header: 'Tên nhiệm vụ',
+				id: 'name',
+				accessor: 'name',
+				maxWidth: 400,
+				minWidth: 400,
+				Cell: EditableCell,
+			},
+			{
+				Header: 'Ngày công',
+				accessor: 'manday',
+				maxWidth: 100,
+				minWidth: 100,
+			},
+			{
+				Header: 'Giá trị KPI',
+				accessor: 'kpi_value',
+				maxWidth: 100,
+				minWidth: 100,
+			},
+			{
+				Header: 'Số lượng',
+				id: 'quantity',
+				accessor: 'quantity',
+				maxWidth: 50,
+				minWidth: 50,
+				Cell: EditableCell,
+			},
+		],
+		[],
+	);
 
 	return (
 		<Modal show={show} onHide={handleClose} centered size='xl'>
@@ -303,9 +471,6 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 											name='startDate'
 											placeholder='Ngày bắt đầu'
 											onChange={handleChange}
-											defaultValue={moment()
-												.add(0, 'days')
-												.format('YYYY-MM-DD')}
 											value={
 												mission.startDate ||
 												moment().add(0, 'days').format('YYYY-MM-DD')
@@ -406,6 +571,23 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 								</div>
 							</div>
 						</div>
+						{!isEmpty(data) ? (
+							<div className='row'>
+								<TableContainerOuter>
+									<TableContainer>
+										<Styles>
+											<Table
+												columns={columnTables}
+												data={data}
+												updateMyData={updateMyData}
+												selectedRows={selectedRows}
+												setSelectedRows={setSelectedRows}
+											/>
+										</Styles>
+									</TableContainer>
+								</TableContainerOuter>
+							</div>
+						) : null}
 					</div>
 					<div className='col-12 my-4'>
 						<div className='w-100 mt-4 text-center'>
