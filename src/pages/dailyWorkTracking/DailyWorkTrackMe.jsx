@@ -113,10 +113,13 @@ const DailyWorkTrackingMe = () => {
 		column: {},
 		valueForm: {},
 	});
-
-	useEffect(() => {
+	const fetchData = () => {
 		const query = getQueryDate(0);
 		dispatch(fetchWorktrackListMe(query));
+	};
+	useEffect(() => {
+		fetchData();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -372,7 +375,8 @@ const DailyWorkTrackingMe = () => {
 											<Toast
 												style={{
 													width: 'auto',
-													right: '10%',
+													right: '0',
+													top: '7vh',
 													position: 'absolute',
 												}}
 												onClose={() => setOpen(false)}
@@ -412,6 +416,13 @@ const DailyWorkTrackingMe = () => {
 													</div>
 												</Toast.Body>
 											</Toast>
+											<Button
+												icon='ChangeCircle'
+												size='sm'
+												onClick={() => fetchData()}
+												color='primary'>
+												Tải lại
+											</Button>
 											<Button
 												icon='DateRange'
 												onClick={() => setOpen(!open)}
