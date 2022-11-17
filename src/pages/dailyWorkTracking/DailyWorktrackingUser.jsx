@@ -4,7 +4,7 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import _ from 'lodash';
+import _, { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
@@ -350,7 +350,7 @@ const DailyWorkTrackingUser = () => {
 											show={open}
 											animation={false}>
 											<Toast.Header closeButton={false}>
-											<DateRangePicker
+												<DateRangePicker
 													onChange={(item) => setState([item.selection])}
 													showSelectionPreview
 													moveRangeOnFirstSelection={false}
@@ -388,17 +388,30 @@ const DailyWorkTrackingUser = () => {
 								</CardHeader>
 								<CardBody>
 									<TableContainerOuter>
-										<TableContainer>
-											<Styles>
-												<Table columns={columnTables} data={treeValue} />
-											</Styles>
-										</TableContainer>
+										{isEmpty(treeValue) ? (
+											<h5
+												style={{
+													textAlign: 'center',
+													border: '1px solid',
+													padding: '20px',
+												}}>
+												Chưa có nhiệm vụ nào !
+											</h5>
+										) : (
+											<TableContainer>
+												<Styles>
+													<Table
+														columns={columnTables}
+														data={treeValue}
+													/>
+												</Styles>
+											</TableContainer>
+										)}
 									</TableContainerOuter>
 									<CardFooter
 										tag='div'
 										className=''
 										size='lg'
-										borderSize={1}
 										borderColor='primary'>
 										<CardFooterRight tag='div' className='fw-bold fs-5'>
 											Tổng điểm KPI:

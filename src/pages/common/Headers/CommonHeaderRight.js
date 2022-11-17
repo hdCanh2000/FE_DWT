@@ -11,7 +11,7 @@ import { HeaderRight } from '../../../layout/Header/Header';
 // } from '../../../components/bootstrap/OffCanvas';
 // import Alert from '../../../components/bootstrap/Alert';
 import useDarkMode from '../../../hooks/useDarkMode';
-import { getLangWithKey } from '../../../lang';
+// import { getLangWithKey } from '../../../lang';
 
 // eslint-disable-next-line react/prop-types
 const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
@@ -39,13 +39,13 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 
 	const { i18n } = useTranslation();
 
-	const changeLanguage = () => {
-		if (i18n.language === 'vi-VN') {
-			i18n.changeLanguage('en-US');
-		} else {
-			i18n.changeLanguage('vi-VN');
-		}
-	};
+	// const changeLanguage = () => {
+	// 	if (i18n.language === 'vi-VN') {
+	// 		i18n.changeLanguage('en-US');
+	// 	} else {
+	// 		i18n.changeLanguage('vi-VN');
+	// 	}
+	// };
 
 	/**
 	 * Language attribute
@@ -58,20 +58,19 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 		<HeaderRight>
 			<div className='row g-3'>
 				{beforeChildren}
-				{/*	Notifications */}
-				<div className='col-auto'>
-					{/* eslint-disable-next-line react/jsx-props-no-spreading */}
+				{/* <div className='col-auto'>
 					<Button
-						// eslint-disable-next-line react/jsx-props-no-spreading
 						{...styledBtn}
 						aria-label='Change language'
 						data-tour='lang-selector'
-						onClick={() => changeLanguage()}>
-						<span>{getLangWithKey(i18n.language)?.text}</span>
+						onClick={() => changeLanguage()}
+					>
+						<span>
+							VNI
+						</span>
 					</Button>
-				</div>
-				{/*	Notifications */}
-				<div className='col-auto'>
+				</div> */}
+				{/* <div className='col-auto'>
 					<Button
 						// eslint-disable-next-line react/jsx-props-no-spreading
 						{...styledBtn}
@@ -79,7 +78,6 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 						aria-label='CompareArrows'
 					/>
 				</div>
-				{/*	Notifications */}
 				<div className='col-auto'>
 					<Button
 						// eslint-disable-next-line react/jsx-props-no-spreading
@@ -88,7 +86,7 @@ const CommonHeaderRight = ({ beforeChildren, afterChildren }) => {
 						// onClick={() => setOffcanvasStatus(true)}
 						aria-label='Notifications'
 					/>
-				</div>
+				</div> */}
 				<div className='col-auto'>
 					<Button
 						// eslint-disable-next-line react/jsx-props-no-spreading

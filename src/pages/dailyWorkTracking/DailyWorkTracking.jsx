@@ -10,6 +10,7 @@ import { Toast } from 'react-bootstrap';
 import { addDays } from 'date-fns';
 import { DateRangePicker } from 'react-date-range';
 import moment from 'moment/moment';
+import { isEmpty } from 'lodash';
 import Card, {
 	CardActions,
 	CardBody,
@@ -273,7 +274,6 @@ const DailyWorkTracking = () => {
 			},
 		},
 	];
-
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -300,7 +300,7 @@ const DailyWorkTracking = () => {
 											show={open}
 											animation={false}>
 											<Toast.Header closeButton={false}>
-											<DateRangePicker
+												<DateRangePicker
 													onChange={(item) => setState([item.selection])}
 													showSelectionPreview
 													moveRangeOnFirstSelection={false}
@@ -338,11 +338,25 @@ const DailyWorkTracking = () => {
 								</CardHeader>
 								<CardBody className='w-100'>
 									<TableContainerOuter>
-										<TableContainer>
-											<Styles>
-												<Table columns={columnTables} data={worktrack} />
-											</Styles>
-										</TableContainer>
+										{isEmpty(worktrack) ? (
+											<h5
+												style={{
+													textAlign: 'center',
+													border: '1px solid',
+													padding: '20px',
+												}}>
+												Chưa có nhiệm vụ nào !
+											</h5>
+										) : (
+											<TableContainer>
+												<Styles>
+													<Table
+														columns={columnTables}
+														data={worktrack}
+													/>
+												</Styles>
+											</TableContainer>
+										)}
 									</TableContainerOuter>
 									<CardFooter
 										tag='div'
