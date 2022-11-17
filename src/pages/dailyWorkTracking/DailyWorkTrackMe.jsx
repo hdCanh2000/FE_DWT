@@ -422,14 +422,25 @@ const DailyWorkTrackingMe = () => {
 									</CardHeader>
 									<CardBody>
 										<TableContainerOuter>
-											<TableContainer>
-												<Styles>
-													<Table
-														columns={columnTables}
-														data={treeValue}
-													/>
-												</Styles>
-											</TableContainer>
+											{isEmpty(treeValue) ? (
+												<h5
+													style={{
+														textAlign: 'center',
+														border: '1px solid',
+														padding: '20px',
+													}}>
+													Chưa có nhiệm vụ nào !
+												</h5>
+											) : (
+												<TableContainer>
+													<Styles>
+														<Table
+															columns={columnTables}
+															data={treeValue}
+														/>
+													</Styles>
+												</TableContainer>
+											)}
 										</TableContainerOuter>
 										<CardFooter tag='div' className='' size='lg'>
 											<CardFooterRight tag='div' className='fw-bold fs-5'>

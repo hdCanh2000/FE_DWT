@@ -227,7 +227,9 @@ const OrderTask = () => {
 											<CardHeader>
 												<CardLabel>
 													<CardTitle>
-														<CardLabel>Danh sách nhiệm vụ</CardLabel>
+														<CardLabel>
+															Danh mục định mức lao động
+														</CardLabel>
 													</CardTitle>
 												</CardLabel>
 											</CardHeader>

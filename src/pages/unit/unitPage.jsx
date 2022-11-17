@@ -206,7 +206,7 @@ const UnitPage = () => {
 					<div>
 						{verifyPermissionHOC(
 							<div className='row mb-0'>
-								<div className='col-12'>
+								<div className='col-7' style={{ margin: '0 auto' }}>
 									<Card className='w-100'>
 										<CardHeader>
 											<CardLabel icon='ReceiptLong' iconColor='primary'>

@@ -82,15 +82,20 @@ export const calcTotalCurrentKPIWorkTrackByUser = (worktracks) => {
 		});
 	return total.toFixed(2);
 };
-
+const loop = (data) => {
+	let totals = 0.0;
+	data.forEach((ele) => {
+		totals += parseFloat(ele?.totalKPI, 10);
+		if (!isEmpty(ele?.subRows)) {
+			totals += loop(ele?.subRows);
+		}
+	});
+	return totals;
+};
 export const calcTotalKPIAllWorkTrack = (worktracks) => {
 	if (isEmpty(worktracks) || !isArray(worktracks)) return 0;
-	let total = 0;
-	worktracks.forEach((worktrack) => {
-		const totalKPIOfWorktrack = calcTotalKPIOfWorkTrackItem(worktrack);
-		total += totalKPIOfWorktrack;
-	});
-	return total.toFixed(2);
+	// eslint-disable-next-line prefer-const
+	return loop(worktracks).toFixed(2);
 };
 
 export const calcTotalCurrentKPIAllWorkTrack = (worktracks) => {

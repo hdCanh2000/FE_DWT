@@ -203,7 +203,9 @@ const OrderTaskForm = ({ show, onClose, item, fetch }) => {
 							<table className='w-100 mb-4 border'>
 								<thead>
 									<tr>
-										<th className='p-3 border text-left'>Nhiệm vụ</th>
+										<th className='p-3 border text-left'>
+											Tên định mức lao động
+										</th>
 										<th className='p-3 border text-center'>Định mức KPI</th>
 										<th className='p-3 border text-center'>Số lượng</th>
 									</tr>
