@@ -12,7 +12,7 @@ const DAILYWORKTRACKING = {
 	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTracking')),
 	DAILYWORKTRACKINGUSER: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackingUser')),
 	DAILYWORKTRACKINGME: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTrackMe')),
-	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/orderTask')),
+	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/OrderTaskPage')),
 	PEDINGWORKTRACKPAGE: lazy(() => import('../pages/pendingWorktrack/PendingWorktrackPage')),
 };
 

@@ -11,6 +11,7 @@ import {
 	Filter,
 	Toolbar,
 	Inject,
+	Resize,
 } from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -152,7 +153,7 @@ const searchOptions = {
 	operator: 'contains',
 };
 
-const OrderTask = () => {
+const OrderTaskPage = () => {
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
 	const tasks = useSelector((state) => state.worktrack.tasks);
@@ -242,6 +243,7 @@ const OrderTask = () => {
 														locale='vi-VI'
 														dataSource={treeValue}
 														treeColumnIndex={0}
+														allowResizing
 														toolbar={toolbarOptions}
 														searchSettings={searchOptions}
 														className='cursor-pointer'
@@ -258,6 +260,7 @@ const OrderTask = () => {
 														}}
 														childMapping='children'
 														height='600'>
+														<Inject services={[Resize]} />
 														<ColumnsDirective>
 															<ColumnDirective
 																field='data.name'
@@ -299,4 +302,4 @@ const OrderTask = () => {
 		</PageWrapper>
 	);
 };
-export default OrderTask;
+export default OrderTaskPage;
