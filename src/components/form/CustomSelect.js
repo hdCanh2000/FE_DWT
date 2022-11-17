@@ -10,6 +10,7 @@ const customStyles = {
 };
 
 const CustomSelect = ({
+	name,
 	onChange,
 	options,
 	value,
@@ -21,6 +22,7 @@ const CustomSelect = ({
 }) => {
 	return (
 		<Select
+			name={name}
 			menuPortalTarget={document.body}
 			isDisabled={disabled}
 			value={value}
@@ -38,6 +40,7 @@ const CustomSelect = ({
 
 CustomSelect.propTypes = {
 	className: PropTypes.string,
+	name: PropTypes.string,
 	disabled: PropTypes.bool,
 	onChange: PropTypes.func,
 	// eslint-disable-next-line react/forbid-prop-types
@@ -48,6 +51,7 @@ CustomSelect.propTypes = {
 	placeholder: PropTypes.string,
 };
 CustomSelect.defaultProps = {
+	name: '',
 	className: null,
 	disabled: null,
 	onChange: null,

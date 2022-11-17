@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, useCallback, memo } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import moment from 'moment';
@@ -27,7 +27,6 @@ import { fetchKpiNormList } from '../../../redux/slice/kpiNormSlice';
 import OrderTaskForm from './OrdertaskForm';
 import { deleteWorkTrack } from '../../dailyWorkTracking/services';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
-import NotPermission from '../../presentation/auth/NotPermission';
 import FormGroup from '../../../components/bootstrap/forms/FormGroup';
 import Button from '../../../components/bootstrap/Button';
 import Loading from '../../../components/Loading/Loading';
@@ -44,7 +43,24 @@ L10n.load({
 	},
 });
 
-const Item = memo(({ data, fetch, onOpen }) => {
+const createDataTree = (dataset) => {
+	const hashTable = Object.create(null);
+	dataset.forEach((aData) => {
+		hashTable[aData.id] = { data: aData, children: [] };
+	});
+	const dataTree = [];
+	dataset.forEach((aData) => {
+		if (aData.parentId) {
+			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
+		} else {
+			dataTree.push(hashTable[aData.id]);
+		}
+	});
+	return dataTree;
+};
+
+const Item = memo(({ data, onOpen }) => {
+	const dispatch = useDispatch();
 	const { quantity, deadline, users } = data;
 	const [open, setOpen] = useState(false);
 	const handleClose = () => {
@@ -66,7 +82,7 @@ const Item = memo(({ data, fetch, onOpen }) => {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
 			});
-			fetch();
+			dispatch(fetchAssignTask());
 		} catch (error) {
 			toast.error('Xoá công việc không thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
@@ -81,7 +97,11 @@ const Item = memo(({ data, fetch, onOpen }) => {
 				<CardHeader className='pb-1 cursor-pointer w-100'>
 					<CardLabel className='w-100 cursor-pointer' onClick={() => onOpen(data)}>
 						<CardTitle>
-							<CardLabel>{_.get(data, 'name')}</CardLabel>
+							<CardLabel>
+								{_.get(data, 'name')
+									? _.get(data, 'name')
+									: _.get(data, 'kpiNorm.name')}
+							</CardLabel>
 						</CardTitle>
 					</CardLabel>
 					<CardActions onClick={handleOpen}>
@@ -143,25 +163,11 @@ const OrderTask = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = useState([]);
+
 	useEffect(() => {
 		dispatch(fetchAssignTask());
 		dispatch(fetchKpiNormList());
 	}, [dispatch]);
-	const createDataTree = useCallback((dataset) => {
-		const hashTable = Object.create(null);
-		dataset.forEach((aData) => {
-			hashTable[aData.id] = { data: aData, children: [] };
-		});
-		const dataTree = [];
-		dataset.forEach((aData) => {
-			if (aData.parentId) {
-				hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
-			} else {
-				dataTree.push(hashTable[aData.id]);
-			}
-		});
-		return dataTree;
-	}, []);
 
 	useEffect(() => {
 		if (!_.isEmpty(kpiNorm)) {
@@ -177,11 +183,13 @@ const OrderTask = () => {
 			);
 			setTreeValue(treeData);
 		}
-	}, [createDataTree, kpiNorm]);
+	}, [kpiNorm]);
+
 	const showKpiNorm = (kpiNormId) => {
 		const newKpiNorm = kpiNorm.filter((item) => item.id === kpiNormId);
 		return newKpiNorm.length !== 0 ? newKpiNorm[0].label : null;
 	};
+
 	return (
 		<PageWrapper title='Giao việc'>
 			<Page container='fluid'>
@@ -189,120 +197,105 @@ const OrderTask = () => {
 					<Loading />
 				) : (
 					<div>
-						{verifyPermissionHOC(
-							<div className='col-12'>
-								<div className='row h-100 w-100'>
-									<div className='col-4' style={{ height: '800px' }}>
-										<Card style={{ height: '800px' }}>
-											<CardHeader>
-												<CardLabel>
-													<CardTitle>
-														<CardLabel>Nhiệm vụ đã giao</CardLabel>
-													</CardTitle>
-												</CardLabel>
-											</CardHeader>
-											<div className='p-4' style={{ overflow: 'scroll' }}>
+						<div className='col-12'>
+							<div className='row h-100 w-100'>
+								<div className='col-4' style={{ height: '800px' }}>
+									<Card style={{ height: '800px' }}>
+										<CardHeader>
+											<CardLabel>
+												<CardTitle>
+													<CardLabel>Nhiệm vụ đã giao</CardLabel>
+												</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<div className='p-4' style={{ overflow: 'scroll' }}>
+											<div>
 												<div>
-													<div>
-														{tasks.length === 0 &&
-															'Chưa giao nhiệm vụ nào!'}
-													</div>
-													{tasks?.map((item) => (
-														<Item
-															fetch={() =>
-																dispatch(fetchAssignTask())
-															}
-															key={item.id}
-															showKpiNorm={showKpiNorm}
-															data={item}
-															onOpen={handleOpenForm}
-														/>
-													))}
+													{tasks.length === 0 &&
+														'Chưa giao nhiệm vụ nào!'}
+												</div>
+												{tasks?.map((item) => (
+													<Item
+														key={item.id}
+														showKpiNorm={showKpiNorm}
+														data={item}
+														onOpen={handleOpenForm}
+													/>
+												))}
+											</div>
+										</div>
+									</Card>
+								</div>
+								<div className='col-8' style={{ height: '800px' }}>
+									<Card style={{ height: '800px' }}>
+										<CardHeader>
+											<CardLabel>
+												<CardTitle>
+													<CardLabel>Danh sách nhiệm vụ</CardLabel>
+												</CardTitle>
+											</CardLabel>
+										</CardHeader>
+										<CardBody className='h-100'>
+											<div className='control-pane h-100'>
+												<div className='control-section h-100'>
+													<TreeGridComponent
+														locale='vi-VI'
+														dataSource={treeValue}
+														treeColumnIndex={0}
+														toolbar={toolbarOptions}
+														searchSettings={searchOptions}
+														className='cursor-pointer'
+														rowSelected={(item) => {
+															handleOpenForm({
+																children: item.data?.children,
+																kpiNorm_id: item.data?.data?.id,
+																unit: item.data.data?.unit,
+																quantity: item.data.data?.quantity,
+																kpi_value:
+																	item.data.data?.kpi_value,
+																kpiNorm_name: item.data.data?.name,
+															});
+														}}
+														childMapping='children'
+														height='600'>
+														<ColumnsDirective>
+															<ColumnDirective
+																field='data.name'
+																headerText='Tên nhiệm vụ'
+																width='200'
+															/>
+															<ColumnDirective
+																field='data.position.name'
+																headerText='Vị trí đảm nhiệm'
+																width='90'
+																textAlign='Left'
+															/>
+															<ColumnDirective
+																field='data.quantity'
+																headerText='Số lượng'
+																width='90'
+																textAlign='Center'
+															/>
+															<ColumnDirective
+																field='data.kpi_value'
+																headerText='Giá trị KPI'
+																width='90'
+																textAlign='Center'
+															/>
+														</ColumnsDirective>
+														<Inject services={[Filter, Toolbar]} />
+													</TreeGridComponent>
 												</div>
 											</div>
-										</Card>
-									</div>
-									<div className='col-8' style={{ height: '800px' }}>
-										<Card style={{ height: '800px' }}>
-											<CardHeader>
-												<CardLabel>
-													<CardTitle>
-														<CardLabel>Danh sách nhiệm vụ</CardLabel>
-													</CardTitle>
-												</CardLabel>
-											</CardHeader>
-											<CardBody className='h-100'>
-												<div className='control-pane h-100'>
-													<div className='control-section h-100'>
-														<TreeGridComponent
-															locale='vi-VI'
-															dataSource={treeValue}
-															treeColumnIndex={0}
-															allowResizing
-															allowReordering
-															toolbar={toolbarOptions}
-															searchSettings={searchOptions}
-															className='cursor-pointer'
-															rowSelected={(item) => {
-																handleOpenForm({
-																	kpiNorm_id: item.data.data.id,
-																	unit: item.data.data?.unit,
-																	quantity:
-																		item.data.data?.quantity,
-																	kpi_value:
-																		item.data.data.kpi_value,
-																	kpiNorm_name:
-																		item.data.data.name,
-																});
-															}}
-															childMapping='children'
-															height='600'>
-															<ColumnsDirective>
-																<ColumnDirective
-																	field='data.name'
-																	headerText='Tên nhiệm vụ'
-																	width='200'
-																/>
-																<ColumnDirective
-																	field='data.position.name'
-																	headerText='Vị trí đảm nhiệm'
-																	width='90'
-																	textAlign='Left'
-																/>
-																<ColumnDirective
-																	field='data.quantity'
-																	headerText='Số lượng'
-																	width='90'
-																	textAlign='Center'
-																/>
-																<ColumnDirective
-																	field='data.kpi_value'
-																	headerText='Giá trị KPI'
-																	width='90'
-																	textAlign='Center'
-																/>
-															</ColumnsDirective>
-															<Inject services={[Filter, Toolbar]} />
-														</TreeGridComponent>
-													</div>
-												</div>
-											</CardBody>
-										</Card>
-									</div>
+										</CardBody>
+									</Card>
 								</div>
-							</div>,
-							['admin', 'manager', 'user'],
-							<NotPermission />,
-						)}
+							</div>
+						</div>
 					</div>
 				)}
 			</Page>
-			<OrderTaskForm
-				fetch={() => dispatch(fetchAssignTask())}
-				show={toggleForm}
-				onClose={handleCloseForm}
-				item={itemEdit}
-			/>
+			<OrderTaskForm show={toggleForm} onClose={handleCloseForm} item={itemEdit} />
 		</PageWrapper>
 	);
 };
