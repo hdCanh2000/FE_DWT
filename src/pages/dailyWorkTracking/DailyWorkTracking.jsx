@@ -205,7 +205,7 @@ const DailyWorkTracking = () => {
 								})
 							}>
 							<div style={{ marginLeft: `${row.depth * 1}rem` }}>
-								{row.original.name}
+								{row.original.name || row.original.kpiNorm.name}
 							</div>
 						</span>
 					</div>
