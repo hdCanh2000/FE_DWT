@@ -105,14 +105,12 @@ const DailyWorkTracking = () => {
 		column: {},
 		valueForm: {},
 	});
-	const fetchData = () => {
+
+	useEffect(() => {
 		const { startDate, endDate } = getQueryDate(0);
 		dispatch(fetchWorktrackListAll({ startDate, endDate }));
-	};
-	useEffect(() => {
-		fetch();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch]);
+
 	const [open, setOpen] = useState(false);
 	const [state, setState] = useState([
 		{
@@ -332,13 +330,13 @@ const DailyWorkTracking = () => {
 												</div>
 											</Toast.Body>
 										</Toast>
-										<Button
+										{/* <Button
 											icon='ChangeCircle'
 											size='sm'
 											onClick={() => fetchData()}
 											color='primary'>
 											Tải lại
-										</Button>
+										</Button> */}
 										<Button
 											icon='DateRange'
 											onClick={() => setOpen(!open)}
