@@ -295,6 +295,15 @@ const ManagerDashboard = () => {
 	const columnTables = [
 		{
 			id: 'expander',
+			Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+				<span {...getToggleAllRowsExpandedProps()}>
+					{isAllRowsExpanded ? (
+						<Icon icon='KeyboardArrowDown' color='dark' size='md' />
+					) : (
+						<Icon icon='KeyboardArrowRight' color='dark' size='md' />
+					)}
+				</span>
+			),
 			Cell: ({ row }) =>
 				row.canExpand ? (
 					<span
@@ -323,6 +332,7 @@ const ManagerDashboard = () => {
 					<div className='d-flex'>
 						<span
 							className='cursor-pointer d-block w-100 fw-bold fs-6'
+							style={{ marginLeft: `${row.depth * 1.5}rem` }}
 							onClick={() =>
 								handleOpenForm({
 									...row.original,

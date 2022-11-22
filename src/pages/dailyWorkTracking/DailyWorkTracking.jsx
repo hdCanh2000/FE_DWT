@@ -26,7 +26,7 @@ import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import Loading from '../../components/Loading/Loading';
 import DailyWorktrackForm from './DailyWorktrackForm';
-import { addWorktrackLog } from './services';
+import { addWorktrackLog, uploadFileReport } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import {
 	calcTotalCurrentKPIAllWorkTrack,
@@ -106,11 +106,6 @@ const DailyWorkTracking = () => {
 		valueForm: {},
 	});
 
-	useEffect(() => {
-		const { startDate, endDate } = getQueryDate(0);
-		dispatch(fetchWorktrackListAll({ startDate, endDate }));
-	}, [dispatch]);
-
 	const [open, setOpen] = useState(false);
 	const [state, setState] = useState([
 		{
@@ -119,6 +114,12 @@ const DailyWorkTracking = () => {
 			key: 'selection',
 		},
 	]);
+
+	useEffect(() => {
+		const { startDate, endDate } = getQueryDate(0);
+		dispatch(fetchWorktrackListAll({ startDate, endDate }));
+	}, [dispatch]);
+
 	const handleShowForm = (row, item, dataWorktrack) => {
 		setShowForm(true);
 		setDataShow({
@@ -127,6 +128,7 @@ const DailyWorkTracking = () => {
 			dataWorktrack,
 		});
 	};
+
 	const handleClose = () => {
 		setShowForm(false);
 		setDataShow({
@@ -136,39 +138,91 @@ const DailyWorkTracking = () => {
 	};
 
 	const handleSubmit = (item) => {
-		const dataSubmit = {
-			status: item.status,
-			date: dataShow.valueForm.date,
-			note: item.note,
-			quantity: item.quantity || null,
-			workTrack_id: item.data.dataWorktrack.id || null,
-		};
-		addWorktrackLog(dataSubmit)
-			.then(() => {
-				handleClose();
-				dispatch(fetchWorktrackListAll());
-				toast.success('Báo cáo nhiệm vụ thành công!', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
-				});
+		const selectedFile = item.files;
+		const formData = new FormData();
+		// eslint-disable-next-line no-restricted-syntax
+		for (const key of Object.keys(selectedFile)) {
+			formData.append('files', selectedFile[key], selectedFile[key].name);
+		}
+		uploadFileReport(formData)
+			.then((res) => {
+				const dataSubmit = {
+					status: item.status,
+					date: dataShow.valueForm.date,
+					note: item.note,
+					quantity: item.quantity || null,
+					files: JSON.stringify(res.data.data),
+					workTrack_id: item.data.dataWorktrack.id,
+				};
+				addWorktrackLog(dataSubmit)
+					.then(() => {
+						handleClose();
+						dispatch(fetchWorktrackListAll());
+						toast.success('Báo cáo nhiệm vụ thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+					})
+					.catch((err) => {
+						toast.error('Báo cáo nhiệm vụ không thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						throw err;
+					});
 			})
-			.catch((err) => {
-				toast.error('Báo cáo nhiệm vụ không thành công!', {
+			.catch((error) => {
+				toast.error('Upload file không thành công. Vui lòng thử lại.', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				throw err;
+				throw error;
 			});
+
+		// const dataSubmit = {
+		// 	status: item.status,
+		// 	date: dataShow.valueForm.date,
+		// 	note: item.note,
+		// 	quantity: item.quantity || null,
+		// 	workTrack_id: item.data.dataWorktrack.id || null,
+		// };
+		// addWorktrackLog(dataSubmit)
+		// 	.then(() => {
+		// 		handleClose();
+		// 		dispatch(fetchWorktrackListAll());
+		// 		toast.success('Báo cáo nhiệm vụ thành công!', {
+		// 			position: toast.POSITION.TOP_RIGHT,
+		// 			autoClose: 1000,
+		// 		});
+		// 	})
+		// 	.catch((err) => {
+		// 		toast.error('Báo cáo nhiệm vụ không thành công!', {
+		// 			position: toast.POSITION.TOP_RIGHT,
+		// 			autoClose: 1000,
+		// 		});
+		// 		throw err;
+		// 	});
 	};
+
 	const handleChangeDate = () => {
 		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
 		const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
 		dispatch(fetchWorktrackListAll({ startDate, endDate }));
 		setOpen(false);
 	};
+
 	const columnTables = [
 		{
 			id: 'expander',
+			Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+				<span {...getToggleAllRowsExpandedProps()}>
+					{isAllRowsExpanded ? (
+						<Icon icon='KeyboardArrowDown' color='dark' size='md' />
+					) : (
+						<Icon icon='KeyboardArrowRight' color='dark' size='md' />
+					)}
+				</span>
+			),
 			Cell: ({ row }) =>
 				row.canExpand ? (
 					<span
@@ -197,6 +251,7 @@ const DailyWorkTracking = () => {
 					<div className='d-flex'>
 						<span
 							className='cursor-pointer d-block w-100 fw-bold fs-6'
+							style={{ marginLeft: `${row.depth * 1.5}rem` }}
 							onClick={() =>
 								handleOpenForm({
 									...row.original,
@@ -205,9 +260,7 @@ const DailyWorkTracking = () => {
 									),
 								})
 							}>
-							<div style={{ marginLeft: `${row.depth * 1}rem` }}>
-								{row.original.name || row.original.kpiNorm.name}
-							</div>
+							{row.original.name || row.original.kpiNorm.name}
 						</span>
 					</div>
 				);
@@ -275,6 +328,7 @@ const DailyWorkTracking = () => {
 			},
 		},
 	];
+
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -330,13 +384,6 @@ const DailyWorkTracking = () => {
 												</div>
 											</Toast.Body>
 										</Toast>
-										{/* <Button
-											icon='ChangeCircle'
-											size='sm'
-											onClick={() => fetchData()}
-											color='primary'>
-											Tải lại
-										</Button> */}
 										<Button
 											icon='DateRange'
 											onClick={() => setOpen(!open)}

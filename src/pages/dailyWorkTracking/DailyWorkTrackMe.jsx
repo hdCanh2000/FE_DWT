@@ -29,7 +29,7 @@ import DailyWorktrackInfo from './DailyWorktrackInfo';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import Button from '../../components/bootstrap/Button';
 import { fetchWorktrackListMe } from '../../redux/slice/worktrackSlice';
-import { addWorktrackLog } from './services';
+import { addWorktrackLog, uploadFileReport } from './services';
 import { updateStatusWorktrack } from '../pendingWorktrack/services';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import {
@@ -108,15 +108,25 @@ const DailyWorkTrackingMe = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const [treeValue, setTreeValue] = React.useState([]);
 	const [showForm, setShowForm] = React.useState(false);
+	const [open, setOpen] = useState(false);
+	const [state, setState] = useState([
+		{
+			startDate: new Date(),
+			endDate: addDays(new Date(), 7),
+			key: 'selection',
+		},
+	]);
 	const [dataShow, setDataShow] = React.useState({
 		row: {},
 		column: {},
 		valueForm: {},
 	});
+
 	const fetchData = () => {
 		const query = getQueryDate(0);
 		dispatch(fetchWorktrackListMe(query));
 	};
+
 	useEffect(() => {
 		fetchData();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,44 +174,55 @@ const DailyWorkTrackingMe = () => {
 	};
 
 	const handleSubmit = (item) => {
-		const dataSubmit = {
-			status: item.status,
-			date: dataShow.valueForm.date,
-			note: item.note,
-			quantity: item.quantity || null,
-			workTrack_id: item.data.dataWorktrack.id,
-		};
-		addWorktrackLog(dataSubmit)
-			.then(() => {
-				handleClose();
-				dispatch(fetchWorktrackListMe());
-				toast.success('Báo cáo nhiệm vụ thành công!', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
-				});
+		const selectedFile = item.files;
+		const formData = new FormData();
+		// eslint-disable-next-line no-restricted-syntax
+		for (const key of Object.keys(selectedFile)) {
+			formData.append('files', selectedFile[key], selectedFile[key].name);
+		}
+		uploadFileReport(formData)
+			.then((res) => {
+				const dataSubmit = {
+					status: item.status,
+					date: dataShow.valueForm.date,
+					note: item.note,
+					quantity: item.quantity || null,
+					files: JSON.stringify(res.data.data),
+					workTrack_id: item.data.dataWorktrack.id,
+				};
+				addWorktrackLog(dataSubmit)
+					.then(() => {
+						handleClose();
+						dispatch(fetchWorktrackListMe());
+						toast.success('Báo cáo nhiệm vụ thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+					})
+					.catch((err) => {
+						toast.error('Báo cáo nhiệm vụ không thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						throw err;
+					});
 			})
-			.catch((err) => {
-				toast.error('Báo cáo nhiệm vụ không thành công!', {
+			.catch((error) => {
+				toast.error('Upload file không thành công. Vui lòng thử lại.', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				throw err;
+				throw error;
 			});
 	};
-	const [open, setOpen] = useState(false);
-	const [state, setState] = useState([
-		{
-			startDate: new Date(),
-			endDate: addDays(new Date(), 7),
-			key: 'selection',
-		},
-	]);
+
 	const handleChangeDate = () => {
 		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
 		const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
 		dispatch(fetchWorktrackListMe({ startDate, endDate }));
 		setOpen(false);
 	};
+
 	const handleChangeStatus = (worktrackSubmit) => {
 		const dataSubmit = {
 			id: worktrackSubmit?.id,
@@ -228,6 +249,15 @@ const DailyWorkTrackingMe = () => {
 	const columnTables = [
 		{
 			id: 'expander',
+			Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+				<span {...getToggleAllRowsExpandedProps()}>
+					{isAllRowsExpanded ? (
+						<Icon icon='KeyboardArrowDown' color='dark' size='md' />
+					) : (
+						<Icon icon='KeyboardArrowRight' color='dark' size='md' />
+					)}
+				</span>
+			),
 			Cell: ({ row }) =>
 				row.canExpand ? (
 					<span
@@ -256,6 +286,7 @@ const DailyWorkTrackingMe = () => {
 					<div className='d-flex'>
 						<span
 							className='cursor-pointer d-block w-100 fw-bold fs-6'
+							style={{ marginLeft: `${row.depth * 1.5}rem` }}
 							onClick={() =>
 								handleOpenForm({
 									...row.original,
@@ -354,6 +385,29 @@ const DailyWorkTrackingMe = () => {
 			},
 		},
 	];
+
+	// const handleSubmission = () => {
+	// 	const formData = new FormData();
+	// 	// eslint-disable-next-line no-restricted-syntax
+	// 	for (const key of Object.keys(selectedFile)) {
+	// 		formData.append('files', selectedFile[key], selectedFile[key].name);
+	// 	}
+	// 	uploadFileReport(formData)
+	// 		.then((res) => {
+	// 			setUrls(res.data.data);
+	// 			toast.success('Upload file báo cáo thành công.', {
+	// 				position: toast.POSITION.TOP_RIGHT,
+	// 				autoClose: 1000,
+	// 			});
+	// 		})
+	// 		.catch((error) => {
+	// 			toast.error('Upload file không thành công. Vui lòng thử lại.', {
+	// 				position: toast.POSITION.TOP_RIGHT,
+	// 				autoClose: 1000,
+	// 			});
+	// 			throw error;
+	// 		});
+	// };
 
 	return (
 		<PageWrapper title='Công việc hàng ngày'>
