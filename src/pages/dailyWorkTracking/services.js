@@ -76,6 +76,21 @@ const updateWorktrackLog = (data) => {
 	});
 };
 
+const uploadFileReport = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/api/file/upload`,
+		data,
+	});
+};
+
+const downloadFileReport = (name) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/api/file/download/${name}`,
+	});
+};
+
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -87,4 +102,6 @@ export {
 	getWorktrackById,
 	deleteWorkTrack,
 	getAllWorktrackMe,
+	uploadFileReport,
+	downloadFileReport,
 };

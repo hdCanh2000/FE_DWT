@@ -1,13 +1,19 @@
-import React from 'react';
+/* eslint-disable no-script-url */
+/* eslint-disable react/jsx-no-script-url */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
+import _ from 'lodash';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Select from '../../components/bootstrap/forms/Select';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import Input from '../../components/bootstrap/forms/Input';
+import InputGroup from '../../components/bootstrap/forms/InputGroup';
 import validate from './validate';
+import { downloadFileReport } from './services';
 
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
@@ -22,10 +28,39 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 			handleSubmit({
 				...values,
 				data,
+				files: selectedFile,
 			});
 			resetForm();
 		},
 	});
+
+	const [selectedFile, setSelectedFile] = useState(null);
+
+	const changeHandler = (event) => {
+		setSelectedFile(event.target.files);
+	};
+
+	const handleDowloadFile = async (file) => {
+		const response = await downloadFileReport(file);
+		let filename = file;
+		const disposition = _.get(response.headers, 'content-disposition');
+		if (disposition && disposition.indexOf('attachment') !== -1) {
+			const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+			const matches = filenameRegex.exec(disposition);
+			if (matches != null && matches[1]) {
+				filename = matches[1].replace(/['"]/g, '');
+			}
+		}
+		const url = window.URL.createObjectURL(
+			new Blob([response.data], { type: _.get(response.headers, 'content-type') }),
+		);
+		const link = document.createElement('a');
+		link.href = url;
+		link.setAttribute('download', filename);
+		document.body.appendChild(link);
+		link.click();
+	};
+
 	return (
 		<Modal
 			show={show}
@@ -120,6 +155,34 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 								)}
 							</div>
 						</div>
+						{data.row?.status ? (
+							<div>
+								<h5>Danh sách file báo cáo</h5>
+								<ul>
+									{JSON.parse(data.row.files)?.map((file) => (
+										<li key={file}>
+											<a
+												href='javascript:void(0)'
+												className=''
+												onClick={() => handleDowloadFile(file)}>
+												{file}
+											</a>
+										</li>
+									))}
+								</ul>
+							</div>
+						) : (
+							<div className='col-12'>
+								<InputGroup>
+									<Input
+										type='file'
+										disabled={data.row?.status}
+										multiple
+										onChange={changeHandler}
+									/>
+								</InputGroup>
+							</div>
+						)}
 					</div>
 				</form>
 			</Modal.Body>
