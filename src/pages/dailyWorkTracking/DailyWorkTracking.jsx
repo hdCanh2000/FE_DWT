@@ -14,8 +14,6 @@ import { isEmpty } from 'lodash';
 import Card, {
 	CardActions,
 	CardBody,
-	CardFooter,
-	CardFooterRight,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -28,12 +26,7 @@ import Loading from '../../components/Loading/Loading';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog, uploadFileReport } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
-import {
-	calcTotalCurrentKPIAllWorkTrack,
-	calcTotalKPIAllWorkTrack,
-	columns,
-	renderColor,
-} from '../../utils/function';
+import { columns, renderColor } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
 import Table from './Table';
 import { getQueryDate } from '../../utils/utils';
@@ -178,30 +171,6 @@ const DailyWorkTracking = () => {
 				});
 				throw error;
 			});
-
-		// const dataSubmit = {
-		// 	status: item.status,
-		// 	date: dataShow.valueForm.date,
-		// 	note: item.note,
-		// 	quantity: item.quantity || null,
-		// 	workTrack_id: item.data.dataWorktrack.id || null,
-		// };
-		// addWorktrackLog(dataSubmit)
-		// 	.then(() => {
-		// 		handleClose();
-		// 		dispatch(fetchWorktrackListAll());
-		// 		toast.success('Báo cáo nhiệm vụ thành công!', {
-		// 			position: toast.POSITION.TOP_RIGHT,
-		// 			autoClose: 1000,
-		// 		});
-		// 	})
-		// 	.catch((err) => {
-		// 		toast.error('Báo cáo nhiệm vụ không thành công!', {
-		// 			position: toast.POSITION.TOP_RIGHT,
-		// 			autoClose: 1000,
-		// 		});
-		// 		throw err;
-		// 	});
 	};
 
 	const handleChangeDate = () => {
@@ -414,24 +383,6 @@ const DailyWorkTracking = () => {
 											</TableContainer>
 										)}
 									</TableContainerOuter>
-									<CardFooter
-										tag='div'
-										className=''
-										size='lg'
-										borderColor='primary'>
-										<CardFooterRight tag='div' className='fw-bold fs-5'>
-											Tổng điểm KPI:
-											<span className='text-primary ms-2'>
-												{calcTotalKPIAllWorkTrack(worktrack)}
-											</span>
-										</CardFooterRight>
-										<CardFooterRight tag='div' className='fw-bold fs-5'>
-											Tổng điểm KPI hiện tại:
-											<span className='text-primary ms-2'>
-												{calcTotalCurrentKPIAllWorkTrack(worktrack)}
-											</span>
-										</CardFooterRight>
-									</CardFooter>
 								</CardBody>
 							</Card>
 						</div>

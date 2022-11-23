@@ -317,7 +317,7 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 															{
 																LIST_STATUS.find(
 																	(st) => st.value === log.status,
-																).label
+																)?.label
 															}
 														</td>
 														<td>
