@@ -29,6 +29,7 @@ import { fetchWorktrackListMe } from '../../../redux/slice/worktrackSlice';
 import { addWorktrackLog } from '../../dailyWorkTracking/services';
 import {
 	calcCurrentKPIOfWorkTrack,
+	calcProgressTask,
 	calcTotalCurrentKPIWorkTrackByUser,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
@@ -149,57 +150,71 @@ const Table = ({ columns: userColumns, data }) => {
 		{
 			columns: userColumns,
 			data,
-			initialState: { expanded: { 0: true } },
+			initialState: {
+				expanded: {
+					0: true,
+					1: true,
+					2: true,
+					3: true,
+					4: true,
+					5: true,
+					6: true,
+					7: true,
+					8: true,
+					9: true,
+					10: true,
+				},
+			},
 		},
 		useExpanded,
 	);
 
 	return (
-		<>
-			<table {...getTableProps()}>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th
-									{...column.getHeaderProps({
-										style: { minWidth: column.minWidth, width: column.width },
-									})}>
-									{column.render('Header')}
-								</th>
-							))}
+		<table {...getTableProps()}>
+			<thead>
+				{headerGroups.map((headerGroup) => (
+					<tr {...headerGroup.getHeaderGroupProps()}>
+						{headerGroup.headers.map((column) => (
+							<th
+								{...column.getHeaderProps({
+									style: {
+										minWidth: column.minWidth,
+										width: column.width,
+										textAlign: column.align ? column.align : 'left',
+									},
+								})}>
+								{column.render('Header')}
+							</th>
+						))}
+					</tr>
+				))}
+			</thead>
+			<tbody {...getTableBodyProps()}>
+				{rows.map((row) => {
+					prepareRow(row);
+					return (
+						<tr {...row.getRowProps()}>
+							{row.cells.map((cell) => {
+								return (
+									<td
+										{...cell.getCellProps({
+											style: {
+												minWidth: cell.column.minWidth,
+												width: cell.column.width,
+												textAlign: cell.column.align
+													? cell.column.align
+													: 'left',
+											},
+										})}>
+										{cell.render('Cell')}
+									</td>
+								);
+							})}
 						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
-					{rows.map((row) => {
-						prepareRow(row);
-						return (
-							<tr {...row.getRowProps()}>
-								{row.cells.map((cell) => {
-									return (
-										<td
-											{...cell.getCellProps({
-												style: {
-													minWidth: cell.column.minWidth,
-													width: cell.column.width,
-												},
-											})}>
-											{cell.render('Cell')}
-										</td>
-									);
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			{/* <br />
-			<div>Showing the first 1 results of {rows.length} rows</div>
-			<pre>
-				<code>{JSON.stringify({ expanded }, null, 2)}</code>
-			</pre> */}
-		</>
+					);
+				})}
+			</tbody>
+		</table>
 	);
 };
 
@@ -240,6 +255,7 @@ const UserDashboard = () => {
 							totalKPI: calcTotalKPIOfWorkTrack(item),
 							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
 							currentKPI: calcCurrentKPIOfWorkTrack(item),
+							progress: `${calcProgressTask(item)}%`,
 						};
 					}),
 			);
@@ -323,8 +339,8 @@ const UserDashboard = () => {
 		{
 			Header: 'Tên nhiệm vụ',
 			accessor: 'name',
-			maxWidth: 400,
-			minWidth: 400,
+			maxWidth: 350,
+			minWidth: 350,
 			Cell: ({ row }) => {
 				return (
 					<div className='d-flex'>
@@ -348,26 +364,36 @@ const UserDashboard = () => {
 		{
 			Header: 'Trạng thái',
 			accessor: 'statusName',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 100,
+			minWidth: 100,
+		},
+		{
+			Header: 'Tỉ lệ hoàn thành',
+			accessor: 'progress',
+			maxWidth: 120,
+			minWidth: 120,
+			align: 'right',
 		},
 		{
 			Header: 'Tổng điểm KPI',
 			accessor: 'totalKPI',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 120,
+			minWidth: 120,
+			align: 'right',
 		},
 		{
 			Header: 'KPI đạt được',
 			accessor: 'currentKPI',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 100,
+			minWidth: 100,
+			align: 'right',
 		},
 		{
 			Header: 'Số lượng hoàn thành',
 			accessor: 'totalQuantity',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 150,
+			minWidth: 150,
+			align: 'right',
 		},
 		{
 			Header: 'Nhật trình công việc',
@@ -448,17 +474,17 @@ const UserDashboard = () => {
 								size='lg'
 								borderSize={1}
 								borderColor='primary'>
-								<CardFooterRight tag='div' className='fw-bold fs-5'>
-									Tổng điểm KPI:
-									<span className='text-primary ms-2'>
-										{calcTotalKPIWorkTrackByUser(worktrack)}
-									</span>
-								</CardFooterRight>
-								<CardFooterRight tag='div' className='fw-bold fs-5'>
-									Tổng điểm KPI hiện tại:
-									<span className='text-primary ms-2'>
-										{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
-									</span>
+								<CardFooterRight tag='div' className='fw-bold fs-5 d-flex'>
+									<span>KPI hoàn thành:</span>
+									<div>
+										<span className='text-success me-1'>
+											{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
+										</span>
+										<span>/</span>
+										<span className='text-primary ms-1'>
+											{calcTotalKPIWorkTrackByUser(worktrack)}
+										</span>
+									</div>
 								</CardFooterRight>
 							</CardFooter>
 						</CardBody>

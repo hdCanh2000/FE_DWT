@@ -108,6 +108,12 @@ export const calcTotalCurrentKPIAllWorkTrack = (worktracks) => {
 	return total.toFixed(2);
 };
 
+export const calcProgressTask = (worktrack) => {
+	return Math.round(
+		(calcCurrentKPIOfWorkTrack(worktrack) / calcTotalKPIOfWorkTrack(worktrack)) * 100,
+	);
+};
+
 export const createDataTreeTable = (dataset) => {
 	const hashTable = Object.create(null);
 	dataset.forEach((aData) => {
