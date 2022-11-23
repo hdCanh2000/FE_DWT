@@ -7,11 +7,9 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTable, useExpanded } from 'react-table';
 import styled from 'styled-components';
-import { L10n } from '@syncfusion/ej2-base';
 import { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
 import Card, {
-	CardActions,
 	CardBody,
 	CardFooter,
 	CardFooterRight,
@@ -26,12 +24,12 @@ import { fetchEmployeeList } from '../../../redux/slice/employeeSlice';
 import { LIST_STATUS } from '../../../utils/constants';
 import DailyWorktrackInfo from '../../dailyWorkTracking/DailyWorktrackInfo';
 import DailyWorktrackForm from '../../dailyWorkTracking/DailyWorktrackForm';
-import Button from '../../../components/bootstrap/Button';
-import { addWorktrackLog } from '../../dailyWorkTracking/services';
+import { addWorktrackLog, uploadFileReport } from '../../dailyWorkTracking/services';
 import { fetchWorktrackListMe } from '../../../redux/slice/worktrackSlice';
 import Icon from '../../../components/icon/Icon';
 import {
 	calcCurrentKPIOfWorkTrack,
+	calcProgressTask,
 	calcTotalCurrentKPIWorkTrackByUser,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
@@ -129,15 +127,6 @@ const renderColor = (status) => {
 	}
 };
 
-L10n.load({
-	'vi-VI': {
-		grid: {
-			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
-			EmptyRecord: 'Hiện tại chưa có công việc.',
-		},
-	},
-});
-
 const Table = ({ columns: userColumns, data }) => {
 	const {
 		getTableProps,
@@ -151,57 +140,71 @@ const Table = ({ columns: userColumns, data }) => {
 		{
 			columns: userColumns,
 			data,
-			initialState: { expanded: { 0: true } },
+			initialState: {
+				expanded: {
+					0: true,
+					1: true,
+					2: true,
+					3: true,
+					4: true,
+					5: true,
+					6: true,
+					7: true,
+					8: true,
+					9: true,
+					10: true,
+				},
+			},
 		},
 		useExpanded,
 	);
 
 	return (
-		<>
-			<table {...getTableProps()}>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th
-									{...column.getHeaderProps({
-										style: { minWidth: column.minWidth, width: column.width },
-									})}>
-									{column.render('Header')}
-								</th>
-							))}
+		<table {...getTableProps()}>
+			<thead>
+				{headerGroups.map((headerGroup) => (
+					<tr {...headerGroup.getHeaderGroupProps()}>
+						{headerGroup.headers.map((column) => (
+							<th
+								{...column.getHeaderProps({
+									style: {
+										minWidth: column.minWidth,
+										width: column.width,
+										textAlign: column.align ? column.align : 'left',
+									},
+								})}>
+								{column.render('Header')}
+							</th>
+						))}
+					</tr>
+				))}
+			</thead>
+			<tbody {...getTableBodyProps()}>
+				{rows.map((row) => {
+					prepareRow(row);
+					return (
+						<tr {...row.getRowProps()}>
+							{row.cells.map((cell) => {
+								return (
+									<td
+										{...cell.getCellProps({
+											style: {
+												minWidth: cell.column.minWidth,
+												width: cell.column.width,
+												textAlign: cell.column.align
+													? cell.column.align
+													: 'left',
+											},
+										})}>
+										{cell.render('Cell')}
+									</td>
+								);
+							})}
 						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
-					{rows.map((row) => {
-						prepareRow(row);
-						return (
-							<tr {...row.getRowProps()}>
-								{row.cells.map((cell) => {
-									return (
-										<td
-											{...cell.getCellProps({
-												style: {
-													minWidth: cell.column.minWidth,
-													width: cell.column.width,
-												},
-											})}>
-											{cell.render('Cell')}
-										</td>
-									);
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			{/* <br />
-			<div>Showing the first 1 results of {rows.length} rows</div>
-			<pre>
-				<code>{JSON.stringify({ expanded }, null, 2)}</code>
-			</pre> */}
-		</>
+					);
+				})}
+			</tbody>
+		</table>
 	);
 };
 
@@ -241,6 +244,7 @@ const ManagerDashboard = () => {
 							totalKPI: calcTotalKPIOfWorkTrack(item),
 							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
 							currentKPI: calcCurrentKPIOfWorkTrack(item),
+							progress: `${calcProgressTask(item)}%`,
 						};
 					}),
 			);
@@ -267,28 +271,45 @@ const ManagerDashboard = () => {
 	};
 
 	const handleSubmit = (item) => {
-		const dataSubmit = {
-			status: item.status,
-			date: dataShow.valueForm.date,
-			note: item.note,
-			quantity: item.quantity || null,
-			workTrack_id: item.data.dataWorktrack.id || null,
-		};
-		addWorktrackLog(dataSubmit)
-			.then(() => {
-				handleClose();
-				dispatch(fetchWorktrackListMe());
-				toast.success('Báo cáo nhiệm vụ thành công!', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
-				});
+		const selectedFile = item.files;
+		const formData = new FormData();
+		// eslint-disable-next-line no-restricted-syntax
+		for (const key of Object.keys(selectedFile)) {
+			formData.append('files', selectedFile[key], selectedFile[key].name);
+		}
+		uploadFileReport(formData)
+			.then((res) => {
+				const dataSubmit = {
+					status: item.status,
+					date: dataShow.valueForm.date,
+					note: item.note,
+					quantity: item.quantity || null,
+					files: JSON.stringify(res.data.data),
+					workTrack_id: item.data.dataWorktrack.id,
+				};
+				addWorktrackLog(dataSubmit)
+					.then(() => {
+						handleClose();
+						dispatch(fetchWorktrackListMe());
+						toast.success('Báo cáo nhiệm vụ thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+					})
+					.catch((err) => {
+						toast.error('Báo cáo nhiệm vụ không thành công!', {
+							position: toast.POSITION.TOP_RIGHT,
+							autoClose: 1000,
+						});
+						throw err;
+					});
 			})
-			.catch((err) => {
-				toast.error('Báo cáo nhiệm vụ không thành công!', {
+			.catch((error) => {
+				toast.error('Upload file không thành công. Vui lòng thử lại.', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				throw err;
+				throw error;
 			});
 	};
 
@@ -325,8 +346,8 @@ const ManagerDashboard = () => {
 		{
 			Header: 'Tên nhiệm vụ',
 			accessor: 'name',
-			maxWidth: 400,
-			minWidth: 400,
+			maxWidth: 350,
+			minWidth: 350,
 			Cell: ({ row }) => {
 				return (
 					<div className='d-flex'>
@@ -350,26 +371,36 @@ const ManagerDashboard = () => {
 		{
 			Header: 'Trạng thái',
 			accessor: 'statusName',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 100,
+			minWidth: 100,
+		},
+		{
+			Header: 'Tỉ lệ hoàn thành',
+			accessor: 'progress',
+			maxWidth: 120,
+			minWidth: 120,
+			align: 'right',
 		},
 		{
 			Header: 'Tổng điểm KPI',
 			accessor: 'totalKPI',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 120,
+			minWidth: 120,
+			align: 'right',
 		},
 		{
 			Header: 'KPI đạt được',
 			accessor: 'currentKPI',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 100,
+			minWidth: 100,
+			align: 'right',
 		},
 		{
 			Header: 'Số lượng hoàn thành',
 			accessor: 'totalQuantity',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 150,
+			minWidth: 150,
+			align: 'right',
 		},
 		{
 			Header: 'Nhật trình công việc',
@@ -435,10 +466,9 @@ const ManagerDashboard = () => {
 								<thead>
 									<tr>
 										<th>Họ và tên</th>
-										<th>Phòng ban</th>
 										<th>Vị trí</th>
-										<th className='text-center'>Số nhiệm vụ đang có</th>
-										<th>Chức vụ</th>
+										<th className='text-center'>Số nhiệm vụ đang thực hiện</th>
+										{/* <th className='text-center'>Tỉ lệ hoàn thành</th> */}
 									</tr>
 								</thead>
 								<tbody>
@@ -452,7 +482,6 @@ const ManagerDashboard = () => {
 														{item.name}
 													</Link>
 												</td>
-												<td>{item?.department?.name}</td>
 												<td>{item?.position?.name}</td>
 												<td className='text-center'>
 													{item?.workTracks?.filter((wt) => {
@@ -461,11 +490,6 @@ const ManagerDashboard = () => {
 															true
 														);
 													})?.length || 0}
-												</td>
-												<td>
-													{item?.role === 'manager'
-														? 'Quản lý '
-														: 'Nhân viên'}
 												</td>
 											</tr>
 										</React.Fragment>
@@ -485,18 +509,6 @@ const ManagerDashboard = () => {
 									<CardLabel>Danh sách công việc đang thực hiện</CardLabel>
 								</CardTitle>
 							</CardLabel>
-							<CardActions>
-								<Button
-									color='info'
-									icon='ChangeCircle'
-									tag='button'
-									type='button'
-									isOutline={false}
-									isLight
-									onClick={() => dispatch(fetchWorktrackListMe())}>
-									Tải lại
-								</Button>
-							</CardActions>
 						</CardHeader>
 						<CardBody>
 							<TableContainerOuter>
@@ -512,17 +524,17 @@ const ManagerDashboard = () => {
 								size='lg'
 								borderSize={1}
 								borderColor='primary'>
-								<CardFooterRight tag='div' className='fw-bold fs-5'>
-									Tổng điểm KPI:
-									<span className='text-primary ms-2'>
-										{calcTotalKPIWorkTrackByUser(worktrack)}
-									</span>
-								</CardFooterRight>
-								<CardFooterRight tag='div' className='fw-bold fs-5'>
-									Tổng điểm KPI hiện tại:
-									<span className='text-primary ms-2'>
-										{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
-									</span>
+								<CardFooterRight tag='div' className='fw-bold fs-5 d-flex'>
+									<span>KPI hoàn thành:</span>
+									<div>
+										<span className='text-success me-1'>
+											{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
+										</span>
+										<span>/</span>
+										<span className='text-primary ms-1'>
+											{calcTotalKPIWorkTrackByUser(worktrack)}
+										</span>
+									</div>
 								</CardFooterRight>
 							</CardFooter>
 						</CardBody>

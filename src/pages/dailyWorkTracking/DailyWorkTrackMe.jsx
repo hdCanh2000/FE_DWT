@@ -34,6 +34,7 @@ import { updateStatusWorktrack } from '../pendingWorktrack/services';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import {
 	calcCurrentKPIOfWorkTrack,
+	calcProgressTask,
 	calcTotalCurrentKPIWorkTrackByUser,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
@@ -147,6 +148,7 @@ const DailyWorkTrackingMe = () => {
 							totalKPI: calcTotalKPIOfWorkTrack(item),
 							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
 							currentKPI: calcCurrentKPIOfWorkTrack(item),
+							progress: `${calcProgressTask(item)}%`,
 						};
 					}),
 			);
@@ -279,8 +281,8 @@ const DailyWorkTrackingMe = () => {
 		{
 			Header: 'Tên nhiệm vụ',
 			accessor: 'name',
-			maxWidth: 400,
-			minWidth: 400,
+			maxWidth: 350,
+			minWidth: 350,
 			Cell: ({ row }) => {
 				return (
 					<div className='d-flex'>
@@ -304,14 +306,15 @@ const DailyWorkTrackingMe = () => {
 		{
 			Header: 'Trạng thái',
 			accessor: 'statusName',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 100,
+			minWidth: 100,
 		},
 		{
 			Header: 'Báo cáo',
 			accessor: 'report',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 100,
+			minWidth: 100,
+			align: 'center',
 			Cell: ({ row }) => {
 				return (
 					<div className='d-flex'>
@@ -330,22 +333,32 @@ const DailyWorkTrackingMe = () => {
 			},
 		},
 		{
+			Header: 'Tỉ lệ hoàn thành',
+			accessor: 'progress',
+			maxWidth: 120,
+			minWidth: 120,
+			align: 'right',
+		},
+		{
 			Header: 'Tổng điểm KPI',
 			accessor: 'totalKPI',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 120,
+			minWidth: 120,
+			align: 'right',
 		},
 		{
 			Header: 'KPI đạt được',
 			accessor: 'currentKPI',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 100,
+			minWidth: 100,
+			align: 'right',
 		},
 		{
 			Header: 'Số lượng hoàn thành',
 			accessor: 'totalQuantity',
-			maxWidth: 200,
-			minWidth: 200,
+			maxWidth: 150,
+			minWidth: 150,
+			align: 'right',
 		},
 		{
 			Header: 'Nhật trình công việc',
@@ -385,29 +398,6 @@ const DailyWorkTrackingMe = () => {
 			},
 		},
 	];
-
-	// const handleSubmission = () => {
-	// 	const formData = new FormData();
-	// 	// eslint-disable-next-line no-restricted-syntax
-	// 	for (const key of Object.keys(selectedFile)) {
-	// 		formData.append('files', selectedFile[key], selectedFile[key].name);
-	// 	}
-	// 	uploadFileReport(formData)
-	// 		.then((res) => {
-	// 			setUrls(res.data.data);
-	// 			toast.success('Upload file báo cáo thành công.', {
-	// 				position: toast.POSITION.TOP_RIGHT,
-	// 				autoClose: 1000,
-	// 			});
-	// 		})
-	// 		.catch((error) => {
-	// 			toast.error('Upload file không thành công. Vui lòng thử lại.', {
-	// 				position: toast.POSITION.TOP_RIGHT,
-	// 				autoClose: 1000,
-	// 			});
-	// 			throw error;
-	// 		});
-	// };
 
 	return (
 		<PageWrapper title='Công việc hàng ngày'>
@@ -507,18 +497,24 @@ const DailyWorkTrackingMe = () => {
 												</TableContainer>
 											)}
 										</TableContainerOuter>
-										<CardFooter tag='div' className='' size='lg'>
-											<CardFooterRight tag='div' className='fw-bold fs-5'>
-												Tổng điểm KPI:
-												<span className='text-primary ms-2'>
-													{calcTotalKPIWorkTrackByUser(worktrack)}
-												</span>
-											</CardFooterRight>
-											<CardFooterRight tag='div' className='fw-bold fs-5'>
-												Tổng điểm KPI hoàn thành:
-												<span className='text-primary ms-2'>
-													{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
-												</span>
+										<CardFooter
+											tag='div'
+											className=''
+											size='lg'
+											borderColor='primary'>
+											<CardFooterRight className='fw-bold fs-5 d-flex'>
+												<span>KPI hoàn thành:</span>
+												<div>
+													<span className='text-success me-1'>
+														{calcTotalCurrentKPIWorkTrackByUser(
+															worktrack,
+														)}
+													</span>
+													<span>/</span>
+													<span className='text-primary ms-1'>
+														{calcTotalKPIWorkTrackByUser(worktrack)}
+													</span>
+												</div>
 											</CardFooterRight>
 										</CardFooter>
 									</CardBody>
