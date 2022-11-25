@@ -200,15 +200,6 @@ const DailyWorkTrackingMe = () => {
 	const columnTables = [
 		{
 			id: 'expander',
-			Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
-				<span {...getToggleAllRowsExpandedProps()}>
-					{isAllRowsExpanded ? (
-						<Icon icon='KeyboardArrowDown' color='dark' size='md' />
-					) : (
-						<Icon icon='KeyboardArrowRight' color='dark' size='md' />
-					)}
-				</span>
-			),
 			Cell: ({ row }) =>
 				row.canExpand ? (
 					<span
