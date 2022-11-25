@@ -23,6 +23,7 @@ import Card, {
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
+import { fetchEmployeeById } from '../../redux/slice/employeeSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
@@ -50,6 +51,7 @@ import { inputRanges, staticRanges } from './customReactDateRange';
 const DailyWorkTrackingUser = () => {
 	const dispatch = useDispatch();
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
+	const employee = useSelector((state) => state.employee.employee);
 	const loading = useSelector((state) => state.worktrack.loading);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -86,6 +88,7 @@ const DailyWorkTrackingUser = () => {
 
 	useEffect(() => {
 		fetchData();
+		dispatch(fetchEmployeeById(id));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [dispatch, id]);
 
@@ -192,6 +195,15 @@ const DailyWorkTrackingUser = () => {
 	const columnTables = [
 		{
 			id: 'expander',
+			Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+				<span {...getToggleAllRowsExpandedProps()}>
+					{isAllRowsExpanded ? (
+						<Icon icon='KeyboardArrowDown' color='dark' size='md' />
+					) : (
+						<Icon icon='KeyboardArrowRight' color='dark' size='md' />
+					)}
+				</span>
+			),
 			Cell: ({ row }) =>
 				row.canExpand ? (
 					<span
@@ -315,14 +327,12 @@ const DailyWorkTrackingUser = () => {
 					<div className='row mb-0'>
 						<div className='col-12'>
 							<Card className='w-100'>
-								<CardHeader>
-									<CardLabel icon='TaskAlt' iconColor='primary'>
-										<CardTitle>
-											<CardLabel>
-												Danh sách nhiệm vụ của {_.get(worktrack, 'name')}
-												<span className='mx-2'>-</span>
-												{_.get(worktrack, 'department.name')}
-											</CardLabel>
+								<CardHeader className='w-100 text-center'>
+									<CardLabel className='d-block w-100'>
+										<CardTitle className='fs-4 my-2'>
+											Danh sách nhiệm vụ của {_.get(employee, 'name')}
+											<span className='mx-2'>-</span>
+											{_.get(employee, 'department.name')}
 										</CardTitle>
 										<CardSubTitle className='fs-5 text-info'>
 											Từ {state[0].startDate.toLocaleDateString()}
@@ -330,6 +340,10 @@ const DailyWorkTrackingUser = () => {
 											{state[0].endDate.toLocaleDateString()}
 										</CardSubTitle>
 									</CardLabel>
+								</CardHeader>
+								<CardHeader
+									className='d-block text-end py-0'
+									style={{ minHeight: '100%' }}>
 									<CardActions style={{ display: 'inline-flex' }}>
 										<Toast
 											style={{
@@ -377,13 +391,6 @@ const DailyWorkTrackingUser = () => {
 												</div>
 											</Toast.Body>
 										</Toast>
-										<Button
-											icon='ChangeCircle'
-											size='sm'
-											onClick={() => fetchData()}
-											color='primary'>
-											Tải lại
-										</Button>
 										<Button
 											icon='DateRange'
 											onClick={() => setOpen(!open)}

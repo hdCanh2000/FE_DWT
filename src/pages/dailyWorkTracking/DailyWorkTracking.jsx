@@ -132,6 +132,15 @@ const DailyWorkTracking = () => {
 	const columnTables = [
 		{
 			id: 'expander',
+			Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+				<span {...getToggleAllRowsExpandedProps()}>
+					{isAllRowsExpanded ? (
+						<Icon icon='KeyboardArrowDown' color='dark' size='md' />
+					) : (
+						<Icon icon='KeyboardArrowRight' color='dark' size='md' />
+					)}
+				</span>
+			),
 			Cell: ({ row }) =>
 				row.canExpand ? (
 					<span
@@ -259,10 +268,10 @@ const DailyWorkTracking = () => {
 					<div className='row mb-0'>
 						<div className='col-12'>
 							<Card className='w-100'>
-								<CardHeader>
-									<CardLabel icon='TaskAlt' iconColor='primary'>
-										<CardTitle>
-											<CardLabel>Danh sách nhiệm vụ</CardLabel>
+								<CardHeader className='w-100 text-center'>
+									<CardLabel className='d-block w-100'>
+										<CardTitle className='fs-4 my-2'>
+											Danh sách nhiệm vụ
 										</CardTitle>
 										<CardSubTitle className='fs-5 text-info'>
 											Từ {state[0].startDate.toLocaleDateString()}
@@ -270,6 +279,10 @@ const DailyWorkTracking = () => {
 											{state[0].endDate.toLocaleDateString()}
 										</CardSubTitle>
 									</CardLabel>
+								</CardHeader>
+								<CardHeader
+									className='d-block text-end py-0'
+									style={{ minHeight: '100%' }}>
 									<CardActions style={{ display: 'inline-flex' }}>
 										<Toast
 											style={{

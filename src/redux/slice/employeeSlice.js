@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
 	getAllEmployee,
+	getUserById,
 	getAllEmployeeByDepartment,
 	addEmployee,
 	updateEmployee,
@@ -8,16 +9,21 @@ import {
 
 const initialState = {
 	employees: [],
+	employee: {},
 	loading: false,
 	error: false,
 	pagination: {},
 	currentPage: 1,
 };
 
-// Đầu tiên, tạo thunk
 export const fetchEmployeeList = createAsyncThunk('employee/fetchList', async (params) => {
 	const response = await getAllEmployee(params);
 	return response.data;
+});
+
+export const fetchEmployeeById = createAsyncThunk('employee/fetchById', async (id) => {
+	const response = await getUserById(id);
+	return response.data.data;
 });
 
 export const fetchEmployeeListByDepartment = createAsyncThunk(
@@ -104,6 +110,18 @@ export const employeeSlice = createSlice({
 			state.employees = [...action.payload];
 		},
 		[fetchEmployeeListByDepartment.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// fetch employee by id
+		[fetchEmployeeById.pending]: (state) => {
+			state.loading = true;
+		},
+		[fetchEmployeeById.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.employee = { ...action.payload };
+		},
+		[fetchEmployeeById.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
