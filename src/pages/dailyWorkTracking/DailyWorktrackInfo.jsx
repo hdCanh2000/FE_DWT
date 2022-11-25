@@ -4,29 +4,14 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect, memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import SelectComponent from 'react-select';
 import { Modal } from 'react-bootstrap';
 import { get, isEmpty } from 'lodash';
 import styled from 'styled-components';
-import FormGroup from '../../components/bootstrap/forms/FormGroup';
-import Input from '../../components/bootstrap/forms/Input';
-import Select from '../../components/bootstrap/forms/Select';
-import { LIST_STATUS, PRIORITIES } from '../../utils/constants';
-import Option from '../../components/bootstrap/Option';
-import Textarea from '../../components/bootstrap/forms/Textarea';
+import { LIST_STATUS } from '../../utils/constants';
 import { fetchMissionList } from '../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchAssignTask } from '../../redux/slice/worktrackSlice';
 import { downloadFileReport } from './services';
-
-const customStyles = {
-	control: (provided) => ({
-		...provided,
-		padding: '10px',
-		fontSize: '18px',
-		borderRadius: '1.25rem',
-	}),
-};
 
 const Styles = styled.div`
 	table {
@@ -148,207 +133,128 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 			<Modal.Body className='px-4'>
 				<div className='row'>
 					<div className='col-12 p-4'>
-						<div className='row'>
-							<table className='w-100 mb-4 border'>
+						<h5 className='text-info mb-2'>Thông tin định mức lao động</h5>
+						<table className='w-100 border'>
+							<thead>
+								<tr>
+									<th className='p-2 border text-left'>Tên định mức lao động</th>
+									<th className='p-2 border text-center'>Định mức KPI</th>
+									<th className='p-2 border text-center'>Số lượng</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td className='p-2 border text-left'>
+										<b>
+											{get(item, 'kpiNorm_name')
+												? get(item, 'kpiNorm_name')
+												: get(mission, 'kpiNorm.name')}
+										</b>
+									</td>
+									<td className='p-2 border text-center'>
+										<b>
+											{item.id
+												? get(item, 'kpiNorm.kpi_value')
+												: get(item, 'kpi_value')}
+										</b>
+									</td>
+									<td className='p-2 border text-center'>
+										<b>
+											{item.id
+												? get(item, 'kpiNorm.quantity')
+												: get(item, 'quantity')}
+										</b>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div className='col-12 px-4'>
+						<h5 className='text-info mb-2'>Thông tin nhiệm vụ</h5>
+						<table className='w-100 border'>
+							<tr>
+								<th className='p-2 border text-left'>Tên nhiệm vụ</th>
+								<td className='p-2 border text-left'>{mission.name}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Nhiệm vụ cha</th>
+								<td className='p-2 border text-left'>{parentOption.label}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Thuộc mục tiêu</th>
+								<td className='p-2 border text-left'>{missionOption.label}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Người phụ trách</th>
+								<td className='p-2 border text-left'>{userOption.label}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Ngày bắt đầu</th>
+								<td className='p-2 border text-left'>{mission.startDate}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Hạn hoàn thành</th>
+								<td className='p-2 border text-left'>{mission.deadline}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Độ ưu tiên</th>
+								<td className='p-2 border text-left'>{`Cấp ${mission.priority}`}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Số lượng</th>
+								<td className='p-2 border text-left'>{mission.quantity}</td>
+							</tr>
+							<tr>
+								<th className='p-2 border text-left'>Ghi chú</th>
+								<td className='p-2 border text-left'>{mission.note}</td>
+							</tr>
+						</table>
+					</div>
+					<div className='col-12 p-4'>
+						{/* Tracking công việc */}
+						<h5 className='text-info mb-2'>Danh sách tracking công việc</h5>
+						<Styles>
+							<table>
 								<thead>
 									<tr>
-										<th className='p-3 border text-left'>
-											Tên định mức lao động
-										</th>
-										<th className='p-3 border text-center'>Định mức KPI</th>
-										<th className='p-3 border text-center'>Số lượng</th>
+										<th className='text-center'>Ngày thực hiện</th>
+										<th>Trạng thái công việc</th>
+										<th>Danh sách file báo cáo</th>
 									</tr>
 								</thead>
-								<tbody>
-									<tr>
-										<td className='p-3 border text-left'>
-											<b>
-												{get(item, 'kpiNorm_name')
-													? get(item, 'kpiNorm_name')
-													: get(mission, 'kpiNorm.name')}
-											</b>
-										</td>
-										<td className='p-3 border text-center'>
-											<b>
-												{item.id
-													? get(item, 'kpiNorm.kpi_value')
-													: get(item, 'kpi_value')}
-											</b>
-										</td>
-										<td className='p-3 border text-center'>
-											<b>
-												{item.id
-													? get(item, 'kpiNorm.quantity')
-													: get(item, 'quantity')}
-											</b>
-										</td>
-									</tr>
+								<tbody className='overflow-scroll'>
+									{item?.workTrackLogs?.map((log) => (
+										<tr>
+											<td className='text-center'>{log?.date}</td>
+											<td>
+												{
+													LIST_STATUS.find(
+														(st) => st.value === log.status,
+													)?.label
+												}
+											</td>
+											<td>
+												<ul className='mb-0'>
+													{log?.files &&
+														JSON.parse(log?.files)?.map((file) => (
+															<li key={file}>
+																<a
+																	href='javascript:void(0)'
+																	className=''
+																	onClick={() =>
+																		handleDowloadFile(file)
+																	}>
+																	{file}
+																</a>
+															</li>
+														))}
+												</ul>
+											</td>
+										</tr>
+									))}
 								</tbody>
 							</table>
-							{/* Thuộc mục tiêu */}
-							<div className='row g-2'>
-								<div className='col-12'>
-									<FormGroup id='name' label='Tên nhiệm vụ'>
-										<Input
-											name='name'
-											placeholder='Tên nhiệm vụ'
-											value={mission.name}
-											type='text'
-											disabled
-											ariaLabel='Tên nhiệm vụ'
-											className='border border-2 rounded-0 shadow-none'
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-4'>
-									<FormGroup id='task' label='Thuộc mục tiêu'>
-										<SelectComponent
-											placeholder='Thuộc mục tiêu'
-											value={missionOption}
-											isDisabled
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-4'>
-									<FormGroup id='parent' label='Thuộc nhiệm vụ cha'>
-										<SelectComponent
-											placeholder='Thuộc nhiệm vụ cha'
-											value={parentOption}
-											isDisabled
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-4'>
-									<FormGroup id='userOption' label='Nguời phụ trách'>
-										<SelectComponent
-											style={customStyles}
-											placeholder='Chọn nguời phụ trách'
-											value={userOption}
-											isDisabled
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-3'>
-									<FormGroup id='startDate' label='Ngày bắt đầu'>
-										<Input
-											name='startDate'
-											placeholder='Ngày bắt đầu'
-											value={mission.startDate || ''}
-											type='date'
-											ariaLabel='Ngày bắt đầu'
-											className='border border-2 rounded-0 shadow-none'
-											disabled
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-3'>
-									<FormGroup id='deadline' label='Hạn ngày hoàn thành'>
-										<Input
-											name='deadline'
-											placeholder='Hạn ngày hoàn thành'
-											value={mission.deadline || ''}
-											type='date'
-											ariaLabel='Hạn ngày hoàn thành'
-											className='border border-2 rounded-0 shadow-none'
-											disabled
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-3'>
-									<FormGroup id='priority' label='Độ ưu tiên'>
-										<Select
-											name='priority'
-											ariaLabel='Board select'
-											className='border border-2 rounded-0 shadow-none'
-											placeholder='Độ ưu tiên'
-											disabled
-											value={mission.priority || 2}>
-											{PRIORITIES.map((priority) => (
-												<Option key={priority} value={priority}>
-													{`Cấp ${priority}`}
-												</Option>
-											))}
-										</Select>
-									</FormGroup>
-								</div>
-								<div className='col-3'>
-									<FormGroup id='quantity' label='Số lượng'>
-										<Input
-											type='text'
-											name='quantity'
-											value={mission.quantity || ''}
-											placeholder='Số lượng'
-											disabled
-											className='border border-2 rounded-0 shadow-none'
-										/>
-									</FormGroup>
-								</div>
-								<div className='col-12'>
-									<FormGroup id='note' label='Ghi chú'>
-										<Textarea
-											name='note'
-											value={mission.note || ''}
-											ariaLabel='Ghi chú'
-											placeholder='Ghi chú'
-											disabled
-											className='border border-2 rounded-0 shadow-none'
-										/>
-									</FormGroup>
-								</div>
-							</div>
-							{/* Tracking công việc */}
-							<div className='row g-2'>
-								<div className='col-12'>
-									<h5>Danh sách tracking công việc</h5>
-									<Styles>
-										<table>
-											<thead>
-												<tr>
-													<th className='text-center'>Ngày thực hiện</th>
-													<th>Trạng thái công việc</th>
-													<th>Danh sách file báo cáo</th>
-												</tr>
-											</thead>
-											<tbody className='overflow-scroll'>
-												{item?.workTrackLogs?.map((log) => (
-													<tr>
-														<td className='text-center'>{log?.date}</td>
-														<td>
-															{
-																LIST_STATUS.find(
-																	(st) => st.value === log.status,
-																)?.label
-															}
-														</td>
-														<td>
-															<ul className='mb-0'>
-																{log?.files &&
-																	JSON.parse(log?.files)?.map(
-																		(file) => (
-																			<li key={file}>
-																				<a
-																					href='javascript:void(0)'
-																					className=''
-																					onClick={() =>
-																						handleDowloadFile(
-																							file,
-																						)
-																					}>
-																					{file}
-																				</a>
-																			</li>
-																		),
-																	)}
-															</ul>
-														</td>
-													</tr>
-												))}
-											</tbody>
-										</table>
-									</Styles>
-								</div>
-							</div>
-						</div>
+						</Styles>
 					</div>
 				</div>
 			</Modal.Body>

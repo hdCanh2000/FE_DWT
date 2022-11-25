@@ -201,6 +201,15 @@ const DailyWorkTrackingMe = () => {
 	const columnTables = [
 		{
 			id: 'expander',
+			Header: ({ getToggleAllRowsExpandedProps, isAllRowsExpanded }) => (
+				<span {...getToggleAllRowsExpandedProps()}>
+					{isAllRowsExpanded ? (
+						<Icon icon='KeyboardArrowDown' color='dark' size='md' />
+					) : (
+						<Icon icon='KeyboardArrowRight' color='dark' size='md' />
+					)}
+				</span>
+			),
 			Cell: ({ row }) =>
 				row.canExpand ? (
 					<span
@@ -351,112 +360,103 @@ const DailyWorkTrackingMe = () => {
 					<div className='row mb-0 h-100'>
 						<div className='col-12'>
 							<Card className='w-100'>
-								<div style={{ margin: '24px 24px 0' }}>
-									<CardHeader>
-										<CardLabel icon='FormatListBulleted' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Nhiệm vụ của tôi</CardLabel>
-											</CardTitle>
-											<CardSubTitle className='fs-5 text-info'>
-												Từ {state[0].startDate.toLocaleDateString()}
-												<span className='mx-2'>-</span>
-												{state[0].endDate.toLocaleDateString()}
-											</CardSubTitle>
-										</CardLabel>
-										<CardActions style={{ display: 'inline-flex' }}>
-											<Toast
+								<CardHeader className='w-100 text-center'>
+									<CardLabel className='d-block w-100'>
+										<CardTitle className='fs-4 my-2'>
+											Danh sách nhiệm vụ của tôi
+										</CardTitle>
+										<CardSubTitle className='fs-5 text-info'>
+											Từ {state[0].startDate.toLocaleDateString()}
+											<span className='mx-2'>-</span>
+											{state[0].endDate.toLocaleDateString()}
+										</CardSubTitle>
+									</CardLabel>
+								</CardHeader>
+								<CardHeader
+									className='d-block text-end py-0'
+									style={{ minHeight: '100%' }}>
+									<CardActions style={{ display: 'inline-flex' }}>
+										<Toast
+											style={{
+												width: 'auto',
+												right: '0',
+												top: '7vh',
+												position: 'absolute',
+												zIndex: '100',
+											}}
+											onClose={() => setOpen(false)}
+											show={open}
+											animation={false}>
+											<Toast.Header closeButton={false}>
+												<DateRangePicker
+													onChange={(item) => setState([item.selection])}
+													showSelectionPreview
+													moveRangeOnFirstSelection={false}
+													months={1}
+													ranges={state}
+													direction='horizontal'
+													staticRanges={staticRanges}
+													inputRanges={inputRanges}
+												/>
+											</Toast.Header>
+											<Toast.Body
 												style={{
-													width: 'auto',
-													right: '0',
-													top: '7vh',
-													position: 'absolute',
-													zIndex: '100',
-												}}
-												onClose={() => setOpen(false)}
-												show={open}
-												animation={false}>
-												<Toast.Header closeButton={false}>
-													<DateRangePicker
-														onChange={(item) =>
-															setState([item.selection])
-														}
-														showSelectionPreview
-														moveRangeOnFirstSelection={false}
-														months={1}
-														ranges={state}
-														direction='horizontal'
-														staticRanges={staticRanges}
-														inputRanges={inputRanges}
-													/>
-												</Toast.Header>
-												<Toast.Body
+													background: '#fff',
+													height: 60,
+												}}>
+												<div
 													style={{
-														background: '#fff',
-														height: 60,
+														float: 'right',
 													}}>
-													<div
-														style={{
-															float: 'right',
-														}}>
-														<Button
-															onClick={() => setOpen(!open)}
-															color='danger'>
-															Đóng
-														</Button>
-														<Button
-															style={{ marginLeft: '5px' }}
-															onClick={() => handleChangeDate()}
-															color='info'>
-															Chấp nhận
-														</Button>
-													</div>
-												</Toast.Body>
-											</Toast>
-											<Button
-												icon='ChangeCircle'
-												size='sm'
-												onClick={() => fetchData()}
-												color='primary'>
-												Tải lại
-											</Button>
-											<Button
-												icon='DateRange'
-												onClick={() => setOpen(!open)}
-												color='primary'>
-												Lọc theo tháng
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<CardBody>
-										<Table columns={columnTables} data={treeValue} />
-										<CardFooter
-											tag='div'
-											className=''
-											size='lg'
-											borderColor='primary'>
-											<CardFooterRight className='fw-bold fs-5 d-flex'>
-												<span>KPI tạm tính:</span>
-												<div>
-													<span className='text-success me-1'>
-														{calcTotalCurrentKPIWorkTrackByUser(
-															worktrack,
-														)}
-													</span>
-													<span>/</span>
-													<span className='text-primary ms-1'>
-														{calcTotalKPIWorkTrackByUser(worktrack)}
-													</span>
+													<Button
+														onClick={() => setOpen(!open)}
+														color='danger'>
+														Đóng
+													</Button>
+													<Button
+														style={{ marginLeft: '5px' }}
+														onClick={() => handleChangeDate()}
+														color='info'>
+														Chấp nhận
+													</Button>
 												</div>
-												<span>~</span>
-												<div>
-													<span className='text-danger me-1'>
-														{calcProgressWorktrack(worktrack)}%
-													</span>
-												</div>
-											</CardFooterRight>
-										</CardFooter>
-									</CardBody>
-								</div>
+											</Toast.Body>
+										</Toast>
+										<Button
+											icon='DateRange'
+											onClick={() => setOpen(!open)}
+											color='primary'>
+											Lọc theo tháng
+										</Button>
+									</CardActions>
+								</CardHeader>
+								<CardBody>
+									<Table columns={columnTables} data={treeValue} />
+									<CardFooter
+										tag='div'
+										className=''
+										size='lg'
+										borderColor='primary'>
+										<CardFooterRight className='fw-bold fs-5 d-flex'>
+											<span>KPI tạm tính:</span>
+											<div>
+												<span className='text-success me-1'>
+													{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
+												</span>
+												<span>/</span>
+												<span className='text-primary ms-1'>
+													{calcTotalKPIWorkTrackByUser(worktrack)}
+												</span>
+											</div>
+											<span>~</span>
+											<div>
+												<span className='text-danger me-1'>
+													{calcProgressWorktrack(worktrack)}%
+												</span>
+											</div>
+										</CardFooterRight>
+									</CardFooter>
+								</CardBody>
 							</Card>
 						</div>
 					</div>
