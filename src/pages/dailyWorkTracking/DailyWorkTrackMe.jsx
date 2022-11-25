@@ -9,7 +9,6 @@ import { Toast } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { DateRangePicker } from 'react-date-range';
 import moment from 'moment/moment';
-import { addDays } from 'date-fns';
 import Card, {
 	CardActions,
 	CardBody,
@@ -17,6 +16,7 @@ import Card, {
 	CardFooterRight,
 	CardHeader,
 	CardLabel,
+	CardSubTitle,
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
@@ -44,7 +44,7 @@ import {
 	renderColor,
 } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
-import { getQueryDate } from '../../utils/utils';
+import { getFirstAndLastDateOfMonth, getQueryDate } from '../../utils/utils';
 import Table from './Table';
 import { inputRanges, staticRanges } from './customReactDateRange';
 
@@ -63,8 +63,8 @@ const DailyWorkTrackingMe = () => {
 	const [open, setOpen] = useState(false);
 	const [state, setState] = useState([
 		{
-			startDate: new Date(),
-			endDate: addDays(new Date(), 7),
+			startDate: getFirstAndLastDateOfMonth().firstDay,
+			endDate: getFirstAndLastDateOfMonth().lastDay,
 			key: 'selection',
 		},
 	]);
@@ -357,6 +357,11 @@ const DailyWorkTrackingMe = () => {
 											<CardTitle>
 												<CardLabel>Nhiệm vụ của tôi</CardLabel>
 											</CardTitle>
+											<CardSubTitle className='fs-5 text-info'>
+												Từ {state[0].startDate.toLocaleDateString()}
+												<span className='mx-2'>-</span>
+												{state[0].endDate.toLocaleDateString()}
+											</CardSubTitle>
 										</CardLabel>
 										<CardActions style={{ display: 'inline-flex' }}>
 											<Toast
