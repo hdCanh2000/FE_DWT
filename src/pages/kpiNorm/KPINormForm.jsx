@@ -67,7 +67,7 @@ const KPINormForm = ({
 		onSubmit: async (values, { resetForm }) => {
 			const dataSubmit = {
 				unit_id: values?.unit?.id,
-				id: parseInt(values?.id, 10),
+				id: parseInt(values?.id, 10) || null,
 				name: values?.name,
 				description: values?.description,
 				descriptionKpiValue: values.descriptionKpiValue,

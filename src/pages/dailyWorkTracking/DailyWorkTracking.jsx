@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Toast } from 'react-bootstrap';
-import { addDays } from 'date-fns';
 import { DateRangePicker } from 'react-date-range';
 import moment from 'moment/moment';
 import Card, {
@@ -14,6 +13,7 @@ import Card, {
 	CardBody,
 	CardHeader,
 	CardLabel,
+	CardSubTitle,
 	CardTitle,
 } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
@@ -27,7 +27,7 @@ import DailyWorktrackInfo from './DailyWorktrackInfo';
 import { columns, renderColor } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
 import Table from './Table';
-import { getQueryDate } from '../../utils/utils';
+import { getFirstAndLastDateOfMonth, getQueryDate } from '../../utils/utils';
 import Button from '../../components/bootstrap/Button';
 import { inputRanges, staticRanges } from './customReactDateRange';
 
@@ -51,8 +51,8 @@ const DailyWorkTracking = () => {
 	const [open, setOpen] = useState(false);
 	const [state, setState] = useState([
 		{
-			startDate: new Date(),
-			endDate: addDays(new Date(), 7),
+			startDate: getFirstAndLastDateOfMonth().firstDay,
+			endDate: getFirstAndLastDateOfMonth().lastDay,
 			key: 'selection',
 		},
 	]);
@@ -264,6 +264,11 @@ const DailyWorkTracking = () => {
 										<CardTitle>
 											<CardLabel>Danh sách nhiệm vụ</CardLabel>
 										</CardTitle>
+										<CardSubTitle className='fs-5 text-info'>
+											Từ {state[0].startDate.toLocaleDateString()}
+											<span className='mx-2'>-</span>
+											{state[0].endDate.toLocaleDateString()}
+										</CardSubTitle>
 									</CardLabel>
 									<CardActions style={{ display: 'inline-flex' }}>
 										<Toast
