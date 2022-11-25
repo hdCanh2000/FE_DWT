@@ -272,6 +272,7 @@ const DailyWorkTracking = () => {
 												top: '7vh',
 												right: '0',
 												position: 'absolute',
+												zIndex: '100',
 											}}
 											onClose={() => setOpen(false)}
 											show={open}
@@ -288,9 +289,15 @@ const DailyWorkTracking = () => {
 													inputRanges={inputRanges}
 												/>
 											</Toast.Header>
-											<Toast.Body>
+											<Toast.Body
+												style={{
+													background: '#fff',
+													height: 60,
+												}}>
 												<div
-													style={{ float: 'right', marginBottom: '5px' }}>
+													style={{
+														float: 'right',
+													}}>
 													<Button
 														onClick={() => setOpen(!open)}
 														color='danger'>
@@ -309,7 +316,7 @@ const DailyWorkTracking = () => {
 											icon='DateRange'
 											onClick={() => setOpen(!open)}
 											color='primary'>
-											Lọc theo ngày
+											Lọc theo tháng
 										</Button>
 									</CardActions>
 								</CardHeader>

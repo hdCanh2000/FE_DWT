@@ -23,7 +23,7 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
-import { addKpiNorm, exportExcel, updateKpiNorm } from './services';
+import { exportExcel } from './services';
 import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
@@ -167,60 +167,60 @@ const KpiNormPage = () => {
 		},
 	];
 
-	const handleSubmitForm = async (data) => {
-		const dataSubmit = {
-			unit_id: data?.unit?.id,
-			id: parseInt(data?.id, 10),
-			name: data?.name,
-			description: data?.description,
-			descriptionKpiValue: data.descriptionKpiValue,
-			position_id: parseInt(data.position?.id, 10) || null,
-			department_id:
-				parseInt(data.position?.department?.id, 10) || parseInt(data?.department?.id, 10),
-			parent_id: parseInt(data?.parent?.id, 10) || null,
-			kpi_value: Number(data.kpi_value) || null,
-			manday: Number(data.manday) || null,
-			quantity: parseInt(data.quantity, 10) || null,
-			taskType: data?.taskType.value || 'Thường xuyên',
-		};
-		if (data.id) {
-			try {
-				const response = await updateKpiNorm(dataSubmit);
-				await response.data;
-				toast.success('Cập nhật định mức lao động thành công!', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
-				});
-				dispatch(fetchKpiNormList());
-				handleCloseForm();
-			} catch (error) {
-				dispatch(fetchKpiNormList());
-				toast.error('Cập nhật định mức lao động không thành công!', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
-				});
-				throw error;
-			}
-		} else {
-			try {
-				const response = await addKpiNorm(dataSubmit);
-				await response.data;
-				toast.success('Thêm định mức lao động thành công!', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
-				});
-				dispatch(fetchKpiNormList());
-				handleCloseForm();
-			} catch (error) {
-				dispatch(fetchKpiNormList());
-				toast.error('Thêm định mức lao động không thành công!', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
-				});
-				throw error;
-			}
-		}
-	};
+	// const handleSubmitForm = async (data) => {
+	// 	const dataSubmit = {
+	// 		unit_id: data?.unit?.id,
+	// 		id: parseInt(data?.id, 10),
+	// 		name: data?.name,
+	// 		description: data?.description,
+	// 		descriptionKpiValue: data.descriptionKpiValue,
+	// 		position_id: parseInt(data.position?.id, 10) || null,
+	// 		department_id:
+	// 			parseInt(data.position?.department?.id, 10) || parseInt(data?.department?.id, 10),
+	// 		parent_id: parseInt(data?.parent?.id, 10) || null,
+	// 		kpi_value: Number(data.kpi_value) || null,
+	// 		manday: Number(data.manday) || null,
+	// 		quantity: parseInt(data.quantity, 10) || null,
+	// 		taskType: data?.taskType.value || 'Thường xuyên',
+	// 	};
+	// 	if (data.id) {
+	// 		try {
+	// 			const response = await updateKpiNorm(dataSubmit);
+	// 			await response.data;
+	// 			toast.success('Cập nhật định mức lao động thành công!', {
+	// 				position: toast.POSITION.TOP_RIGHT,
+	// 				autoClose: 1000,
+	// 			});
+	// 			dispatch(fetchKpiNormList());
+	// 			handleCloseForm();
+	// 		} catch (error) {
+	// 			dispatch(fetchKpiNormList());
+	// 			toast.error('Cập nhật định mức lao động không thành công!', {
+	// 				position: toast.POSITION.TOP_RIGHT,
+	// 				autoClose: 1000,
+	// 			});
+	// 			throw error;
+	// 		}
+	// 	} else {
+	// 		try {
+	// 			const response = await addKpiNorm(dataSubmit);
+	// 			await response.data;
+	// 			toast.success('Thêm định mức lao động thành công!', {
+	// 				position: toast.POSITION.TOP_RIGHT,
+	// 				autoClose: 1000,
+	// 			});
+	// 			dispatch(fetchKpiNormList());
+	// 			handleCloseForm();
+	// 		} catch (error) {
+	// 			dispatch(fetchKpiNormList());
+	// 			toast.error('Thêm định mức lao động không thành công!', {
+	// 				position: toast.POSITION.TOP_RIGHT,
+	// 				autoClose: 1000,
+	// 			});
+	// 			throw error;
+	// 		}
+	// 	}
+	// };
 
 	const handleExportExcel = async () => {
 		try {
@@ -361,7 +361,7 @@ const KpiNormPage = () => {
 				<KPINormForm
 					show={toggleForm}
 					onClose={handleCloseForm}
-					handleSubmit={handleSubmitForm}
+					// handleSubmit={handleSubmitForm}
 					item={itemEdit}
 					label={
 						itemEdit?.id ? 'Cập nhật định mức lao động' : 'Thêm mới định mức lao động'
