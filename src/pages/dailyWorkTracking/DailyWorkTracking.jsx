@@ -176,7 +176,7 @@ const DailyWorkTracking = () => {
 								handleOpenForm({
 									...row.original,
 									parent: worktrack.workTracks?.find(
-										(i) => i.id === row.original.parentId,
+										(i) => i.id === row.original.parent_id,
 									),
 								})
 							}>

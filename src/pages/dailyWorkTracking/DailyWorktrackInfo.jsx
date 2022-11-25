@@ -2,13 +2,12 @@
 /* eslint-disable react/jsx-no-script-url */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable react/prop-types */
-import React, { useState, useEffect, memo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, memo } from 'react';
+import { useDispatch } from 'react-redux';
 import { Modal } from 'react-bootstrap';
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 import styled from 'styled-components';
 import { LIST_STATUS } from '../../utils/constants';
-import { fetchMissionList } from '../../redux/slice/missionSlice';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchAssignTask } from '../../redux/slice/worktrackSlice';
 import { downloadFileReport } from './services';
@@ -45,64 +44,11 @@ const Styles = styled.div`
 
 const DailyWorktrackInfo = ({ show, onClose, item }) => {
 	const dispatch = useDispatch();
-	const tasks = useSelector((state) => state.worktrack.tasks);
-	const [missionOption, setMissionOption] = useState({});
-	const [parentOption, setParentOption] = useState({});
-	const [userOption, setUserOption] = useState({});
-	const [mission, setMission] = React.useState({
-		quantity: '',
-		startDate: '',
-		deadline: '',
-		priority: 2,
-		note: '',
-	});
 
 	useEffect(() => {
-		dispatch(fetchMissionList());
 		dispatch(fetchEmployeeList());
 		dispatch(fetchAssignTask());
 	}, [dispatch]);
-
-	useEffect(() => {
-		const dataParent = tasks?.find((ele) => ele.id === item?.parent_id);
-		if (dataParent) {
-			const userResponsible = dataParent?.users?.find(
-				(user) => user.workTrackUsers.isResponsible === true,
-			);
-			setParentOption({
-				...dataParent,
-				label: `${get(dataParent, 'kpiNorm.name')} - ${get(userResponsible, 'name')}`,
-				value: get(dataParent, 'id'),
-			});
-		}
-	}, [tasks, item]);
-
-	useEffect(() => {
-		if (item.id) setMission({ ...item });
-		setMissionOption({
-			...item.mission,
-			label: get(item, 'mission.name'),
-			value: get(item, 'mission.name'),
-		});
-		if (!isEmpty(item?.users)) {
-			const userResponsible = item?.users.filter(
-				(items) => items?.workTrackUsers?.isResponsible === true,
-			);
-			setUserOption({
-				label: get(userResponsible, '[0].name'),
-				value: get(userResponsible, '[0].name'),
-				id: get(userResponsible, '[0].id'),
-			});
-		}
-	}, [item]);
-
-	const handleClose = () => {
-		onClose();
-		setMission({});
-		setMissionOption({});
-		setUserOption({});
-		setParentOption({});
-	};
 
 	const handleDowloadFile = async (file) => {
 		const response = await downloadFileReport(file);
@@ -126,13 +72,13 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 	};
 
 	return (
-		<Modal show={show} onHide={handleClose} centered size='xl'>
+		<Modal show={show} onHide={onClose} centered size='xl'>
 			<Modal.Header closeButton className='p-4'>
 				<Modal.Title>Thông tin nhiệm vụ</Modal.Title>
 			</Modal.Header>
 			<Modal.Body className='px-4'>
 				<div className='row'>
-					<div className='col-12 p-4'>
+					<div className='col-12 px-4 pb-4'>
 						<h5 className='text-info mb-2'>Thông tin định mức lao động</h5>
 						<table className='w-100 border'>
 							<thead>
@@ -148,7 +94,7 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 										<b>
 											{get(item, 'kpiNorm_name')
 												? get(item, 'kpiNorm_name')
-												: get(mission, 'kpiNorm.name')}
+												: get(item, 'kpiNorm.name')}
 										</b>
 									</td>
 									<td className='p-2 border text-center'>
@@ -174,39 +120,45 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 						<table className='w-100 border'>
 							<tr>
 								<th className='p-2 border text-left'>Tên nhiệm vụ</th>
-								<td className='p-2 border text-left'>{mission.name}</td>
+								<td className='p-2 border text-left'>{get(item, 'name')}</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Nhiệm vụ cha</th>
-								<td className='p-2 border text-left'>{parentOption.label}</td>
+								<td className='p-2 border text-left'>
+									{get(item, 'parent.name') || get(item, 'parent.kpiNorm.name')}
+								</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Thuộc mục tiêu</th>
-								<td className='p-2 border text-left'>{missionOption.label}</td>
+								<td className='p-2 border text-left'>
+									{get(item, 'mission.name')}
+								</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Người phụ trách</th>
-								<td className='p-2 border text-left'>{userOption.label}</td>
+								<td className='p-2 border text-left'>{get(item, 'user.name')}</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Ngày bắt đầu</th>
-								<td className='p-2 border text-left'>{mission.startDate}</td>
+								<td className='p-2 border text-left'>{get(item, 'startDate')}</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Hạn hoàn thành</th>
-								<td className='p-2 border text-left'>{mission.deadline}</td>
+								<td className='p-2 border text-left'>{get(item, 'deadline')}</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Độ ưu tiên</th>
-								<td className='p-2 border text-left'>{`Cấp ${mission.priority}`}</td>
+								<td className='p-2 border text-left'>{`Cấp ${
+									get(item, 'priority') ? get(item, 'priority') : 1
+								}`}</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Số lượng</th>
-								<td className='p-2 border text-left'>{mission.quantity}</td>
+								<td className='p-2 border text-left'>{get(item, 'quantity')}</td>
 							</tr>
 							<tr>
 								<th className='p-2 border text-left'>Ghi chú</th>
-								<td className='p-2 border text-left'>{mission.note}</td>
+								<td className='p-2 border text-left'>{get(item, 'note')}</td>
 							</tr>
 						</table>
 					</div>

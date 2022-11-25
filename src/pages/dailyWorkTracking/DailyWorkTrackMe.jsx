@@ -247,6 +247,7 @@ const DailyWorkTrackingMe = () => {
 									parent: worktrack.workTracks?.find(
 										(i) => i.id === row.original.parentId,
 									),
+									user: { name: worktrack?.name, id: worktrack?.id },
 								})
 							}>
 							{row.original.name || row.original.kpiNorm.name}
