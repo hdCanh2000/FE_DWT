@@ -114,6 +114,16 @@ export const calcProgressTask = (worktrack) => {
 	);
 };
 
+export const calcProgressWorktrack = (worktrack) => {
+	return (
+		Math.round(
+			(calcTotalCurrentKPIWorkTrackByUser(worktrack) /
+				calcTotalKPIWorkTrackByUser(worktrack)) *
+				100,
+		) || 0
+	);
+};
+
 export const createDataTreeTable = (dataset) => {
 	const hashTable = Object.create(null);
 	dataset.forEach((aData) => {

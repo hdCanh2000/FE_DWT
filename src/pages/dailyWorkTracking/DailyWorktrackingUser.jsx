@@ -32,6 +32,7 @@ import { addWorktrackLog, uploadFileReport } from './services';
 import {
 	calcCurrentKPIOfWorkTrack,
 	calcProgressTask,
+	calcProgressWorktrack,
 	calcTotalCurrentKPIWorkTrackByUser,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
@@ -319,6 +320,8 @@ const DailyWorkTrackingUser = () => {
 										<CardTitle>
 											<CardLabel>
 												Danh sách nhiệm vụ của {_.get(worktrack, 'name')}
+												<span className='mx-2'>-</span>
+												{_.get(worktrack, 'department.name')}
 											</CardLabel>
 										</CardTitle>
 									</CardLabel>
@@ -329,6 +332,7 @@ const DailyWorkTrackingUser = () => {
 												top: '7vh',
 												right: '0',
 												position: 'absolute',
+												zIndex: '100',
 											}}
 											onClose={() => setOpen(false)}
 											show={open}
@@ -345,9 +349,15 @@ const DailyWorkTrackingUser = () => {
 													inputRanges={inputRanges}
 												/>
 											</Toast.Header>
-											<Toast.Body>
+											<Toast.Body
+												style={{
+													background: '#fff',
+													height: 60,
+												}}>
 												<div
-													style={{ float: 'right', marginBottom: '5px' }}>
+													style={{
+														float: 'right',
+													}}>
 													<Button
 														onClick={() => setOpen(!open)}
 														color='danger'>
@@ -373,7 +383,7 @@ const DailyWorkTrackingUser = () => {
 											icon='DateRange'
 											onClick={() => setOpen(!open)}
 											color='primary'>
-											Lọc theo ngày
+											Lọc theo tháng
 										</Button>
 									</CardActions>
 								</CardHeader>
@@ -385,7 +395,7 @@ const DailyWorkTrackingUser = () => {
 										size='lg'
 										borderColor='primary'>
 										<CardFooterRight tag='div' className='fw-bold fs-5 d-flex'>
-											<span>KPI hoàn thành:</span>
+											<span>KPI tạm tính:</span>
 											<div>
 												<span className='text-success me-1'>
 													{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
@@ -393,6 +403,12 @@ const DailyWorkTrackingUser = () => {
 												<span>/</span>
 												<span className='text-primary ms-1'>
 													{calcTotalKPIWorkTrackByUser(worktrack)}
+												</span>
+											</div>
+											<span>~</span>
+											<div>
+												<span className='text-danger me-1'>
+													{calcProgressWorktrack(worktrack)}%
 												</span>
 											</div>
 										</CardFooterRight>

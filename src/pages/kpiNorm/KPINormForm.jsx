@@ -14,7 +14,7 @@ import Checks from '../../components/bootstrap/forms/Checks';
 import CustomSelect from '../../components/form/CustomSelect';
 import Select from '../../components/bootstrap/forms/Select';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
-import { deleteKpiNorm } from './services';
+import { addKpiNorm, deleteKpiNorm, updateKpiNorm } from './services';
 import { fetchKpiNormList } from '../../redux/slice/kpiNormSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 
@@ -47,6 +47,7 @@ const KPINormForm = ({
 		}
 		return { label: 'Không' };
 	};
+
 	const formik = useFormik({
 		initialValues: {
 			...item,
@@ -54,6 +55,7 @@ const KPINormForm = ({
 				value: item.taskType,
 				label: item.taskType,
 			},
+			description: _.get(item, 'description') || '',
 			parent: dataParent(item.parent_id),
 			descriptionKpiValue: _.get(item, 'descriptionKpiValue') || '',
 			quantity: _.get(item, 'quantity') || '',
@@ -62,11 +64,59 @@ const KPINormForm = ({
 		},
 		validationSchema: validate,
 		enableReinitialize: true,
-		onSubmit: (values, { resetForm }) => {
-			handleSubmit(values);
-			setTimeout(() => {
-				resetForm();
-			}, 1000);
+		onSubmit: async (values, { resetForm }) => {
+			const dataSubmit = {
+				unit_id: values?.unit?.id,
+				id: parseInt(values?.id, 10),
+				name: values?.name,
+				description: values?.description,
+				descriptionKpiValue: values.descriptionKpiValue,
+				position_id: parseInt(values.position?.id, 10) || null,
+				department_id:
+					parseInt(values.position?.department?.id, 10) ||
+					parseInt(values?.department?.id, 10),
+				parent_id: parseInt(values?.parent?.id, 10) || null,
+				kpi_value: Number(values.kpi_value) || null,
+				manday: Number(values.manday) || null,
+				quantity: parseInt(values.quantity, 10) || null,
+				taskType: values?.taskType.value || 'Thường xuyên',
+			};
+			if (values.id) {
+				try {
+					const response = await updateKpiNorm(dataSubmit);
+					await response.data;
+					toast.success('Cập nhật định mức lao động thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					dispatch(fetchKpiNormList());
+					handleCloseForm();
+					resetForm({});
+				} catch (error) {
+					toast.error('Cập nhật định mức lao động không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					throw error;
+				}
+			} else {
+				try {
+					const response = await addKpiNorm(dataSubmit);
+					await response.data;
+					toast.success('Thêm định mức lao động thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					dispatch(fetchKpiNormList());
+					resetForm({});
+				} catch (error) {
+					toast.error('Thêm định mức lao động không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					throw error;
+				}
+			}
 		},
 	});
 
