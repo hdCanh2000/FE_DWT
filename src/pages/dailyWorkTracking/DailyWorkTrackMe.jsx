@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 import { Toast } from 'react-bootstrap';
-import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { DateRangePicker } from 'react-date-range';
 import moment from 'moment/moment';
@@ -47,55 +46,6 @@ import Icon from '../../components/icon/Icon';
 import { getQueryDate } from '../../utils/utils';
 import Table from './Table';
 import { inputRanges, staticRanges } from './customReactDateRange';
-
-const Styles = styled.div`
-	table {
-		border-spacing: 0;
-		border: 1px solid black;
-		width: 100%;
-		margin-left: 5px;
-		margin-right: 5px;
-		&::-webkit-scrollbar {
-			height: 1px;
-			border: 1px solid #d5d5d5;
-		}
-		tbody {
-			overflow-y: auto;
-		}
-		tr {
-			:last-child {
-				td {
-					border-bottom: 0;
-				}
-			}
-		}
-
-		th,
-		td {
-			margin: 0;
-			padding: 0.5rem;
-			border-bottom: 1px solid black;
-			border-right: 1px solid black;
-
-			:last-child {
-				border-right: 1px;
-			}
-		}
-	}
-`;
-
-const TableContainerOuter = styled.div`
-	width: 100%;
-	height: 100%;
-	overflow-y: hidden;
-	padding-bottom: 20px;
-`;
-
-const TableContainer = styled.div`
-	width: 100%;
-	height: 100%;
-	min-width: 900px;
-`;
 
 const DailyWorkTrackingMe = () => {
 	const dispatch = useDispatch();
@@ -210,11 +160,10 @@ const DailyWorkTrackingMe = () => {
 					});
 			})
 			.catch((error) => {
-				toast.error('Upload file không thành công. Vui lòng thử lại.', {
+				toast.error(error.response.data.message, {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				throw error;
 			});
 	};
 
@@ -277,12 +226,14 @@ const DailyWorkTrackingMe = () => {
 				) : null,
 			maxWidth: 25,
 			minWidth: 25,
+			sticky: 'left',
 		},
 		{
 			Header: 'Tên nhiệm vụ',
 			accessor: 'name',
 			maxWidth: 350,
 			minWidth: 350,
+			sticky: 'left',
 			Cell: ({ row }) => {
 				return (
 					<div className='d-flex'>
@@ -476,27 +427,7 @@ const DailyWorkTrackingMe = () => {
 										</CardActions>
 									</CardHeader>
 									<CardBody>
-										<TableContainerOuter>
-											{isEmpty(treeValue) ? (
-												<h5
-													style={{
-														textAlign: 'center',
-														border: '1px solid',
-														padding: '20px',
-													}}>
-													Chưa có nhiệm vụ nào !
-												</h5>
-											) : (
-												<TableContainer>
-													<Styles>
-														<Table
-															columns={columnTables}
-															data={treeValue}
-														/>
-													</Styles>
-												</TableContainer>
-											)}
-										</TableContainerOuter>
+										<Table columns={columnTables} data={treeValue} />
 										<CardFooter
 											tag='div'
 											className=''
