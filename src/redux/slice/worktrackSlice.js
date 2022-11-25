@@ -10,6 +10,7 @@ import { getAllWorktrackByStatus } from '../../pages/pendingWorktrack/services';
 import { LIST_STATUS, LIST_STATUS_PENDING } from '../../utils/constants';
 import {
 	calcCurrentKPIOfWorkTrack,
+	calcProgressTask,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
 	createDataTreeTable,
@@ -40,6 +41,7 @@ export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', 
 						totalKPI: calcTotalKPIOfWorkTrack(item),
 						totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
 						currentKPI: calcCurrentKPIOfWorkTrack(item),
+						progress: `${calcProgressTask(item)}%`,
 					};
 				}),
 		  )
@@ -56,6 +58,7 @@ export const fetchWorktrackListAll = createAsyncThunk('worktrack/fetchListAll', 
 						totalKPI: calcTotalKPIOfWorkTrack(item),
 						totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
 						currentKPI: calcCurrentKPIOfWorkTrack(item),
+						progress: `${calcProgressTask(item)}%`,
 					};
 				}),
 		  );

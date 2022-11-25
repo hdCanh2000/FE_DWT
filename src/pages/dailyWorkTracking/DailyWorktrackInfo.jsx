@@ -322,22 +322,23 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 														</td>
 														<td>
 															<ul className='mb-0'>
-																{JSON.parse(log.files)?.map(
-																	(file) => (
-																		<li key={file}>
-																			<a
-																				href='javascript:void(0)'
-																				className=''
-																				onClick={() =>
-																					handleDowloadFile(
-																						file,
-																					)
-																				}>
-																				{file}
-																			</a>
-																		</li>
-																	),
-																)}
+																{log?.files &&
+																	JSON.parse(log?.files)?.map(
+																		(file) => (
+																			<li key={file}>
+																				<a
+																					href='javascript:void(0)'
+																					className=''
+																					onClick={() =>
+																						handleDowloadFile(
+																							file,
+																						)
+																					}>
+																					{file}
+																				</a>
+																			</li>
+																		),
+																	)}
 															</ul>
 														</td>
 													</tr>

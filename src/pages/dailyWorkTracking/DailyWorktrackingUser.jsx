@@ -4,9 +4,8 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import _, { isEmpty } from 'lodash';
+import _ from 'lodash';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { Toast } from 'react-bootstrap';
 import { addDays } from 'date-fns';
@@ -46,55 +45,6 @@ import { getQueryDate } from '../../utils/utils';
 import Table from './Table';
 import Button from '../../components/bootstrap/Button';
 import { inputRanges, staticRanges } from './customReactDateRange';
-
-const Styles = styled.div`
-	table {
-		border-spacing: 0;
-		border: 1px solid black;
-		width: 100%;
-		margin-left: 5px;
-		margin-right: 5px;
-		&::-webkit-scrollbar {
-			height: 1px;
-			border: 1px solid #d5d5d5;
-		}
-		tbody {
-			overflow-y: auto;
-		}
-		tr {
-			:last-child {
-				td {
-					border-bottom: 0;
-				}
-			}
-		}
-
-		th,
-		td {
-			margin: 0;
-			padding: 0.5rem;
-			border-bottom: 1px solid black;
-			border-right: 1px solid black;
-
-			:last-child {
-				border-right: 1px;
-			}
-		}
-	}
-`;
-
-const TableContainerOuter = styled.div`
-	width: 100%;
-	height: 100%;
-	overflow-y: hidden;
-	padding-bottom: 20px;
-`;
-
-const TableContainer = styled.div`
-	width: 100%;
-	height: 100%;
-	min-width: 900px;
-`;
 
 const DailyWorkTrackingUser = () => {
 	const dispatch = useDispatch();
@@ -267,12 +217,14 @@ const DailyWorkTrackingUser = () => {
 				) : null,
 			maxWidth: 25,
 			minWidth: 25,
+			sticky: 'left',
 		},
 		{
 			Header: 'Tên nhiệm vụ',
 			accessor: 'name',
 			maxWidth: 350,
 			minWidth: 350,
+			sticky: 'left',
 			Cell: ({ row }) => {
 				return (
 					<div className='d-flex'>
@@ -435,27 +387,7 @@ const DailyWorkTrackingUser = () => {
 									</CardActions>
 								</CardHeader>
 								<CardBody>
-									<TableContainerOuter>
-										{isEmpty(treeValue) ? (
-											<h5
-												style={{
-													textAlign: 'center',
-													border: '1px solid',
-													padding: '20px',
-												}}>
-												Chưa có nhiệm vụ nào !
-											</h5>
-										) : (
-											<TableContainer>
-												<Styles>
-													<Table
-														columns={columnTables}
-														data={treeValue}
-													/>
-												</Styles>
-											</TableContainer>
-										)}
-									</TableContainerOuter>
+									<Table columns={columnTables} data={treeValue} />
 									<CardFooter
 										tag='div'
 										className=''

@@ -1,6 +1,76 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import { useTable, useExpanded } from 'react-table';
+import { useSticky } from 'react-table-sticky';
+import { isEmpty } from 'lodash';
+
+const Styles = styled.div`
+	table {
+		border-spacing: 0;
+		border: 1px solid black;
+		width: 100%;
+		margin-left: 5px;
+		margin-right: 5px;
+		tbody {
+			overflow-y: auto;
+		}
+		tr {
+			:last-child {
+				td {
+					border-bottom: 0;
+				}
+			}
+		}
+
+		th,
+		td {
+			margin: 0;
+			padding: 0.5rem;
+			border-bottom: 1px solid black;
+			border-right: 1px solid black;
+			background-color: #fff;
+			:last-child {
+				border-right: 1px;
+			}
+			:first-child {
+				border-right: 0;
+			}
+		}
+		&.sticky {
+			overflow: scroll;
+			.header,
+			.footer {
+				position: sticky;
+				z-index: 1;
+				width: fit-content;
+			}
+
+			.body {
+				position: relative;
+				z-index: 0;
+				border: 1px solid black;
+			}
+
+			[data-sticky-td] {
+				position: sticky;
+			}
+		}
+	}
+`;
+
+const TableContainerOuter = styled.div`
+	width: 100%;
+	height: 100%;
+	overflow-y: hidden;
+	padding-bottom: 20px;
+`;
+
+const TableContainer = styled.div`
+	width: 100%;
+	height: 100%;
+	min-width: 900px;
+`;
 
 const Table = ({ columns: userColumns, data }) => {
 	const {
@@ -32,49 +102,70 @@ const Table = ({ columns: userColumns, data }) => {
 			},
 		},
 		useExpanded,
+		useSticky,
 	);
 
 	return (
-		<table {...getTableProps()}>
-			<thead>
-				{headerGroups.map((headerGroup) => (
-					<tr {...headerGroup.getHeaderGroupProps()}>
-						{headerGroup.headers.map((column) => (
-							<th
-								key={column.accessor}
-								{...column.getHeaderProps({
-									style: { minWidth: column.minWidth, width: column.width },
-								})}>
-								{column.render('Header')}
-							</th>
-						))}
-					</tr>
-				))}
-			</thead>
-			<tbody {...getTableBodyProps()}>
-				{rows.map((row) => {
-					prepareRow(row);
-					return (
-						<tr {...row.getRowProps()}>
-							{row.cells.map((cell) => {
-								return (
-									<td
-										key={cell.accessor}
-										{...cell.getCellProps({
-											style: {
-												minWidth: cell.column.minWidth,
-												width: cell.column.width,
-											},
-										})}>
-										{cell.render('Cell')}
-									</td>
-								);
-							})}
-						</tr>
-					);
-				})}
-			</tbody>
-		</table>
+		<TableContainerOuter>
+			{isEmpty(data) ? (
+				<h5
+					style={{
+						textAlign: 'center',
+						border: '1px solid',
+						padding: '20px',
+					}}>
+					Chưa có nhiệm vụ nào !
+				</h5>
+			) : (
+				<TableContainer>
+					<Styles>
+						<table {...getTableProps()} className='sticky'>
+							<thead>
+								{headerGroups.map((headerGroup) => (
+									<tr {...headerGroup.getHeaderGroupProps()}>
+										{headerGroup.headers.map((column) => (
+											<th
+												key={column.accessor}
+												{...column.getHeaderProps({
+													style: {
+														minWidth: column.minWidth,
+														width: column.width,
+													},
+												})}>
+												{column.render('Header')}
+											</th>
+										))}
+									</tr>
+								))}
+							</thead>
+							<tbody {...getTableBodyProps()}>
+								{rows.map((row) => {
+									prepareRow(row);
+									return (
+										<tr {...row.getRowProps()}>
+											{row.cells.map((cell) => {
+												return (
+													<td
+														key={cell.accessor}
+														{...cell.getCellProps({
+															style: {
+																minWidth: cell.column.minWidth,
+																width: cell.column.width,
+															},
+														})}>
+														{cell.render('Cell')}
+													</td>
+												);
+											})}
+										</tr>
+									);
+								})}
+							</tbody>
+						</table>
+					</Styles>
+				</TableContainer>
+			)}
+		</TableContainerOuter>
 	);
 };
 

@@ -24,13 +24,12 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 		},
 		enableReinitialize: true,
 		validationSchema: validate,
-		onSubmit: (values, { resetForm }) => {
+		onSubmit: (values) => {
 			handleSubmit({
 				...values,
 				data,
 				files: selectedFile,
 			});
-			resetForm();
 		},
 	});
 
