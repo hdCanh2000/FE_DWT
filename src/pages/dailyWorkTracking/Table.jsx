@@ -10,8 +10,6 @@ const Styles = styled.div`
 		border-spacing: 0;
 		border: 1px solid black;
 		width: 100%;
-		margin-left: 5px;
-		margin-right: 5px;
 		tbody {
 			overflow-y: auto;
 		}
@@ -49,7 +47,6 @@ const Styles = styled.div`
 			.body {
 				position: relative;
 				z-index: 0;
-				border: 1px solid black;
 			}
 
 			[data-sticky-td] {
@@ -138,7 +135,7 @@ const Table = ({ columns: userColumns, data }) => {
 									</tr>
 								))}
 							</thead>
-							<tbody {...getTableBodyProps()}>
+							<tbody {...getTableBodyProps()} className='body'>
 								{rows.map((row) => {
 									prepareRow(row);
 									return (

@@ -28,7 +28,6 @@ import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import './style.css';
 import KPINormForm from './KPINormForm';
 import Loading from '../../components/Loading/Loading';
 import { fetchUnitList } from '../../redux/slice/unitSlice';
@@ -176,7 +175,8 @@ const KpiNormPage = () => {
 			description: data?.description,
 			descriptionKpiValue: data.descriptionKpiValue,
 			position_id: parseInt(data.position?.id, 10) || null,
-			department_id: parseInt(data.position?.department?.id, 10) || null,
+			department_id:
+				parseInt(data.position?.department?.id, 10) || parseInt(data?.department?.id, 10),
 			parent_id: parseInt(data?.parent?.id, 10) || null,
 			kpi_value: Number(data.kpi_value) || null,
 			manday: Number(data.manday) || null,
@@ -358,7 +358,6 @@ const KpiNormPage = () => {
 						</div>
 					</div>
 				)}
-
 				<KPINormForm
 					show={toggleForm}
 					onClose={handleCloseForm}
