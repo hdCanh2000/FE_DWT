@@ -5,8 +5,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTable, useExpanded } from 'react-table';
-import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { toast } from 'react-toastify';
 import Card, {
@@ -30,183 +28,16 @@ import Icon from '../../../components/icon/Icon';
 import {
 	calcCurrentKPIOfWorkTrack,
 	calcProgressTask,
+	calcProgressWorktrack,
 	calcTotalCurrentKPIWorkTrackByUser,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
 	calcTotalKPIWorkTrackByUser,
+	columns,
+	createDataTreeTable,
+	renderColor,
 } from '../../../utils/function';
-
-const createDataTreeTable = (dataset) => {
-	const hashTable = Object.create(null);
-	dataset.forEach((aData) => {
-		hashTable[aData.id] = { ...aData, subRows: [] };
-	});
-	const dataTree = [];
-	dataset.forEach((aData) => {
-		if (aData.parentId) {
-			hashTable[aData.parentId]?.subRows.push(hashTable[aData.id]);
-		} else {
-			dataTree.push(hashTable[aData.id]);
-		}
-	});
-	return dataTree;
-};
-
-const Styles = styled.div`
-	table {
-		border-spacing: 0;
-		border: 1px solid black;
-		width: 100%;
-		margin-left: 5px;
-		margin-right: 5px;
-		&::-webkit-scrollbar {
-			height: 1px;
-			border: 1px solid #d5d5d5;
-		}
-		tbody {
-			overflow-y: auto;
-		}
-		tr {
-			:last-child {
-				td {
-					border-bottom: 0;
-				}
-			}
-		}
-
-		th,
-		td {
-			margin: 0;
-			padding: 0.5rem;
-			border-bottom: 1px solid black;
-			border-right: 1px solid black;
-
-			:last-child {
-				border-right: 1px;
-			}
-		}
-	}
-`;
-
-const TableContainerOuter = styled.div`
-	width: 100%;
-	height: 100%;
-	overflow-y: hidden;
-	padding-bottom: 20px;
-`;
-
-const TableContainer = styled.div`
-	width: 100%;
-	height: 100%;
-	min-width: 900px;
-`;
-
-const columns = () => {
-	const date = new Date();
-	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-	const result = [];
-	for (let i = 1; i <= days; i += 1) {
-		result.push({
-			day: i,
-			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
-		});
-	}
-	return result;
-};
-
-const renderColor = (status) => {
-	switch (status) {
-		case 'inProgress':
-			return '#ffc000';
-		case 'completed':
-			return '#c5e0b3';
-		case 'expired':
-			return '#f97875';
-		default:
-			return 'transparent';
-	}
-};
-
-const Table = ({ columns: userColumns, data }) => {
-	const {
-		getTableProps,
-		getTableBodyProps,
-		headerGroups,
-		rows,
-		prepareRow,
-		// eslint-disable-next-line no-unused-vars
-		state: { expanded },
-	} = useTable(
-		{
-			columns: userColumns,
-			data,
-			initialState: {
-				expanded: {
-					0: true,
-					1: true,
-					2: true,
-					3: true,
-					4: true,
-					5: true,
-					6: true,
-					7: true,
-					8: true,
-					9: true,
-					10: true,
-				},
-			},
-		},
-		useExpanded,
-	);
-
-	return (
-		<table {...getTableProps()}>
-			<thead>
-				{headerGroups.map((headerGroup) => (
-					<tr {...headerGroup.getHeaderGroupProps()}>
-						{headerGroup.headers.map((column) => (
-							<th
-								{...column.getHeaderProps({
-									style: {
-										minWidth: column.minWidth,
-										width: column.width,
-										textAlign: column.align ? column.align : 'left',
-									},
-								})}>
-								{column.render('Header')}
-							</th>
-						))}
-					</tr>
-				))}
-			</thead>
-			<tbody {...getTableBodyProps()}>
-				{rows.map((row) => {
-					prepareRow(row);
-					return (
-						<tr {...row.getRowProps()}>
-							{row.cells.map((cell) => {
-								return (
-									<td
-										{...cell.getCellProps({
-											style: {
-												minWidth: cell.column.minWidth,
-												width: cell.column.width,
-												textAlign: cell.column.align
-													? cell.column.align
-													: 'left',
-											},
-										})}>
-										{cell.render('Cell')}
-									</td>
-								);
-							})}
-						</tr>
-					);
-				})}
-			</tbody>
-		</table>
-	);
-};
+import Table from '../../dailyWorkTracking/Table';
 
 const ManagerDashboard = () => {
 	const dispatch = useDispatch();
@@ -272,45 +103,72 @@ const ManagerDashboard = () => {
 
 	const handleSubmit = (item) => {
 		const selectedFile = item.files;
-		const formData = new FormData();
-		// eslint-disable-next-line no-restricted-syntax
-		for (const key of Object.keys(selectedFile)) {
-			formData.append('files', selectedFile[key], selectedFile[key].name);
-		}
-		uploadFileReport(formData)
-			.then((res) => {
-				const dataSubmit = {
-					status: item.status,
-					date: dataShow.valueForm.date,
-					note: item.note,
-					quantity: item.quantity || null,
-					files: JSON.stringify(res.data.data),
-					workTrack_id: item.data.dataWorktrack.id,
-				};
-				addWorktrackLog(dataSubmit)
-					.then(() => {
-						handleClose();
-						dispatch(fetchWorktrackListMe());
-						toast.success('Báo cáo nhiệm vụ thành công!', {
-							position: toast.POSITION.TOP_RIGHT,
-							autoClose: 1000,
+		if (selectedFile && selectedFile.length > 0) {
+			const formData = new FormData();
+			// eslint-disable-next-line no-restricted-syntax
+			for (const key of Object.keys(selectedFile)) {
+				formData.append('files', selectedFile[key], selectedFile[key].name);
+			}
+			uploadFileReport(formData)
+				.then((res) => {
+					const dataSubmit = {
+						status: item.status,
+						date: dataShow.valueForm.date,
+						note: item.note,
+						quantity: item.quantity || null,
+						files: JSON.stringify(res.data.data),
+						workTrack_id: item.data.dataWorktrack.id,
+					};
+					addWorktrackLog(dataSubmit)
+						.then(() => {
+							handleClose();
+							dispatch(fetchWorktrackListMe());
+							toast.success('Báo cáo nhiệm vụ thành công!', {
+								position: toast.POSITION.TOP_RIGHT,
+								autoClose: 1000,
+							});
+						})
+						.catch((err) => {
+							toast.error('Báo cáo nhiệm vụ không thành công!', {
+								position: toast.POSITION.TOP_RIGHT,
+								autoClose: 1000,
+							});
+							throw err;
 						});
-					})
-					.catch((err) => {
-						toast.error('Báo cáo nhiệm vụ không thành công!', {
-							position: toast.POSITION.TOP_RIGHT,
-							autoClose: 1000,
-						});
-						throw err;
+				})
+				.catch((error) => {
+					toast.error('Upload file không thành công. Vui lòng thử lại.', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
 					});
-			})
-			.catch((error) => {
-				toast.error('Upload file không thành công. Vui lòng thử lại.', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
+					throw error;
 				});
-				throw error;
-			});
+		} else {
+			const dataSubmit = {
+				status: item.status,
+				date: dataShow.valueForm.date,
+				note: item.note,
+				quantity: item.quantity || null,
+				files: null,
+				workTrack_id: item.data.dataWorktrack.id,
+			};
+			addWorktrackLog(dataSubmit)
+				.then(() => {
+					handleClose();
+					dispatch(fetchWorktrackListMe());
+					toast.success('Báo cáo nhiệm vụ thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+				})
+				.catch((err) => {
+					toast.error('Báo cáo nhiệm vụ không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					throw err;
+				});
+		}
 	};
 
 	const columnTables = [
@@ -342,12 +200,14 @@ const ManagerDashboard = () => {
 				) : null,
 			maxWidth: 25,
 			minWidth: 25,
+			sticky: 'left',
 		},
 		{
 			Header: 'Tên nhiệm vụ',
 			accessor: 'name',
 			maxWidth: 350,
 			minWidth: 350,
+			sticky: 'left',
 			Cell: ({ row }) => {
 				return (
 					<div className='d-flex'>
@@ -403,7 +263,29 @@ const ManagerDashboard = () => {
 			align: 'right',
 		},
 		{
-			Header: 'Nhật trình công việc',
+			Header: () => {
+				return (
+					<div className='d-flex'>
+						{columns().map((item) => {
+							return (
+								<div
+									key={item?.day}
+									style={{
+										border: '1px solid #c8c7c7',
+										width: 48,
+										height: 36,
+										backgroundColor: item.color ? '#f97875' : '#fff',
+										borderRadius: 0,
+										color: item.color ? '#fff' : '#000',
+									}}
+									className='rounded-none d-flex justify-content-center align-items-center'>
+									{`${item.textDate}`}
+								</div>
+							);
+						})}
+					</div>
+				);
+			},
 			accessor: 'log',
 			Cell: ({ row }) => {
 				const { workTrackLogs } = row.original;
@@ -417,11 +299,15 @@ const ManagerDashboard = () => {
 										border: '1px solid #c8c7c7',
 										width: 48,
 										height: 36,
-										backgroundColor: renderColor(
-											workTrackLogs?.find((i) => i?.date === item?.date)
-												?.status,
-										),
+										backgroundColor: item.color
+											? '#f97875'
+											: renderColor(
+													workTrackLogs?.find(
+														(i) => i?.date === item?.date,
+													)?.status,
+											  ),
 										borderRadius: 0,
+										color: item.color ? '#fff' : '#000',
 									}}
 									onClick={() =>
 										handleShowForm(
@@ -468,7 +354,7 @@ const ManagerDashboard = () => {
 										<th>Họ và tên</th>
 										<th>Vị trí</th>
 										<th className='text-center'>Số nhiệm vụ đang thực hiện</th>
-										{/* <th className='text-center'>Tỉ lệ hoàn thành</th> */}
+										<th className='text-center'>Tỉ lệ hoàn thành</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -491,6 +377,9 @@ const ManagerDashboard = () => {
 														);
 													})?.length || 0}
 												</td>
+												<td className='text-center'>
+													{calcProgressWorktrack(item)}
+												</td>
 											</tr>
 										</React.Fragment>
 									))}
@@ -511,21 +400,10 @@ const ManagerDashboard = () => {
 							</CardLabel>
 						</CardHeader>
 						<CardBody>
-							<TableContainerOuter>
-								<TableContainer>
-									<Styles>
-										<Table columns={columnTables} data={treeValue} />
-									</Styles>
-								</TableContainer>
-							</TableContainerOuter>
-							<CardFooter
-								tag='div'
-								className=''
-								size='lg'
-								borderSize={1}
-								borderColor='primary'>
-								<CardFooterRight tag='div' className='fw-bold fs-5 d-flex'>
-									<span>KPI hoàn thành:</span>
+							<Table columns={columnTables} data={treeValue} />
+							<CardFooter tag='div' className='' size='lg' borderColor='primary'>
+								<CardFooterRight className='fw-bold fs-5 d-flex'>
+									<span>KPI tạm tính:</span>
 									<div>
 										<span className='text-success me-1'>
 											{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
@@ -533,6 +411,12 @@ const ManagerDashboard = () => {
 										<span>/</span>
 										<span className='text-primary ms-1'>
 											{calcTotalKPIWorkTrackByUser(worktrack)}
+										</span>
+									</div>
+									<span>~</span>
+									<div>
+										<span className='text-danger me-1'>
+											{calcProgressWorktrack(worktrack)}%
 										</span>
 									</div>
 								</CardFooterRight>

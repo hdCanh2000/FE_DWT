@@ -81,12 +81,12 @@ const DailyWorkTracking = () => {
 
 	const handleSubmit = (item) => {
 		const selectedFile = item.files;
-		const formData = new FormData();
-		// eslint-disable-next-line no-restricted-syntax
-		for (const key of Object.keys(selectedFile)) {
-			formData.append('files', selectedFile[key], selectedFile[key].name);
-		}
-		if (Object.keys(selectedFile).length > 0) {
+		if (selectedFile && selectedFile.length > 0) {
+			const formData = new FormData();
+			// eslint-disable-next-line no-restricted-syntax
+			for (const key of Object.keys(selectedFile)) {
+				formData.append('files', selectedFile[key], selectedFile[key].name);
+			}
 			uploadFileReport(formData)
 				.then((res) => {
 					const dataSubmit = {
@@ -261,6 +261,7 @@ const DailyWorkTracking = () => {
 										height: 36,
 										backgroundColor: item.color ? '#f97875' : '#fff',
 										borderRadius: 0,
+										color: item.color ? '#fff' : '#000',
 									}}
 									className='rounded-none d-flex justify-content-center align-items-center'>
 									{`${item.textDate}`}
@@ -291,6 +292,7 @@ const DailyWorkTracking = () => {
 													)?.status,
 											  ),
 										borderRadius: 0,
+										color: item.color ? '#fff' : '#000',
 									}}
 									onClick={() =>
 										handleShowForm(
