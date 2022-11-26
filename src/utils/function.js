@@ -156,14 +156,21 @@ export const createDataTree = (dataset) => {
 	return dataTree;
 };
 
+// const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const daysOfWeekVN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
 export const columns = () => {
 	const date = new Date();
 	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
 	const result = [];
 	for (let i = 1; i <= days; i += 1) {
+		const fullDate = `${date.getFullYear()}-${date.getMonth() + 1}-${i >= 10 ? i : `0${i}`}`;
 		result.push({
-			day: i,
+			day: i >= 10 ? i : `0${i}`,
 			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
+			fullDate,
+			textDate: daysOfWeekVN[new Date(fullDate).getDay()],
+			color: new Date(fullDate).getDay() === 0 ? 'danger' : '',
 		});
 	}
 	return result;
