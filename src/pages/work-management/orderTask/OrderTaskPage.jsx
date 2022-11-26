@@ -60,7 +60,7 @@ const createDataTree = (dataset) => {
 	return dataTree;
 };
 
-const Item = memo(({ data, onOpen }) => {
+const Item = memo(({ data, onOpen, dataChildren }) => {
 	const dispatch = useDispatch();
 	const { quantity, deadline, users } = data;
 	const [open, setOpen] = useState(false);
@@ -132,6 +132,7 @@ const Item = memo(({ data, onOpen }) => {
 						Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
 					</div>
 					<div className='col-12'>Số lượng : {quantity}</div>
+					<div className='col-12'>Số nhiệm vụ con : {dataChildren}</div>
 				</CardBody>
 			</Card>
 			<AlertConfirm
@@ -224,14 +225,17 @@ const OrderTaskPage = () => {
 													{tasks.length === 0 &&
 														'Chưa giao nhiệm vụ nào!'}
 												</div>
-												{tasks?.map((item) => (
-													<Item
-														key={item.id}
-														showKpiNorm={showKpiNorm}
-														data={item}
-														onOpen={handleOpenForm}
-													/>
-												))}
+												{tasks
+													// ?.filter((item) => item.parentId === null)
+													?.map((item) => (
+														<Item
+															key={item.id}
+															showKpiNorm={showKpiNorm}
+															data={item}
+															onOpen={handleOpenForm}
+															dataChildren={2}
+														/>
+													))}
 											</div>
 										</div>
 									</Card>

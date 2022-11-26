@@ -139,7 +139,6 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 			);
 			setParentOption({
 				...dataParent,
-				// label: get(dataParent, 'kpiNorm.name'),
 				label: `${get(dataParent, 'kpiNorm.name')} - ${get(userResponsible, 'name')}`,
 				value: get(dataParent, 'id'),
 			});
@@ -197,7 +196,7 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 					kpiNorm_id: item.kpiNorm_id,
 					mission_id: missionOption.id || null,
 					key_id: keyOption.id || null,
-					quantity: parseInt(mission.quantity, 10) || null,
+					quantity: parseInt(mission.quantity, 10) || 1,
 					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
 					priority: parseInt(mission.priority, 10) || null,
 					note: mission.note || null,
@@ -230,7 +229,7 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 					kpiNorm_id: item.kpiNorm_id,
 					mission_id: missionOption.id || null,
 					key_id: keyOption.id || null,
-					quantity: parseInt(mission.quantity, 10) || null,
+					quantity: parseInt(mission.quantity, 10) || 1,
 					user_id: role.includes('user') ? parseInt(userId, 10) : userOption.id,
 					priority: parseInt(mission.priority, 10) || null,
 					note: mission.note || null,
@@ -252,11 +251,13 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 								kpiNorm_id: selectedRow.id || null,
 								mission_id: res.data?.data?.mission_id || null,
 								key_id: res.data?.data?.key_id || null,
-								quantity: parseInt(selectedRow.quantity, 10) || null,
+								quantity:
+									parseInt(selectedRow.quantity, 10) || res.data?.data?.quantity,
 								user_id: role.includes('user')
 									? parseInt(userId, 10)
 									: userOption.id,
-								priority: parseInt(mission.priority, 10) || null,
+								priority:
+									parseInt(mission.priority, 10) || res.data?.data?.priority,
 								deadline: res.data?.data?.deadline || null,
 								startDate: res.data?.data?.startDate,
 								status: res.data?.data?.status,
@@ -284,7 +285,7 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 		column: { id },
 		updateMyData,
 	}) => {
-		const [value, setValue] = React.useState(initialValue);
+		const [value, setValue] = React.useState(initialValue || '');
 
 		const onChange = (e) => {
 			setValue(e.target.value);
