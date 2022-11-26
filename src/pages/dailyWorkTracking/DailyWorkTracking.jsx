@@ -86,40 +86,67 @@ const DailyWorkTracking = () => {
 		for (const key of Object.keys(selectedFile)) {
 			formData.append('files', selectedFile[key], selectedFile[key].name);
 		}
-		uploadFileReport(formData)
-			.then((res) => {
-				const dataSubmit = {
-					status: item.status,
-					date: dataShow.valueForm.date,
-					note: item.note,
-					quantity: item.quantity || null,
-					files: JSON.stringify(res.data.data),
-					workTrack_id: item.data.dataWorktrack.id,
-				};
-				addWorktrackLog(dataSubmit)
-					.then(() => {
-						handleClose();
-						dispatch(fetchWorktrackListAll());
-						toast.success('Báo cáo nhiệm vụ thành công!', {
-							position: toast.POSITION.TOP_RIGHT,
-							autoClose: 1000,
+		if (Object.keys(selectedFile).length > 0) {
+			uploadFileReport(formData)
+				.then((res) => {
+					const dataSubmit = {
+						status: item.status,
+						date: dataShow.valueForm.date,
+						note: item.note,
+						quantity: item.quantity || null,
+						files: JSON.stringify(res.data.data),
+						workTrack_id: item.data.dataWorktrack.id,
+					};
+					addWorktrackLog(dataSubmit)
+						.then(() => {
+							handleClose();
+							dispatch(fetchWorktrackListAll());
+							toast.success('Báo cáo nhiệm vụ thành công!', {
+								position: toast.POSITION.TOP_RIGHT,
+								autoClose: 1000,
+							});
+						})
+						.catch((err) => {
+							toast.error('Báo cáo nhiệm vụ không thành công!', {
+								position: toast.POSITION.TOP_RIGHT,
+								autoClose: 1000,
+							});
+							throw err;
 						});
-					})
-					.catch((err) => {
-						toast.error('Báo cáo nhiệm vụ không thành công!', {
-							position: toast.POSITION.TOP_RIGHT,
-							autoClose: 1000,
-						});
-						throw err;
+				})
+				.catch((error) => {
+					toast.error('Upload file không thành công. Vui lòng thử lại.', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
 					});
-			})
-			.catch((error) => {
-				toast.error('Upload file không thành công. Vui lòng thử lại.', {
-					position: toast.POSITION.TOP_RIGHT,
-					autoClose: 1000,
+					throw error;
 				});
-				throw error;
-			});
+		} else {
+			const dataSubmit = {
+				status: item.status,
+				date: dataShow.valueForm.date,
+				note: item.note,
+				quantity: item.quantity || null,
+				files: null,
+				workTrack_id: item.data.dataWorktrack.id,
+			};
+			addWorktrackLog(dataSubmit)
+				.then(() => {
+					handleClose();
+					dispatch(fetchWorktrackListAll());
+					toast.success('Báo cáo nhiệm vụ thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+				})
+				.catch((err) => {
+					toast.error('Báo cáo nhiệm vụ không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					throw err;
+				});
+		}
 	};
 
 	const handleChangeDate = () => {
@@ -221,7 +248,28 @@ const DailyWorkTracking = () => {
 			align: 'right',
 		},
 		{
-			Header: 'Nhật trình công việc',
+			Header: () => {
+				return (
+					<div className='d-flex'>
+						{columns().map((item) => {
+							return (
+								<div
+									key={item?.day}
+									style={{
+										border: '1px solid #c8c7c7',
+										width: 48,
+										height: 36,
+										backgroundColor: item.color ? '#f97875' : '#fff',
+										borderRadius: 0,
+									}}
+									className='rounded-none d-flex justify-content-center align-items-center'>
+									{`${item.textDate}`}
+								</div>
+							);
+						})}
+					</div>
+				);
+			},
 			accessor: 'log',
 			Cell: ({ row }) => {
 				const { workTrackLogs } = row.original;
@@ -235,10 +283,13 @@ const DailyWorkTracking = () => {
 										border: '1px solid #c8c7c7',
 										width: 48,
 										height: 36,
-										backgroundColor: renderColor(
-											workTrackLogs?.find((i) => i?.date === item?.date)
-												?.status,
-										),
+										backgroundColor: item.color
+											? '#f97875'
+											: renderColor(
+													workTrackLogs?.find(
+														(i) => i?.date === item?.date,
+													)?.status,
+											  ),
 										borderRadius: 0,
 									}}
 									onClick={() =>
