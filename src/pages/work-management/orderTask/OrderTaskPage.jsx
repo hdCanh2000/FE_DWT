@@ -60,7 +60,7 @@ const createDataTree = (dataset) => {
 	return dataTree;
 };
 
-const Item = memo(({ data, onOpen, dataChildren }) => {
+const Item = memo(({ data, onOpen }) => {
 	const dispatch = useDispatch();
 	const { quantity, deadline, users } = data;
 	const [open, setOpen] = useState(false);
@@ -132,7 +132,6 @@ const Item = memo(({ data, onOpen, dataChildren }) => {
 						Thời hạn hoàn thành: {moment(deadline).format('DD-MM-YYYY')}
 					</div>
 					<div className='col-12'>Số lượng : {quantity}</div>
-					<div className='col-12'>Số nhiệm vụ con : {dataChildren}</div>
 				</CardBody>
 			</Card>
 			<AlertConfirm
