@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import _ from 'lodash';
-import { useTable, useRowSelect } from 'react-table';
+import { useTable } from 'react-table';
 import Select from 'react-select';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +22,13 @@ import Alert from '../../components/bootstrap/Alert';
 import Loading from '../../components/Loading/Loading';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import DetailPendingWorkTrack from './DetailPendingWorktrack';
+import ConfirmForm from './ConfirmForm';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcProgressTask,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIOfWorkTrack,
+} from '../../utils/function';
 
 const Styles = styled.div`
 	table {
@@ -50,111 +57,52 @@ const Styles = styled.div`
 	}
 `;
 
-const IndeterminateCheckbox = React.forwardRef(({ indeterminate, ...rest }, ref) => {
-	const defaultRef = React.useRef();
-	const resolvedRef = ref || defaultRef;
-
-	React.useEffect(() => {
-		resolvedRef.current.indeterminate = indeterminate;
-	}, [resolvedRef, indeterminate]);
-
-	return <input type='checkbox' ref={resolvedRef} {...rest} />;
-});
-
-const Table = ({ columns, data, onChangeStatusMultiple, darkModeStatus }) => {
-	const {
-		getTableProps,
-		getTableBodyProps,
-		headerGroups,
-		rows,
-		prepareRow,
-		selectedFlatRows,
-		// eslint-disable-next-line no-unused-vars
-		state: { selectedRowIds },
-	} = useTable(
-		{
-			columns,
-			data,
-		},
-		useRowSelect,
-		(hooks) => {
-			hooks.visibleColumns.push((columns) => [
-				{
-					id: 'selection',
-					Header: ({ getToggleAllRowsSelectedProps }) => (
-						<div>
-							<IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
-						</div>
-					),
-					Cell: ({ row }) => (
-						<div>
-							<IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-						</div>
-					),
-				},
-				...columns,
-			]);
-		},
-	);
-
-	const handleChangeStatusMultiple = () => {
-		onChangeStatusMultiple(selectedFlatRows.map((d) => d.original));
-	};
+const Table = ({ columns, data }) => {
+	const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+		columns,
+		data,
+	});
 
 	return (
-		<>
-			<table {...getTableProps()}>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th {...column.getHeaderProps()}>{column.render('Header')}</th>
-							))}
+		<table {...getTableProps()}>
+			<thead>
+				{headerGroups.map((headerGroup) => (
+					<tr {...headerGroup.getHeaderGroupProps()}>
+						{headerGroup.headers.map((column) => (
+							<th
+								{...column.getHeaderProps({
+									style: {
+										textAlign: column.align,
+									},
+								})}>
+								{column.render('Header')}
+							</th>
+						))}
+					</tr>
+				))}
+			</thead>
+			<tbody {...getTableBodyProps()}>
+				{rows.slice(0, 10).map((row) => {
+					prepareRow(row);
+					return (
+						<tr {...row.getRowProps()}>
+							{row.cells.map((cell) => {
+								return (
+									<td
+										{...cell.getCellProps({
+											style: {
+												textAlign: cell.column.align,
+											},
+										})}>
+										{cell.render('Cell')}
+									</td>
+								);
+							})}
 						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
-					{rows.slice(0, 10).map((row) => {
-						prepareRow(row);
-						return (
-							<tr {...row.getRowProps()}>
-								{row.cells.map((cell) => {
-									return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			{selectedFlatRows?.length >= 2 && (
-				<div className='w-25 m-auto mt-4'>
-					<Button
-						color='info'
-						isOutline={!darkModeStatus}
-						isLight={darkModeStatus}
-						onClick={handleChangeStatusMultiple}
-						isDisable={!selectedFlatRows?.length}
-						className='text-nowrap ms-2 rounded-0 outline-none shadow-none'
-						icon='Check'>
-						Duyệt nhiều
-					</Button>
-				</div>
-			)}
-
-			{/* <p>Selected Rows: {Object.keys(selectedRowIds).length}</p>
-			<pre>
-				<code>
-					{JSON.stringify(
-						{
-							selectedRowIds,
-							'selectedFlatRows[].original': selectedFlatRows.map((d) => d.original),
-						},
-						null,
-						2,
-					)}
-				</code>
-			</pre> */}
-		</>
+					);
+				})}
+			</tbody>
+		</table>
 	);
 };
 
@@ -171,6 +119,15 @@ const PendingWorktrackPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const item = useSelector((state) => state.toggleForm.data);
+
+	const [isConfirmForm, setIsConfirmForm] = useState(false);
+	const [selectedRow, setSelectedRow] = useState({});
+
+	const handleOpenConfirm = (row) => {
+		setIsConfirmForm(true);
+		setSelectedRow(row);
+	};
+
 	async function fetchDataWorktracksByStatus(status) {
 		try {
 			const response = await getAllWorktrackByStatus(status);
@@ -189,6 +146,10 @@ const PendingWorktrackPage = () => {
 								userResponsible: item.users.find(
 									(item) => item?.workTrackUsers?.isResponsible === true,
 								)?.name,
+								totalKPI: calcTotalKPIOfWorkTrack(item),
+								totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+								currentKPI: calcCurrentKPIOfWorkTrack(item),
+								progress: calcProgressTask(item),
 							};
 					  })
 					: [],
@@ -209,100 +170,93 @@ const PendingWorktrackPage = () => {
 			id: row?.id,
 			status: row.status === 'pending' ? 'accepted' : 'closed',
 		};
-		updateStatusWorktrack(dataSubmit)
+		updateStatusWorktrack(
+			isConfirmForm ? { ...dataSubmit, kpi_point: row.kpi_point } : dataSubmit,
+		)
 			.then(() => {
 				fetchDataWorktracksByStatus(statusOption.value);
+				setIsConfirmForm(false);
 				toast.success('Duyệt công việc thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
 			})
 			.catch((error) => {
-				// eslint-disable-next-line no-console
-				console.log(error);
-			});
-	};
-
-	const handleChangeStatusMultiple = (rows) => {
-		for (let i = 0; i < rows.length; i += 1) {
-			updateStatusWorktrack({
-				id: rows[i].id,
-				status: rows[i].status === 'pending' ? 'accepted' : 'closed',
-			})
-				.then(() => {})
-				.catch((error) => {
-					// eslint-disable-next-line no-console
-					console.log(error);
-				})
-				.finally(() => {
-					fetchDataWorktracksByStatus(statusOption.value);
+				toast.error('Duyệt công việc không thành công!', {
+					position: toast.POSITION.TOP_RIGHT,
+					autoClose: 1000,
 				});
-		}
+				throw error;
+			});
 	};
 
 	const columns = React.useMemo(
 		() => [
 			{
-				Header: 'Danh sách công việc',
-				columns: [
-					{
-						Header: 'Tên nhiệm vụ',
-						accessor: 'kpiNorm.name',
-					},
-					{
-						Header: 'Thuộc mục tiêu',
-						accessor: 'mission.name',
-					},
-					{
-						Header: 'Người thực hiện',
-						accessor: 'userResponsible',
-					},
-					{
-						Header: 'Hạn hoàn thành',
-						accessor: 'deadlineText',
-					},
-					{
-						Header: 'Số lượng',
-						accessor: 'quantity',
-					},
-					{
-						Header: 'Trạng thái',
-						accessor: 'statusName',
-					},
-					{
-						Header: 'Hành động',
-						accessor: 'action',
-						Cell: ({ row }) => (
-							<div className='align-items-center'>
-								<Button
-									style={{ marginRight: '10px' }}
-									isOutline={!darkModeStatus}
-									color='primary'
-									isLight={darkModeStatus}
-									className='text-nowrap'
-									icon='RemoveRedEye'
-									size='sm'
-									onClick={() =>
-										handleOpenForm({
-											...row.original,
-										})
-									}>
-									Xem
-								</Button>
-								<Button
-									isOutline={!darkModeStatus}
-									color='success'
-									isLight={darkModeStatus}
-									className='text-nowrap'
-									icon='Check'
-									size='sm'
-									onClick={() => handleChangeStatus(row.original)}>
-									Duyệt
-								</Button>
-							</div>
-						),
-					},
-				],
+				Header: 'Tên nhiệm vụ',
+				accessor: 'kpiNorm.name',
+			},
+			{
+				Header: 'Người thực hiện',
+				accessor: 'userResponsible',
+			},
+			{
+				Header: 'Số lượng',
+				accessor: 'quantity',
+				align: 'right',
+			},
+			{
+				Header: 'Giá trị KPI',
+				accessor: 'totalKPI',
+				align: 'right',
+			},
+			{
+				Header: 'Số lượng hoàn thành',
+				accessor: 'totalQuantity',
+				align: 'right',
+			},
+			{
+				Header: 'KPI tạm tính',
+				accessor: 'currentKPI',
+				align: 'right',
+			},
+			{
+				Header: 'Hành động',
+				accessor: 'action',
+				align: 'center',
+				Cell: ({ row }) => (
+					<div className='align-items-center'>
+						<Button
+							style={{ marginRight: '10px' }}
+							isOutline={!darkModeStatus}
+							color='primary'
+							isLight={darkModeStatus}
+							className='text-nowrap'
+							icon='RemoveRedEye'
+							size='sm'
+							onClick={() =>
+								handleOpenForm({
+									...row.original,
+								})
+							}>
+							Xem
+						</Button>
+						<Button
+							isOutline={!darkModeStatus}
+							color='success'
+							isLight={darkModeStatus}
+							className='text-nowrap'
+							icon='Check'
+							size='sm'
+							onClick={
+								statusOption.value === 'pending'
+									? () => handleChangeStatus(row.original)
+									: () => handleOpenConfirm(row.original)
+							}>
+							Duyệt
+						</Button>
+					</div>
+				),
 			},
 		],
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -351,14 +305,7 @@ const PendingWorktrackPage = () => {
 											</div>
 											{!_.isEmpty(data) ? (
 												<Styles>
-													<Table
-														columns={columns}
-														data={data}
-														darkModeStatus={darkModeStatus}
-														onChangeStatusMultiple={
-															handleChangeStatusMultiple
-														}
-													/>
+													<Table columns={columns} data={data} />
 												</Styles>
 											) : (
 												<Alert
@@ -380,6 +327,12 @@ const PendingWorktrackPage = () => {
 				)}
 			</Page>
 			<DetailPendingWorkTrack data={item} handleClose={handleCloseForm} show={toggleForm} />
+			<ConfirmForm
+				show={isConfirmForm}
+				item={selectedRow}
+				handleClose={() => setIsConfirmForm(false)}
+				handleSubmit={handleChangeStatus}
+			/>
 		</PageWrapper>
 	);
 };

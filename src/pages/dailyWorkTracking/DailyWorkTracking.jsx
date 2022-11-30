@@ -234,8 +234,15 @@ const DailyWorkTracking = () => {
 			align: 'right',
 		},
 		{
-			Header: 'KPI đạt được',
+			Header: 'KPI tạm tính',
 			accessor: 'currentKPI',
+			maxWidth: 100,
+			minWidth: 100,
+			align: 'right',
+		},
+		{
+			Header: 'KPI thực tế',
+			accessor: 'kpiPoint',
 			maxWidth: 100,
 			minWidth: 100,
 			align: 'right',

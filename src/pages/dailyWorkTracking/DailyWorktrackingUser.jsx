@@ -34,6 +34,7 @@ import {
 	calcCurrentKPIOfWorkTrack,
 	calcProgressTask,
 	calcProgressWorktrack,
+	// calcRealKPIPointByUser,
 	calcTotalCurrentKPIWorkTrackByUser,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
@@ -108,6 +109,7 @@ const DailyWorkTrackingUser = () => {
 							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
 							currentKPI: calcCurrentKPIOfWorkTrack(item),
 							progress: calcProgressTask(item),
+							kpiPoint: item.kpi_point ? item.kpi_point : '--',
 							parentId: item.parent_id,
 						};
 					}),
@@ -294,8 +296,15 @@ const DailyWorkTrackingUser = () => {
 			align: 'right',
 		},
 		{
-			Header: 'KPI đạt được',
+			Header: 'KPI tạm tính',
 			accessor: 'currentKPI',
+			maxWidth: 100,
+			minWidth: 100,
+			align: 'right',
+		},
+		{
+			Header: 'KPI thực tế',
+			accessor: 'kpiPoint',
 			maxWidth: 100,
 			minWidth: 100,
 			align: 'right',
@@ -478,6 +487,14 @@ const DailyWorkTrackingUser = () => {
 												</span>
 											</div>
 										</CardFooterRight>
+										{/* <CardFooterRight tag='div' className='fw-bold fs-5 d-flex'>
+											<span>KPI thực tế:</span>
+											<div>
+												<span className='text-success me-1'>
+													{calcRealKPIPointByUser(worktrack)}
+												</span>
+											</div>
+										</CardFooterRight> */}
 									</CardFooter>
 								</CardBody>
 							</Card>

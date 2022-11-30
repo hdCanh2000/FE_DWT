@@ -131,6 +131,17 @@ export const calcProgressWorktrack = (worktrack) => {
 	);
 };
 
+export const calcRealKPIPointByUser = (worktrack) => {
+	let total = 0;
+	if (isEmpty(worktrack)) return 0;
+	const { workTracks } = worktrack;
+	if (isEmpty(workTracks) || !isArray(workTracks)) return 0;
+	workTracks.forEach((item) => {
+		total += item.kpi_point;
+	});
+	return total || 0;
+};
+
 export const createDataTreeTable = (dataset) => {
 	const hashTable = Object.create(null);
 	dataset.forEach((aData) => {
