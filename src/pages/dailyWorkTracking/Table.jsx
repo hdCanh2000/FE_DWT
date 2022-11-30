@@ -127,6 +127,7 @@ const Table = ({ columns: userColumns, data }) => {
 													style: {
 														minWidth: column.minWidth,
 														width: column.width,
+														textAlign: column.align,
 													},
 												})}>
 												{column.render('Header')}
@@ -148,6 +149,7 @@ const Table = ({ columns: userColumns, data }) => {
 															style: {
 																minWidth: cell.column.minWidth,
 																width: cell.column.width,
+																textAlign: cell.column.align,
 															},
 														})}>
 														{cell.render('Cell')}

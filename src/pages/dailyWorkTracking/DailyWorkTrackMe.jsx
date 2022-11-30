@@ -100,7 +100,7 @@ const DailyWorkTrackingMe = () => {
 							totalKPI: calcTotalKPIOfWorkTrack(item),
 							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
 							currentKPI: calcCurrentKPIOfWorkTrack(item),
-							progress: `${calcProgressTask(item)}%`,
+							progress: calcProgressTask(item),
 						};
 					}),
 			);

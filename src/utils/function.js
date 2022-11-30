@@ -4,7 +4,8 @@ export const calcTotalKPIOfWorkTrack = (worktrack) => {
 	const { kpiNorm } = worktrack;
 	if (isEmpty(kpiNorm)) return 0;
 	return (
-		(kpiNorm.kpi_value / (kpiNorm.quantity ? kpiNorm.quantity : 1)) *
+		(kpiNorm.kpi_value / kpiNorm.manday) *
+		(kpiNorm.quantity ? kpiNorm.quantity : 1) *
 		worktrack.quantity
 	).toFixed(2);
 };
@@ -41,7 +42,11 @@ export const calcProgressWokTrack = (worktrack) => {
 const calcTotalKPIOfWorkTrackItem = (worktrack) => {
 	const { kpiNorm } = worktrack;
 	if (isEmpty(kpiNorm)) return 0;
-	return (kpiNorm.kpi_value / (kpiNorm.quantity ? kpiNorm.quantity : 1)) * worktrack.quantity;
+	return (
+		(kpiNorm.kpi_value / kpiNorm.manday) *
+		(kpiNorm.quantity ? kpiNorm.quantity : 1) *
+		worktrack.quantity
+	);
 };
 
 const calcCurrentKPIOfWorkTrackItem = (worktrack) => {
@@ -109,9 +114,11 @@ export const calcTotalCurrentKPIAllWorkTrack = (worktracks) => {
 };
 
 export const calcProgressTask = (worktrack) => {
-	return Math.round(
+	if (!worktrack.quantity) return '--';
+	const progress = Math.round(
 		(calcCurrentKPIOfWorkTrack(worktrack) / calcTotalKPIOfWorkTrack(worktrack)) * 100,
 	);
+	return `${progress}%`;
 };
 
 export const calcProgressWorktrack = (worktrack) => {
