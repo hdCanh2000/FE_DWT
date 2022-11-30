@@ -188,3 +188,11 @@ export const renderColor = (status) => {
 			return 'transparent';
 	}
 };
+
+export const convertDate = (date = '') => {
+	const dateStr = date.toLocaleDateString().split('/');
+	const y = dateStr[2];
+	const m = dateStr[1];
+	const d = dateStr[0];
+	return `${d >= 10 ? d : `0${d}`}/${m >= 10 ? m : `0${m}`}/${y}`;
+};

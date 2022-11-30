@@ -24,7 +24,7 @@ import Loading from '../../components/Loading/Loading';
 import DailyWorktrackForm from './DailyWorktrackForm';
 import { addWorktrackLog, uploadFileReport } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
-import { columns, renderColor } from '../../utils/function';
+import { columns, convertDate, renderColor } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
 import Table from './Table';
 import { getFirstAndLastDateOfMonth, getQueryDate } from '../../utils/utils';
@@ -327,9 +327,9 @@ const DailyWorkTracking = () => {
 											Danh sách nhiệm vụ
 										</CardTitle>
 										<CardSubTitle className='fs-5 text-info'>
-											Từ {state[0].startDate.toLocaleDateString()}
+											Từ {convertDate(state[0].startDate)}
 											<span className='mx-2'>-</span>
-											{state[0].endDate.toLocaleDateString()}
+											{convertDate(state[0].endDate)}
 										</CardSubTitle>
 									</CardLabel>
 								</CardHeader>

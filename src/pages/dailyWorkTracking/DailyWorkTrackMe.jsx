@@ -40,6 +40,7 @@ import {
 	calcTotalKPIOfWorkTrack,
 	calcTotalKPIWorkTrackByUser,
 	columns,
+	convertDate,
 	createDataTreeTable,
 	renderColor,
 } from '../../utils/function';
@@ -421,9 +422,9 @@ const DailyWorkTrackingMe = () => {
 											Danh sách nhiệm vụ của tôi
 										</CardTitle>
 										<CardSubTitle className='fs-5 text-info'>
-											Từ {state[0].startDate.toLocaleDateString()}
+											Từ {convertDate(state[0].startDate)}
 											<span className='mx-2'>-</span>
-											{state[0].endDate.toLocaleDateString()}
+											{convertDate(state[0].endDate)}
 										</CardSubTitle>
 									</CardLabel>
 								</CardHeader>
