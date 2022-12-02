@@ -1,4 +1,5 @@
 import { isArray, isEmpty } from 'lodash';
+import moment from 'moment';
 
 export const calcTotalKPIOfWorkTrack = (worktrack) => {
 	const { kpiNorm } = worktrack;
@@ -177,18 +178,20 @@ export const createDataTree = (dataset) => {
 // const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const daysOfWeekVN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
-export const columns = () => {
-	const date = new Date();
-	const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+export const columns = (selectedDate) => {
+	const startDate = moment(selectedDate && selectedDate[0].startDate);
+	const timeEnd = moment(selectedDate && selectedDate[0].endDate);
+	const diff = timeEnd.diff(moment(startDate));
+	const diffDuration = moment.duration(diff);
 	const result = [];
-	for (let i = 1; i <= days; i += 1) {
-		const fullDate = `${date.getFullYear()}-${date.getMonth() + 1}-${i >= 10 ? i : `0${i}`}`;
+	for (let i = 0; i <= diffDuration.days(); i += 1) {
+		const cloneDate = startDate.clone();
+		const currentDate = cloneDate.add(i, 'days');
 		result.push({
-			day: i >= 10 ? i : `0${i}`,
-			date: `${i >= 10 ? i : `0${i}`}-${date.getMonth() + 1}-${date.getFullYear()}`,
-			fullDate,
-			textDate: daysOfWeekVN[new Date(fullDate).getDay()],
-			color: new Date(fullDate).getDay() === 0 ? 'danger' : '',
+			day: currentDate.format('DD'),
+			date: currentDate.format('DD-MM-YYYY'),
+			textDate: daysOfWeekVN[currentDate.day()],
+			color: currentDate.day() === 0 ? 'danger' : '',
 		});
 	}
 	return result;

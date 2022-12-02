@@ -3,6 +3,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useEffect, useState } from 'react';
+import _ from 'lodash';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Toast } from 'react-bootstrap';
@@ -207,7 +208,7 @@ const DailyWorkTracking = () => {
 									),
 								})
 							}>
-							{row.original.name || row.original.kpiNorm.name}
+							{_.get(row, 'original.name') || _.get(row, 'original.kpiNorm.name')}
 						</span>
 					</div>
 				);
@@ -258,7 +259,7 @@ const DailyWorkTracking = () => {
 			Header: () => {
 				return (
 					<div className='d-flex'>
-						{columns().map((item) => {
+						{columns(state).map((item) => {
 							return (
 								<div
 									key={item?.day}
@@ -283,7 +284,7 @@ const DailyWorkTracking = () => {
 				const { workTrackLogs } = row.original;
 				return (
 					<div className='d-flex'>
-						{columns().map((item) => {
+						{columns(state).map((item) => {
 							return (
 								<div
 									key={item?.day}
