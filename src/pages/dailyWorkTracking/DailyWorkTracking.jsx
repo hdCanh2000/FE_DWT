@@ -463,17 +463,18 @@ const DailyWorkTracking = () => {
                   <CardActions style={{ display: "inline-flex", marginLeft: 20 }}>
                     <Button
                       // icon='DateRange'
-                      onClick={handleExportExcel}
                       color="primary">
-                      Xuất báo cáo
+                      <CSVLink
+                        data={excelData}
+                        asyncOnClick
+                        onClick={handleExportExcel}
+                        style={{ color: "#fff", textDecoration: "none" }}
+                        filename="Bao_cao_kpi.csv"
+                      >
+                        Xuất báo cáo
+                      </CSVLink>
                     </Button>
-                    <CSVLink
-                      data={excelData}
-                      asyncOnClick
-                      onClick={handleExportExcel}
-                    >
-                      Download me
-                    </CSVLink>;
+
                   </CardActions>
                 </CardHeader>
                 <CardBody className="w-100">
