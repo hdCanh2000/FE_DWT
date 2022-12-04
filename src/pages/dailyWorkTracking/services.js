@@ -91,6 +91,10 @@ const downloadFileReport = (name) => {
 	});
 };
 
+const downLoadWorkTrack = async (params = {}) => {
+	const url = `/api/worktracks/export_all`
+	return axiosClient.get(url, {params});
+}
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -104,4 +108,5 @@ export {
 	getAllWorktrackMe,
 	uploadFileReport,
 	downloadFileReport,
+	downLoadWorkTrack
 };

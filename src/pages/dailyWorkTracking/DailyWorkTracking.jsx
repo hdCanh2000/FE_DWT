@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import { Toast } from "react-bootstrap";
 import { DateRangePicker } from "react-date-range";
 import moment from "moment/moment";
-import { CSVLink } from "react-csv";
 
 import Card, {
   CardActions,
@@ -25,7 +24,7 @@ import { fetchWorktrackListAll } from "../../redux/slice/worktrackSlice";
 import { toggleFormSlice } from "../../redux/common/toggleFormSlice";
 import Loading from "../../components/Loading/Loading";
 import DailyWorktrackForm from "./DailyWorktrackForm";
-import { addWorktrackLog, uploadFileReport } from "./services";
+import { addWorktrackLog, uploadFileReport, downLoadWorkTrack } from "./services";
 import DailyWorktrackInfo from "./DailyWorktrackInfo";
 import { columns, convertDate, renderColor } from "../../utils/function";
 import Icon from "../../components/icon/Icon";
@@ -61,7 +60,6 @@ const DailyWorkTracking = () => {
       key: "selection"
     }
   ]);
-  const [excelData, setExcelData] = useState([]);
 
   useEffect(() => {
     const { startDate, endDate } = getQueryDate(0);
@@ -325,61 +323,13 @@ const DailyWorkTracking = () => {
     }
   ];
   /* eslint-disable */
-  const handleExportExcel = () => {
-    if (worktrack.length === 0) {
-      setExcelData([]);
+  const handleExportExcel = async () => {
+    try {
+      await downLoadWorkTrack();
+
+    } catch (err) {
+      console.log(err);
     }
-    const data = [];
-    const header = ["STT", "Tên nhiệm vụ", "Người phụ trách", "Tỉ lệ hoàn thành", "Tổng điểm KPI", "KPI tạm tính", "KPI thực tế", "Số lượng hoàn thành", "Ngày báo cáo", "Nội Dung Báo cáo", "File báo cáo"];
-    data.push(header);
-    // normalize data
-
-    worktrack.forEach((item, index) => {
-      console.log(item);
-      const row = [
-        index + 1,
-        item.kpiNorm.name,
-        item.user.name,
-        item.progress,
-        item.totalKPI,
-        item.currentKPI,
-        item.kpiPoint,
-        item.totalQuantity
-      ];
-      if (item.workTrackLogs.length === 0) {
-        data.push([...row, "", "", ""]);
-        return;
-      }
-      item.workTrackLogs.forEach((log, index) => {
-        // for the first log push to current row
-        if (index === 0) {
-          row.push(log.date);
-          row.push(log.note || "");
-          row.push(log.files || "");
-          data.push(row);
-        }
-        // when index > 0, push new row
-        else {
-          const logRow = [
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            log.date,
-            log.content,
-            log.file
-          ];
-          data.push(logRow);
-        }
-      });
-
-    });
-    console.log("data", data);
-    setExcelData(data);
   };
   /* eslint-enable */
   return (
@@ -461,19 +411,12 @@ const DailyWorkTracking = () => {
                     </Button>
                   </CardActions>
                   <CardActions style={{ display: "inline-flex", marginLeft: 20 }}>
-                    <Button
-                      // icon='DateRange'
-                      color="primary">
-                      <CSVLink
-                        data={excelData}
-                        asyncOnClick
-                        onClick={handleExportExcel}
-                        style={{ color: "#fff", textDecoration: "none" }}
-                        filename="Bao_cao_kpi.csv"
-                      >
-                        Xuất báo cáo
-                      </CSVLink>
-                    </Button>
+
+                    <a
+                      className="btn btn-primary"
+                      href={`${process.env.REACT_APP_DEV_API_URL}/api/worktracks/export_all`}>
+                      Xuất excel
+                    </a>
 
                   </CardActions>
                 </CardHeader>
