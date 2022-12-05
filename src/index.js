@@ -1,4 +1,5 @@
 import React from 'react';
+import 'antd/dist/reset.css';
 import ReactDOM from 'react-dom'; // For React 17
 // import { createRoot } from 'react-dom/client'; // For React 18
 import { BrowserRouter as Router } from 'react-router-dom';
