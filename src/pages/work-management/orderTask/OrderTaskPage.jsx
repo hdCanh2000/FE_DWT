@@ -164,7 +164,7 @@ const columns = [
     title: 'Số lượng',
     dataIndex: 'quantity',
     width: '10%',
-    key: 'address',
+    key: 'qty',
   },
   {
     title: 'Giá trị KPI',
