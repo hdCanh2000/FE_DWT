@@ -6,7 +6,7 @@ import {
 	ColumnsDirective,
 	ColumnDirective,
 	Filter,
-	Toolbar,
+	// Toolbar,
 	Inject,
 	Resize,
 } from '@syncfusion/ej2-react-treegrid';
@@ -347,7 +347,7 @@ const KpiNormPage = () => {
 																textAlign='Center'
 															/>
 														</ColumnsDirective>
-														<Inject services={[Filter, Toolbar]} />
+														<Inject services={[Filter]} />
 													</TreeGridComponent>
 												</div>
 											</div>
