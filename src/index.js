@@ -14,7 +14,7 @@ import { store } from './redux/store/index';
 import './i18n';
 
 registerLicense(
-	'ORg4AjUWIQA/Gnt2VVhjQlFaclhJXGFWeUx0RWFbb19xfldDal9TVBYiSV9jS3xSd0VkW3xcdXBTQ2ZbWQ==',
+	'ORg4AjUWIQA/Gnt2VVhjQlFac1lJXHxKYVF2R2BJfl96cVRMYVRBJAtUQF1hS39RdkFhWnpadXxURGdc',
 );
 
 const children = (
