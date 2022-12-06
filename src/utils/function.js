@@ -44,8 +44,9 @@ export const calcProgressWokTrack = (worktrack) => {
 const calcTotalKPIOfWorkTrackItem = (worktrack) => {
   const {kpiNorm} = worktrack;
   if (isEmpty(kpiNorm)) return 0;
+  const manDay = kpiNorm.manday || 1;
   return (
-    (kpiNorm.kpi_value / kpiNorm.manday) *
+    (kpiNorm.kpi_value / manDay) *
     (kpiNorm.quantity ? kpiNorm.quantity : 1) *
     worktrack.quantity
   );
