@@ -117,7 +117,6 @@ const KpiNormPage = () => {
 		});
 	}, [treeValue]);
 
-
 	const fixForm = () => {
 		return kpiNorm.map((item) => ({
 			...item,

@@ -329,6 +329,13 @@ const DailyWorkTracking = () => {
 			const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
 			const res = await downLoadWorkTrack({ startDate, endDate });
 			const { fileName } = res.data.data;
+
+			let hostName = process.env.REACT_APP_DEV_API_URL;
+			// remove last /
+			if (hostName[hostName.length - 1] === '/') {
+				hostName = hostName.slice(0, hostName.length - 1);
+			}
+
 			const fileUrl = `${process.env.REACT_APP_DEV_API_URL}/files/${fileName}`;
 
 			// download file by create an a tag with download attribute and href is the file url then click it
