@@ -1,18 +1,10 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState, memo } from 'react';
+import { Table } from 'antd';
+import React, { useEffect, useState, memo, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import _ from 'lodash';
-import {
-	TreeGridComponent,
-	ColumnsDirective,
-	ColumnDirective,
-	Filter,
-	Toolbar,
-	Inject,
-	Resize,
-} from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Card, {
@@ -145,13 +137,40 @@ const Item = memo(({ data, onOpen }) => {
 	);
 });
 
-const toolbarOptions = ['Search'];
-const searchOptions = {
-	fields: ['data.name', 'data.position.name'],
-	ignoreCase: true,
-	key: '',
-	operator: 'contains',
-};
+// const toolbarOptions = ['Search'];
+// const searchOptions = {
+//   fields: ['data.name', 'data.position.name'],
+//   ignoreCase: true,
+//   key: '',
+//   operator: 'contains',
+// };
+
+const columns = [
+	{
+		title: 'Tên nhiệm vụ',
+		dataIndex: 'name',
+		key: 'name',
+		width: '30%',
+	},
+	{
+		title: 'Vị trí đảm nhiệm',
+		dataIndex: 'position',
+		key: 'position',
+		width: '30%',
+	},
+	{
+		title: 'Số lượng',
+		dataIndex: 'quantity',
+		width: '10%',
+		key: 'qty',
+	},
+	{
+		title: 'Giá trị KPI',
+		dataIndex: 'kpi_value',
+		width: '10%',
+		key: 'kpiValue',
+	},
+];
 
 const OrderTaskPage = () => {
 	const dispatch = useDispatch();
@@ -164,6 +183,28 @@ const OrderTaskPage = () => {
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = useState([]);
+
+	// norminalize data for antd table tree
+	const antdTableData = useMemo(() => {
+		return treeValue.map((item) => {
+			if (item.children.length === 0) {
+				return {
+					...item.data,
+					position: item.data.position.name,
+					key: item.data.id,
+				};
+			}
+			return {
+				...item.data,
+				position: item.data.position.name,
+				key: item.data.id,
+				children: item.children.map((child) => ({
+					...child.data,
+					position: child.data.position.name,
+				})),
+			};
+		});
+	}, [treeValue]);
 
 	useEffect(() => {
 		dispatch(fetchAssignTask());
@@ -248,58 +289,31 @@ const OrderTaskPage = () => {
 												</CardTitle>
 											</CardLabel>
 										</CardHeader>
-										<CardBody className='h-100'>
+										<CardBody className='mh-100' isScrollable>
 											<div className='control-pane h-100'>
 												<div className='control-section h-100'>
-													<TreeGridComponent
-														locale='vi-VI'
-														dataSource={treeValue}
-														treeColumnIndex={0}
-														allowResizing
-														toolbar={toolbarOptions}
-														searchSettings={searchOptions}
-														className='cursor-pointer'
-														rowSelected={(item) => {
-															handleOpenForm({
-																children: item.data?.children,
-																kpiNorm_id: item.data?.data?.id,
-																unit: item.data.data?.unit,
-																quantity: item.data.data?.quantity,
-																kpi_value:
-																	item.data.data?.kpi_value,
-																kpiNorm_name: item.data.data?.name,
-															});
+													<Table
+														columns={columns}
+														dataSource={antdTableData}
+														pagination={{
+															defaultPageSize: 10,
+															position: ['bottomCenter'],
+															showSizeChanger: false,
 														}}
-														childMapping='children'
-														height='600'>
-														<Inject services={[Resize]} />
-														<ColumnsDirective>
-															<ColumnDirective
-																field='data.name'
-																headerText='Tên nhiệm vụ'
-																width='200'
-															/>
-															<ColumnDirective
-																field='data.position.name'
-																headerText='Vị trí đảm nhiệm'
-																width='90'
-																textAlign='Left'
-															/>
-															<ColumnDirective
-																field='data.quantity'
-																headerText='Số lượng'
-																width='90'
-																textAlign='Center'
-															/>
-															<ColumnDirective
-																field='data.kpi_value'
-																headerText='Giá trị KPI'
-																width='90'
-																textAlign='Center'
-															/>
-														</ColumnsDirective>
-														<Inject services={[Filter, Toolbar]} />
-													</TreeGridComponent>
+														onRow={(record) => ({
+															onClick: () => {
+																handleOpenForm({
+																	children:
+																		record?.children || [],
+																	kpiNorm_id: record.id,
+																	unit: record.unit,
+																	quantity: record.quantity,
+																	kpi_value: record.kpi_value,
+																	kpiNorm_name: record.name,
+																});
+															},
+														})}
+													/>
 												</div>
 											</div>
 										</CardBody>

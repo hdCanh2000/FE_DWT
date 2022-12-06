@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useTable, useExpanded } from 'react-table';
+/* eslint-disable */
 import { useSticky } from 'react-table-sticky';
+/* eslint-enable */
 import { isEmpty } from 'lodash';
 
 const Styles = styled.div`
@@ -10,9 +12,11 @@ const Styles = styled.div`
 		border-spacing: 0;
 		border: 1px solid black;
 		width: 100%;
+
 		tbody {
 			overflow-y: auto;
 		}
+
 		tr {
 			:last-child {
 				td {
@@ -28,15 +32,19 @@ const Styles = styled.div`
 			border-bottom: 1px solid black;
 			border-right: 1px solid black;
 			background-color: #fff;
+
 			:last-child {
 				border-right: 1px;
 			}
+
 			:first-child {
 				border-right: 0;
 			}
 		}
+
 		&.sticky {
 			overflow: scroll;
+
 			.header,
 			.footer {
 				position: sticky;
