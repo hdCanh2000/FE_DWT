@@ -39,6 +39,7 @@ const Styles = styled.div`
 		border-spacing: 0;
 		border: 1px solid black;
 		width: 100%;
+
 		tr {
 			:last-child {
 				td {
@@ -101,10 +102,10 @@ const OrderTaskForm = ({ show, onClose, item }) => {
 		setData(
 			item?.children?.map((i) => {
 				return {
-					id: i?.data?.id,
-					kpiNorm_name: i?.data?.name,
-					kpi_value: i?.data?.kpi_value,
-					manday: i?.data?.manday,
+					id: i?.id,
+					kpiNorm_name: i?.name,
+					kpi_value: i?.kpi_value,
+					manday: i?.manday,
 				};
 			}),
 		);
