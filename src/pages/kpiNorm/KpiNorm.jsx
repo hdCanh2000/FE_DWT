@@ -1,17 +1,9 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import {
-	TreeGridComponent,
-	ColumnsDirective,
-	ColumnDirective,
-	Filter,
-	Toolbar,
-	Inject,
-	Resize,
-} from '@syncfusion/ej2-react-treegrid';
 import { L10n } from '@syncfusion/ej2-base';
 import _, { isEmpty } from 'lodash';
+import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, {
@@ -41,6 +33,40 @@ L10n.load({
 	},
 });
 
+const antdTableCols = [
+	{
+		title: 'Tên nhiệm vụ',
+		dataIndex: 'name',
+		key: 'name',
+		width: '50%',
+	},
+	{
+		title: 'Vị trí đảm nhiệm',
+		dataIndex: 'position',
+		key: 'position',
+		width: '20%',
+	},
+	{
+		title: 'Ngày công cần thiết',
+		dataIndex: 'manday',
+		key: 'manday',
+		width: '10%',
+	},
+
+	{
+		title: 'Giá trị KPI',
+		dataIndex: 'kpi_value',
+		width: '10%',
+		key: 'kpiValue',
+	},
+	{
+		title: 'Số lượng',
+		dataIndex: 'quantity',
+		width: '10%',
+		key: 'qty',
+	},
+];
+
 const KpiNormPage = () => {
 	const dispatch = useDispatch();
 	const kpiNorm = useSelector((state) => state.kpiNorm.kpiNorms);
@@ -52,13 +78,13 @@ const KpiNormPage = () => {
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
-	const toolbarOptions = ['Search'];
-	const searchOptions = {
-		fields: ['data.name', 'data.position.name'],
-		ignoreCase: true,
-		key: '',
-		operator: 'contains',
-	};
+	// const toolbarOptions = ['Search'];
+	// const searchOptions = {
+	//   fields: ['data.name', 'data.position.name'],
+	//   ignoreCase: true,
+	//   key: '',
+	//   operator: 'contains',
+	// };
 
 	useEffect(() => {
 		dispatch(fetchPositionList());
@@ -67,6 +93,30 @@ const KpiNormPage = () => {
 	}, [dispatch]);
 
 	const [treeValue, setTreeValue] = React.useState([]);
+
+	// normilize data for antd tree table view
+	// norminalize data for antd table tree
+	const antdTableData = useMemo(() => {
+		return treeValue.map((item) => {
+			if (item.children.length === 0) {
+				return {
+					...item.data,
+					position: item.data.position.name,
+					key: item.data.id,
+				};
+			}
+			return {
+				...item.data,
+				position: item.data.position.name,
+				key: item.data.id,
+				children: item.children.map((child) => ({
+					...child.data,
+					position: child.data.position.name,
+				})),
+			};
+		});
+	}, [treeValue]);
+
 
 	const fixForm = () => {
 		return kpiNorm.map((item) => ({
@@ -301,54 +351,20 @@ const KpiNormPage = () => {
 										<CardBody>
 											<div className='control-pane'>
 												<div className='control-section'>
-													<TreeGridComponent
-														locale='vi-VI'
-														dataSource={treeValue}
-														treeColumnIndex={0}
-														allowResizing
-														allowReordering
-														toolbar={toolbarOptions}
-														searchSettings={searchOptions}
-														className='cursor-pointer'
-														rowSelected={(item) => {
-															handleOpenForm(item.data.data);
+													<Table
+														columns={antdTableCols}
+														dataSource={antdTableData}
+														pagination={{
+															defaultPageSize: 10,
+															position: ['bottomCenter'],
+															showSizeChanger: false,
 														}}
-														childMapping='children'
-														height='600'>
-														<Inject services={[Resize]} />
-														<ColumnsDirective>
-															<ColumnDirective
-																field='data.name'
-																headerText='Tên nhiệm vụ'
-																width='200'
-															/>
-															<ColumnDirective
-																field='data.position.name'
-																headerText='Vị trí đảm nhiệm'
-																width='90'
-																textAlign='Left'
-															/>
-															<ColumnDirective
-																field='data.manday'
-																headerText='Ngày công cần thiết'
-																width='90'
-																textAlign='Center'
-															/>
-															<ColumnDirective
-																field='data.kpi_value'
-																headerText='Giá trị KPI'
-																width='90'
-																textAlign='Center'
-															/>
-															<ColumnDirective
-																field='data.quantity'
-																headerText='Số lượng'
-																width='90'
-																textAlign='Center'
-															/>
-														</ColumnsDirective>
-														<Inject services={[Filter, Toolbar]} />
-													</TreeGridComponent>
+														onRow={(record) => ({
+															onClick: () => {
+																handleOpenForm(record);
+															},
+														})}
+													/>
 												</div>
 											</div>
 										</CardBody>
