@@ -320,7 +320,7 @@ const DailyWorkTrackingUser = () => {
 			Header: () => {
 				return (
 					<div className='d-flex'>
-						{columns().map((item) => {
+						{columns(state).map((item) => {
 							return (
 								<div
 									key={item?.day}
@@ -345,7 +345,7 @@ const DailyWorkTrackingUser = () => {
 				const { workTrackLogs } = row.original;
 				return (
 					<div className='d-flex'>
-						{columns().map((item) => {
+						{columns(state).map((item) => {
 							return (
 								<div
 									key={item?.day}
