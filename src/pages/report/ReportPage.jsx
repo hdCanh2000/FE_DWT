@@ -26,16 +26,11 @@ import { fetchEmployeeById } from '../../redux/slice/employeeSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
-import {
-	addWorktrackLog,
-	downLoadWorkTrack,
-	uploadFileReport,
-} from '../dailyWorkTracking/services';
+import { downLoadWorkTrack } from '../dailyWorkTracking/services';
 import {
 	calcCurrentKPIOfWorkTrack,
 	calcProgressTask,
 	calcProgressWorktrack,
-	// calcRealKPIPointByUser,
 	calcTotalCurrentKPIWorkTrackByUser,
 	calcTotalFromWorkTrackLogs,
 	calcTotalKPIOfWorkTrack,
@@ -50,27 +45,17 @@ import { getFirstAndLastDateOfMonth, getQueryDate } from '../../utils/utils';
 import Table from '../dailyWorkTracking/Table';
 import Button from '../../components/bootstrap/Button';
 import { inputRanges, staticRanges } from '../dailyWorkTracking/customReactDateRange';
-import DailyWorktrackInfo from '../dailyWorkTracking/DailyWorktrackInfo';
-import DailyWorktrackForm from '../dailyWorkTracking/DailyWorktrackForm';
 
 const DailyWorkTrackingUser = () => {
 	const dispatch = useDispatch();
 	const worktrack = useSelector((state) => state.worktrack.worktrack);
 	const employee = useSelector((state) => state.employee.employee);
 	const loading = useSelector((state) => state.worktrack.loading);
-	const toggleForm = useSelector((state) => state.toggleForm.open);
-	const itemEdit = useSelector((state) => state.toggleForm.data);
+
 	const [exporting, setExporting] = useState(false);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
 	const [treeValue, setTreeValue] = React.useState([]);
-	const [showForm, setShowForm] = React.useState(false);
-	const [dataShow, setDataShow] = React.useState({
-		row: {},
-		column: {},
-		valueForm: {},
-	});
 
 	const id = window.localStorage.getItem('userId');
 	const [open, setOpen] = useState(false);
@@ -122,93 +107,6 @@ const DailyWorkTrackingUser = () => {
 			setTreeValue([]);
 		}
 	}, [worktrack]);
-
-	const handleShowForm = (row, item, dataWorktrack) => {
-		setShowForm(true);
-		setDataShow({
-			valueForm: item,
-			row,
-			dataWorktrack,
-		});
-	};
-
-	const handleClose = () => {
-		setShowForm(false);
-		setDataShow({
-			valueForm: {},
-			row: {},
-		});
-	};
-
-	const handleSubmit = (item) => {
-		const selectedFile = item.files;
-		if (selectedFile && selectedFile.length > 0) {
-			const formData = new FormData();
-			// eslint-disable-next-line no-restricted-syntax
-			for (const key of Object.keys(selectedFile)) {
-				formData.append('files', selectedFile[key], selectedFile[key].name);
-			}
-			uploadFileReport(formData)
-				.then((res) => {
-					const dataSubmit = {
-						status: item.status,
-						date: dataShow.valueForm.date,
-						note: item.note,
-						quantity: item.quantity || null,
-						files: JSON.stringify(res.data.data),
-						workTrack_id: item.data.dataWorktrack.id,
-					};
-					addWorktrackLog(dataSubmit)
-						.then(() => {
-							handleClose();
-							fetchData();
-							toast.success('Báo cáo nhiệm vụ thành công!', {
-								position: toast.POSITION.TOP_RIGHT,
-								autoClose: 1000,
-							});
-						})
-						.catch((err) => {
-							toast.error('Báo cáo nhiệm vụ không thành công!', {
-								position: toast.POSITION.TOP_RIGHT,
-								autoClose: 1000,
-							});
-							throw err;
-						});
-				})
-				.catch((error) => {
-					toast.error('Upload file không thành công. Vui lòng thử lại.', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw error;
-				});
-		} else {
-			const dataSubmit = {
-				status: item.status,
-				date: dataShow.valueForm.date,
-				note: item.note,
-				quantity: item.quantity || null,
-				files: null,
-				workTrack_id: item.data.dataWorktrack.id,
-			};
-			addWorktrackLog(dataSubmit)
-				.then(() => {
-					handleClose();
-					fetchData();
-					toast.success('Báo cáo nhiệm vụ thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-				})
-				.catch((err) => {
-					toast.error('Báo cáo nhiệm vụ không thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw err;
-				});
-		}
-	};
 
 	const handleChangeDate = () => {
 		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
@@ -366,13 +264,6 @@ const DailyWorkTrackingUser = () => {
 										borderRadius: 0,
 										color: item.color ? '#fff' : '#000',
 									}}
-									onClick={() =>
-										handleShowForm(
-											workTrackLogs?.find((i) => i?.date === item?.date),
-											item,
-											row.original,
-										)
-									}
 									className='rounded-none cursor-pointer d-flex justify-content-center align-items-center'>
 									{`${item?.day}`}
 								</div>
@@ -528,32 +419,12 @@ const DailyWorkTrackingUser = () => {
 												</span>
 											</div>
 										</CardFooterRight>
-										{/* <CardFooterRight tag='div' className='fw-bold fs-5 d-flex'>
-											<span>KPI thực tế:</span>
-											<div>
-												<span className='text-success me-1'>
-													{calcRealKPIPointByUser(worktrack)}
-												</span>
-											</div>
-										</CardFooterRight> */}
 									</CardFooter>
 								</CardBody>
 							</Card>
 						</div>
 					</div>
 				)}
-				<DailyWorktrackInfo
-					item={itemEdit}
-					worktrack={worktrack}
-					onClose={handleCloseForm}
-					show={toggleForm}
-				/>
-				<DailyWorktrackForm
-					data={dataShow}
-					show={showForm}
-					handleClose={handleClose}
-					handleSubmit={handleSubmit}
-				/>
 			</Page>
 		</PageWrapper>
 	);
