@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
-import _ from 'lodash';
+
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
@@ -13,7 +13,6 @@ import Textarea from '../../components/bootstrap/forms/Textarea';
 import Input from '../../components/bootstrap/forms/Input';
 import InputGroup from '../../components/bootstrap/forms/InputGroup';
 import validate from './validate';
-import { downloadFileReport } from './services';
 
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 	const formik = useFormik({
@@ -37,27 +36,6 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 
 	const changeHandler = (event) => {
 		setSelectedFile(event.target.files);
-	};
-
-	const handleDowloadFile = async (file) => {
-		const response = await downloadFileReport(file);
-		let filename = file;
-		const disposition = _.get(response.headers, 'content-disposition');
-		if (disposition && disposition.indexOf('attachment') !== -1) {
-			const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-			const matches = filenameRegex.exec(disposition);
-			if (matches != null && matches[1]) {
-				filename = matches[1].replace(/['"]/g, '');
-			}
-		}
-		const url = window.URL.createObjectURL(
-			new Blob([response.data], { type: _.get(response.headers, 'content-type') }),
-		);
-		const link = document.createElement('a');
-		link.href = url;
-		link.setAttribute('download', filename);
-		document.body.appendChild(link);
-		link.click();
 	};
 
 	return (
@@ -161,9 +139,9 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 									{JSON.parse(data.row.files)?.map((file) => (
 										<li key={file}>
 											<a
-												href='javascript:void(0)'
-												className=''
-												onClick={() => handleDowloadFile(file)}>
+												href={`${process.env.REACT_APP_DEV_API_URL}/uploads/${file}`}
+												target='_blank'
+												rel='noreferrer'>
 												{file}
 											</a>
 										</li>
