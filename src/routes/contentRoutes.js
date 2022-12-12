@@ -51,6 +51,10 @@ const MISSION = {
 	MISSION: lazy(() => import('../pages/work-management/mission/MissionPage')),
 };
 
+const REPORT = {
+	LIST_REPORT: lazy(() => import('../pages/report/ReportPage')),
+};
+
 const presentation = [
 	{
 		path: dashboardMenu.dashboard.path,
@@ -140,6 +144,11 @@ const presentation = [
 		path: profile.profile.path,
 		element: <PROFILE.PROFILE />,
 	},
+	{
+		path: demoPages.reportPage.subMenu.reportList.path,
+		element: <REPORT.LIST_REPORT />,
+	},
+
 	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,

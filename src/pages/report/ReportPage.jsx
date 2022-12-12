@@ -1,56 +1,63 @@
-/* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable react/prop-types */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import _ from 'lodash';
 import { toast } from 'react-toastify';
 import { Toast } from 'react-bootstrap';
-import { DateRangePicker } from 'react-date-range';
 import moment from 'moment/moment';
-
+import { DateRangePicker } from 'react-date-range';
 import Card, {
 	CardActions,
 	CardBody,
+	CardFooter,
+	CardFooterRight,
 	CardHeader,
 	CardLabel,
-	CardSubTitle,
 	CardTitle,
+	CardSubTitle,
 } from '../../components/bootstrap/Card';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
+import { fetchWorktrackList } from '../../redux/slice/worktrackSlice';
+import { fetchEmployeeById } from '../../redux/slice/employeeSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
-import DailyWorktrackForm from './DailyWorktrackForm';
-import { addWorktrackLog, uploadFileReport, downLoadWorkTrack } from './services';
-import DailyWorktrackInfo from './DailyWorktrackInfo';
-import { columns, convertDate, renderColor } from '../../utils/function';
+import { downLoadWorkTrack } from '../dailyWorkTracking/services';
+import {
+	calcCurrentKPIOfWorkTrack,
+	calcProgressTask,
+	calcProgressWorktrack,
+	calcTotalCurrentKPIWorkTrackByUser,
+	calcTotalFromWorkTrackLogs,
+	calcTotalKPIOfWorkTrack,
+	calcTotalKPIWorkTrackByUser,
+	columns,
+	convertDate,
+	createDataTreeTable,
+	renderColor,
+} from '../../utils/function';
 import Icon from '../../components/icon/Icon';
-import Table from './Table';
 import { getFirstAndLastDateOfMonth, getQueryDate } from '../../utils/utils';
+import Table from '../dailyWorkTracking/Table';
 import Button from '../../components/bootstrap/Button';
-import { inputRanges, staticRanges } from './customReactDateRange';
+import { inputRanges, staticRanges } from '../dailyWorkTracking/customReactDateRange';
 
-const DailyWorkTracking = () => {
+const DailyWorkTrackingUser = () => {
 	const dispatch = useDispatch();
-
-	const worktrack = useSelector((state) => state.worktrack.worktracks);
-
+	const worktrack = useSelector((state) => state.worktrack.worktrack);
+	const employee = useSelector((state) => state.employee.employee);
 	const loading = useSelector((state) => state.worktrack.loading);
-	const toggleForm = useSelector((state) => state.toggleForm.open);
-	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-	const [exporting, setExporting] = useState(false);
-	const [showForm, setShowForm] = React.useState(false);
-	const [dataShow, setDataShow] = React.useState({
-		row: {},
-		column: {},
-		valueForm: {},
-	});
 
+	const [exporting, setExporting] = useState(false);
+	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
+
+	const [treeValue, setTreeValue] = React.useState([]);
+
+	const id = window.localStorage.getItem('userId');
 	const [open, setOpen] = useState(false);
 	const [state, setState] = useState([
 		{
@@ -60,102 +67,59 @@ const DailyWorkTracking = () => {
 		},
 	]);
 
+	const fetchData = () => {
+		const query = getQueryDate(0);
+		const data = {
+			id,
+			query,
+		};
+		dispatch(fetchWorktrackList(data));
+	};
+
 	useEffect(() => {
-		const { startDate, endDate } = getQueryDate(0);
-		dispatch(fetchWorktrackListAll({ startDate, endDate }));
-	}, [dispatch]);
+		fetchData();
+		dispatch(fetchEmployeeById(id));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dispatch, id]);
 
-	const handleShowForm = (row, item, dataWorktrack) => {
-		setShowForm(true);
-		setDataShow({
-			valueForm: item,
-			row,
-			dataWorktrack,
-		});
-	};
-
-	const handleClose = () => {
-		setShowForm(false);
-		setDataShow({
-			valueForm: {},
-			row: {},
-		});
-	};
-
-	const handleSubmit = (item) => {
-		const selectedFile = item.files;
-		if (selectedFile && selectedFile.length > 0) {
-			const formData = new FormData();
-			// eslint-disable-next-line no-restricted-syntax
-			for (const key of Object.keys(selectedFile)) {
-				formData.append('files', selectedFile[key], selectedFile[key].name);
-			}
-			uploadFileReport(formData)
-				.then((res) => {
-					const dataSubmit = {
-						status: item.status,
-						date: dataShow.valueForm.date,
-						note: item.note,
-						quantity: item.quantity || null,
-						files: JSON.stringify(res.data.data),
-						workTrack_id: item.data.dataWorktrack.id,
-					};
-					addWorktrackLog(dataSubmit)
-						.then(() => {
-							handleClose();
-							dispatch(fetchWorktrackListAll());
-							toast.success('Báo cáo nhiệm vụ thành công!', {
-								position: toast.POSITION.TOP_RIGHT,
-								autoClose: 1000,
-							});
-						})
-						.catch((err) => {
-							toast.error('Báo cáo nhiệm vụ không thành công!', {
-								position: toast.POSITION.TOP_RIGHT,
-								autoClose: 1000,
-							});
-							throw err;
-						});
-				})
-				.catch((error) => {
-					toast.error('Upload file không thành công. Vui lòng thử lại.', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw error;
-				});
+	useEffect(() => {
+		if (!_.isEmpty(worktrack)) {
+			const treeData = createDataTreeTable(
+				worktrack.workTracks
+					?.filter((item) => {
+						return item?.workTrackUsers?.isResponsible === true;
+					})
+					?.map((item) => {
+						return {
+							...item,
+							statusName: LIST_STATUS.find((st) => st.value === item.status)?.label,
+							totalKPI: calcTotalKPIOfWorkTrack(item),
+							totalQuantity: calcTotalFromWorkTrackLogs(item.workTrackLogs),
+							currentKPI: calcCurrentKPIOfWorkTrack(item),
+							progress: calcProgressTask(item),
+							kpiPoint: item.kpi_point ? item.kpi_point : '--',
+							parentId: item.parent_id,
+						};
+					}),
+			);
+			setTreeValue(treeData);
 		} else {
-			const dataSubmit = {
-				status: item.status,
-				date: dataShow.valueForm.date,
-				note: item.note,
-				quantity: item.quantity || null,
-				files: null,
-				workTrack_id: item.data.dataWorktrack.id,
-			};
-			addWorktrackLog(dataSubmit)
-				.then(() => {
-					handleClose();
-					dispatch(fetchWorktrackListAll());
-					toast.success('Báo cáo nhiệm vụ thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-				})
-				.catch((err) => {
-					toast.error('Báo cáo nhiệm vụ không thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw err;
-				});
+			setTreeValue([]);
 		}
-	};
+	}, [worktrack]);
 
 	const handleChangeDate = () => {
 		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
 		const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
-		dispatch(fetchWorktrackListAll({ startDate, endDate }));
+		const query = {
+			startDate,
+			endDate,
+		};
+		const dataQuery = {
+			id,
+			query,
+		};
+		dispatch(fetchWorktrackList(dataQuery));
 		setOpen(false);
 	};
 
@@ -176,7 +140,7 @@ const DailyWorkTracking = () => {
 					<span
 						{...row.getToggleRowExpandedProps({
 							style: {
-								paddingLeft: `${row.depth * 1}rem`,
+								paddingLeft: `${row.depth * 1.5}rem`,
 							},
 						})}>
 						{row.isExpanded ? (
@@ -201,26 +165,22 @@ const DailyWorkTracking = () => {
 					<div className='d-flex'>
 						<span
 							className='cursor-pointer d-block w-100 fw-bold fs-6'
-							style={{ marginLeft: `${row.depth * 1.5}rem` }}
 							onClick={() =>
 								handleOpenForm({
 									...row.original,
 									parent: worktrack.workTracks?.find(
-										(i) => i.id === row.original.parent_id,
+										(i) => i.id === row.original.parentId,
 									),
+									user: { name: worktrack?.name, id: worktrack?.id },
 								})
 							}>
-							{row.original.name || row.original.kpiNorm.name}
+							<div style={{ marginLeft: `${row.depth * 1.5}rem` }}>
+								{row.original.name || row.original.kpiNorm.name}
+							</div>
 						</span>
 					</div>
 				);
 			},
-		},
-		{
-			Header: 'Người phụ trách',
-			accessor: 'user.name',
-			maxWidth: 150,
-			minWidth: 150,
 		},
 		{
 			Header: 'Tỉ lệ hoàn thành',
@@ -261,7 +221,7 @@ const DailyWorkTracking = () => {
 			Header: () => {
 				return (
 					<div className='d-flex'>
-						{columns().map((item) => {
+						{columns(state).map((item) => {
 							return (
 								<div
 									key={item?.day}
@@ -286,7 +246,7 @@ const DailyWorkTracking = () => {
 				const { workTrackLogs } = row.original;
 				return (
 					<div className='d-flex'>
-						{columns().map((item) => {
+						{columns(state).map((item) => {
 							return (
 								<div
 									key={item?.day}
@@ -304,15 +264,8 @@ const DailyWorkTracking = () => {
 										borderRadius: 0,
 										color: item.color ? '#fff' : '#000',
 									}}
-									onClick={() =>
-										handleShowForm(
-											workTrackLogs?.find((i) => i?.date === item?.date),
-											item,
-											row.original,
-										)
-									}
 									className='rounded-none cursor-pointer d-flex justify-content-center align-items-center'>
-									{item?.day}
+									{`${item?.day}`}
 								</div>
 							);
 						})}
@@ -327,7 +280,7 @@ const DailyWorkTracking = () => {
 			setExporting(true);
 			const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
 			const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
-			const res = await downLoadWorkTrack({ startDate, endDate });
+			const res = await downLoadWorkTrack({ startDate, endDate, userId: employee.id });
 			const { fileName } = res.data.data;
 
 			let hostName = process.env.REACT_APP_DEV_API_URL;
@@ -337,7 +290,6 @@ const DailyWorkTracking = () => {
 			}
 
 			const fileUrl = `${process.env.REACT_APP_DEV_API_URL}/files/${fileName}`;
-
 			// download file by create an a tag with download attribute and href is the file url then click it
 			const link = document.createElement('a');
 			link.href = fileUrl;
@@ -354,11 +306,10 @@ const DailyWorkTracking = () => {
 			setExporting(false);
 		}
 	};
-
 	return (
-		<PageWrapper title='Danh sách công việc'>
+		<PageWrapper title='Xuất báo cáo công việc'>
 			<Page container='fluid'>
-				{loading ? (
+				{loading && !_.isEmpty(worktrack) ? (
 					<Loading />
 				) : (
 					<div className='row mb-0'>
@@ -367,7 +318,9 @@ const DailyWorkTracking = () => {
 								<CardHeader className='w-100 text-center'>
 									<CardLabel className='d-block w-100'>
 										<CardTitle className='fs-4 my-2'>
-											Danh sách nhiệm vụ
+											Báo cáo công việc của {_.get(employee, 'name')}
+											<span className='mx-2'>-</span>
+											{_.get(employee, 'department.name')}
 										</CardTitle>
 										<CardSubTitle className='fs-5 text-info'>
 											Từ {convertDate(state[0].startDate)}
@@ -432,37 +385,48 @@ const DailyWorkTracking = () => {
 											color='primary'>
 											Lọc theo tháng
 										</Button>
-									</CardActions>
-									<CardActions style={{ display: 'inline-flex', marginLeft: 20 }}>
+
 										<Button
 											onClick={handleExportExcel}
 											color='primary'
 											isDisable={exporting}>
-											Xuất Excel
+											Xuất báo cáo
 										</Button>
 									</CardActions>
 								</CardHeader>
-								<CardBody className='w-100'>
-									<Table columns={columnTables} data={worktrack} />
+								<CardBody>
+									<Table columns={columnTables} data={treeValue} />
+									<CardFooter
+										tag='div'
+										className=''
+										size='lg'
+										borderColor='primary'>
+										<CardFooterRight tag='div' className='fw-bold fs-5 d-flex'>
+											<span>KPI tạm tính:</span>
+											<div>
+												<span className='text-success me-1'>
+													{calcTotalCurrentKPIWorkTrackByUser(worktrack)}
+												</span>
+												<span>/</span>
+												<span className='text-primary ms-1'>
+													{calcTotalKPIWorkTrackByUser(worktrack)}
+												</span>
+											</div>
+											<span>~</span>
+											<div>
+												<span className='text-danger me-1'>
+													{calcProgressWorktrack(worktrack)}%
+												</span>
+											</div>
+										</CardFooterRight>
+									</CardFooter>
 								</CardBody>
 							</Card>
 						</div>
 					</div>
 				)}
-				<DailyWorktrackInfo
-					item={itemEdit}
-					worktrack={worktrack}
-					onClose={handleCloseForm}
-					show={toggleForm}
-				/>
-				<DailyWorktrackForm
-					data={dataShow}
-					show={showForm}
-					handleClose={handleClose}
-					handleSubmit={handleSubmit}
-				/>
 			</Page>
 		</PageWrapper>
 	);
 };
-export default DailyWorkTracking;
+export default DailyWorkTrackingUser;
