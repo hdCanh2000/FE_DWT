@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { Toast } from 'react-bootstrap';
 import { DateRangePicker } from 'react-date-range';
 import moment from 'moment/moment';
+
 import Card, {
 	CardActions,
 	CardBody,
@@ -23,7 +24,7 @@ import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import Loading from '../../components/Loading/Loading';
 import DailyWorktrackForm from './DailyWorktrackForm';
-import { addWorktrackLog, uploadFileReport } from './services';
+import { addWorktrackLog, uploadFileReport, downLoadWorkTrack } from './services';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import { columns, convertDate, renderColor } from '../../utils/function';
 import Icon from '../../components/icon/Icon';
@@ -36,12 +37,13 @@ const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
 
 	const worktrack = useSelector((state) => state.worktrack.worktracks);
+
 	const loading = useSelector((state) => state.worktrack.loading);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
-
+	const [exporting, setExporting] = useState(false);
 	const [showForm, setShowForm] = React.useState(false);
 	const [dataShow, setDataShow] = React.useState({
 		row: {},
@@ -320,6 +322,39 @@ const DailyWorkTracking = () => {
 		},
 	];
 
+	const handleExportExcel = async () => {
+		try {
+			setExporting(true);
+			const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
+			const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
+			const res = await downLoadWorkTrack({ startDate, endDate });
+			const { fileName } = res.data.data;
+
+			let hostName = process.env.REACT_APP_DEV_API_URL;
+			// remove last /
+			if (hostName[hostName.length - 1] === '/') {
+				hostName = hostName.slice(0, hostName.length - 1);
+			}
+
+			const fileUrl = `${process.env.REACT_APP_DEV_API_URL}/files/${fileName}`;
+
+			// download file by create an a tag with download attribute and href is the file url then click it
+			const link = document.createElement('a');
+			link.href = fileUrl;
+			link.setAttribute('download', fileName);
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+		} catch (err) {
+			toast.error('Export file không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+		} finally {
+			setExporting(false);
+		}
+	};
+
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -396,6 +431,14 @@ const DailyWorkTracking = () => {
 											onClick={() => setOpen(!open)}
 											color='primary'>
 											Lọc theo tháng
+										</Button>
+									</CardActions>
+									<CardActions style={{ display: 'inline-flex', marginLeft: 20 }}>
+										<Button
+											onClick={handleExportExcel}
+											color='primary'
+											isDisable={exporting}>
+											Xuất Excel
 										</Button>
 									</CardActions>
 								</CardHeader>

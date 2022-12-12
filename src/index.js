@@ -14,9 +14,7 @@ import { ThemeContextProvider } from './contexts/themeContext';
 import { store } from './redux/store/index';
 import './i18n';
 
-registerLicense(
-	'ORg4AjUWIQA/Gnt2VVhjQlFac1lJXHxKYVF2R2BJfl96cVRMYVRBJAtUQF1hS39RdkFhWnpadXxURGdc',
-);
+registerLicense('ORg4AjUWIQA/Gnt2VVhjQlFac1lJXHxKYVF2R2BJfl96cVRMYVRBJAtUQF1hS39RdkFhWnpadXxURGdc');
 
 const children = (
 	<Router>

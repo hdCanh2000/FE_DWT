@@ -90,7 +90,11 @@ const downloadFileReport = (name) => {
 		url: `/api/file/download/${name}`,
 	});
 };
-
+/* when this api is called backend api will create an xls file then return the filename */
+const downLoadWorkTrack = async (params = {}) => {
+	const url = `/api/worktracks/export_all`;
+	return axiosClient.get(url, { params });
+};
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -104,4 +108,5 @@ export {
 	getAllWorktrackMe,
 	uploadFileReport,
 	downloadFileReport,
+	downLoadWorkTrack,
 };

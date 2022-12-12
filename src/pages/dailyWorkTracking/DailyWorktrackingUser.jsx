@@ -29,7 +29,7 @@ import { LIST_STATUS } from '../../utils/constants';
 import Loading from '../../components/Loading/Loading';
 import DailyWorktrackInfo from './DailyWorktrackInfo';
 import DailyWorktrackForm from './DailyWorktrackForm';
-import { addWorktrackLog, uploadFileReport } from './services';
+import { addWorktrackLog, downLoadWorkTrack, uploadFileReport } from './services';
 import {
 	calcCurrentKPIOfWorkTrack,
 	calcProgressTask,
@@ -57,6 +57,7 @@ const DailyWorkTrackingUser = () => {
 	const loading = useSelector((state) => state.worktrack.loading);
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const [exporting, setExporting] = useState(false);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 
@@ -381,6 +382,37 @@ const DailyWorkTrackingUser = () => {
 		},
 	];
 
+	const handleExportExcel = async () => {
+		try {
+			setExporting(true);
+			const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
+			const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
+			const res = await downLoadWorkTrack({ startDate, endDate, userId: employee.id });
+			const { fileName } = res.data.data;
+
+			let hostName = process.env.REACT_APP_DEV_API_URL;
+			// remove last /
+			if (hostName[hostName.length - 1] === '/') {
+				hostName = hostName.slice(0, hostName.length - 1);
+			}
+
+			const fileUrl = `${process.env.REACT_APP_DEV_API_URL}/files/${fileName}`;
+			// download file by create an a tag with download attribute and href is the file url then click it
+			const link = document.createElement('a');
+			link.href = fileUrl;
+			link.setAttribute('download', fileName);
+			document.body.appendChild(link);
+			link.click();
+			link.remove();
+		} catch (err) {
+			toast.error('Export file không thành công!', {
+				position: toast.POSITION.TOP_RIGHT,
+				autoClose: 1000,
+			});
+		} finally {
+			setExporting(false);
+		}
+	};
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -459,6 +491,13 @@ const DailyWorkTrackingUser = () => {
 											onClick={() => setOpen(!open)}
 											color='primary'>
 											Lọc theo tháng
+										</Button>
+
+										<Button
+											onClick={handleExportExcel}
+											color='primary'
+											isDisable={exporting}>
+											Xuất báo cáo
 										</Button>
 									</CardActions>
 								</CardHeader>
