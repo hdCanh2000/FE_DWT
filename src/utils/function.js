@@ -181,8 +181,12 @@ export const createDataTree = (dataset) => {
 const daysOfWeekVN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
 export const columns = (selectedDate) => {
-	const startDate = moment(selectedDate && selectedDate[0].startDate);
-	const timeEnd = moment(selectedDate && selectedDate[0].endDate);
+	const startDate = selectedDate
+		? moment(selectedDate && selectedDate[0].startDate)
+		: moment().startOf('month');
+	const timeEnd = selectedDate
+		? moment(selectedDate && selectedDate[0].endDate)
+		: moment().endOf('month');
 	const diff = timeEnd.diff(moment(startDate));
 	const diffDuration = moment.duration(diff);
 	const result = [];
