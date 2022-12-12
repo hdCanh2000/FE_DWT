@@ -10,16 +10,17 @@ import styled from 'styled-components';
 import { LIST_STATUS } from '../../utils/constants';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { fetchAssignTask } from '../../redux/slice/worktrackSlice';
-import { downloadFileReport } from './services';
 
 const Styles = styled.div`
 	table {
 		border-spacing: 0;
 		border: 1px solid black;
 		width: 100%;
+
 		tbody {
 			overflow-y: auto;
 		}
+
 		tr {
 			:last-child {
 				td {
@@ -49,27 +50,6 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 		dispatch(fetchEmployeeList());
 		dispatch(fetchAssignTask());
 	}, [dispatch]);
-
-	const handleDowloadFile = async (file) => {
-		const response = await downloadFileReport(file);
-		let filename = file;
-		const disposition = get(response.headers, 'content-disposition');
-		if (disposition && disposition.indexOf('attachment') !== -1) {
-			const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-			const matches = filenameRegex.exec(disposition);
-			if (matches != null && matches[1]) {
-				filename = matches[1].replace(/['"]/g, '');
-			}
-		}
-		const url = window.URL.createObjectURL(
-			new Blob([response.data], { type: get(response.headers, 'content-type') }),
-		);
-		const link = document.createElement('a');
-		link.href = url;
-		link.setAttribute('download', filename);
-		document.body.appendChild(link);
-		link.click();
-	};
 
 	return (
 		<Modal show={show} onHide={onClose} centered size='xl'>
@@ -191,11 +171,9 @@ const DailyWorktrackInfo = ({ show, onClose, item }) => {
 														JSON.parse(log?.files)?.map((file) => (
 															<li key={file}>
 																<a
-																	href='javascript:void(0)'
-																	className=''
-																	onClick={() =>
-																		handleDowloadFile(file)
-																	}>
+																	href={`${process.env.REACT_APP_DEV_API_URL}/uploads/${file}`}
+																	target='_blank'
+																	rel='noreferrer'>
 																	{file}
 																</a>
 															</li>
