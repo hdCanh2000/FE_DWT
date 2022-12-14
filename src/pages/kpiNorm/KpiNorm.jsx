@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { L10n } from '@syncfusion/ej2-base';
 import _, { isEmpty } from 'lodash';
-import { Table } from 'antd';
+import { Input, Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, {
@@ -77,7 +77,7 @@ const KpiNormPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-
+	const [search, setSearch] = React.useState('');
 	// const toolbarOptions = ['Search'];
 	// const searchOptions = {
 	//   fields: ['data.name', 'data.position.name'],
@@ -304,6 +304,10 @@ const KpiNormPage = () => {
 		}
 	};
 
+	const handleSearchKPI = (e) => {
+		e.preventDefault();
+		dispatch(fetchKpiNormList({ text: search }));
+	};
 	return (
 		<PageWrapper title='Danh mục định mức lao động'>
 			<Page container='fluid'>
@@ -347,6 +351,22 @@ const KpiNormPage = () => {
 												['admin', 'manager'],
 											)}
 										</CardHeader>
+										<form onSubmit={handleSearchKPI} className='row'>
+											<div className='d-flex col-lg-6 col-md-12 col-xs-12 col-sm-12'>
+												<Input
+													placeholder='Tìm kiếm định mức'
+													value={search}
+													onChange={(e) => setSearch(e.target.value)}
+												/>
+												<Button
+													color='primary'
+													icon='Search'
+													className='d-flex align-items-center mx-2'
+													type='submit'>
+													Tìm
+												</Button>
+											</div>
+										</form>
 										<CardBody>
 											<div className='control-pane'>
 												<div className='control-section'>
