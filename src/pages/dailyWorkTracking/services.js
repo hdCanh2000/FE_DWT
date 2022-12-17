@@ -95,6 +95,24 @@ const downLoadWorkTrack = async (params = {}) => {
 	const url = `/api/worktracks/export_all`;
 	return axiosClient.get(url, { params });
 };
+
+const getListTarget = async (params) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/targets`,
+		params,
+	});
+	return resp.data;
+};
+
+const getUserDetail = async (id) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/users/${id}`,
+	});
+	return resp.data.data;
+};
+
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -109,4 +127,6 @@ export {
 	uploadFileReport,
 	downloadFileReport,
 	downLoadWorkTrack,
+	getListTarget,
+	getUserDetail,
 };

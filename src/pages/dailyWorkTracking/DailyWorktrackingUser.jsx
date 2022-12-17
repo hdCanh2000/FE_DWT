@@ -1,148 +1,161 @@
 /* eslint-disable */
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import Card, { CardBody, CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
-import { Table } from 'antd';
-import moment from 'moment';
-
-const columns = [
-	{
-		title: 'MỤC TIÊU NHIỆM VỤ (THÁNG)',
-		colSpan: 9,
-		dataIndex: 'key',
-		fixed: 'left'
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'name',
-		fixed: 'left',
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'description'
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'deadline'
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'quantity'
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'unit'
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'manDay'
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'manDayEstimated'
-	},
-	{
-		title: '',
-		colSpan: 0,
-		dataIndex: 'plan'
-	},
-	{
-		title: 'Nhật trình công việc',
-		colSpan: 31,
-		dataIndex: 'day1',
-	},
-];
-for (let i = 0; i < 30; i++) {
-	columns.push({
-		title: '',
-		colSpan: 0,
-		dataIndex: `day${i + 2}`,
-	});
-}
-columns.push({
-	title: 'Đánh giá KQ/Chấm KPI',
-	colSpan: 2,
-	dataIndex: 'currentManDay',
-});
-columns.push({
-	title: '',
-	colSpan: 0,
-	dataIndex: 'comment',
-});
+import Card, { CardBody, CardLabel, CardTitle } from '../../components/bootstrap/Card';
+import { Button, DatePicker, Skeleton, Table } from 'antd';
+import locale from 'antd/es/date-picker/locale/vi_VN';
+import dayjs from 'dayjs';
+import { getWorkTrackTableRowAndHeaderRow } from './workTrackTableConfig';
+import { useQuery } from 'react-query';
+import { getListTarget, getUserDetail } from './services';
+import scrollIntoView from 'scroll-into-view';
 
 const DailyWorkTrackingUser = () => {
 	const params = useParams();
 	const { id } = params;
-	console.log('id', id);
-	const headerRow = {
-		key: 'STT',
-		name: 'Mục tiêu/Nhiệm vụ',
-		description: 'Diễn giải',
-		deadline: 'Thời hạn',
-		quantity: 'SL',
-		unit: 'DVT',
-		manDay: '~ MD',
-		manDayEstimated: 'KQT MD',
-		plan: 'KHTT (nêu có)',
-		currentManDay: 'MD',
-		comment: 'Ý kiến',
+	const [date, setDate] = useState(dayjs());
+	const [dataSearch, setDataSearch] = useState({
+		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
+		q: '',
+		userId: id,
+	});
+	const onCalenderClick = (record, currentDay) => {
+		console.log(record, currentDay);
 	};
-	for (let i = 0; i < 31; i++) {
-		const dayName = moment(`2022-12-${i + 1}`, 'YYYY-MM-DD').format('ddd');
-		console.log(dayName);
-		headerRow[`day${i + 1}`] = `${i + 1} \n ${dayName}`;
-	}
-	const data = [
-		//header row
-		headerRow,
-		{
-			key: '1',
-			name: 'sửa bảng',
-			description: 'sửa bảng theo dõi',
-			deadline: '20-12-2022',
-			quantity: 1,
-			unit: 'bảng',
-			manDay: 2,
-			manDayEstimated: 2,
-			plan: 'dùng antd sửa bảng',
-			day1: '!1',
-			day2: '1',
-			day15: 2,
-			currentManDay: '4',
-			comment: 'Em huy dứt khoát',
-		},
-	];
+	const { columns, headerRow } = getWorkTrackTableRowAndHeaderRow(date, onCalenderClick);
+	const {
+		data: listTarget = [],
+		isLoading: isLoadingListTarget,
+		isError: isErrorListTarget,
+	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) => getListTarget(dataSearch));
+	//get user from api
+	const {
+		data: user = {},
+		isLoading: isLoadingUser,
+		isError: isErrorUser,
+	} = useQuery(['getUserDetail', id], ({ queryKey }) => getUserDetail(queryKey[1]));
+	//normalize data for table
+	console.log(listTarget);
+	const tableData = useMemo(() => {
+		const rows = listTarget.map((item, index) => {
+			const targetLogs = item.TargetLogs;
+			let totalCompletedTasks = 0;
+			targetLogs.forEach((targetLog) => {
+				if (targetLog.status === 'completed') {
+					totalCompletedTasks += targetLog.quantity;
+				}
+			});
+
+			const row = {
+				key: index + 1,
+				...item,
+				deadline: dayjs(item.deadline).format('DD/MM/YYYY'),
+				// KQT MD: Kết quả tạm - Nhân từ số đầu việc hoàn thành nhân với MD
+				manDayEstimated: totalCompletedTasks * item.manDay,
+				unit: item.unit.name,
+			};
+			//insert targetLogs to table
+			targetLogs.forEach((targetLog) => {
+				const targetDay = dayjs(targetLog.reportDate || targetLog.noticedDate).format('DD');
+				const logStatus = targetLog.status;
+				const logQuantity = targetLog.quantity;
+				const logNoticed = targetLog.noticedStatus;
+				const jsonData = JSON.stringify({
+					logStatus,
+					logQuantity,
+					logNoticed,
+				});
+				row[`day${+targetDay}`] = jsonData;
+			});
+			return row;
+		});
+		return [headerRow, ...rows];
+	}, [listTarget]);
+	useEffect(() => {
+		// only scroll to current day when search month and year is current month and year
+		const searchMonth = +dataSearch.start.split('-')[0];
+		const searchYear = +dataSearch.start.split('-')[2];
+		const currentMonth = dayjs().month() + 1;
+		const currentYear = dayjs().year();
+		if (searchMonth !== currentMonth || searchYear !== currentYear) {
+			return;
+		}
+		const element = document.getElementById(`${+dayjs().format('DD')}`);
+		if (!element) return;
+		scrollIntoView(element, {
+			align: {
+				top: 0.5,
+				right: 1,
+			},
+		});
+	}, [tableData]);
+	const handleChangeMonth = (date) => {
+		setDate(date);
+		setDataSearch({
+			...dataSearch,
+			start: `${date.month() + 1}-01-${date.year()}`,
+			end: `${date.month() + 1}-${date.daysInMonth()}-${date.year()}`,
+		});
+	};
 
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
 				<Card className='w-100'>
 					<div style={{ margin: '24px 24px 0' }}>
-						<CardHeader>
-							<CardLabel icon='TaskAlt' iconColor='primary'>
+						<div className='w-100 d-flex justify-content-between align-items-center'>
+							{/*DONT REMOVE THIS EMPTY DIV IT IS FOR ALIGNING THE HEADER*/}
+							<div></div>
+							<div>
 								<CardTitle>
-									<CardLabel>Danh sách nhiệm vụ của</CardLabel>
+									<CardLabel className='d-flex justify-content-center'>
+										NHẬT TRÌNH CÔNG VIỆC
+									</CardLabel>
 								</CardTitle>
-							</CardLabel>
-						</CardHeader>
+								<div className='text-center'>
+									Vị trí:{' '}
+									{isLoadingUser
+										? '...'
+										: isErrorUser
+										? '_'
+										: user.department.name}
+								</div>
+							</div>
+							<div className='text-end'>
+								<div>
+									Người thực hiện:{' '}
+									{isLoadingUser ? '...' : isErrorUser ? '_' : user.name}
+								</div>
+								<div>
+									Tháng:{' '}
+									<DatePicker.MonthPicker
+										format='MM/YYYY'
+										locale={locale}
+										style={{ width: 100 }}
+										value={date}
+										onChange={handleChangeMonth}
+									/>
+								</div>
+							</div>
+						</div>
 						<CardBody>
 							<div className='control-pane'>
 								<div className='control-section'>
-									<Table
-										columns={columns}
-										dataSource={data}
-										bordered
-										scroll={{ x: 'max-content' }}
-									/>
+									{isLoadingListTarget ? (
+										<Skeleton />
+									) : isErrorListTarget ? (
+										<div>Xảy ra lỗi khi lấy dữ liệu</div>
+									) : (
+										<Table
+											columns={columns}
+											dataSource={tableData}
+											bordered
+											scroll={{ x: 'max-content' }}
+										/>
+									)}
 								</div>
 							</div>
 						</CardBody>
