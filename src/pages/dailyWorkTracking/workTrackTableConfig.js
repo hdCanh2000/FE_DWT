@@ -1,4 +1,6 @@
-/* eslint-disable */
+/* eslint no-nested-ternary: 0 */
+/* eslint no-plusplus: 0 */
+/* eslint import/prefer-default-export: 0 */
 import React from 'react';
 import dayjs from 'dayjs';
 import moment from 'moment';
@@ -6,47 +8,68 @@ import moment from 'moment';
 const calenderRender = (text, record, currentDay, onCalenderClick) => {
 	const dayName = moment(currentDay).format('ddd');
 	const isWeekend = dayName === 'Sat' || dayName === 'Sun';
-	const bgColor = dayName === 'Sat' ? '#fff2cc' : dayName === 'Sun' ? '#ff9f9f' : 'white';
+	const saturdayCellStyle = {
+		backgroundColor: 'rgba(251,188,6,.1)',
+		borderColor: 'rgba(251,188,6,.2)',
+		color: '#e4aa04',
+	};
+	const sundayCellStyle = {
+		color: '#52cbcb',
+		backgroundColor: 'rgba(102,209,209,.1)',
+		borderColor: 'rgba(102,209,209,.2)',
+	};
+	const headerCellStyle =
+		dayName === 'Sat' ? saturdayCellStyle : dayName === 'Sun' ? sundayCellStyle : {};
 
 	if (record.key === 'STT') {
 		const [day, dayNameText] = text.split(' ');
 		return {
 			props: {
-				style: { backgroundColor: bgColor },
+				style: headerCellStyle,
 				id: day,
 			},
 			children: (
-				<div className='text-center' style={{ width: 28, background: bgColor }}>
+				<div className='text-center' style={{ width: 28 }}>
 					<div>{day}</div>
 					<div>{dayNameText}</div>
 				</div>
 			),
 		};
 	}
-	const completedColor = '#c5e0b3';
-	const inProgressColor = '#ffc000';
-	const warningColor = 'red';
+	const completedStyle = {
+		backgroundColor: 'rgba(5,163,74,.1)',
+		borderColor: 'rgba(5,163,74,.2)',
+		color: '#048a3f',
+	};
+	const inProgressStyle = {
+		backgroundColor: '#fff',
+	};
+	const warningStyle = {
+		backgroundColor: 'rgba(101,113,255,.1)',
+		borderColor: 'rgba(101,113,255,.2)',
+		color: '#4c59ff',
+	};
 	let textToRender = text;
-	let bgColorToRender = bgColor;
+	let cellStyle = headerCellStyle;
 	if (text) {
 		const { logStatus, logQuantity, logNoticed } = JSON.parse(text);
 		const isCompleted = logStatus === 'completed';
 		const isWarning = !!logNoticed;
-		if (isWarning) {
-			bgColorToRender = warningColor;
-			textToRender = `! ${logQuantity || ''}`;
-		} else if (isCompleted) {
-			bgColorToRender = completedColor;
+		if (isCompleted) {
+			cellStyle = completedStyle;
 			textToRender = logQuantity || '';
+		} else if (isWarning && !isCompleted) {
+			cellStyle = warningStyle;
+			textToRender = `! ${logQuantity || ''}`;
 		} else {
-			bgColorToRender = inProgressColor;
+			cellStyle = inProgressStyle;
 			textToRender = logQuantity || '';
 		}
 	}
 	return {
 		props: {
 			style: {
-				backgroundColor: bgColorToRender,
+				...cellStyle,
 				cursor: isWeekend ? 'not-allowed' : 'pointer',
 			},
 			onClick: () => {
@@ -59,7 +82,11 @@ const calenderRender = (text, record, currentDay, onCalenderClick) => {
 	};
 };
 
-export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => {
+export const getWorkTrackTableRowAndHeaderRow = (
+	filterDay,
+	onCalenderClick,
+	onTargetTitleClick,
+) => {
 	if (!filterDay) filterDay = dayjs();
 	const month = filterDay.month() + 1;
 	const year = filterDay.year();
@@ -74,7 +101,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -86,7 +119,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -97,7 +136,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -108,7 +153,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -119,7 +170,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -130,7 +187,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -141,7 +204,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -152,7 +221,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{
@@ -163,7 +238,13 @@ export const getWorkTrackTableRowAndHeaderRow = (filterDay, onCalenderClick) => 
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
 				}
-				return text;
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
 			},
 		},
 		{

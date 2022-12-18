@@ -113,6 +113,24 @@ const getUserDetail = async (id) => {
 	return resp.data.data;
 };
 
+const createTargetLog = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/targets/target_logs`,
+		data,
+	});
+	return resp.data;
+};
+
+const uploadFile = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/targets/upload`,
+		data,
+	});
+	return resp.data;
+};
+
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -129,4 +147,6 @@ export {
 	downLoadWorkTrack,
 	getListTarget,
 	getUserDetail,
+	createTargetLog,
+	uploadFile,
 };

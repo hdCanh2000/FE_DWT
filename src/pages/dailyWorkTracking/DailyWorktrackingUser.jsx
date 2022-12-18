@@ -1,21 +1,30 @@
-/* eslint-disable */
+/* eslint no-nested-ternary: 0 */
 import React, { useEffect, useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
+import { DatePicker, Skeleton, Table } from 'antd';
+import locale from 'antd/es/date-picker/locale/vi_VN';
+import moment from 'moment';
+import dayjs from 'dayjs';
+import scrollIntoView from 'scroll-into-view';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, { CardBody, CardLabel, CardTitle } from '../../components/bootstrap/Card';
-import { Button, DatePicker, Skeleton, Table } from 'antd';
-import locale from 'antd/es/date-picker/locale/vi_VN';
-import dayjs from 'dayjs';
 import { getWorkTrackTableRowAndHeaderRow } from './workTrackTableConfig';
-import { useQuery } from 'react-query';
 import { getListTarget, getUserDetail } from './services';
-import scrollIntoView from 'scroll-into-view';
+import ModalTargetLog from './ModalTargetLog';
+import ModalTargetInfo from './ModalTargetInfo';
 
 const DailyWorkTrackingUser = () => {
 	const params = useParams();
 	const { id } = params;
 	const [date, setDate] = useState(dayjs());
+	const [isOpenTargetLogModal, setIsOpenTargetLogModal] = useState(false);
+	const [isOpenTargetInfoModal, setIsOpenTargetInfoModal] = useState(false);
+	const [canScroll, setCanScroll] = useState(true);
+	// set default date to today
+	const [targetLogModalData, setTargetLogModalData] = useState({ logDay: moment(), target: {} });
+	const [targetInfoModalData, setTargetInfoModalData] = useState({});
 	const [dataSearch, setDataSearch] = useState({
 		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
 		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
@@ -23,22 +32,35 @@ const DailyWorkTrackingUser = () => {
 		userId: id,
 	});
 	const onCalenderClick = (record, currentDay) => {
-		console.log(record, currentDay);
+		setTargetLogModalData((prevState) => ({
+			...prevState,
+			logDay: currentDay,
+			target: record,
+		}));
+		setIsOpenTargetLogModal((prevState) => !prevState);
 	};
-	const { columns, headerRow } = getWorkTrackTableRowAndHeaderRow(date, onCalenderClick);
+	const onTargetTitleClick = (record) => {
+		setTargetInfoModalData(record);
+		setIsOpenTargetInfoModal(true);
+	};
+	const { columns, headerRow } = getWorkTrackTableRowAndHeaderRow(
+		date,
+		onCalenderClick,
+		onTargetTitleClick,
+	);
 	const {
 		data: listTarget = [],
 		isLoading: isLoadingListTarget,
 		isError: isErrorListTarget,
-	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) => getListTarget(dataSearch));
-	//get user from api
+		refetch: reFetchListTarget,
+	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) => getListTarget(queryKey[1]));
+	// get user from api
 	const {
 		data: user = {},
 		isLoading: isLoadingUser,
 		isError: isErrorUser,
 	} = useQuery(['getUserDetail', id], ({ queryKey }) => getUserDetail(queryKey[1]));
-	//normalize data for table
-	console.log(listTarget);
+	// normalize data for table
 	const tableData = useMemo(() => {
 		const rows = listTarget.map((item, index) => {
 			const targetLogs = item.TargetLogs;
@@ -57,7 +79,7 @@ const DailyWorkTrackingUser = () => {
 				manDayEstimated: totalCompletedTasks * item.manDay,
 				unit: item.unit.name,
 			};
-			//insert targetLogs to table
+			// insert targetLogs to table
 			targetLogs.forEach((targetLog) => {
 				const targetDay = dayjs(targetLog.reportDate || targetLog.noticedDate).format('DD');
 				const logStatus = targetLog.status;
@@ -73,7 +95,7 @@ const DailyWorkTrackingUser = () => {
 			return row;
 		});
 		return [headerRow, ...rows];
-	}, [listTarget]);
+	}, [listTarget, headerRow]);
 	useEffect(() => {
 		// only scroll to current day when search month and year is current month and year
 		const searchMonth = +dataSearch.start.split('-')[0];
@@ -81,6 +103,9 @@ const DailyWorkTrackingUser = () => {
 		const currentMonth = dayjs().month() + 1;
 		const currentYear = dayjs().year();
 		if (searchMonth !== currentMonth || searchYear !== currentYear) {
+			return;
+		}
+		if (!canScroll) {
 			return;
 		}
 		const element = document.getElementById(`${+dayjs().format('DD')}`);
@@ -91,13 +116,13 @@ const DailyWorkTrackingUser = () => {
 				right: 1,
 			},
 		});
-	}, [tableData]);
-	const handleChangeMonth = (date) => {
-		setDate(date);
+	}, [tableData, canScroll, dataSearch.start]);
+	const handleChangeMonth = (updatedDate) => {
+		setDate(updatedDate);
 		setDataSearch({
 			...dataSearch,
-			start: `${date.month() + 1}-01-${date.year()}`,
-			end: `${date.month() + 1}-${date.daysInMonth()}-${date.year()}`,
+			start: `${updatedDate.month() + 1}-01-${updatedDate.year()}`,
+			end: `${updatedDate.month() + 1}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
 		});
 	};
 
@@ -107,8 +132,8 @@ const DailyWorkTrackingUser = () => {
 				<Card className='w-100'>
 					<div style={{ margin: '24px 24px 0' }}>
 						<div className='w-100 d-flex justify-content-between align-items-center'>
-							{/*DONT REMOVE THIS EMPTY DIV IT IS FOR ALIGNING THE HEADER*/}
-							<div></div>
+							{/* DONT REMOVE THIS EMPTY DIV IT IS FOR ALIGNING THE HEADER */}
+							<div />
 							<div>
 								<CardTitle>
 									<CardLabel className='d-flex justify-content-center'>
@@ -121,7 +146,7 @@ const DailyWorkTrackingUser = () => {
 										? '...'
 										: isErrorUser
 										? '_'
-										: user.department.name}
+										: user?.department?.name}
 								</div>
 							</div>
 							<div className='text-end'>
@@ -162,6 +187,30 @@ const DailyWorkTrackingUser = () => {
 					</div>
 				</Card>
 			</Page>
+
+			<ModalTargetLog
+				isOpen={isOpenTargetLogModal}
+				logDay={targetLogModalData.logDay}
+				target={targetLogModalData.target}
+				onOk={() => {
+					setTargetLogModalData({ logDay: moment(), target: null });
+					setIsOpenTargetLogModal(false);
+				}}
+				onCancel={() => {
+					setTargetLogModalData({ logDay: moment(), target: null });
+					setIsOpenTargetLogModal(false);
+				}}
+				reFetchTable={async () => {
+					setCanScroll(false);
+					await reFetchListTarget();
+				}}
+			/>
+
+			<ModalTargetInfo
+				open={isOpenTargetInfoModal}
+				target={targetInfoModalData}
+				onOk={() => setIsOpenTargetInfoModal(false)}
+			/>
 		</PageWrapper>
 	);
 };
