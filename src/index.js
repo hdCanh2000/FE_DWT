@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import { registerLicense } from '@syncfusion/ej2-base';
 import 'react-toastify/dist/ReactToastify.css';
 import './styles/styles.scss';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import App from './App/App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeContextProvider } from './contexts/themeContext';
@@ -15,16 +16,18 @@ import { store } from './redux/store/index';
 import './i18n';
 
 registerLicense('ORg4AjUWIQA/Gnt2VVhjQlFac1lJXHxKYVF2R2BJfl96cVRMYVRBJAtUQF1hS39RdkFhWnpadXxURGdc');
-
+const queryClient = new QueryClient();
 const children = (
-	<Router>
-		<Provider store={store}>
-			<ThemeContextProvider>
-				<ToastContainer />
-				<App />
-			</ThemeContextProvider>
-		</Provider>
-	</Router>
+	<QueryClientProvider client={queryClient}>
+		<Router>
+			<Provider store={store}>
+				<ThemeContextProvider>
+					<ToastContainer />
+					<App />
+				</ThemeContextProvider>
+			</Provider>
+		</Router>
+	</QueryClientProvider>
 );
 
 const container = document.getElementById('root');
