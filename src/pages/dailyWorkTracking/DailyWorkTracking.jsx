@@ -4,6 +4,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 
 import React, { useEffect, useState } from 'react';
+import { Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { Toast } from 'react-bootstrap';
@@ -18,6 +19,7 @@ import Card, {
 	CardSubTitle,
 	CardTitle,
 } from '../../components/bootstrap/Card';
+
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchWorktrackListAll } from '../../redux/slice/worktrackSlice';
@@ -35,7 +37,6 @@ import { inputRanges, staticRanges } from './customReactDateRange';
 
 const DailyWorkTracking = () => {
 	const dispatch = useDispatch();
-
 	const worktrack = useSelector((state) => state.worktrack.worktracks);
 
 	const loading = useSelector((state) => state.worktrack.loading);
@@ -59,6 +60,7 @@ const DailyWorkTracking = () => {
 			key: 'selection',
 		},
 	]);
+	const [search, setSearch] = useState('');
 
 	useEffect(() => {
 		const { startDate, endDate } = getQueryDate(0);
@@ -355,6 +357,13 @@ const DailyWorkTracking = () => {
 		}
 	};
 
+	const handleSearchWorkTrack = async (e) => {
+		e.preventDefault();
+		const startDate = moment(state[0].startDate).format('YYYY-MM-DD');
+		const endDate = moment(state[0].endDate).format('YYYY-MM-DD');
+		dispatch(fetchWorktrackListAll({ startDate, endDate, name: search }));
+	};
+
 	return (
 		<PageWrapper title='Danh sách công việc'>
 			<Page container='fluid'>
@@ -376,8 +385,9 @@ const DailyWorkTracking = () => {
 										</CardSubTitle>
 									</CardLabel>
 								</CardHeader>
+
 								<CardHeader
-									className='d-block text-end py-0'
+									className='d-block text-end py-0 col-lg-6-col-md-6 col-sm-12'
 									style={{ minHeight: '100%' }}>
 									<CardActions style={{ display: 'inline-flex' }}>
 										<Toast
@@ -441,7 +451,24 @@ const DailyWorkTracking = () => {
 											Xuất Excel
 										</Button>
 									</CardActions>
+									<form
+										onSubmit={handleSearchWorkTrack}
+										style={{ display: 'inline-flex', marginLeft: 20 }}>
+										<Input
+											placeholder='tìm kiếm nhiệm vụ'
+											value={search}
+											onChange={(e) => setSearch(e.target.value)}
+										/>
+										<Button
+											icon='Search'
+											color='primary'
+											className='d-flex align-items-center mx-2'
+											type='submit'>
+											Tìm
+										</Button>
+									</form>
 								</CardHeader>
+
 								<CardBody className='w-100'>
 									<Table columns={columnTables} data={worktrack} />
 								</CardBody>
