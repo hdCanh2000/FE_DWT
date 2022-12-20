@@ -6,7 +6,7 @@ import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { createTargetLog, uploadFile } from './services';
+import { createTargetLog, uploadFile } from '../../pages/dailyWorkTracking/services';
 
 // xlsx, csv, doc, docx, pdf, ai, psd, jpg, jpeg, png, txt
 const ALLOWED_TYPES = [
