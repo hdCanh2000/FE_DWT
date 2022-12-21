@@ -29,7 +29,7 @@ const calenderRender = (text, record, currentDay, onCalenderClick) => {
 				id: day,
 			},
 			children: (
-				<div className='text-center' style={{ width: 28 }}>
+				<div className='text-center' style={{ width: 30 }}>
 					<div>{day}</div>
 					<div>{dayNameText}</div>
 				</div>
@@ -100,7 +100,9 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			fixed: 'left',
 			render: (text, record) => {
 				if (record.key === 'STT') {
-					return <b>{text}</b>;
+					return {
+						children: <b>{text}</b>,
+					};
 				}
 				return {
 					props: {

@@ -53,7 +53,11 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 			{
 				label: 'Số lượng',
-				value: `${currentTarget?.quantity} ${currentTarget?.unit}`,
+				value: `${currentTarget?.quantity} ${
+					typeof currentTarget?.unit === 'object'
+						? currentTarget?.unit?.name
+						: currentTarget?.unit
+				}`,
 			},
 			{
 				label: 'Man day',

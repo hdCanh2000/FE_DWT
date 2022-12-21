@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { Table } from 'antd';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import { getWorkTrackTableRowAndHeaderRow } from './config';
 import moment from 'moment/moment';
@@ -17,6 +17,7 @@ const TargetTable = ({ dataSearch }) => {
 	// set default date to today
 	const [targetLogModalData, setTargetLogModalData] = useState({ logDay: moment(), target: {} });
 	const [targetInfoModalData, setTargetInfoModalData] = useState({});
+	const tableRef = useRef(null);
 
 	const onCalenderClick = (record, currentDay) => {
 		setTargetLogModalData((prevState) => ({
@@ -102,6 +103,17 @@ const TargetTable = ({ dataSearch }) => {
 		});
 	}, [tableData]);
 
+	// disable sticky header
+	useEffect(() => {
+		if (!tableData.length) return;
+		const table = tableRef.current;
+		if (!table) return;
+		const tableHeader = table.querySelector('th[colspan="9"]');
+		if (!tableHeader) return;
+		// reset style attribute
+		tableHeader.style = '';
+	}, [tableData, tableRef]);
+
 	return (
 		<>
 			{isErrorListTarget ? (
@@ -113,6 +125,7 @@ const TargetTable = ({ dataSearch }) => {
 					bordered
 					scroll={{ x: 'max-content' }}
 					loading={isLoadingListTarget}
+					ref={tableRef}
 				/>
 			)}
 			<ModalTargetLog

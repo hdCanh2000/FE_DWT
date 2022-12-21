@@ -60,6 +60,48 @@ const exportExcel = () => {
 	});
 };
 
+const createTarget = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/api/targets`,
+		data,
+	});
+};
+
+const updateTarget = async (id, data) => {
+	const resp = await axiosClient.put(`/api/targets/${id}`, data);
+	return resp.data;
+};
+
+const deleteTarget = async (id) => {
+	const resp = await axiosClient.delete(`/api/targets/${id}`);
+	return resp.data;
+};
+const getAllUnits = async () => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/units`,
+	});
+	return resp.data;
+};
+
+const getAllPositions = async () => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: '/api/positions',
+	});
+	return resp.data;
+};
+
+const getAllUsers = async (params = {}) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/users`,
+		params,
+	});
+	return resp.data;
+};
+
 export {
 	exportExcel,
 	getAllKpiNorm,
@@ -69,4 +111,10 @@ export {
 	fetchAllKpiNorms,
 	fetchAllSubKpiNorms,
 	getAllKpiNormbyId,
+	createTarget,
+	getAllUnits,
+	getAllPositions,
+	updateTarget,
+	deleteTarget,
+	getAllUsers,
 };
