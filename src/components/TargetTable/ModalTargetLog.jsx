@@ -62,6 +62,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			setUploadedFiles(uploadedFilesFromApi);
 		}
 	}, [currentTargetLog, form]);
+
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
@@ -91,7 +92,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 						formData.append('files', file);
 						formData.append('userId', target?.user?.id);
 						formData.append('positionId', target?.position?.id);
-						formData.append('departmentId', target?.department?.id);
+						formData.append('departmentId', target?.user?.department?.id);
 						const resp = await axios.post(
 							'https://report.sweetsica.com/api/report/upload',
 							formData,
