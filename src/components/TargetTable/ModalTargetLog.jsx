@@ -1,4 +1,5 @@
 /* eslint react/prop-types: 0 */
+/* eslint-disable */
 import { Button, Form, Input, InputNumber, Modal, Select, Upload } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
@@ -6,7 +7,8 @@ import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { createTargetLog, uploadFile } from './services';
+import { createTargetLog, uploadFile } from '../../pages/dailyWorkTracking/services';
+import axios from 'axios';
 
 // xlsx, csv, doc, docx, pdf, ai, psd, jpg, jpeg, png, txt
 const ALLOWED_TYPES = [
@@ -45,7 +47,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			}) || {}
 		);
 	}, [target, logDay]);
-
 	useEffect(() => {
 		if (_.isEmpty(currentTargetLog)) {
 			form.resetFields();
@@ -61,6 +62,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			setUploadedFiles(uploadedFilesFromApi);
 		}
 	}, [currentTargetLog, form]);
+
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
@@ -88,16 +90,22 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 					try {
 						const formData = new FormData();
 						formData.append('files', file);
-						const resp = await uploadFile(formData);
-						const urlArr = resp.data;
-						return urlArr.length > 0 ? urlArr[0] : null;
+						formData.append('userId', target?.user?.id);
+						formData.append('positionId', target?.position?.id);
+						formData.append('departmentId', target?.user?.department?.id);
+						const resp = await axios.post(
+							'https://report.sweetsica.com/api/report/upload',
+							formData,
+						);
+						const respData = resp.data;
+						return respData.downloadLink;
 					} catch (error) {
 						return null;
 					}
 				}),
 			);
-
-			data.files = JSON.stringify([...uploadedFiles, ...listUploaded]);
+			const listUploadedFiltered = listUploaded.filter((item) => !!item);
+			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
 			await createTargetLog(data);
 			await reFetchTable();
 			onOk();
@@ -185,7 +193,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 							<div className='d-flex align-items-center space-x-2'>
 								<GrAttachment />
 								<a href={file} target='_blank' className='mx-2' rel='noreferrer'>
-									{file.split('/')[4]}
+									{file.split('/')[file.split('/')?.length - 1]}
 								</a>
 							</div>
 							<div>

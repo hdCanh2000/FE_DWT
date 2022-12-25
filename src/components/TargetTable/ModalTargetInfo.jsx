@@ -53,7 +53,11 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 			{
 				label: 'Số lượng',
-				value: `${currentTarget?.quantity} ${currentTarget?.unit}`,
+				value: `${currentTarget?.quantity} ${
+					typeof currentTarget?.unit === 'object'
+						? currentTarget?.unit?.name
+						: currentTarget?.unit
+				}`,
 			},
 			{
 				label: 'Man day',
@@ -68,15 +72,18 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 	);
 	const columns = [
 		{
+			key: 'reportDate',
 			title: 'Ngày báo cáo',
 			dataIndex: 'reportDate',
 			render: (text) => moment(text).format('DD/MM/YYYY'),
 		},
 		{
+			key: 'quantity',
 			title: 'Số lượng',
 			dataIndex: 'quantity',
 		},
 		{
+			key: 'status',
 			title: 'Trạng thái công việc',
 			dataIndex: 'status',
 			render: (text) => {
@@ -86,12 +93,13 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 		},
 		{
+			key: 'files',
 			title: 'Files báo cáo',
 			dataIndex: 'files',
 			render: (text) => {
 				const filesArr = JSON.parse(text || '[]');
 				return filesArr.map((file) => (
-					<ul>
+					<ul key={file}>
 						<li>
 							<a href={file} target='_blank' rel='noreferrer'>
 								{file}

@@ -29,7 +29,7 @@ const calenderRender = (text, record, currentDay, onCalenderClick) => {
 				id: day,
 			},
 			children: (
-				<div className='text-center' style={{ width: 28 }}>
+				<div className='text-center' style={{ width: 30 }}>
 					<div>{day}</div>
 					<div>{dayNameText}</div>
 				</div>
@@ -93,13 +93,16 @@ export const getWorkTrackTableRowAndHeaderRow = (
 	const totalDays = filterDay.daysInMonth();
 	const columns = [
 		{
+			key: 'STT',
 			title: 'MỤC TIÊU NHIỆM VỤ (THÁNG)',
 			colSpan: 9,
 			dataIndex: 'key',
 			fixed: 'left',
 			render: (text, record) => {
 				if (record.key === 'STT') {
-					return <b>{text}</b>;
+					return {
+						children: <b>{text}</b>,
+					};
 				}
 				return {
 					props: {
@@ -111,6 +114,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'name',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'name',
@@ -129,6 +133,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'description',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'description',
@@ -146,6 +151,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'deadline',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'deadline',
@@ -163,6 +169,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'quantity',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'quantity',
@@ -180,6 +187,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'unit',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'unit',
@@ -197,6 +205,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'manDay',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'manDay',
@@ -214,6 +223,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'manDayEstimated',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'manDayEstimated',
@@ -231,6 +241,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'executionPlan',
 			title: '',
 			colSpan: 0,
 			dataIndex: 'executionPlan',
@@ -248,6 +259,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'day1',
 			title: 'Nhật trình công việc',
 			colSpan: totalDays,
 			dataIndex: 'day1',
@@ -261,6 +273,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 		const day = i + 2;
 		const currentDay = moment(`${year}-${month}-${day}`, 'YYYY-MM-DD');
 		columns.push({
+			key: `day${day}`,
 			title: '',
 			colSpan: 0,
 			dataIndex: `day${day}`,
@@ -268,6 +281,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 		});
 	}
 	columns.push({
+		key: 'recentManDay',
 		title: 'Đánh giá KQ/Chấm KPI',
 		colSpan: 2,
 		dataIndex: 'recentManDay', // this should be currentManDay but it's a typo in the API
@@ -279,6 +293,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 		},
 	});
 	columns.push({
+		key: 'managerComment',
 		title: '',
 		colSpan: 0,
 		dataIndex: 'managerComment',
