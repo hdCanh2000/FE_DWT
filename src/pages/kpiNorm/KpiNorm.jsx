@@ -1,6 +1,5 @@
 import React from 'react';
 import { toast } from 'react-toastify';
-import { L10n } from '@syncfusion/ej2-base';
 import { Table } from 'antd';
 import { useQuery } from 'react-query';
 import _ from 'lodash';
@@ -19,15 +18,6 @@ import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
 import { getListTarget } from '../dailyWorkTracking/services';
 import ModalTargetForm from './ModalTargetForm';
-
-L10n.load({
-	'vi-VI': {
-		grid: {
-			EmptyDataSourceError: 'Có lỗi xảy ra, vui lòng tải lại trang.',
-			EmptyRecord: 'Không có dữ liệu nhiệm vụ.',
-		},
-	},
-});
 
 const antdTableCols = [
 	{

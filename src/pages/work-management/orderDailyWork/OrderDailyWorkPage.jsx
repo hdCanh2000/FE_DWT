@@ -1,20 +1,21 @@
-import React, { useMemo, useState } from 'react';
-import { Button as AntButton, Row, Col, Table, Space, Modal } from 'antd';
-import moment from 'moment';
-import { useQuery } from 'react-query';
-import { toast } from 'react-toastify';
+/* eslint-disable */
+import Page from '../../../layout/Page/Page';
+import { Button as AntButton, Col, Modal, Row, Space, Table } from 'antd';
 import Card, {
 	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
 } from '../../../components/bootstrap/Card';
-import Page from '../../../layout/Page/Page';
+import React, { useMemo, useState } from 'react';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-import { getListTarget } from '../../dailyWorkTracking/services';
-
+import { useQuery } from 'react-query';
+import { getDailyWorks, getListTarget } from '../../dailyWorkTracking/services';
+import moment from 'moment/moment';
+import dailyWorkApi from '../../dailyWork/services';
 import { updateTarget } from '../../kpiNorm/services';
-import ModalOrderTaskForm from './ModalOrderTaskForm';
+import { toast } from 'react-toastify';
+import ModalOrderDailyWork from './ModalOrderDailyWork';
 
 const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 	const shareRender = (text, record) => {
@@ -48,29 +49,25 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			render: shareRender,
 		},
 		{
-			title: 'Phòng ban',
-			dataIndex: 'positionText',
-			key: 'position',
-			render: shareRender,
-		},
-		{
-			title: 'Thời hạn',
-			dataIndex: 'deadlineText',
-			key: 'deadline',
-			render: shareRender,
-		},
-		{
 			title: 'Trạng thái',
 			dataIndex: 'statusText',
 			key: 'status',
 			render: shareRender,
 		},
 		{
-			title: 'KPI',
-			dataIndex: 'kpiValue',
-			key: 'kipValue',
+			title: 'CST',
+			dataIndex: 'monthKey',
+			key: 'monthKey',
 			render: shareRender,
 		},
+
+		{
+			title: 'DVT',
+			dataIndex: 'unitText',
+			key: 'unit',
+			render: shareRender,
+		},
+
 		{
 			title: '',
 			key: 'action',
@@ -84,6 +81,7 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 		},
 	];
 };
+
 const unAssignedTaskColumns = [
 	{
 		title: 'STT',
@@ -92,20 +90,15 @@ const unAssignedTaskColumns = [
 		fixed: 'left',
 	},
 	{
-		title: 'Tên nhiệm vụ',
+		title: 'Tên tiêu chí',
 		dataIndex: 'name',
 		key: 'name',
 		fixed: 'left',
 	},
 	{
-		title: 'Vị trí đảm nhiệm',
-		dataIndex: 'positionText',
-		key: 'position',
-	},
-	{
-		title: 'Số lượng',
-		dataIndex: 'quantity',
-		key: 'quantity',
+		title: 'CST',
+		dataIndex: 'monthKey',
+		key: 'monthKey',
 	},
 	{
 		title: 'Đơn vị',
@@ -113,58 +106,58 @@ const unAssignedTaskColumns = [
 		key: 'unit',
 	},
 ];
-const OrderTaskPage = () => {
+const OrderDailyWorkPage = () => {
 	const [dataSearch] = useState({
 		q: '',
 	});
 	const [openConfirmCancelAssignTask, setOpenConfirmCancelAssignTask] = useState(false);
 	const [cancelAssignTaskId, setCancelAssignTaskId] = useState(null);
-	const [currentTarget, setCurrentTarget] = useState(null);
-	const [openOrderTaskModal, setOpenOrderTaskModal] = useState(false);
+	const [currentDailyWork, setCurrentDailyWork] = useState(null);
+	const [openOrderDailyWorkModal, setOpenOrderDailyWorkModal] = useState(false);
 	const {
-		data: assignedTargets = [],
-		isLoading: loadingSignedTargets,
-		isError: errorSignedTargets,
-		refetch: refetchSignedTargets,
+		data: assignedDailyWorks = [],
+		isLoading: isLoadingAssignedDailyWorks,
+		isError: isErrorAssignedDailyWorks,
+		refetch: refetchAssignedDailyWorks,
 	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) =>
-		getListTarget({ ...queryKey[1], status: 'assigned' }),
+		getDailyWorks({ ...queryKey[1], status: 'assigned' }),
 	);
 	const assignedTaskData = useMemo(() => {
-		return assignedTargets.map((item, index) => ({
+		return assignedDailyWorks.map((item, index) => ({
 			...item,
 			key: index + 1,
-			stt: assignedTargets.length - index,
-			deadlineText: item.deadline ? moment(item.deadline).format('DD/MM/YYYY') : '',
+			stt: assignedDailyWorks.length - index,
 			statusText: item.status === 'inProgress' ? 'Đang làm' : 'Đã hoàn thành',
 			userName: item.user ? item.user.name : '',
-			kpiValue: `${item.manDay} MD`,
-			positionText: item.position ? item.position.name : '',
+			monthKey: item.monthKey,
+			unitText: item?.unit?.name,
 		}));
-	}, [assignedTargets]);
+	}, [assignedDailyWorks]);
 
 	const {
-		data: unAssignedTargets = [],
-		isLoading: loadingUnSignedTargets,
-		isError: errorUnSignedTargets,
-		refetch: refetchUnSignedTargets,
-	} = useQuery(['getListTargetUnAssigned', dataSearch], ({ queryKey }) =>
-		getListTarget({ ...queryKey[1] }),
+		data: unAssignedTasks = [],
+		isLoading: isLoadingUnAssignedTasks,
+		isError: isErrorUnAssignedTasks,
+		refetch: refetchUnAssignedTasks,
+	} = useQuery(['getListTargetUnAssign', dataSearch], ({ queryKey }) =>
+		getDailyWorks({ ...queryKey[1] }),
 	);
-
 	const unAssignedTaskData = useMemo(() => {
-		return unAssignedTargets.map((item, index) => ({
+		return unAssignedTasks.map((item, index) => ({
 			...item,
 			key: index + 1,
+			statusText: item.status === 'inProgress' ? 'Đang làm' : 'Đã hoàn thành',
+			monthKey: item.monthKey,
 			unitText: item?.unit?.name,
-			positionText: item.position ? item.position.name : '',
 		}));
-	}, [unAssignedTargets]);
-	const handleDeleteAssignedTask = async () => {
+	}, [unAssignedTasks]);
+
+	const handleCancelAssign = async () => {
 		if (!cancelAssignTaskId) return;
 		try {
-			await updateTarget(cancelAssignTaskId, { userId: null });
-			await refetchSignedTargets();
-			await refetchUnSignedTargets();
+			await dailyWorkApi.updateDailyWork(cancelAssignTaskId, { userId: null });
+			await refetchAssignedDailyWorks();
+			await refetchUnAssignedTasks();
 			toast.success('Hủy giao nhiệm vụ thành công');
 		} catch (err) {
 			toast.error('Có lỗi xảy ra, vui lòng thử lại sau');
@@ -175,7 +168,7 @@ const OrderTaskPage = () => {
 	};
 
 	return (
-		<PageWrapper title='Giao việc'>
+		<PageWrapper title='Giao việc hàng ngày'>
 			<Page container='fluid'>
 				<Row gutter={24}>
 					<Col span={12}>
@@ -186,7 +179,9 @@ const OrderTaskPage = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
-								{!errorSignedTargets && (
+								{isErrorAssignedDailyWorks ? (
+									<div>không thể lấy dữ liệu</div>
+								) : (
 									<Table
 										columns={assignedTaskColumns(
 											(id) => {
@@ -194,14 +189,14 @@ const OrderTaskPage = () => {
 												setCancelAssignTaskId(id);
 											},
 											(record) => {
-												setCurrentTarget(record);
-												setOpenOrderTaskModal(true);
+												setCurrentDailyWork(record);
+												setOpenOrderDailyWorkModal(true);
 											},
 										)}
-										dataSource={assignedTaskData}
+										bordered
 										scroll={{ x: 'max-content' }}
-										pagination={{ position: ['bottomCenter'] }}
-										loading={loadingSignedTargets}
+										loading={isLoadingAssignedDailyWorks}
+										dataSource={assignedTaskData}
 									/>
 								)}
 							</CardBody>
@@ -215,18 +210,20 @@ const OrderTaskPage = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
-								{!errorUnSignedTargets && (
+								{isErrorUnAssignedTasks ? (
+									<div>Không thế lấy dữ liệu</div>
+								) : (
 									<Table
 										columns={unAssignedTaskColumns}
 										dataSource={unAssignedTaskData}
+										bordered
 										scroll={{ x: 'max-content' }}
-										pagination={{ position: ['bottomCenter'] }}
-										loading={loadingUnSignedTargets}
+										loading={isLoadingUnAssignedTasks}
 										onRow={(record) => {
 											return {
 												onClick: () => {
-													setCurrentTarget(record);
-													setOpenOrderTaskModal(true);
+													setCurrentDailyWork(record);
+													setOpenOrderDailyWorkModal(true);
 												},
 											};
 										}}
@@ -237,6 +234,7 @@ const OrderTaskPage = () => {
 					</Col>
 				</Row>
 			</Page>
+
 			<Modal
 				title='Xác nhận hủy giao việc'
 				open={openConfirmCancelAssignTask}
@@ -246,24 +244,25 @@ const OrderTaskPage = () => {
 					<AntButton onClick={() => setOpenConfirmCancelAssignTask(false)} key='cancel'>
 						HỦy
 					</AntButton>,
-					<AntButton danger onClick={handleDeleteAssignedTask} key='del'>
+					<AntButton danger onClick={handleCancelAssign} key='del'>
 						Xóa
 					</AntButton>,
 				]}>
 				<p>Bạn có chắc chắn muốn hủy giao việc cho nhiệm vụ này</p>
 			</Modal>
-			<ModalOrderTaskForm
-				open={openOrderTaskModal}
+			<ModalOrderDailyWork
+				data={currentDailyWork}
+				open={openOrderDailyWorkModal}
 				onClose={async (isUpdate) => {
 					if (isUpdate) {
-						await refetchUnSignedTargets();
-						await refetchSignedTargets();
+						await refetchAssignedDailyWorks();
+						await refetchUnAssignedTasks();
 					}
-					setOpenOrderTaskModal(false);
+					setOpenOrderDailyWorkModal(false);
 				}}
-				data={currentTarget}
 			/>
 		</PageWrapper>
 	);
 };
-export default OrderTaskPage;
+
+export default OrderDailyWorkPage;

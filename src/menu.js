@@ -44,31 +44,52 @@ export const demoPages = {
 	},
 	taskAndAssign: {
 		id: 'taskAndAssign',
-		text: 'Khai báo nhiệm vụ & Giao việc',
-		path: '/giao-viec',
+		text: 'Khai báo nhiệm vụ và tiêu chí',
+		path: '/khai-bao-nhiem-vu',
 		icon: 'CustomBriefCase',
 		subMenu: {
-			assign: {
-				id: 'assign',
-				text: 'Giao việc',
-				path: '/giao-viec',
-				roles: ['admin', 'manager'],
-			},
-
-			pendingAccepted: {
-				id: 'pendingAccepted',
-				text: 'Công việc chờ duyệt',
-				path: '/cong-viec-cho-duyet',
-				roles: ['admin', 'manager'],
-			},
+			// pendingAccepted: {
+			// 	id: 'pendingAccepted',
+			// 	text: 'Công việc chờ duyệt',
+			// 	path: '/cong-viec-cho-duyet',
+			// 	roles: ['admin', 'manager'],
+			// },
 			kpiNorm: {
 				id: 'kpiNorm',
 				text: 'Danh mục định mức lao động',
 				path: '/khai-bao-nhiem-vu',
 				roles: ['admin', 'manager'],
 			},
+
+			dailyWork: {
+				id: 'dailyWork',
+				text: 'Danh mục tiêu chí ngày',
+				path: '/khai-bao-tieu-chi-ngay',
+				roles: ['admin', 'manager'],
+			},
 		},
 		roles: ['admin', 'manager'],
+	},
+	assign: {
+		id: 'assign',
+		text: 'Giao việc',
+		path: '/giao-viec',
+		icon: 'CustomBriefCase',
+		roles: ['admin', 'manager'],
+		subMenu: {
+			assignTask: {
+				id: 'assignTask',
+				text: 'Giao nhiệm vụ',
+				path: '/giao-viec',
+				roles: ['admin', 'manager'],
+			},
+			assignDailyWork: {
+				id: 'assignDailyWork',
+				text: 'Giao công việc hàng ngày',
+				path: '/giao-tieu-chi-ngay',
+				roles: ['admin', 'manager'],
+			},
+		},
 	},
 	employeeAssignTask: {
 		id: 'employeeAssignTask',

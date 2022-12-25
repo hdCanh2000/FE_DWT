@@ -27,7 +27,7 @@ const calenderRender = (text, record, currentDay, onCalenderClick) => {
 		return {
 			props: {
 				style: headerCellStyle,
-				id: day,
+				id: `daily_work_${day}`,
 			},
 			children: (
 				<div className='text-center' style={{ width: 30 }}>
@@ -97,7 +97,7 @@ const calenderRender = (text, record, currentDay, onCalenderClick) => {
 	};
 };
 
-export const getWorkTrackTableRowAndHeaderRow = (
+export const getDailyWorkTableRowAndHeaderRow = (
 	filterDay,
 	onCalenderClick,
 	onTargetTitleClick,
@@ -109,8 +109,8 @@ export const getWorkTrackTableRowAndHeaderRow = (
 	const columns = [
 		{
 			key: 'STT',
-			title: 'MỤC TIÊU NHIỆM VỤ (THÁNG)',
-			colSpan: 9,
+			title: 'TIÊU CHÍ BÁO CÁO NGÀY',
+			colSpan: 6,
 			dataIndex: 'key',
 			fixed: 'left',
 			render: (text, record) => {
@@ -148,63 +148,10 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
-			key: 'description',
-			title: '',
-			colSpan: 0,
-			dataIndex: 'description',
-			render: (text, record) => {
-				if (record.key === 'STT') {
-					return <b>{text}</b>;
-				}
-				return {
-					props: {
-						onClick: () => onTargetTitleClick(record),
-						style: { cursor: 'pointer' },
-					},
-					children: <div>{text}</div>,
-				};
-			},
-		},
-		{
-			key: 'deadline',
-			title: '',
-			colSpan: 0,
-			dataIndex: 'deadline',
-			render: (text, record) => {
-				if (record.key === 'STT') {
-					return <b>{text}</b>;
-				}
-				return {
-					props: {
-						onClick: () => onTargetTitleClick(record),
-						style: { cursor: 'pointer' },
-					},
-					children: <div>{text}</div>,
-				};
-			},
-		},
-		{
-			key: 'quantity',
-			title: '',
-			colSpan: 0,
-			dataIndex: 'quantity',
-			render: (text, record) => {
-				if (record.key === 'STT') {
-					return <b>{text}</b>;
-				}
-				return {
-					props: {
-						onClick: () => onTargetTitleClick(record),
-						style: { cursor: 'pointer' },
-					},
-					children: <div>{text}</div>,
-				};
-			},
-		},
-		{
 			key: 'unit',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'unit',
 			render: (text, record) => {
 				if (record.key === 'STT') {
@@ -220,10 +167,11 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
-			key: 'manDay',
+			key: 'monthKey',
 			title: '',
 			colSpan: 0,
-			dataIndex: 'manDay',
+			dataIndex: 'monthKey',
+			fixed: 'left',
 			render: (text, record) => {
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
@@ -238,10 +186,11 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
-			key: 'manDayEstimated',
+			key: 'totalResult',
 			title: '',
 			colSpan: 0,
-			dataIndex: 'manDayEstimated',
+			dataIndex: 'totalResult',
+			fixed: 'left',
 			render: (text, record) => {
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
@@ -255,11 +204,13 @@ export const getWorkTrackTableRowAndHeaderRow = (
 				};
 			},
 		},
+
 		{
-			key: 'executionPlan',
+			key: 'progress',
 			title: '',
 			colSpan: 0,
-			dataIndex: 'executionPlan',
+			dataIndex: 'progress',
+			fixed: 'left',
 			render: (text, record) => {
 				if (record.key === 'STT') {
 					return <b>{text}</b>;
@@ -295,43 +246,14 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			render: (text, record) => calenderRender(text, record, currentDay, onCalenderClick),
 		});
 	}
-	columns.push({
-		key: 'recentManDay',
-		title: 'Đánh giá KQ/Chấm KPI',
-		colSpan: 2,
-		dataIndex: 'recentManDay', // this should be currentManDay but it's a typo in the API
-		render: (text, record) => {
-			if (record.key === 'STT') {
-				return <b>{text}</b>;
-			}
-			return text;
-		},
-	});
-	columns.push({
-		key: 'managerComment',
-		title: '',
-		colSpan: 0,
-		dataIndex: 'managerComment',
-		render: (text, record) => {
-			if (record.key === 'STT') {
-				return <b>{text}</b>;
-			}
-			return text;
-		},
-	});
 
 	const headerRow = {
 		key: 'STT',
-		name: 'Mục tiêu/Nhiệm vụ',
-		description: 'Diễn giải',
-		deadline: 'Thời hạn',
-		quantity: 'SL',
+		name: 'Tiêu chí',
 		unit: 'DVT',
-		manDay: '~ MD',
-		manDayEstimated: 'KQT MD',
-		executionPlan: 'KHTT (nêu có)',
-		recentManDay: 'MD',
-		managerComment: 'Ý kiến',
+		monthKey: 'CST',
+		totalResult: 'KQ lũy kế',
+		progress: 'Tiến độ',
 	};
 	for (let i = 0; i < totalDays; i++) {
 		const dayName = moment(`${year}-${month}-${i + 1}`, 'YYYY-MM-DD').format('ddd');

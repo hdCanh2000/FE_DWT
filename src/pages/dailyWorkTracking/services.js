@@ -122,11 +122,29 @@ const createTargetLog = async (data) => {
 	return resp.data;
 };
 
+const createDailyWorkLog = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/dailyWorks/logs`,
+		data,
+	});
+	return resp.data;
+};
+
 const uploadFile = async (data) => {
 	const resp = await axiosClient({
 		method: 'POST',
 		url: `/api/targets/upload`,
 		data,
+	});
+	return resp.data;
+};
+
+const getDailyWorks = async (params) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/dailyWorks`,
+		params,
 	});
 	return resp.data;
 };
@@ -149,4 +167,6 @@ export {
 	getUserDetail,
 	createTargetLog,
 	uploadFile,
+	getDailyWorks,
+	createDailyWorkLog,
 };

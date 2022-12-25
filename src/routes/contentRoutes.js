@@ -47,6 +47,13 @@ const KPINORM = {
 	KPINORM: lazy(() => import('../pages/kpiNorm/KpiNorm')),
 };
 
+const DAILY_WORK = {
+	DAILY_WORK: lazy(() => import('../pages/dailyWork/DailyWork')),
+	ORDER_DAILY_WORK: lazy(() =>
+		import('../pages/work-management/orderDailyWork/OrderDailyWorkPage'),
+	),
+};
+
 const MISSION = {
 	MISSION: lazy(() => import('../pages/work-management/mission/MissionPage')),
 };
@@ -87,7 +94,7 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: `${demoPages.taskAndAssign.subMenu.assign.path}`,
+		path: `${demoPages.assign.subMenu.assignTask.path}`,
 		element: <DAILYWORKTRACKING.ORDERTASK />,
 		exact: true,
 	},
@@ -124,6 +131,16 @@ const presentation = [
 		exact: true,
 	},
 	{
+		path: demoPages.taskAndAssign.subMenu.dailyWork.path,
+		element: <DAILY_WORK.DAILY_WORK />,
+		exact: true,
+	},
+	{
+		path: demoPages.assign.subMenu.assignDailyWork.path,
+		element: <DAILY_WORK.ORDER_DAILY_WORK />,
+		exact: true,
+	},
+	{
 		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
 		exact: true,
@@ -136,10 +153,10 @@ const presentation = [
 		path: demoPages.mission.path,
 		element: <MISSION.MISSION />,
 	},
-	{
-		path: demoPages.taskAndAssign.subMenu.pendingAccepted.path,
-		element: <DAILYWORKTRACKING.PEDINGWORKTRACKPAGE />,
-	},
+	// {
+	// 	path: demoPages.taskAndAssign.subMenu.pendingAccepted.path,
+	// 	element: <DAILYWORKTRACKING.PEDINGWORKTRACKPAGE />,
+	// },
 	{
 		path: profile.profile.path,
 		element: <PROFILE.PROFILE />,

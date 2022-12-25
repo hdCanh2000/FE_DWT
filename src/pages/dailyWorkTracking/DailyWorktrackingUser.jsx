@@ -12,6 +12,7 @@ import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, { CardBody, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import { getUserDetail } from './services';
 import TargetTable from '../../components/TargetTable/TargetTable';
+import DailyWorkTable from "../../components/DailyWorkTable/DailyWorkTable";
 
 const DailyWorkTrackingUser = () => {
 	const params = useParams();
@@ -81,6 +82,9 @@ const DailyWorkTrackingUser = () => {
 							<div className='control-pane'>
 								<div className='control-section'>
 									<TargetTable dataSearch={dataSearch} />
+								</div>
+								<div>
+									<DailyWorkTable dataSearch={dataSearch} />
 								</div>
 							</div>
 						</CardBody>
