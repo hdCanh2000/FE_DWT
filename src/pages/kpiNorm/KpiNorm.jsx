@@ -114,6 +114,10 @@ const KpiNormPage = () => {
 		}
 	};
 
+	// const handleSearchKPI = (e) => {
+	// 	e.preventDefault();
+	// 	dispatch(fetchKpiNormList({ text: search }));
+	// };
 	return (
 		<PageWrapper title='Danh sách nhiệm vụ'>
 			<Page container='fluid'>

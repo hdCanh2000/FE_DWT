@@ -1,6 +1,6 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllKpiNorm = (params) => {
+const getAllKpiNorm = (params = {}) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/api/kpiNorms`,
