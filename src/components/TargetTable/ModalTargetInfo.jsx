@@ -56,7 +56,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 				value: `${currentTarget?.quantity} ${
 					typeof currentTarget?.unit === 'object'
 						? currentTarget?.unit?.name
-						: currentTarget?.unit
+						: currentTarget?.unit || ''
 				}`,
 			},
 			{

@@ -64,7 +64,7 @@ const DailyWorkTable = ({ dataSearch }) => {
 				...item,
 				progress: `${totalCompletedTasks} / ${item.monthKey}`,
 				totalResult: totalCompletedTasks,
-				unit: item.unit.name,
+				unit: item?.unit?.name,
 			};
 			// insert targetLogs to table
 			logs.forEach((log) => {
