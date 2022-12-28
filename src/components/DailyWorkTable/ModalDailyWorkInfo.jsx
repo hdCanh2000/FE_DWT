@@ -48,7 +48,7 @@ const ModalDailyWorkInfo = ({ open, onOk, dailyWork }) => {
 				value: `${
 					typeof currentDailyWork?.unit === 'object'
 						? currentDailyWork?.unit?.name
-						: currentDailyWork?.unit
+						: currentDailyWork?.unit || ''
 				}`,
 			},
 

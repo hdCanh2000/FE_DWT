@@ -62,7 +62,7 @@ const TargetTable = ({ dataSearch }) => {
 				deadline: dayjs(item.deadline).format('DD/MM/YYYY'),
 				// KQT MD: Kết quả tạm - Nhân từ số đầu việc hoàn thành nhân với MD
 				manDayEstimated: totalCompletedTasks * item.manDay,
-				unit: item.unit.name,
+				unit: item?.unit?.name,
 			};
 			// insert targetLogs to table
 			targetLogs.forEach((targetLog) => {
