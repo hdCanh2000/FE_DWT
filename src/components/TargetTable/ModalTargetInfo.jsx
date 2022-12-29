@@ -102,7 +102,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 					<ul key={file}>
 						<li>
 							<a href={file} target='_blank' rel='noreferrer'>
-								{file}
+								{file.split('/').pop()}
 							</a>
 						</li>
 					</ul>

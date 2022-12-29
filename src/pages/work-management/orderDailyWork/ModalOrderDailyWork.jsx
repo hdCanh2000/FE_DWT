@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Skeleton } from 'antd';
 import { useQuery } from 'react-query';
-import {getAllUnits, getAllUsers, updateTarget} from '../../kpiNorm/services';
+import { getAllUnits, getAllUsers, updateTarget } from '../../kpiNorm/services';
 import dailyWorkApi from '../../dailyWork/services';
 import { toast } from 'react-toastify';
 
@@ -62,7 +62,7 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 			onClose(true);
 		}
 	};
-
+	const isOrdered = currentDailyWork && currentDailyWork.user;
 	return (
 		<Modal
 			forceRender
@@ -73,7 +73,9 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 			onCancel={() => onClose(false)}
 			open={open}
 			footer={[
-				<Button key='close'>Đóng</Button>,
+				<Button key='close' onClick={() => onClose(false)}>
+					Đóng
+				</Button>,
 				currentDailyWork && (
 					<Button
 						danger
@@ -101,7 +103,7 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 							name='name'
 							label='Tên tiêu chí'
 							rules={[{ required: true, message: 'Vui lòng nhập tên tiêu chí' }]}>
-							<Input placeholder='Nhập tên nhiệm vụ' />
+							<Input placeholder='Nhập tên nhiệm vụ' disabled={!isOrdered} />
 						</Form.Item>
 					</Col>
 					<Col span={12}>
@@ -125,7 +127,7 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 									message: 'Vui lòng nhập CST',
 								},
 							]}>
-							<InputNumber min={0} style={{ width: '100%' }} />
+							<InputNumber min={0} style={{ width: '100%' }} disabled={!isOrdered} />
 						</Form.Item>
 					</Col>
 
@@ -139,7 +141,7 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 									message: 'Vui lòng chọn đơn vị tính',
 								},
 							]}>
-							<Select>
+							<Select disabled={!isOrdered}>
 								{listUnits.map((unit) => (
 									<Select.Option value={unit.id} key={unit.id}>
 										{unit.name}

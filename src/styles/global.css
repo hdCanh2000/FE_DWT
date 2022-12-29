@@ -1,0 +1,37 @@
+.text-over-flow-sm {
+    display: block;
+    display: -webkit-box;
+    font-size: 16px;
+    width: 150px;
+    line-height: 1.3;
+    -webkit-line-clamp: 1; /* số dòng hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 10px;
+}
+.text-over-flow-md {
+    display: block;
+    display: -webkit-box;
+    font-size: 16px;
+    width: 200px;
+    line-height: 1.3;
+    -webkit-line-clamp: 1; /* số dòng hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 10px;
+}
+
+.text-over-flow-lg {
+    display: block;
+    display: -webkit-box;
+    font-size: 16px;
+    width: 300px;
+    line-height: 1.3;
+    -webkit-line-clamp: 1; /* số dòng hiển thị */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 10px;
+}

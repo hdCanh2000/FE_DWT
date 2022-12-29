@@ -70,7 +70,7 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 	const listUsers = listUsersData.data;
 	const listUnits = listUnitData.data;
 	const listPositions = listPositionData.data;
-
+	const isOrdered = currentOrderTask && currentOrderTask.user;
 	return (
 		<Modal
 			forceRender
@@ -101,12 +101,12 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 							name='name'
 							label='Tên nhiệm vụ'
 							rules={[{ required: true, message: 'Vui lòng nhập tên nhiệm vụ' }]}>
-							<Input placeholder='Nhập tên nhiệm vụ' />
+							<Input placeholder='Nhập tên nhiệm vụ' disabled={!isOrdered} />
 						</Form.Item>
 					</Col>
 					<Col span={12}>
 						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
-							<Select>
+							<Select disabled={!isOrdered}>
 								{loadingPositions ? (
 									<Skeleton active />
 								) : errorPositions ? (
@@ -154,7 +154,10 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={24}>
 						<Form.Item name='description' label='Mô tả / diễn giải'>
-							<Input.TextArea placeholder='Nhập mô tả nhiệm vụ' />
+							<Input.TextArea
+								placeholder='Nhập mô tả nhiệm vụ'
+								disabled={!isOrdered}
+							/>
 						</Form.Item>
 					</Col>
 					<Col span={24}>
@@ -165,7 +168,7 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 
 					<Col span={8}>
 						<Form.Item name='manDay' label='ManDay'>
-							<InputNumber min={0} style={{ width: 200 }} />
+							<InputNumber min={0} style={{ width: 200 }} disabled={!isOrdered} />
 						</Form.Item>
 					</Col>
 					<Col span={8}>
@@ -175,7 +178,7 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={8}>
 						<Form.Item name='unitId' label='Đơn vị'>
-							<Select>
+							<Select disabled={!isOrdered}>
 								{loadingUnits ? (
 									<Skeleton />
 								) : errorUnits ? (

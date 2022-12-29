@@ -79,7 +79,9 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 			onCancel={() => onClose(false)}
 			open={open}
 			footer={[
-				<Button key='close'>Đóng</Button>,
+				<Button key='close' onClick={() => onClose(false)}>
+					Đóng
+				</Button>,
 				currentTarget && (
 					<Button
 						danger

@@ -143,7 +143,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 						onClick: () => onTargetTitleClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div>{text}</div>,
+					children: <div className='text-over-flow-lg'>{text}</div>,
 				};
 			},
 		},
@@ -161,7 +161,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 						onClick: () => onTargetTitleClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div>{text}</div>,
+					children: <div className='text-over-flow-md'>{text}</div>,
 				};
 			},
 		},
@@ -269,7 +269,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 						onClick: () => onTargetTitleClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div>{text}</div>,
+					children: <div className='text-over-flow-sm'>{text}</div>,
 				};
 			},
 		},

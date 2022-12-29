@@ -29,6 +29,7 @@ const antdTableCols = [
 		title: 'Tên nhiệm vụ',
 		dataIndex: 'name',
 		key: 'name',
+		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
 	},
 	{
 		title: 'Vị trí',
@@ -194,6 +195,7 @@ const KpiNormPage = () => {
 
 			<ModalTargetForm
 				open={openTargetForm}
+				onCancel={() => setOpenTargetForm(false)}
 				onClose={async (isDone) => {
 					if (isDone) {
 						await refetchListTarget();
