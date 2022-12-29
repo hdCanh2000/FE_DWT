@@ -8,7 +8,7 @@ import { RiErrorWarningLine } from 'react-icons/ri';
 
 const calenderRender = (text, record, currentDay, onCalenderClick) => {
 	const dayName = moment(currentDay).format('ddd');
-	const isWeekend = dayName === 'Sat' || dayName === 'Sun';
+	const isWeekend = dayName === 'Sun';
 	const saturdayCellStyle = {
 		backgroundColor: 'rgba(251,188,6,.1)',
 		borderColor: 'rgba(251,188,6,.2)',
