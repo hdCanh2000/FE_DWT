@@ -26,6 +26,7 @@ const antdTableCols = [
 		title: 'Tên tiêu chí',
 		dataIndex: 'name',
 		key: 'name',
+		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
 	},
 	{
 		title: 'CST',

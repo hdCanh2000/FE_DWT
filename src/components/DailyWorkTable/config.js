@@ -143,7 +143,7 @@ export const getDailyWorkTableRowAndHeaderRow = (
 						onClick: () => onTargetTitleClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div>{text}</div>,
+					children: <div className='text-over-flow-lg'>{text}</div>,
 				};
 			},
 		},
