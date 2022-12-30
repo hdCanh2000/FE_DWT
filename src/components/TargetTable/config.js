@@ -143,7 +143,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 						onClick: () => onTargetTitleClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div className='text-over-flow-lg'>{text}</div>,
+					children: <div className='text-over-flow-sm'>{text}</div>,
 				};
 			},
 		},
@@ -151,6 +151,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			key: 'description',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'description',
 			render: (text, record) => {
 				if (record.key === 'STT') {
@@ -161,7 +162,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 						onClick: () => onTargetTitleClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div className='text-over-flow-md'>{text}</div>,
+					children: <div className='text-over-flow-sm'>{text}</div>,
 				};
 			},
 		},
@@ -169,6 +170,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			key: 'deadline',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'deadline',
 			render: (text, record) => {
 				if (record.key === 'STT') {
@@ -187,6 +189,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			key: 'quantity',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'quantity',
 			render: (text, record) => {
 				if (record.key === 'STT') {
@@ -205,6 +208,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			key: 'unit',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'unit',
 			render: (text, record) => {
 				if (record.key === 'STT') {
@@ -223,6 +227,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			key: 'manDay',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'manDay',
 			render: (text, record) => {
 				if (record.key === 'STT') {
@@ -241,6 +246,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			key: 'manDayEstimated',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'manDayEstimated',
 			render: (text, record) => {
 				if (record.key === 'STT') {
@@ -259,6 +265,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			key: 'executionPlan',
 			title: '',
 			colSpan: 0,
+			fixed: 'left',
 			dataIndex: 'executionPlan',
 			render: (text, record) => {
 				if (record.key === 'STT') {

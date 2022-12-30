@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { Button as AntButton, Row, Col, Table, Space, Modal } from 'antd';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useMemo, useState } from 'react';
+import { Button as AntButton, Row, Col, Table, Space, Modal, Input } from 'antd';
 import moment from 'moment';
 import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
@@ -11,10 +12,11 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-import { getListTarget } from '../../dailyWorkTracking/services';
+import { getListTarget, getUserDetail } from '../../dailyWorkTracking/services';
 
 import { updateTarget } from '../../kpiNorm/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
+import Button from '../../../components/bootstrap/Button';
 
 const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 	const shareRender = (text, record) => {
@@ -39,7 +41,15 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			dataIndex: 'name',
 			key: 'name',
 			fixed: 'left',
-			render: shareRender,
+			render: (text, record) => {
+				return {
+					props: {
+						onClick: () => handleRowClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div className='text-over-flow-sm'>{text}</div>,
+				};
+			},
 		},
 		{
 			title: 'Người được giao',
@@ -96,6 +106,9 @@ const unAssignedTaskColumns = [
 		dataIndex: 'name',
 		key: 'name',
 		fixed: 'left',
+		render: (text) => {
+			return <div className='text-over-flow-sm'>{text}</div>;
+		},
 	},
 	{
 		title: 'Vị trí đảm nhiệm',
@@ -114,9 +127,15 @@ const unAssignedTaskColumns = [
 	},
 ];
 const OrderTaskPage = () => {
-	const [dataSearch] = useState({
+	const [assignedTableParams, setAssignedTableParams] = useState({
 		q: '',
 	});
+	const [assignedTableSearch, setAssignedTableSearch] = useState('');
+
+	const [unAssignedTableParams, setUnAssignedTableParams] = useState({
+		q: '',
+	});
+	const [unAssignedTableSearch, setUnAssignedTableSearch] = useState('');
 	const [openConfirmCancelAssignTask, setOpenConfirmCancelAssignTask] = useState(false);
 	const [cancelAssignTaskId, setCancelAssignTaskId] = useState(null);
 	const [currentTarget, setCurrentTarget] = useState(null);
@@ -126,7 +145,7 @@ const OrderTaskPage = () => {
 		isLoading: loadingSignedTargets,
 		isError: errorSignedTargets,
 		refetch: refetchSignedTargets,
-	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) =>
+	} = useQuery(['getListTarget', assignedTableParams], ({ queryKey }) =>
 		getListTarget({ ...queryKey[1], status: 'assigned' }),
 	);
 	const assignedTaskData = useMemo(() => {
@@ -137,7 +156,7 @@ const OrderTaskPage = () => {
 			deadlineText: item.deadline ? moment(item.deadline).format('DD/MM/YYYY') : '',
 			statusText: item.status === 'inProgress' ? 'Đang làm' : 'Đã hoàn thành',
 			userName: item.user ? item.user.name : '',
-			kpiValue: `${item.manDay} MD`,
+			kpiValue: `${item?.manDay || '_'} MD`,
 			positionText: item.position ? item.position.name : '',
 		}));
 	}, [assignedTargets]);
@@ -147,9 +166,25 @@ const OrderTaskPage = () => {
 		isLoading: loadingUnSignedTargets,
 		isError: errorUnSignedTargets,
 		refetch: refetchUnSignedTargets,
-	} = useQuery(['getListTargetUnAssigned', dataSearch], ({ queryKey }) =>
+	} = useQuery(['getListTargetUnAssigned', unAssignedTableParams], ({ queryKey }) =>
 		getListTarget({ ...queryKey[1] }),
 	);
+
+	const userId = localStorage.getItem('userId');
+
+	const { data: user = { department_id: null, role: '' } } = useQuery(
+		['getUserDetail', userId],
+		({ queryKey }) => getUserDetail(queryKey[1]),
+	);
+
+	useEffect(() => {
+		if (!user) return;
+		if (!user.department_id) return;
+		if (user.role !== 'manager') return;
+
+		setAssignedTableParams({ ...assignedTableParams, departmentId: user.department_id });
+		setUnAssignedTableParams({ ...unAssignedTableParams, departmentId: user.department_id });
+	}, [user]);
 
 	const unAssignedTaskData = useMemo(() => {
 		return unAssignedTargets.map((item, index) => ({
@@ -173,6 +208,18 @@ const OrderTaskPage = () => {
 			setCancelAssignTaskId(null);
 		}
 	};
+	const handleSearchAssignedTask = (value) => {
+		setAssignedTableParams({
+			...assignedTableParams,
+			q: value,
+		});
+	};
+	const handleSearchUnAssignedTask = (value) => {
+		setUnAssignedTableParams({
+			...unAssignedTableParams,
+			q: value,
+		});
+	};
 
 	return (
 		<PageWrapper title='Giao việc'>
@@ -186,6 +233,34 @@ const OrderTaskPage = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
+								<Row gutter={24} className='mb-2'>
+									<Col
+										lg={12}
+										md={12}
+										sm={24}
+										className='d-flex align-items-center'>
+										<Input.Search
+											onSearch={handleSearchAssignedTask}
+											onChange={(e) => setAssignedTableSearch(e.target.value)}
+											value={assignedTableSearch}
+											placeholder='Tìm kiếm nhiệm vụ'
+										/>
+										{assignedTableParams.q && (
+											<Button
+												color='link'
+												className='mx-2'
+												onClick={() => {
+													setAssignedTableSearch('');
+													setAssignedTableParams({
+														...assignedTableParams,
+														q: '',
+													});
+												}}>
+												Reset
+											</Button>
+										)}
+									</Col>
+								</Row>
 								{!errorSignedTargets && (
 									<Table
 										columns={assignedTaskColumns(
@@ -215,6 +290,36 @@ const OrderTaskPage = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
+								<Row gutter={24} className='mb-2'>
+									<Col
+										lg={12}
+										md={12}
+										sm={24}
+										className='d-flex align-items-center'>
+										<Input.Search
+											onSearch={handleSearchUnAssignedTask}
+											onChange={(e) =>
+												setUnAssignedTableSearch(e.target.value)
+											}
+											value={unAssignedTableSearch}
+											placeholder='Tìm kiếm nhiệm vụ'
+										/>
+										{unAssignedTableParams.q && (
+											<Button
+												color='link'
+												className='mx-2'
+												onClick={() => {
+													setUnAssignedTableSearch('');
+													setUnAssignedTableParams({
+														...unAssignedTableParams,
+														q: '',
+													});
+												}}>
+												Reset
+											</Button>
+										)}
+									</Col>
+								</Row>
 								{!errorUnSignedTargets && (
 									<Table
 										columns={unAssignedTaskColumns}

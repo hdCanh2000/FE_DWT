@@ -30,6 +30,7 @@
 		]
 	},
 	"dependencies": {
+		"@ant-design/icons": "^4.8.0",
 		"@emotion/react": "^11.9.0",
 		"@omtanke/react-use-event-outside": "^1.0.1",
 		"@popperjs/core": "^2.11.5",
