@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllPositionLevel } from '../../pages/positionLevelConfig/services';
+import { getAllResource } from '../../api/fetchApi';
 
 const initialState = {
 	positionLevels: [],
@@ -12,7 +12,7 @@ const initialState = {
 export const fetchPositionLevelList = createAsyncThunk(
 	'positionLevel/fetchLevelList',
 	async (params) => {
-		const response = await getAllPositionLevel(params);
+		const response = await getAllResource('/api/positionLevels', params);
 		return response.data;
 	},
 );

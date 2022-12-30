@@ -1,12 +1,17 @@
-import React from 'react';
+/* eslint-disable no-script-url */
+/* eslint-disable react/jsx-no-script-url */
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
+
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import Select from '../../components/bootstrap/forms/Select';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import Input from '../../components/bootstrap/forms/Input';
+import InputGroup from '../../components/bootstrap/forms/InputGroup';
 import validate from './validate';
 
 const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
@@ -18,14 +23,21 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 		},
 		enableReinitialize: true,
 		validationSchema: validate,
-		onSubmit: (values, { resetForm }) => {
+		onSubmit: (values) => {
 			handleSubmit({
 				...values,
 				data,
+				files: selectedFile,
 			});
-			resetForm();
 		},
 	});
+
+	const [selectedFile, setSelectedFile] = useState(null);
+
+	const changeHandler = (event) => {
+		setSelectedFile(event.target.files);
+	};
+
 	return (
 		<Modal
 			show={show}
@@ -120,6 +132,34 @@ const DailyWorktrackForm = ({ data, show, handleClose, handleSubmit }) => {
 								)}
 							</div>
 						</div>
+						{data.row?.status ? (
+							<div>
+								<h5>Danh sách file báo cáo</h5>
+								<ul>
+									{JSON.parse(data.row.files)?.map((file) => (
+										<li key={file}>
+											<a
+												href={`${process.env.REACT_APP_DEV_API_URL}/uploads/${file}`}
+												target='_blank'
+												rel='noreferrer'>
+												{file}
+											</a>
+										</li>
+									))}
+								</ul>
+							</div>
+						) : (
+							<div className='col-12'>
+								<InputGroup>
+									<Input
+										type='file'
+										disabled={data.row?.status}
+										multiple
+										onChange={changeHandler}
+									/>
+								</InputGroup>
+							</div>
+						)}
 					</div>
 				</form>
 			</Modal.Body>

@@ -12,7 +12,7 @@ const DAILYWORKTRACKING = {
 	DAILYWORKTRACKING: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTracking')),
 	DAILYWORKTRACKINGUSER: lazy(() => import('../pages/dailyWorkTracking/DailyWorktrackingUser')),
 	DAILYWORKTRACKINGME: lazy(() => import('../pages/dailyWorkTracking/DailyWorkTrackMe')),
-	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/orderTask')),
+	ORDERTASK: lazy(() => import('../pages/work-management/orderTask/OrderTaskPage')),
 	PEDINGWORKTRACKPAGE: lazy(() => import('../pages/pendingWorktrack/PendingWorktrackPage')),
 };
 
@@ -26,7 +26,7 @@ const MANAGEMENT = {
 	PERMISSION: lazy(() => import('../pages/config/configPermission/ConfigPermissionPage')),
 };
 const POSITION_LEVEL_CONFIG = {
-	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/positionLevelConfig')),
+	POSITION_LEVEL_CONFIG: lazy(() => import('../pages/positionLevelConfig/PositionLevelConfig')),
 };
 
 const AUTH = {
@@ -40,15 +40,26 @@ const UNIT = {
 	UNIT: lazy(() => import('../pages/unit/unitPage')),
 };
 const KEY = {
-	KEY: lazy(() => import('../pages/keys/keys')),
+	KEY: lazy(() => import('../pages/keys/Keys')),
 };
 
 const KPINORM = {
-	KPINORM: lazy(() => import('../pages/kpiNorm/kpiNorm')),
+	KPINORM: lazy(() => import('../pages/kpiNorm/KpiNorm')),
+};
+
+const DAILY_WORK = {
+	DAILY_WORK: lazy(() => import('../pages/dailyWork/DailyWork')),
+	ORDER_DAILY_WORK: lazy(() =>
+		import('../pages/work-management/orderDailyWork/OrderDailyWorkPage'),
+	),
 };
 
 const MISSION = {
 	MISSION: lazy(() => import('../pages/work-management/mission/MissionPage')),
+};
+
+const REPORT = {
+	LIST_REPORT: lazy(() => import('../pages/report/ReportPage')),
 };
 
 const presentation = [
@@ -83,7 +94,7 @@ const presentation = [
 		exact: true,
 	},
 	{
-		path: `${demoPages.taskAndAssign.subMenu.assign.path}`,
+		path: `${demoPages.assign.subMenu.assignTask.path}`,
 		element: <DAILYWORKTRACKING.ORDERTASK />,
 		exact: true,
 	},
@@ -120,6 +131,16 @@ const presentation = [
 		exact: true,
 	},
 	{
+		path: demoPages.taskAndAssign.subMenu.dailyWork.path,
+		element: <DAILY_WORK.DAILY_WORK />,
+		exact: true,
+	},
+	{
+		path: demoPages.assign.subMenu.assignDailyWork.path,
+		element: <DAILY_WORK.ORDER_DAILY_WORK />,
+		exact: true,
+	},
+	{
 		path: demoPages.hrRecords.subMenu.positionLevelConfig.path,
 		element: <POSITION_LEVEL_CONFIG.POSITION_LEVEL_CONFIG />,
 		exact: true,
@@ -132,14 +153,19 @@ const presentation = [
 		path: demoPages.mission.path,
 		element: <MISSION.MISSION />,
 	},
-	{
-		path: demoPages.taskAndAssign.subMenu.pendingAccepted.path,
-		element: <DAILYWORKTRACKING.PEDINGWORKTRACKPAGE />,
-	},
+	// {
+	// 	path: demoPages.taskAndAssign.subMenu.pendingAccepted.path,
+	// 	element: <DAILYWORKTRACKING.PEDINGWORKTRACKPAGE />,
+	// },
 	{
 		path: profile.profile.path,
 		element: <PROFILE.PROFILE />,
 	},
+	{
+		path: demoPages.reportPage.subMenu.reportList.path,
+		element: <REPORT.LIST_REPORT />,
+	},
+
 	{
 		path: '*',
 		element: <AUTH.PAGE_404 />,

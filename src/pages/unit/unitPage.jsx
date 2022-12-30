@@ -8,6 +8,7 @@ import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
+	CardBody,
 	CardHeader,
 	CardLabel,
 	CardTitle,
@@ -15,13 +16,13 @@ import Card, {
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addUnit, updateUnit, deleteUnit } from './services';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { changeCurrentPage, fetchUnitList } from '../../redux/slice/unitSlice';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
+import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
 const UnitPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -77,9 +78,9 @@ const UnitPage = () => {
 		setCurrentPage(searchValue.page);
 	};
 
-	const handleDelete = async (valueDelete) => {
+	const handleDelete = async (data) => {
 		try {
-			await deleteUnit(valueDelete?.id);
+			await deleteResouce('/api/units', data?.id);
 			toast.success('Xoá đơn vị thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
@@ -153,7 +154,7 @@ const UnitPage = () => {
 		};
 		if (data.id) {
 			try {
-				const response = await updateUnit({ id: data?.id, ...dataSubmit });
+				const response = await updateResouce('/api/units', { id: data?.id, ...dataSubmit });
 				await response.data;
 				toast.success('Cập nhật đơn vị thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -174,7 +175,7 @@ const UnitPage = () => {
 			}
 		} else {
 			try {
-				const response = await addUnit(dataSubmit);
+				const response = await addResource('/api/units', dataSubmit);
 				await response.data;
 				toast.success('Thêm đơn vị thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -205,43 +206,41 @@ const UnitPage = () => {
 					<div>
 						{verifyPermissionHOC(
 							<div className='row mb-0'>
-								<div className='col-8' style={{ margin: '0 auto', height: '90vh' }}>
+								<div className='col-7' style={{ margin: '0 auto' }}>
 									<Card className='w-100'>
-										<div style={{ margin: '24px 24px 0' }}>
-											<CardHeader>
-												<CardLabel icon='ReceiptLong' iconColor='primary'>
-													<CardTitle>
-														<CardLabel>Danh sách đơn vị tính</CardLabel>
-													</CardTitle>
-												</CardLabel>
-												<CardActions>
-													<Button
-														color='info'
-														icon='AddCircleOutline'
-														tag='button'
-														onClick={() =>
-															handleOpenForm({ name: '', code: '' })
-														}>
-														Thêm mới
-													</Button>
-												</CardActions>
-											</CardHeader>
-											<div className='p-4'>
-												<TableCommon
-													className='table table-modern mb-0'
-													columns={columns}
-													data={units}
-													onSubmitSearch={handleSubmitSearch}
-													onChangeCurrentPage={handleChangeCurrentPage}
-													currentPage={parseInt(currentPage, 10)}
-													totalItem={pagination?.totalRows}
-													total={pagination?.total}
-													setCurrentPage={setCurrentPage}
-													searchvalue={text}
-													isSearch
-												/>
-											</div>
-										</div>
+										<CardHeader>
+											<CardLabel icon='ReceiptLong' iconColor='primary'>
+												<CardTitle>
+													<CardLabel>Danh sách đơn vị tính</CardLabel>
+												</CardTitle>
+											</CardLabel>
+											<CardActions>
+												<Button
+													color='info'
+													icon='AddCircleOutline'
+													tag='button'
+													onClick={() =>
+														handleOpenForm({ name: '', code: '' })
+													}>
+													Thêm mới
+												</Button>
+											</CardActions>
+										</CardHeader>
+										<CardBody>
+											<TableCommon
+												className='table table-modern mb-0'
+												columns={columns}
+												data={units}
+												onSubmitSearch={handleSubmitSearch}
+												onChangeCurrentPage={handleChangeCurrentPage}
+												currentPage={parseInt(currentPage, 10)}
+												totalItem={pagination?.totalRows}
+												total={pagination?.total}
+												setCurrentPage={setCurrentPage}
+												searchvalue={text}
+												isSearch
+											/>
+										</CardBody>
 									</Card>
 								</div>
 							</div>,
@@ -263,7 +262,7 @@ const UnitPage = () => {
 					onCloseModal={handleCloseForm}
 					onConfirm={() => handleDelete(itemEdit)}
 					title='Xoá đơn vị tính'
-					content={`Xác nhận xoá đơn vị tính <strong>${itemEdit?.name}</strong> ?`}
+					content='Xác nhận xoá đơn vị tính?'
 				/>
 			</Page>
 		</PageWrapper>

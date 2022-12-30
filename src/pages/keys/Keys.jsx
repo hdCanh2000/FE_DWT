@@ -21,10 +21,10 @@ import { fetchUnitList } from '../../redux/slice/unitSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { changeCurrentPage, fetchKeyList } from '../../redux/slice/keySlice';
-import { addkey, deleteKey, updateKey } from './services';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import validate from './validate';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
+import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
 const Keys = () => {
 	const [searchParams] = useSearchParams();
@@ -83,8 +83,27 @@ const Keys = () => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
+			isShowNested: true,
 			render: (item) => <span>{item?.unit?.name}</span>,
 			options: units,
+			fields: [
+				{
+					title: 'Tên đơn vị',
+					id: 'name',
+					key: 'name',
+					isShow: true,
+					name: 'name',
+					type: 'text',
+				},
+				{
+					title: 'Mã đơn vị',
+					id: 'code',
+					key: 'code',
+					isShow: true,
+					name: 'code',
+					type: 'text',
+				},
+			],
 			col: 3,
 		},
 		{
@@ -120,7 +139,15 @@ const Keys = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={() =>
+							handleOpenForm({
+								...item,
+								position: {
+									label: item?.position?.name,
+									value: item?.position?.id,
+								},
+							})
+						}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -168,7 +195,7 @@ const Keys = () => {
 		};
 		if (isEmpty(itemEdit)) {
 			try {
-				await addkey(newValue);
+				await addResource('/api/keys', newValue);
 				toast.success('Thêm chỉ số key thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
@@ -183,15 +210,15 @@ const Keys = () => {
 			}
 		} else {
 			try {
-				await updateKey(newValue);
-				toast.success('Thay đổi chỉ số key thành công!', {
+				await updateResouce('/api/keys', newValue);
+				toast.success('Cập nhật chỉ số key thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
 				fetch();
 				handleCloseForm();
 			} catch (error) {
-				toast.error('Thay đổi chỉ số key không thành công!', {
+				toast.error('Cập nhật chỉ số key không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
@@ -201,7 +228,7 @@ const Keys = () => {
 
 	const handleDelete = async (data) => {
 		try {
-			await deleteKey(data?.id);
+			await deleteResouce('/api/keys', data?.id);
 			toast.success('Xóa chỉ số key thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
@@ -220,13 +247,36 @@ const Keys = () => {
 		setCurrentPage(searchValue.page);
 	};
 
+	const handleSubmitNestedForm = async (itemSubmit, model) => {
+		switch (model) {
+			case 'unit':
+				try {
+					const response = await addResource('/api/units', itemSubmit);
+					await response.data;
+					toast.success('Thêm đơn vị thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+				} catch (error) {
+					toast.error('Thêm đơn vị không thành công!', {
+						position: toast.POSITION.TOP_RIGHT,
+						autoClose: 1000,
+					});
+					throw error;
+				}
+				break;
+			default:
+				break;
+		}
+	};
+
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.keys.text}>
 			<Page container='fluid'>
 				{verifyPermissionHOC(
 					<>
 						<div className='row mb-0'>
-							<div className='col-8' style={{ margin: '0 auto', height: '90vh' }}>
+							<div className='col-12'>
 								<Card className='w-100'>
 									<CardHeader>
 										<CardLabel icon='VpnKey' iconColor='primary'>
@@ -237,7 +287,7 @@ const Keys = () => {
 										<CardActions>
 											<Button
 												color='info'
-												icon='VpnKey'
+												icon='Add'
 												tag='button'
 												onClick={() => handleOpenForm(null)}>
 												Thêm mới
@@ -270,14 +320,15 @@ const Keys = () => {
 							label={itemEdit?.id ? 'Cập nhật key' : 'Tạo key mới'}
 							fields={columns}
 							validate={validate}
-							size='xl'
+							size='lg'
+							onSubmitNestedForm={handleSubmitNestedForm}
 						/>
 						<AlertConfirm
 							openModal={toggleFormDelete}
 							onCloseModal={handleCloseForm}
 							onConfirm={() => handleDelete(itemEdit)}
 							title='Xoá chỉ số key'
-							content={`Xác nhận xoá chỉ số key <strong>${itemEdit?.name}</strong> ?`}
+							content='Xác nhận xoá chỉ số key?'
 						/>
 					</>,
 					['admin'],

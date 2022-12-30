@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllRequirement } from '../../pages/recruitmentRequirements/services';
+import { getAllResource } from '../../api/fetchApi';
 
 const initialState = {
 	requirements: [],
@@ -10,9 +10,8 @@ const initialState = {
 	currentPage: 1,
 };
 
-// Đầu tiên, tạo thunk
 export const fetchRequirementList = createAsyncThunk('requirements/fetchList', async (params) => {
-	const response = await getAllRequirement(params);
+	const response = await getAllResource('/api/requirements', params);
 	return response.data;
 });
 

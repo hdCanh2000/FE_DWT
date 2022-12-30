@@ -18,11 +18,11 @@ import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchRequirementList, changeCurrentPage } from '../../redux/slice/requirementSlice';
-import { addRequirement, updateRequirement, deleteRequirement } from './services';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import AlertConfirm from '../work-management/mission/AlertConfirm';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
+import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
 const RecruitmentRequirementPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -137,7 +137,7 @@ const RecruitmentRequirementPage = () => {
 		};
 		if (data.id) {
 			try {
-				const response = await updateRequirement(dataSubmit);
+				const response = await updateResouce('/api/requirements', dataSubmit);
 				await response.data;
 				toast.success('Cập nhật yêu cầu thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -159,7 +159,7 @@ const RecruitmentRequirementPage = () => {
 			}
 		} else {
 			try {
-				const response = await addRequirement(dataSubmit);
+				const response = await addResource('/api/requirements', dataSubmit);
 				await response.data;
 				toast.success('Cập nhật yêu cầu thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -183,7 +183,7 @@ const RecruitmentRequirementPage = () => {
 
 	const handleDeleteRequirement = async (data) => {
 		try {
-			await deleteRequirement(data);
+			await deleteResouce('/api/requirements', data);
 			toast.success('Xoá yêu cầu thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
@@ -213,7 +213,7 @@ const RecruitmentRequirementPage = () => {
 							<>
 								<div
 									className='row mb-0'
-									style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+									style={{ maxWidth: '70%', minWidth: '70%', margin: '0 auto' }}>
 									<div className='col-12'>
 										<Card className='w-100'>
 											<div style={{ margin: '24px 24px 0' }}>
@@ -276,7 +276,7 @@ const RecruitmentRequirementPage = () => {
 									onCloseModal={handleCloseForm}
 									onConfirm={() => handleDeleteRequirement(itemEdit?.id)}
 									title='Xoá yêu cầu năng lực'
-									content={`Xác nhận xoá yêu cầu năng lực <strong>${itemEdit?.name}</strong> ?`}
+									content='Xác nhận xoá yêu cầu năng lực?'
 								/>
 							</>,
 							['admin'],

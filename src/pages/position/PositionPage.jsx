@@ -22,10 +22,10 @@ import { changeCurrentPage, fetchPositionList } from '../../redux/slice/position
 import { fetchPositionLevelList } from '../../redux/slice/positionLevelSlice';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import { fetchRequirementList } from '../../redux/slice/requirementSlice';
-import { addPosition, updatePosition, deletePositions, getAllPosition } from './services';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 import CommonForm from '../common/ComponentCommon/CommonForm';
+import { addResource, deleteResouce, getAllResource, updateResouce } from '../../api/fetchApi';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -68,14 +68,16 @@ const PositionPage = () => {
 
 	const [allPositions, setAllPositions] = React.useState([]);
 	const fetch = async () => {
-		const response = await getAllPosition();
+		const response = await getAllResource('/api/positions');
 		setAllPositions(
 			response.data.data.map((ele) => ({ ...ele, label: ele?.name, value: ele?.id })),
 		);
 	};
+
 	useEffect(() => {
 		fetch();
-	}, [itemEdit]);
+	}, []);
+
 	useEffect(() => {
 		const query = {};
 		query.text = text;
@@ -237,7 +239,7 @@ const PositionPage = () => {
 		};
 		if (data.id) {
 			try {
-				const response = await updatePosition(dataSubmit);
+				const response = await updateResouce('/api/positions', dataSubmit);
 				await response.data;
 				toast.success('Cập nhật vị trí thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -258,7 +260,7 @@ const PositionPage = () => {
 			}
 		} else {
 			try {
-				const response = await addPosition(dataSubmit);
+				const response = await addResource('/api/positions', dataSubmit);
 				await response.data;
 				toast.success('Thêm vị trí thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -282,7 +284,7 @@ const PositionPage = () => {
 
 	const handleDeletePosition = async (item) => {
 		try {
-			await deletePositions(item);
+			await deleteResouce('/api/positions', item);
 			toast.success('Xoá vị trí thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
@@ -369,7 +371,7 @@ const PositionPage = () => {
 									onCloseModal={handleCloseForm}
 									onConfirm={() => handleDeletePosition(itemEdit?.id)}
 									title='Xoá vị trí công việc'
-									content={`Xác nhận xoá vị trí công việc: <strong>${itemEdit?.name}</strong> ?`}
+									content='Xác nhận xoá vị trí công việc?'
 								/>
 							</>,
 							['admin'],

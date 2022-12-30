@@ -5,7 +5,6 @@ import { departmentSlice } from '../slice/departmentSlice';
 import { positionSlice } from '../slice/positionSlice';
 import { positionLevelSlice } from '../slice/positionLevelSlice';
 import { missionSlice } from '../slice/missionSlice';
-import { taskSlice } from '../slice/taskSlice';
 import { roleSlice } from '../slice/roleSlice';
 import { kpiNormSlice } from '../slice/kpiNormSlice';
 import { unitSlice } from '../slice/unitSlice';
@@ -15,7 +14,6 @@ import { keySlice } from '../slice/keySlice';
 
 const reducer = combineReducers({
 	mission: missionSlice.reducer,
-	task: taskSlice.reducer,
 	employee: employeeSlice.reducer,
 	department: departmentSlice.reducer,
 	position: positionSlice.reducer,

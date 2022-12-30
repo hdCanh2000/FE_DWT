@@ -37,12 +37,11 @@ const Login = () => {
 			localStorage.setItem('name', result.data.name);
 			localStorage.setItem('userId', result.data.userId);
 			localStorage.setItem('roles', JSON.stringify(result.data.role));
-			window.location.href = '/';
+			window.location.href = '/cong-viec-cua-nhan-vien/'.concat(result.data.userId);
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 		}
 	};
-
 	return (
 		<PageWrapper title='Đăng nhập'>
 			<Page className='p-0'>

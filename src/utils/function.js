@@ -1,188 +1,225 @@
-import { isArray, isEmpty, size } from 'lodash';
+import { isArray, isEmpty } from 'lodash';
+import moment from 'moment';
 
-const calcTotalTaskByStatus = (tasks, status) => {
-	// tính tổng số task theo status của 1 nhiệm vụ
-	if (!isArray(tasks) || isEmpty(tasks)) return 0;
+export const calcTotalKPIOfWorkTrack = (worktrack) => {
+	const { kpiNorm } = worktrack;
+	if (isEmpty(kpiNorm)) return 0;
+	const manDay = kpiNorm.manday || 1;
+	return (
+		(kpiNorm.kpi_value / manDay) *
+		(kpiNorm.quantity ? kpiNorm.quantity : 1) *
+		worktrack.quantity
+	).toFixed(2);
+};
+
+export const calcTotalFromWorkTrackLogs = (workTrackLogs) => {
+	if (isEmpty(workTrackLogs) || !isArray(workTrackLogs)) return 0;
 	let total = 0;
-	tasks.forEach((task) => {
-		if (task.status === status) total += 1;
+	workTrackLogs.forEach((workTrackLog) => {
+		total += workTrackLog.quantity;
 	});
 	return total;
 };
 
-// ------------		  UPDATE FUNCTION CALC PROGRESS MISSION & TASK		-----------------
-
-// tính tổng số bước của 1 subtask
-const calcTotalStepOfSubTask = (subtask) => {
-	if (isEmpty(subtask)) return 0;
-	const { steps } = subtask;
-	if (isEmpty(steps)) return 0;
-	return size(steps);
+export const calcCurrentKPIOfWorkTrack = (worktrack) => {
+	if (isEmpty(worktrack)) return 0;
+	const { workTrackLogs } = worktrack;
+	if (isEmpty(workTrackLogs) || !isArray(workTrackLogs)) return 0;
+	const totalQuantity = calcTotalFromWorkTrackLogs(workTrackLogs);
+	const total = calcTotalKPIOfWorkTrack(worktrack);
+	return ((totalQuantity / worktrack.quantity) * total).toFixed(2);
 };
 
-// tính tổng số bước hoàn thành của 1 subtask
-const calcTotalStepCompleteOfSubTask = (subtask) => {
-	if (isEmpty(subtask)) return 0;
-	const { steps } = subtask;
-	if (isEmpty(steps)) return 0;
+export const calcProgressWokTrack = (worktrack) => {
+	if (isEmpty(worktrack)) return 0;
+	const { workTrackLogs } = worktrack;
+	if (isEmpty(workTrackLogs) || !isArray(workTrackLogs)) return 0;
 	let total = 0;
-	steps.forEach((item) => {
-		if (item.status === 1) total += 1;
+	workTrackLogs.forEach((workTrackLog) => {
+		total += workTrackLog.quantity;
 	});
-	return total;
+	return Math.round((total / worktrack.quantity) * 100) || 0;
 };
 
-// tính % hoàn thành của 1 subtask
-const calcProgressSubtask = (subtask) => {
-	if (isEmpty(subtask)) return 0;
-	if (subtask.status === 3 || subtask.status === 4 || subtask.status === 7) return 100;
+const calcTotalKPIOfWorkTrackItem = (worktrack) => {
+	const { kpiNorm } = worktrack;
+	if (isEmpty(kpiNorm)) return 0;
+	const manDay = kpiNorm.manday || 1;
+	return (
+		(kpiNorm.kpi_value / manDay) *
+		(kpiNorm.quantity ? kpiNorm.quantity : 1) *
+		worktrack.quantity
+	);
+};
+
+const calcCurrentKPIOfWorkTrackItem = (worktrack) => {
+	if (isEmpty(worktrack)) return 0;
+	const { workTrackLogs } = worktrack;
+	if (isEmpty(workTrackLogs) || !isArray(workTrackLogs)) return 0;
+	const totalQuantity = calcTotalFromWorkTrackLogs(workTrackLogs);
+	const total = calcTotalKPIOfWorkTrack(worktrack);
+	return (totalQuantity / worktrack.quantity) * total;
+};
+
+export const calcTotalKPIWorkTrackByUser = (worktracks) => {
+	const { workTracks } = worktracks;
+	if (isEmpty(workTracks) || !isArray(workTracks)) return 0;
+	let total = 0;
+	workTracks
+		.filter((item) => {
+			return item?.workTrackUsers?.isResponsible === true;
+		})
+		.forEach((worktrack) => {
+			const totalKPIOfWorktrack = calcTotalKPIOfWorkTrackItem(worktrack);
+			total += totalKPIOfWorktrack;
+		});
+	return total.toFixed(2);
+};
+
+export const calcTotalCurrentKPIWorkTrackByUser = (worktracks) => {
+	const { workTracks } = worktracks;
+	if (isEmpty(workTracks) || !isArray(workTracks)) return 0;
+	let total = 0;
+	workTracks
+		.filter((item) => {
+			return item?.workTrackUsers?.isResponsible === true;
+		})
+		.forEach((worktrack) => {
+			const totalKPIOfWorktrack = calcCurrentKPIOfWorkTrackItem(worktrack);
+			total += totalKPIOfWorktrack;
+		});
+	return total.toFixed(2);
+};
+const loop = (data) => {
+	let totals = 0.0;
+	data.forEach((ele) => {
+		totals += parseFloat(ele?.totalKPI, 10);
+		if (!isEmpty(ele?.subRows)) {
+			totals += loop(ele?.subRows);
+		}
+	});
+	return totals;
+};
+export const calcTotalKPIAllWorkTrack = (worktracks) => {
+	if (isEmpty(worktracks) || !isArray(worktracks)) return 0;
+	// eslint-disable-next-line prefer-const
+	return loop(worktracks).toFixed(2);
+};
+
+export const calcTotalCurrentKPIAllWorkTrack = (worktracks) => {
+	if (isEmpty(worktracks) || !isArray(worktracks)) return 0;
+	let total = 0;
+	worktracks.forEach((worktrack) => {
+		const totalKPIOfWorktrack = calcCurrentKPIOfWorkTrackItem(worktrack);
+		total += totalKPIOfWorktrack;
+	});
+	return total.toFixed(2);
+};
+
+export const calcProgressTask = (worktrack) => {
+	if (!worktrack.quantity) return '--';
+	const progress = Math.round(
+		(calcCurrentKPIOfWorkTrack(worktrack) / calcTotalKPIOfWorkTrack(worktrack)) * 100,
+	);
+	return `${progress}%`;
+};
+
+export const calcProgressWorktrack = (worktrack) => {
 	return (
 		Math.round(
-			(calcTotalStepCompleteOfSubTask(subtask) / calcTotalStepOfSubTask(subtask)) * 100,
+			(calcTotalCurrentKPIWorkTrackByUser(worktrack) /
+				calcTotalKPIWorkTrackByUser(worktrack)) *
+				100,
 		) || 0
 	);
 };
 
-// tính số kpi đã dùng cho 1 subtask
-const calcKPICompleteOfSubtask = (subtask) => {
-	const percentComplete = calcProgressSubtask(subtask);
-	return Math.round((percentComplete / 100) * subtask.kpiValue);
-};
-
-// tính tổng số kpi của 1 task theo subtask
-const calcTotalKPIOfTask = (task) => {
-	if (task.status === 4) return task.kpiValue;
-	const { subtasks } = task;
-	let totalKPI = 0;
-	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
-	subtasks.forEach((subtask) => {
-		totalKPI += subtask.kpiValue;
+export const calcRealKPIPointByUser = (worktrack) => {
+	let total = 0;
+	if (isEmpty(worktrack)) return 0;
+	const { workTracks } = worktrack;
+	if (isEmpty(workTracks) || !isArray(workTracks)) return 0;
+	workTracks.forEach((item) => {
+		total += item.kpi_point;
 	});
-	return totalKPI;
+	return total || 0;
 };
 
-// tính tổng số kpi đã dùng của 1 task
-const calcKPICompleteOfTask = (task) => {
-	if (task?.status === 4 || task?.status === 7) return task?.kpiValue;
-	const { subtasks } = task;
-	let totalKPI = 0;
-	if (!isArray(subtasks) || isEmpty(subtasks)) return 0;
-	subtasks.forEach((subtask) => {
-		if (subtask?.status === 4 || subtask?.status === 7) {
-			totalKPI += calcKPICompleteOfSubtask(subtask);
+export const createDataTreeTable = (dataset) => {
+	const hashTable = Object.create(null);
+	dataset.forEach((aData) => {
+		hashTable[aData.id] = { ...aData, subRows: [] };
+	});
+	const dataTree = [];
+	dataset.forEach((aData) => {
+		if (aData.parentId) {
+			hashTable[aData.parentId]?.subRows.push(hashTable[aData.id]);
+		} else {
+			dataTree.push(hashTable[aData.id]);
 		}
 	});
-	return totalKPI;
+	return dataTree;
 };
 
-// tính % hoàn thành của 1 task (thông qua giá trị kpi)
-const calcProgressTask = (task) => {
-	const totalCompleteKPI = calcKPICompleteOfTask(task);
-	if (task?.status === 4) {
-		return 100;
+export const createDataTree = (dataset) => {
+	const hashTable = Object.create(null);
+	dataset.forEach((aData) => {
+		hashTable[aData.id] = { data: aData, children: [] };
+	});
+	const dataTree = [];
+	dataset.forEach((aData) => {
+		if (aData.parentId) {
+			hashTable[aData.parentId]?.children.push(hashTable[aData.id]);
+		} else {
+			dataTree.push(hashTable[aData.id]);
+		}
+	});
+	return dataTree;
+};
+
+// const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const daysOfWeekVN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+export const columns = (selectedDate) => {
+	const startDate = selectedDate
+		? moment(selectedDate && selectedDate[0].startDate)
+		: moment().startOf('month');
+	const timeEnd = selectedDate
+		? moment(selectedDate && selectedDate[0].endDate)
+		: moment().endOf('month');
+	const diff = timeEnd.diff(moment(startDate));
+	const diffDuration = moment.duration(diff);
+	const result = [];
+	for (let i = 0; i <= diffDuration.days(); i += 1) {
+		const cloneDate = startDate.clone();
+		const currentDate = cloneDate.add(i, 'days');
+		result.push({
+			day: currentDate.format('DD'),
+			date: currentDate.format('DD-MM-YYYY'),
+			textDate: daysOfWeekVN[currentDate.day()],
+			color: currentDate.day() === 0 ? 'danger' : '',
+		});
 	}
-	return Math.round((totalCompleteKPI * 100) / task.kpiValue) || 0;
+	return result;
 };
 
-// tính tổng số kpi đã dùng của 1 mission
-const calcKPICompleteOfMission = (mission, tasks) => {
-	if (isEmpty(mission)) return 0;
-	if (isEmpty(tasks) || !isArray(tasks)) return 0;
-	let totalKPI = 0;
-	tasks.forEach((task) => {
-		// if (task?.status === 4 || task?.status === 7) {
-		totalKPI += calcKPICompleteOfTask(task);
-		// }
-	});
-	return totalKPI;
+export const renderColor = (status) => {
+	switch (status) {
+		case 'inProgress':
+			return '#ffc000';
+		case 'completed':
+			return '#c5e0b3';
+		case 'expired':
+			return '#f97875';
+		default:
+			return 'transparent';
+	}
 };
 
-const calcProgressMission = (mission, tasks) => {
-	if (isEmpty(mission)) return 0;
-	const totalCompleteKPI = calcKPICompleteOfMission(mission, tasks);
-	return Math.round((totalCompleteKPI * 100) / mission.kpiValue) || 0;
-};
-
-const calcProgressMissionByTaskComplete = (mission, tasks) => {
-	if (isEmpty(mission)) return 0;
-	return Math.round((calcTotalTaskByStatus(tasks, 4) * 100) / size(tasks)) || 0;
-};
-
-// ------------		  UPDATE FUNCTION CALC TOTAL & PROGRESS SUBTASK		-----------------
-
-// tính tổng số step theo status của 1 subtask
-const calcTotalStepByStatus = (subtask, status) => {
-	if (isEmpty(subtask)) return 0;
-	let total = 0;
-	const { steps } = subtask;
-	if (isEmpty(steps) || !isArray(steps)) return 0;
-	steps.forEach((step) => {
-		if (step.status === status) total += 1;
-	});
-	return total;
-};
-
-// tính tổng số subtask theo status
-const calcTotalSubtaskByStatus = (task, status) => {
-	if (isEmpty(task)) return 0;
-	let total = 0;
-	const { subtasks } = task;
-	if (isEmpty(subtasks) || !isArray(subtasks)) return 0;
-	subtasks.forEach((subtask) => {
-		if (subtask.status === status) total += 1;
-	});
-	return total;
-};
-
-// ------------		  UPDATE FUNCTION CALC CURRENT KPI VALUE	-----------------
-// kpi thực tế của 1 task
-const calcTotalCurrentKPIOfTask = (task) => {
-	if (isEmpty(task)) return 0;
-	const { subtasks } = task;
-	if (isEmpty(subtasks) || !isArray(subtasks)) return 0;
-	let totalKPI = 0;
-	subtasks.forEach((subtask) => {
-		totalKPI += subtask.kpiValue;
-	});
-	return totalKPI;
-};
-
-// kpi thực tế của của 1 mission
-const calcTotalCurrentKPIOfMission = (mission, tasks) => {
-	if (isEmpty(mission)) return 0;
-	if (isEmpty(tasks) || !isArray(tasks)) return 0;
-	let totalKPI = 0;
-	tasks.forEach((task) => {
-		totalKPI += calcTotalCurrentKPIOfTask(task);
-	});
-	return totalKPI;
-};
-
-// kpi đã dùng của 1 mission
-const calcUsedKPIValueOfMission = (mission, tasks) => {
-	if (isEmpty(mission)) return 0;
-	if (isEmpty(tasks) || !isArray(tasks)) return 0;
-	let totalKPI = 0;
-	tasks.forEach((task) => {
-		totalKPI += task.kpiValue;
-	});
-	return totalKPI;
-};
-
-// eslint-disable-next-line import/prefer-default-export
-export {
-	calcTotalTaskByStatus,
-	calcKPICompleteOfSubtask,
-	calcProgressSubtask,
-	calcTotalStepByStatus,
-	calcTotalStepOfSubTask,
-	calcProgressTask,
-	calcProgressMission,
-	calcProgressMissionByTaskComplete,
-	calcKPICompleteOfTask,
-	calcKPICompleteOfMission,
-	calcTotalSubtaskByStatus,
-	calcTotalKPIOfTask,
-	calcUsedKPIValueOfMission,
-	calcTotalCurrentKPIOfMission,
+export const convertDate = (date = '') => {
+	const dateStr = date.toLocaleDateString().split('/');
+	const y = dateStr[2];
+	const m = dateStr[1];
+	const d = dateStr[0];
+	return `${d >= 10 ? d : `0${d}`}/${m >= 10 ? m : `0${m}`}/${y}`;
 };

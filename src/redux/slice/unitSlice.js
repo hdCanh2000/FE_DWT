@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllUnits } from '../../pages/unit/services';
+import { addResource, getAllResource } from '../../api/fetchApi';
 
 const initialState = {
 	units: [],
@@ -10,7 +10,12 @@ const initialState = {
 };
 
 export const fetchUnitList = createAsyncThunk('unit/fetchList', async (params) => {
-	const response = await getAllUnits(params);
+	const response = await getAllResource('/api/units', params);
+	return response.data;
+});
+
+export const addUnit = createAsyncThunk('unit/add', async (data) => {
+	const response = await addResource('/api/units', data);
 	return response.data;
 });
 
@@ -23,6 +28,7 @@ export const unitSlice = createSlice({
 		},
 	},
 	extraReducers: {
+		// get list
 		[fetchUnitList.pending]: (state) => {
 			state.loading = true;
 		},
@@ -38,6 +44,19 @@ export const unitSlice = createSlice({
 			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchUnitList.rejected]: (state, action) => {
+			state.loading = false;
+			state.error = action.error;
+		},
+		// add
+		// add new
+		[addUnit.pending]: (state) => {
+			state.loading = true;
+		},
+		[addUnit.fulfilled]: (state, action) => {
+			state.loading = false;
+			state.units = [...state.units, action.payload];
+		},
+		[addUnit.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},

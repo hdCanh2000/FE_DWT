@@ -10,7 +10,6 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import { addPositionLevel, deletePositionLevel, updatePositionLevel } from './services';
 import useDarkMode from '../../hooks/useDarkMode';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import validate from './validate';
@@ -23,8 +22,9 @@ import { fetchPositionLevelList, changeCurrentPage } from '../../redux/slice/pos
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 import AlertConfirm from '../work-management/mission/AlertConfirm';
+import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
-const PositionLevelPage = () => {
+const PositionLevelConfigPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
@@ -128,7 +128,7 @@ const PositionLevelPage = () => {
 	const handleSubmitForm = async (itemSubmit) => {
 		if (!itemSubmit.id) {
 			try {
-				const reponse = await addPositionLevel(itemSubmit);
+				const reponse = await addResource('/api/positionLevels', itemSubmit);
 				await reponse.data;
 				toast.success('Thêm cấp nhân sự thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -149,7 +149,7 @@ const PositionLevelPage = () => {
 			}
 		} else {
 			try {
-				const reponse = await updatePositionLevel(itemSubmit);
+				const reponse = await updateResouce('/api/positionLevels', itemSubmit);
 				await reponse.data;
 				toast.success('Cập nhật cấp nhân sự thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
@@ -170,9 +170,9 @@ const PositionLevelPage = () => {
 			}
 		}
 	};
-	const handleDeletePositionLevel = async (item) => {
+	const handleDeletePositionLevel = async (id) => {
 		try {
-			await deletePositionLevel(item);
+			await deleteResouce('/api/positionLevels', id);
 			toast.success('Xoá cấp nhân sự thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
@@ -202,7 +202,7 @@ const PositionLevelPage = () => {
 							<>
 								<div
 									className='row mb-0'
-									style={{ maxWidth: '90%', minWidth: '90%', margin: '0 auto' }}>
+									style={{ maxWidth: '70%', minWidth: '70%', margin: '0 auto' }}>
 									<div className='col-12'>
 										<Card className='w-100'>
 											<div style={{ margin: '24px 24px 0' }}>
@@ -278,4 +278,4 @@ const PositionLevelPage = () => {
 	);
 };
 
-export default PositionLevelPage;
+export default PositionLevelConfigPage;

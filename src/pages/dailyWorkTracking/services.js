@@ -1,9 +1,10 @@
 import axiosClient from '../../utils/axiosClient';
 
-const getAllWorktrackByUserId = (id) => {
+const getAllWorktrackByUserId = (data) => {
 	return axiosClient({
 		method: 'GET',
-		url: `/api/worktracks/user/${id}`,
+		url: `/api/worktracks/user/${data.id}`,
+		params: data.params,
 	});
 };
 const deleteWorkTrack = (id) => {
@@ -13,10 +14,11 @@ const deleteWorkTrack = (id) => {
 	});
 };
 
-const getAllWorktrack = () => {
+const getAllWorktrack = (params) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/api/worktracks`,
+		params,
 	});
 };
 
@@ -27,10 +29,11 @@ const getAllWorktrackByUser = () => {
 	});
 };
 
-const getAllWorktrackMe = () => {
+const getAllWorktrackMe = (params) => {
 	return axiosClient({
 		method: 'GET',
 		url: `/api/worktracks/workTrackMe`,
+		params,
 	});
 };
 
@@ -73,6 +76,79 @@ const updateWorktrackLog = (data) => {
 	});
 };
 
+const uploadFileReport = (data) => {
+	return axiosClient({
+		method: 'POST',
+		url: `/api/file/upload`,
+		data,
+	});
+};
+
+const downloadFileReport = (name) => {
+	return axiosClient({
+		method: 'GET',
+		url: `/api/file/download/${name}`,
+	});
+};
+/* when this api is called backend api will create an xls file then return the filename */
+const downLoadWorkTrack = async (params = {}) => {
+	const url = `/api/worktracks/export_all`;
+	return axiosClient.get(url, { params });
+};
+
+const getListTarget = async (params) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/targets`,
+		params,
+	});
+	return resp.data;
+};
+
+const getUserDetail = async (id) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/users/${id}`,
+	});
+	return resp.data.data;
+};
+
+const createTargetLog = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/targets/target_logs`,
+		data,
+	});
+	return resp.data;
+};
+
+const createDailyWorkLog = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/dailyWorks/logs`,
+		data,
+	});
+	return resp.data;
+};
+
+const uploadFile = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/targets/upload`,
+		data,
+	});
+	return resp.data;
+};
+
+const getDailyWorks = async (params) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/dailyWorks`,
+		params,
+	});
+	return resp.data;
+};
+
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -84,4 +160,13 @@ export {
 	getWorktrackById,
 	deleteWorkTrack,
 	getAllWorktrackMe,
+	uploadFileReport,
+	downloadFileReport,
+	downLoadWorkTrack,
+	getListTarget,
+	getUserDetail,
+	createTargetLog,
+	uploadFile,
+	getDailyWorks,
+	createDailyWorkLog,
 };
