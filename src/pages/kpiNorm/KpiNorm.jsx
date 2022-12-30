@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
-import { Table } from 'antd';
+import { Col, Row, Table, Input, DatePicker } from 'antd';
 import { useQuery } from 'react-query';
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import _ from 'lodash';
+import dayjs from 'dayjs';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, {
@@ -60,11 +62,15 @@ const antdTableCols = [
 ];
 
 const KpiNormPage = () => {
-	const [dataSearch] = React.useState({
+	const [date, setDate] = useState(dayjs());
+	const [dataSearch, setDataSearch] = React.useState({
 		q: '',
+		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
 	});
 	const [openTargetForm, setOpenTargetForm] = React.useState(false);
 	const [target, setTarget] = React.useState(null);
+	const [search, setSearch] = React.useState('');
 	const {
 		data: listTarget = [],
 		isLoading: isLoadingListTarget,
@@ -115,10 +121,21 @@ const KpiNormPage = () => {
 		}
 	};
 
-	// const handleSearchKPI = (e) => {
-	// 	e.preventDefault();
-	// 	dispatch(fetchKpiNormList({ text: search }));
-	// };
+	const handleChangeMonth = (updatedDate) => {
+		setDate(updatedDate);
+		setDataSearch({
+			...dataSearch,
+			start: `${updatedDate.month() + 1}-01-${updatedDate.year()}`,
+			end: `${updatedDate.month() + 1}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
+		});
+	};
+
+	const handleSearch = (value) => {
+		setDataSearch({
+			...dataSearch,
+			q: value,
+		});
+	};
 	return (
 		<PageWrapper title='Danh sách nhiệm vụ'>
 			<Page container='fluid'>
@@ -160,6 +177,51 @@ const KpiNormPage = () => {
 									</CardHeader>
 									<CardBody>
 										<div className='control-pane'>
+											<Row gutter={24} className='mt-2 mb-4'>
+												<Col
+													lg={6}
+													md={12}
+													sm={24}
+													className='d-flex align-items-center'>
+													<Input.Search
+														placeholder='Tìm kiếm nhiệm vụ'
+														value={search}
+														onChange={(e) => setSearch(e.target.value)}
+														onSearch={handleSearch}
+													/>
+													{dataSearch.q && (
+														<Button
+															color='link'
+															className='mx-2'
+															onClick={() => {
+																setSearch('');
+																setDataSearch({
+																	...dataSearch,
+																	q: '',
+																});
+															}}>
+															reset
+														</Button>
+													)}
+												</Col>
+												<Col lg={12} md={12} sm={24} />
+												<Col
+													lg={6}
+													md={12}
+													sm={24}
+													className='d-flex justify-content-end align-items-center'>
+													<div className='mx-2 font-weight-bold'>
+														Tháng:
+													</div>
+													<DatePicker.MonthPicker
+														format='MM/YYYY'
+														locale={locale}
+														style={{ width: 100 }}
+														value={date}
+														onChange={handleChangeMonth}
+													/>
+												</Col>
+											</Row>
 											<div className='control-section'>
 												{isErrorListTarget ? (
 													<div>Không thể lấy dữ liệu</div>

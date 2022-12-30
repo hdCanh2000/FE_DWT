@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { DatePicker, Skeleton, Table } from 'antd';
+import { Col, DatePicker, Input, Row, Skeleton, Table } from 'antd';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from 'dayjs';
 import Page from '../../layout/Page/Page';
@@ -12,30 +12,59 @@ import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import Card, { CardBody, CardLabel, CardTitle } from '../../components/bootstrap/Card';
 import { getUserDetail } from './services';
 import TargetTable from '../../components/TargetTable/TargetTable';
-import DailyWorkTable from "../../components/DailyWorkTable/DailyWorkTable";
+import DailyWorkTable from '../../components/DailyWorkTable/DailyWorkTable';
+import Button from '../../components/bootstrap/Button';
 
 const DailyWorkTrackingUser = () => {
 	const params = useParams();
 	const { id } = params;
-	const [date, setDate] = useState(dayjs());
-	const [dataSearch, setDataSearch] = useState({
-		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
-		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
-		q: '',
-		userId: id,
-	});
+
 	const {
 		data: user = {},
 		isLoading: isLoadingUser,
 		isError: isErrorUser,
 	} = useQuery(['getUserDetail', id], ({ queryKey }) => getUserDetail(queryKey[1]));
+
+	const [date, setDate] = useState(dayjs());
+	const [targetSearchParams, setTargetSearchParams] = useState({
+		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
+		q: '',
+		status: 'assigned',
+		userId: id,
+	});
+	const [targetTableSearchKeyWord, setTargetTableSearchKeyWord] = useState('');
+	const [dailyWorkSearchParams, setDailyWorkSearchParams] = useState({
+		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
+		q: '',
+		status: 'assigned',
+		userId: id,
+	});
+	const [dailyWorkTableSearchKeyWord, setDailyWorkTableSearchKeyWord] = useState('');
+
 	const handleChangeMonth = (updatedDate) => {
 		setDate(updatedDate);
-		setDataSearch({
-			...dataSearch,
+		setTargetSearchParams({
+			...targetSearchParams,
 			start: `${updatedDate.month() + 1}-01-${updatedDate.year()}`,
 			end: `${updatedDate.month() + 1}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
+			userId: id,
 		});
+
+		setDailyWorkSearchParams({
+			...dailyWorkSearchParams,
+			start: `${updatedDate.month() + 1}-01-${updatedDate.year()}`,
+			end: `${updatedDate.month() + 1}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
+			userId: id,
+		});
+	};
+
+	const handleSearchTargets = (value) => {
+		setTargetSearchParams({ ...targetSearchParams, q: value });
+	};
+	const handleSearchDailyWork = (value) => {
+		setDailyWorkSearchParams({ ...dailyWorkSearchParams, q: value });
 	};
 
 	return (
@@ -58,7 +87,7 @@ const DailyWorkTrackingUser = () => {
 										? '...'
 										: isErrorUser
 										? '_'
-										: user?.department?.name}
+										: user?.position?.name}
 								</div>
 							</div>
 							<div className='text-end'>
@@ -81,10 +110,70 @@ const DailyWorkTrackingUser = () => {
 						<CardBody>
 							<div className='control-pane'>
 								<div className='control-section'>
-									<TargetTable dataSearch={dataSearch} />
+									<Row gutter={24} className='my-4'>
+										<Col
+											lg={6}
+											md={12}
+											sm={24}
+											className='d-flex align-items-center'>
+											<Input.Search
+												placeholder='Tìm kiếm nhiệm vụ'
+												onSearch={handleSearchTargets}
+												onChange={(e) =>
+													setTargetTableSearchKeyWord(e.target.value)
+												}
+												value={targetTableSearchKeyWord}
+											/>
+											{targetSearchParams.q && (
+												<Button
+													className='mx-2'
+													color='link'
+													onClick={() => {
+														setTargetTableSearchKeyWord('');
+														setTargetSearchParams({
+															...targetSearchParams,
+															q: '',
+														});
+													}}>
+													Reset
+												</Button>
+											)}
+										</Col>
+									</Row>
+									<TargetTable dataSearch={targetSearchParams} />
 								</div>
 								<div>
-									<DailyWorkTable dataSearch={dataSearch} />
+									<Row gutter={24} className='my-4'>
+										<Col
+											lg={6}
+											md={12}
+											sm={24}
+											className='d-flex align-items-center'>
+											<Input.Search
+												placeholder='Tìm kiếm tiêu chí ngày'
+												onSearch={handleSearchDailyWork}
+												onChange={(e) =>
+													setDailyWorkTableSearchKeyWord(e.target.value)
+												}
+												value={dailyWorkTableSearchKeyWord}
+											/>
+											{dailyWorkSearchParams.q && (
+												<Button
+													className='mx-2'
+													color='link'
+													onClick={() => {
+														setDailyWorkTableSearchKeyWord('');
+														setDailyWorkSearchParams({
+															...dailyWorkSearchParams,
+															q: '',
+														});
+													}}>
+													Reset
+												</Button>
+											)}
+										</Col>
+									</Row>
+									<DailyWorkTable dataSearch={dailyWorkSearchParams} />
 								</div>
 							</div>
 						</CardBody>

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import Page from '../../../layout/Page/Page';
-import { Button as AntButton, Col, Modal, Row, Space, Table } from 'antd';
+import { Button as AntButton, Col, Input, Modal, Row, Space, Table } from 'antd';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -16,6 +16,7 @@ import dailyWorkApi from '../../dailyWork/services';
 import { updateTarget } from '../../kpiNorm/services';
 import { toast } from 'react-toastify';
 import ModalOrderDailyWork from './ModalOrderDailyWork';
+import Button from '../../../components/bootstrap/Button';
 
 const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 	const shareRender = (text, record) => {
@@ -40,7 +41,15 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			dataIndex: 'name',
 			key: 'name',
 			fixed: 'left',
-			render: shareRender,
+			render: (text, record) => {
+				return {
+					props: {
+						onClick: () => handleRowClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div className='text-over-flow-md'>{text}</div>,
+				};
+			},
 		},
 		{
 			title: 'Người được giao',
@@ -94,6 +103,9 @@ const unAssignedTaskColumns = [
 		dataIndex: 'name',
 		key: 'name',
 		fixed: 'left',
+		render: (text) => {
+			return <div className='text-over-flow-md'>{text}</div>;
+		},
 	},
 	{
 		title: 'CST',
@@ -107,9 +119,16 @@ const unAssignedTaskColumns = [
 	},
 ];
 const OrderDailyWorkPage = () => {
-	const [dataSearch] = useState({
+	const [assignedParams, setAssignedParams] = useState({
 		q: '',
 	});
+	const [assignedSearch, setAssignedSearch] = useState('');
+
+	const [unAssignedParams, setUnAssignedParams] = useState({
+		q: '',
+	});
+	const [unAssignedSearch, setUnAssignedSearch] = useState('');
+
 	const [openConfirmCancelAssignTask, setOpenConfirmCancelAssignTask] = useState(false);
 	const [cancelAssignTaskId, setCancelAssignTaskId] = useState(null);
 	const [currentDailyWork, setCurrentDailyWork] = useState(null);
@@ -119,7 +138,7 @@ const OrderDailyWorkPage = () => {
 		isLoading: isLoadingAssignedDailyWorks,
 		isError: isErrorAssignedDailyWorks,
 		refetch: refetchAssignedDailyWorks,
-	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) =>
+	} = useQuery(['getListTarget', assignedParams], ({ queryKey }) =>
 		getDailyWorks({ ...queryKey[1], status: 'assigned' }),
 	);
 	const assignedTaskData = useMemo(() => {
@@ -139,7 +158,7 @@ const OrderDailyWorkPage = () => {
 		isLoading: isLoadingUnAssignedTasks,
 		isError: isErrorUnAssignedTasks,
 		refetch: refetchUnAssignedTasks,
-	} = useQuery(['getListTargetUnAssign', dataSearch], ({ queryKey }) =>
+	} = useQuery(['getListTargetUnAssign', unAssignedParams], ({ queryKey }) =>
 		getDailyWorks({ ...queryKey[1] }),
 	);
 	const unAssignedTaskData = useMemo(() => {
@@ -166,7 +185,12 @@ const OrderDailyWorkPage = () => {
 			setCancelAssignTaskId(null);
 		}
 	};
-
+	const handleSearchAssigned = (value) => {
+		setAssignedParams((prev) => ({ ...prev, q: value }));
+	};
+	const handleSearchUnAssigned = (value) => {
+		setUnAssignedParams((prev) => ({ ...prev, q: value }));
+	};
 	return (
 		<PageWrapper title='Giao việc hàng ngày'>
 			<Page container='fluid'>
@@ -179,6 +203,29 @@ const OrderDailyWorkPage = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
+								<Row gutter={24} className='mb-2'>
+									<Col lg={12} md={24} className='d-flex align-items-center'>
+										<Input.Search
+											placeholder='Tìm'
+											onSearch={handleSearchAssigned}
+											value={assignedSearch}
+											onChange={(e) => setAssignedSearch(e.target.value)}
+										/>
+										{assignedParams.q && (
+											<Button
+												color='link'
+												onClick={() => {
+													setAssignedSearch('');
+													setAssignedParams((prev) => ({
+														...prev,
+														q: '',
+													}));
+												}}>
+												reset
+											</Button>
+										)}
+									</Col>
+								</Row>
 								{isErrorAssignedDailyWorks ? (
 									<div>không thể lấy dữ liệu</div>
 								) : (
@@ -210,6 +257,29 @@ const OrderDailyWorkPage = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
+								<Row gutter={24} className='mb-2'>
+									<Col lg={12} md={24} className='d-flex align-items-center'>
+										<Input.Search
+											placeholder='Tìm'
+											onSearch={handleSearchUnAssigned}
+											value={unAssignedSearch}
+											onChange={(e) => setUnAssignedSearch(e.target.value)}
+										/>
+										{unAssignedParams.q && (
+											<Button
+												color='link'
+												onClick={() => {
+													setUnAssignedSearch('');
+													setUnAssignedParams((prev) => ({
+														...prev,
+														q: '',
+													}));
+												}}>
+												reset
+											</Button>
+										)}
+									</Col>
+								</Row>
 								{isErrorUnAssignedTasks ? (
 									<div>Không thế lấy dữ liệu</div>
 								) : (
