@@ -149,6 +149,14 @@ const getDailyWorks = async (params) => {
 	return resp.data;
 };
 
+const createUnit = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/units`,
+		data,
+	});
+	return resp.data;
+};
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -169,4 +177,5 @@ export {
 	uploadFile,
 	getDailyWorks,
 	createDailyWorkLog,
+	createUnit,
 };

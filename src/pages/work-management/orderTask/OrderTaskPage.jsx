@@ -1,9 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button as AntButton, Row, Col, Table, Space, Modal, Input } from 'antd';
+import {
+	Button as AntButton,
+	Row,
+	Col,
+	Table,
+	Space,
+	Modal,
+	Input,
+	Select,
+	DatePicker,
+} from 'antd';
 import moment from 'moment';
 import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
+import locale from 'antd/es/date-picker/locale/vi_VN';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -17,6 +29,7 @@ import { getListTarget, getUserDetail } from '../../dailyWorkTracking/services';
 import { updateTarget } from '../../kpiNorm/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
 import Button from '../../../components/bootstrap/Button';
+import { getAllDepartment } from '../../department/services';
 
 const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 	const shareRender = (text, record) => {
@@ -33,29 +46,36 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			title: 'STT',
 			dataIndex: 'stt',
 			key: 'key',
-			fixed: 'left',
 			render: shareRender,
+			sorter: (a, b) => a.stt > b.stt,
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: 'Tên nhiệm vụ',
 			dataIndex: 'name',
 			key: 'name',
-			fixed: 'left',
 			render: (text, record) => {
 				return {
 					props: {
 						onClick: () => handleRowClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div className='text-over-flow-sm'>{text}</div>,
+					children: <div className='text-over-flow-lg'>{text}</div>,
 				};
 			},
+			sorter: (a, b) => a.name.localeCompare(b.name),
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: 'Người được giao',
 			dataIndex: 'userName',
 			key: 'userName',
 			render: shareRender,
+			sorter: (a, b) => a.userName.localeCompare(b.userName),
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: 'Phòng ban',
@@ -68,18 +88,39 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			dataIndex: 'deadlineText',
 			key: 'deadline',
 			render: shareRender,
+			sorter: (a, b) => moment(a.deadline).unix() - moment(b.deadline).unix(),
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: 'Trạng thái',
 			dataIndex: 'statusText',
 			key: 'status',
 			render: shareRender,
+			filters: [
+				{
+					text: 'Đã hoàn thành',
+					value: 'completed',
+				},
+				{
+					text: 'Đang làm',
+					value: 'inProgress',
+				},
+			],
+			onFilter: (value, record) => record.status === value,
 		},
 		{
 			title: 'KPI',
 			dataIndex: 'kpiValue',
 			key: 'kipValue',
 			render: shareRender,
+			sorter: (a, b) => {
+				const aManDay = a.manDay || 0;
+				const bManDay = b.manDay || 0;
+				return aManDay - bManDay;
+			},
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: '',
@@ -99,16 +140,20 @@ const unAssignedTaskColumns = [
 		title: 'STT',
 		dataIndex: 'key',
 		key: 'key',
-		fixed: 'left',
+		sorter: (a, b) => a.key - b.key,
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
 	},
 	{
 		title: 'Tên nhiệm vụ',
 		dataIndex: 'name',
 		key: 'name',
-		fixed: 'left',
 		render: (text) => {
-			return <div className='text-over-flow-sm'>{text}</div>;
+			return <div className='text-over-flow-lg'>{text}</div>;
 		},
+		sorter: (a, b) => a.name.localeCompare(b.name),
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
 	},
 	{
 		title: 'Vị trí đảm nhiệm',
@@ -119,23 +164,40 @@ const unAssignedTaskColumns = [
 		title: 'Số lượng',
 		dataIndex: 'quantity',
 		key: 'quantity',
+		sorter: (a, b) => a.quantity - b.quantity,
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
+		render: (text) => {
+			return <div style={{ textAlign: 'end' }}>{text}</div>;
+		},
 	},
 	{
 		title: 'Đơn vị',
 		dataIndex: 'unitText',
 		key: 'unit',
+		sorter: (a, b) => (a?.unitText || '').localeCompare(b?.unitText || ''),
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
 	},
 ];
 const OrderTaskPage = () => {
 	const [assignedTableParams, setAssignedTableParams] = useState({
 		q: '',
+		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
 	});
 	const [assignedTableSearch, setAssignedTableSearch] = useState('');
 
 	const [unAssignedTableParams, setUnAssignedTableParams] = useState({
 		q: '',
+		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
 	});
 	const [unAssignedTableSearch, setUnAssignedTableSearch] = useState('');
+
+	const [assignedTaskDepartmentId, setAssignedTaskDepartmentId] = useState('');
+	const [unAssignedTaskDepartmentId, setUnAssignedTaskDepartmentId] = useState('');
+
 	const [openConfirmCancelAssignTask, setOpenConfirmCancelAssignTask] = useState(false);
 	const [cancelAssignTaskId, setCancelAssignTaskId] = useState(null);
 	const [currentTarget, setCurrentTarget] = useState(null);
@@ -170,6 +232,12 @@ const OrderTaskPage = () => {
 		getListTarget({ ...queryKey[1] }),
 	);
 
+	// get list departments
+	const { data: listDepartmentsData = { data: { data: [] } } } = useQuery(
+		['getListDepartment'],
+		() => getAllDepartment(),
+	);
+	const listDepartments = listDepartmentsData.data.data;
 	const userId = localStorage.getItem('userId');
 
 	const { data: user = { department_id: null, role: '' } } = useQuery(
@@ -181,6 +249,8 @@ const OrderTaskPage = () => {
 		if (!user) return;
 		if (!user.department_id) return;
 		if (user.role !== 'manager') return;
+		setAssignedTaskDepartmentId(user.department_id || null);
+		setUnAssignedTaskDepartmentId(user.department_id || null);
 
 		setAssignedTableParams({ ...assignedTableParams, departmentId: user.department_id });
 		setUnAssignedTableParams({ ...unAssignedTableParams, departmentId: user.department_id });
@@ -235,8 +305,8 @@ const OrderTaskPage = () => {
 							<CardBody>
 								<Row gutter={24} className='mb-2'>
 									<Col
-										lg={12}
-										md={12}
+										lg={8}
+										md={8}
 										sm={24}
 										className='d-flex align-items-center'>
 										<Input.Search
@@ -259,6 +329,61 @@ const OrderTaskPage = () => {
 												Reset
 											</Button>
 										)}
+									</Col>
+									<Col md={8} lg={8} sm={24}>
+										<Select
+											placeholder='Chọn phòng ban'
+											value={assignedTaskDepartmentId}
+											onChange={(value) => {
+												setAssignedTaskDepartmentId(value);
+												setAssignedTableParams({
+													...assignedTableParams,
+													departmentId: value,
+												});
+											}}
+											style={{ width: '100%' }}
+											optionFilterProp='children'
+											showSearch
+											filterOption={(input, option) =>
+												(option?.label.toLowerCase() ?? '').includes(
+													input.toLowerCase(),
+												)
+											}
+											options={[
+												{
+													label: 'Chọn phòng ban',
+													value: null,
+													disabled: true,
+												},
+												{
+													label: 'Tất cả',
+													value: '',
+												},
+												...listDepartments.map((item) => ({
+													label: item.name,
+													value: item.id,
+												})),
+											]}
+										/>
+									</Col>
+
+									<Col md={8} lg={8} sm={24}>
+										<DatePicker.MonthPicker
+											format='MM/YYYY'
+											locale={locale}
+											value={dayjs(assignedTableParams.start, 'M-DD-YYYY')}
+											onChange={(updatedDate) => {
+												setAssignedTableParams({
+													...assignedTableParams,
+													start: `${
+														updatedDate.month() + 1
+													}-01-${updatedDate.year()}`,
+													end: `${
+														updatedDate.month() + 1
+													}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
+												});
+											}}
+										/>
 									</Col>
 								</Row>
 								{!errorSignedTargets && (
@@ -292,8 +417,8 @@ const OrderTaskPage = () => {
 							<CardBody>
 								<Row gutter={24} className='mb-2'>
 									<Col
-										lg={12}
-										md={12}
+										lg={8}
+										md={8}
 										sm={24}
 										className='d-flex align-items-center'>
 										<Input.Search
@@ -318,6 +443,61 @@ const OrderTaskPage = () => {
 												Reset
 											</Button>
 										)}
+									</Col>
+									<Col md={8} lg={8} sm={24}>
+										<Select
+											placeholder='Chọn phòng ban'
+											value={unAssignedTaskDepartmentId}
+											onChange={(value) => {
+												setUnAssignedTaskDepartmentId(value);
+												setUnAssignedTableParams({
+													...assignedTableParams,
+													departmentId: value,
+												});
+											}}
+											style={{ width: '100%' }}
+											optionFilterProp='children'
+											showSearch
+											filterOption={(input, option) =>
+												(option?.label.toLowerCase() ?? '').includes(
+													input.toLowerCase(),
+												)
+											}
+											options={[
+												{
+													label: 'Chọn phòng ban',
+													value: null,
+													disabled: true,
+												},
+												{
+													label: 'Tất cả',
+													value: '',
+												},
+												...listDepartments.map((item) => ({
+													label: item.name,
+													value: item.id,
+												})),
+											]}
+										/>
+									</Col>
+
+									<Col md={8} lg={8} sm={24}>
+										<DatePicker.MonthPicker
+											format='MM/YYYY'
+											locale={locale}
+											value={dayjs(unAssignedTableParams.start, 'M-DD-YYYY')}
+											onChange={(updatedDate) => {
+												setUnAssignedTableParams({
+													...unAssignedTableParams,
+													start: `${
+														updatedDate.month() + 1
+													}-01-${updatedDate.year()}`,
+													end: `${
+														updatedDate.month() + 1
+													}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
+												});
+											}}
+										/>
 									</Col>
 								</Row>
 								{!errorUnSignedTargets && (
