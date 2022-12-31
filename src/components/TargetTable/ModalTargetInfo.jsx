@@ -61,7 +61,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 			{
 				label: 'Man day',
-				value: `${currentTarget?.manDay} ngày`,
+				value: `${currentTarget?.manDay || '_'} ngày`,
 			},
 			{
 				label: 'Kế hoạch thực hiện',

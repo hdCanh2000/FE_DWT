@@ -59,11 +59,9 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 		isError: errorUnits,
 	} = useQuery('getAllUnits', () => getAllUnits());
 
-	const {
-		data: listPositionData = { data: [] },
-		isLoading: loadingPositions,
-		isError: errorPositions,
-	} = useQuery('getAllPositions', () => getAllPositions());
+	const { data: listPositionData = { data: [] } } = useQuery('getAllPositions', () =>
+		getAllPositions(),
+	);
 
 	const { data: listUsersData = { data: [] } } = useQuery('getAllUsers', () => getAllUsers());
 
@@ -106,30 +104,38 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={12}>
 						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
-							<Select disabled={!isOrdered}>
-								{loadingPositions ? (
-									<Skeleton active />
-								) : errorPositions ? (
-									<p>Error</p>
-								) : (
-									listPositions.map((item) => (
-										<Select.Option value={item.id} key={item.id}>
-											{item.name}
-										</Select.Option>
-									))
-								)}
-							</Select>
+							<Select
+								showSearch
+								placeholder='Chọn vị trí'
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								options={listPositions.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}
+								disabled={!isOrdered}
+							/>
 						</Form.Item>
 					</Col>
 					<Col span={12}>
 						<Form.Item name='userId' label='Người đảm nhiệm'>
-							<Select>
-								{listUsers.map((item) => (
-									<Select.Option value={item.id} key={item.id}>
-										{item.name}
-									</Select.Option>
-								))}
-							</Select>
+							<Select
+								showSearch
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								options={listUsers.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}
+							/>
 						</Form.Item>
 					</Col>
 					<Col span={12}>
@@ -178,7 +184,19 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={8}>
 						<Form.Item name='unitId' label='Đơn vị'>
-							<Select disabled={!isOrdered}>
+							<Select
+								showSearch
+								disabled={!isOrdered}
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								options={listUnits.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}>
 								{loadingUnits ? (
 									<Skeleton />
 								) : errorUnits ? (
