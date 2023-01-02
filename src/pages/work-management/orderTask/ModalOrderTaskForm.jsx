@@ -1,26 +1,29 @@
 /* eslint no-nested-ternary: 0 */
 /* eslint react/prop-types: 0 */
 /* eslint react-hooks/exhaustive-deps: 0 */
+/* eslint react/no-unstable-nested-components: 0 */
 import {
 	Button,
 	Col,
 	DatePicker,
+	Divider,
 	Form,
 	Input,
 	InputNumber,
 	Modal,
 	Row,
 	Select,
-	Skeleton,
 } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { getAllPositions, getAllUnits, getAllUsers, updateTarget } from '../../kpiNorm/services';
+import ModalCreateUnit from '../../../components/ModalCreateUnit';
 
 const ModalOrderTaskForm = ({ open, onClose, data }) => {
 	const [loading, setLoading] = useState(false);
+	const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
 	const [currentOrderTask, setCurrentOrderTask] = useState(data);
 	const [form] = Form.useForm();
 
@@ -53,17 +56,14 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 		}
 	};
 	const handleFinishFail = () => {};
-	const {
-		data: listUnitData = { data: [] },
-		isLoading: loadingUnits,
-		isError: errorUnits,
-	} = useQuery('getAllUnits', () => getAllUnits());
+	const { data: listUnitData = { data: [] }, refetch: reFetchUnits } = useQuery(
+		'getAllUnits',
+		() => getAllUnits(),
+	);
 
-	const {
-		data: listPositionData = { data: [] },
-		isLoading: loadingPositions,
-		isError: errorPositions,
-	} = useQuery('getAllPositions', () => getAllPositions());
+	const { data: listPositionData = { data: [] } } = useQuery('getAllPositions', () =>
+		getAllPositions(),
+	);
 
 	const { data: listUsersData = { data: [] } } = useQuery('getAllUsers', () => getAllUsers());
 
@@ -106,30 +106,38 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={12}>
 						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
-							<Select disabled={!isOrdered}>
-								{loadingPositions ? (
-									<Skeleton active />
-								) : errorPositions ? (
-									<p>Error</p>
-								) : (
-									listPositions.map((item) => (
-										<Select.Option value={item.id} key={item.id}>
-											{item.name}
-										</Select.Option>
-									))
-								)}
-							</Select>
+							<Select
+								showSearch
+								placeholder='Chọn vị trí'
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								options={listPositions.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}
+								disabled={!isOrdered}
+							/>
 						</Form.Item>
 					</Col>
 					<Col span={12}>
 						<Form.Item name='userId' label='Người đảm nhiệm'>
-							<Select>
-								{listUsers.map((item) => (
-									<Select.Option value={item.id} key={item.id}>
-										{item.name}
-									</Select.Option>
-								))}
-							</Select>
+							<Select
+								showSearch
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								options={listUsers.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}
+							/>
 						</Form.Item>
 					</Col>
 					<Col span={12}>
@@ -178,23 +186,56 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={8}>
 						<Form.Item name='unitId' label='Đơn vị'>
-							<Select disabled={!isOrdered}>
-								{loadingUnits ? (
-									<Skeleton />
-								) : errorUnits ? (
-									<p>Error</p>
-								) : (
-									listUnits.map((unit) => (
-										<Select.Option value={unit.id} key={unit.id}>
-											{unit.name}
-										</Select.Option>
-									))
+							<Select
+								showSearch
+								disabled={!isOrdered}
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								options={listUnits.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}
+								dropdownRender={(menu) => (
+									<>
+										{menu}
+										<Divider
+											style={{
+												margin: '8px 0',
+											}}
+										/>
+										<div className='p-2'>
+											<Button
+												type='primary'
+												style={{ width: '100%' }}
+												onClick={() => {
+													setOpenCreateUnitModal(true);
+												}}>
+												Thêm đơn vị
+											</Button>
+										</div>
+									</>
 								)}
-							</Select>
+							/>
 						</Form.Item>
 					</Col>
 				</Row>
 			</Form>
+
+			<ModalCreateUnit
+				isOpen={openCreateUnitModal}
+				onClose={() => setOpenCreateUnitModal(false)}
+				onCreateSuccess={async (createdUnit) => {
+					await reFetchUnits();
+					setOpenCreateUnitModal(false);
+					form.setFieldsValue({
+						unitId: createdUnit.id,
+					});
+				}}
+			/>
 		</Modal>
 	);
 };

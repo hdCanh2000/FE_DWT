@@ -1,13 +1,15 @@
 /* eslint-disable */
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Skeleton } from 'antd';
+import { Button, Col, Divider, Form, Input, InputNumber, Modal, Row, Select, Skeleton } from 'antd';
 import { useQuery } from 'react-query';
 import { getAllUnits } from '../kpiNorm/services';
 import { toast } from 'react-toastify';
 import dailyWorkApi from './services';
+import ModalCreateUnit from '../../components/ModalCreateUnit';
 
 const ModalDailyWorkForm = ({ open, onClose, data }) => {
 	const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
+	const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
 	const [currentDailyWork, setCurrentDailyWork] = useState(data);
 	const [loading, setLoading] = useState(false);
 	const [form] = Form.useForm();
@@ -20,7 +22,10 @@ const ModalDailyWorkForm = ({ open, onClose, data }) => {
 		}
 	}, [data]);
 
-	const { data: listUnitData = { data: [] } } = useQuery('getAllUnits', () => getAllUnits());
+	const { data: listUnitData = { data: [] }, refetch: reFetchUnits } = useQuery(
+		'getAllUnits',
+		() => getAllUnits(),
+	);
 
 	const listUnits = listUnitData.data;
 
@@ -124,13 +129,40 @@ const ModalDailyWorkForm = ({ open, onClose, data }) => {
 									message: 'Vui lòng chọn đơn vị tính',
 								},
 							]}>
-							<Select>
-								{listUnits.map((unit) => (
-									<Select.Option value={unit.id} key={unit.id}>
-										{unit.name}
-									</Select.Option>
-								))}
-							</Select>
+							<Select
+								showSearch
+								placeholder='Chọn đơn vị tính'
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase() || option.value === '',
+									)
+								}
+								options={listUnits.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}
+								dropdownRender={(menu) => (
+									<>
+										{menu}
+										<Divider
+											style={{
+												margin: '8px 0',
+											}}
+										/>
+										<div className='p-2'>
+											<Button
+												type='primary'
+												style={{ width: '100%' }}
+												onClick={() => {
+													setOpenCreateUnitModal(true);
+												}}>
+												Thêm đơn vị
+											</Button>
+										</div>
+									</>
+								)}
+							/>
 						</Form.Item>
 					</Col>
 				</Row>
@@ -150,6 +182,17 @@ const ModalDailyWorkForm = ({ open, onClose, data }) => {
 				]}>
 				<p>Bạn có chắc chắn muốn xóa tiêu chí này ?</p>
 			</Modal>
+			<ModalCreateUnit
+				onClose={() => setOpenCreateUnitModal(false)}
+				isOpen={openCreateUnitModal}
+				onCreateSuccess={async (createdUnit) => {
+					await reFetchUnits();
+					form.setFieldsValue({
+						unitId: createdUnit.id,
+					});
+					setOpenCreateUnitModal(false);
+				}}
+			/>
 		</Modal>
 	);
 };
