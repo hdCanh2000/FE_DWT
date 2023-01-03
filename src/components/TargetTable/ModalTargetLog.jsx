@@ -7,7 +7,11 @@ import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { createTargetLog, uploadFile } from '../../pages/dailyWorkTracking/services';
+import {
+	createTargetLog,
+	deleteTargetLog,
+	uploadFile,
+} from '../../pages/dailyWorkTracking/services';
 import axios from 'axios';
 
 // xlsx, csv, doc, docx, pdf, ai, psd, jpg, jpeg, png, txt
@@ -34,7 +38,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 	const rolesString = window.localStorage.getItem('roles') || '[]';
 	const roles = JSON.parse(rolesString);
 
-	const isAdmin = roles.includes('admin');
+	const isAdmin = roles.includes('admin') || roles.includes('manager');
 
 	const currentTargetLog = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
@@ -131,6 +135,19 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 		const removedFiles = uploadedFiles.filter((file) => file !== fileName);
 		setUploadedFiles(removedFiles);
 	};
+	const handleDelete = async () => {
+		if (!currentTargetLog.id) {
+			return;
+		}
+		try {
+			await deleteTargetLog(currentTargetLog.id);
+			await reFetchTable();
+			onOk();
+			toast.success('Xóa báo cáo thành công');
+		} catch (error) {
+			toast.error('Xóa báo cáo thất bại');
+		}
+	};
 	return (
 		<Modal forceRender open={isOpen} onOk={onOk} onCancel={onCancel} footer={null}>
 			<div className='text-center mb-4'>
@@ -225,6 +242,11 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 							disabled={loading}>
 							Lưu
 						</Button>
+						{isAdmin && !_.isEmpty(currentTargetLog) && (
+							<Button danger onClick={handleDelete} className='mx-2'>
+								Xóa báo cáo
+							</Button>
+						)}
 						<Button onClick={onOk}>Đóng</Button>
 					</div>
 				</Form>

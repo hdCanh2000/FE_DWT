@@ -122,6 +122,14 @@ const createTargetLog = async (data) => {
 	return resp.data;
 };
 
+const deleteTargetLog = async (id) => {
+	const resp = await axiosClient({
+		method: 'DELETE',
+		url: `/api/targets/target_logs/${id}`,
+	});
+	return resp.data;
+};
+
 const createDailyWorkLog = async (data) => {
 	const resp = await axiosClient({
 		method: 'POST',
@@ -178,4 +186,5 @@ export {
 	getDailyWorks,
 	createDailyWorkLog,
 	createUnit,
+	deleteTargetLog,
 };
