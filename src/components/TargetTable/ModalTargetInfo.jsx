@@ -49,7 +49,9 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 			{
 				label: 'Hạn hoàn thành',
-				value: moment(currentTarget?.deadLine).format('DD/MM/YYYY'),
+				value: currentTarget.deadLine
+					? moment(currentTarget.deadLine).format('DD/MM/YYYY')
+					: '',
 			},
 			{
 				label: 'Số lượng',

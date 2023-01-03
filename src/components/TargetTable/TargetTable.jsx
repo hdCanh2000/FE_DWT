@@ -59,14 +59,14 @@ const TargetTable = ({ dataSearch }) => {
 			const row = {
 				key: index + 1,
 				...item,
-				deadline: dayjs(item.deadline).format('DD/MM/YYYY'),
+				deadline: item.deadline ? dayjs(item.deadline).format('DD/MM/YYYY') : '_',
 				// KQT MD: Kết quả tạm - Nhân từ số đầu việc hoàn thành nhân với MD
 				manDayEstimated: totalCompletedTasks * item.manDay,
 				unit: item?.unit?.name,
 			};
 			// insert targetLogs to table
 			targetLogs.forEach((targetLog) => {
-				if(targetLog.deletedAt !== null) {
+				if (targetLog.deletedAt !== null) {
 					return;
 				}
 				const targetDay = dayjs(targetLog.reportDate || targetLog.noticedDate).format('DD');
