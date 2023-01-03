@@ -9,6 +9,7 @@ import Input from '../../../components/bootstrap/forms/Input';
 import Button from '../../../components/bootstrap/Button';
 import useDarkMode from '../../../hooks/useDarkMode';
 import { login } from './services';
+import Logo from '../../../assets/logos/logo.png';
 
 const Login = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -44,14 +45,12 @@ const Login = () => {
 	};
 	return (
 		<PageWrapper title='Đăng nhập'>
-			<Page className='p-0'>
+			<Page className='p-0 justify-content-center'>
 				<div className='row h-100 align-items-center justify-content-center'>
-					<div
-						className='col-xl-4 col-lg-6 col-md-8 shadow-3d-container'
-						style={{ marginTop: '10%' }}>
+					<div className='col-xl-4 col-lg-6 col-md-8 shadow-3d-container'>
 						<Card className='shadow-3d-dark' data-tour='login-page'>
 							<CardBody>
-								<div className='text-center my-5'>
+								<div className='text-center my-3'>
 									<Link
 										to='/'
 										className={classNames(
@@ -64,9 +63,11 @@ const Login = () => {
 									/>
 								</div>
 								<>
-									<div className='text-center h1 fw-bold mt-5'>Chào mừng,</div>
-									<div className='text-center h4 text-muted mb-5'>
-										Đăng nhập để tiếp tục!
+									<div className='text-center'>
+										<img src={Logo} alt='logo' style={{ width: '50%' }} />
+									</div>
+									<div className='text-center h4 text-muted mb-5 mt-3'>
+										DWT - Daily Work Track App
 									</div>
 								</>
 								<form className='row g-4' onSubmit={handleOnClick}>
@@ -99,7 +100,7 @@ const Login = () => {
 									</div>
 									<div className='col-12'>
 										<Button
-											color='warning'
+											color='secondary'
 											type='submit'
 											className='w-100 py-3'
 											onClick={handleOnClick}
