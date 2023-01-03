@@ -66,9 +66,6 @@ const TargetTable = ({ dataSearch }) => {
 			};
 			// insert targetLogs to table
 			targetLogs.forEach((targetLog) => {
-				if (targetLog.deletedAt !== null) {
-					return;
-				}
 				const targetDay = dayjs(targetLog.reportDate || targetLog.noticedDate).format('DD');
 				const logStatus = targetLog.status;
 				const logQuantity = targetLog.quantity;

@@ -71,7 +71,11 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 		try {
 			setLoading(true);
 			if (values.status === 'noticed') {
-				const data = { ...values, targetId: target.id, id: currentTargetLog?.id };
+				const data = {
+					...values,
+					targetId: target.id,
+					id: currentTargetLog?.id,
+				};
 				data.noticedDate = logDay.format('YYYY-MM-DD');
 				data.noticedStatus = 'noticed';
 				await createTargetLog(data);

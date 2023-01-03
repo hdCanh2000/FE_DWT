@@ -115,7 +115,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 
 	const data = _.isEmpty(currentTarget)
 		? []
-		: currentTarget?.TargetLogs.filter((x) => x.reportDate !== null && x.deletedAt === null)
+		: currentTarget?.TargetLogs.filter((x) => x.reportDate !== null)
 				.sort((a, b) => {
 					return moment(a.reportDate).diff(moment(b.reportDate));
 				})
