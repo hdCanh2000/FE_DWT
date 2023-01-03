@@ -49,7 +49,9 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 			{
 				label: 'Hạn hoàn thành',
-				value: moment(currentTarget?.deadLine).format('DD/MM/YYYY'),
+				value: currentTarget.deadLine
+					? moment(currentTarget.deadLine).format('DD/MM/YYYY')
+					: '',
 			},
 			{
 				label: 'Số lượng',
@@ -113,7 +115,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 
 	const data = _.isEmpty(currentTarget)
 		? []
-		: currentTarget?.TargetLogs.filter((x) => x.reportDate !== null)
+		: currentTarget?.TargetLogs.filter((x) => x.reportDate !== null && x.deletedAt === null)
 				.sort((a, b) => {
 					return moment(a.reportDate).diff(moment(b.reportDate));
 				})
