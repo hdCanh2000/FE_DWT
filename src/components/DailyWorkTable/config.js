@@ -5,6 +5,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import moment from 'moment';
 import { RiErrorWarningLine } from 'react-icons/ri';
+import { Tooltip } from 'antd';
 
 const calenderRender = (text, record, currentDay, onCalenderClick) => {
 	const dayName = moment(currentDay).format('ddd');
@@ -143,7 +144,11 @@ export const getDailyWorkTableRowAndHeaderRow = (
 						onClick: () => onTargetTitleClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div className='text-over-flow-lg'>{text}</div>,
+					children: (
+						<Tooltip title={text} className='text-over-flow-lg'>
+							<span>{text}</span>
+						</Tooltip>
+					),
 				};
 			},
 		},

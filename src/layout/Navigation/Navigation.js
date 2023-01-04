@@ -105,7 +105,7 @@ export const Item = ({
 				{icon ? (
 					<Icon className='navigation-icon' icon={icon} />
 				) : (
-					<div style={{ marginRight: '23px' }}> </div>
+					<div style={{ marginRight: '23px' }}></div>
 				)}
 				<span className='navigation-text'>{t(title)}</span>
 			</span>
