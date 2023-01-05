@@ -10,6 +10,7 @@ import {
 	Input,
 	Select,
 	DatePicker,
+	Tooltip,
 } from 'antd';
 import moment from 'moment';
 import { useQuery } from 'react-query';
@@ -61,7 +62,11 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 						onClick: () => handleRowClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div className='text-over-flow-lg'>{text}</div>,
+					children: (
+						<Tooltip title={text} className='text-over-flow-lg'>
+							<span>{text}</span>
+						</Tooltip>
+					),
 				};
 			},
 			sorter: (a, b) => a.name.localeCompare(b.name),
@@ -149,7 +154,11 @@ const unAssignedTaskColumns = [
 		dataIndex: 'name',
 		key: 'name',
 		render: (text) => {
-			return <div className='text-over-flow-lg'>{text}</div>;
+			return (
+				<Tooltip title={text} className='text-over-flow-lg'>
+					<span>{text}</span>
+				</Tooltip>
+			);
 		},
 		sorter: (a, b) => a.name.localeCompare(b.name),
 		sortDirections: ['descend', 'ascend', 'descend'],
