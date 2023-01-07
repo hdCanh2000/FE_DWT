@@ -14,6 +14,7 @@ const TargetTable = ({ dataSearch }) => {
 	const [isOpenTargetLogModal, setIsOpenTargetLogModal] = useState(false);
 	const [isOpenTargetInfoModal, setIsOpenTargetInfoModal] = useState(false);
 	const [canScroll, setCanScroll] = useState(true);
+
 	// set default date to today
 	const [targetLogModalData, setTargetLogModalData] = useState({ logDay: moment(), target: {} });
 	const [targetInfoModalData, setTargetInfoModalData] = useState({});
@@ -62,6 +63,8 @@ const TargetTable = ({ dataSearch }) => {
 				deadline: item.deadline ? dayjs(item.deadline).format('DD/MM/YYYY') : '_',
 				// KQT MD: Kết quả tạm - Nhân từ số đầu việc hoàn thành nhân với MD
 				manDayEstimated: totalCompletedTasks * item.manDay,
+				// progress: totalCompletedTasks / item.quantity * 100,
+				progress: `${totalCompletedTasks} / ${item.quantity}`,
 				unit: item?.unit?.name,
 			};
 			// insert targetLogs to table
@@ -150,6 +153,7 @@ const TargetTable = ({ dataSearch }) => {
 				open={isOpenTargetInfoModal}
 				target={targetInfoModalData}
 				onOk={() => setIsOpenTargetInfoModal(false)}
+				reFetchListTarget={reFetchListTarget}
 			/>
 		</>
 	);

@@ -111,7 +111,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 		{
 			key: 'STT',
 			title: 'MỤC TIÊU NHIỆM VỤ (THÁNG)',
-			colSpan: 9,
+			colSpan: 10,
 			dataIndex: 'key',
 			fixed: 'left',
 			render: (text, record) => {
@@ -252,6 +252,25 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			},
 		},
 		{
+			key: 'progress',
+			title: '',
+			colSpan: 0,
+			fixed: 'left',
+			dataIndex: 'progress',
+			render: (text, record) => {
+				if (record.key === 'STT') {
+					return <b>{text}</b>;
+				}
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
+			},
+		},
+		{
 			key: 'manDayEstimated',
 			title: '',
 			colSpan: 0,
@@ -320,7 +339,13 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			if (record.key === 'STT') {
 				return <b>{text}</b>;
 			}
-			return text;
+			return {
+				props: {
+					onClick: () => onTargetTitleClick(record),
+					style: { cursor: 'pointer' },
+				},
+				children: <div>{text}</div>,
+			};
 		},
 	});
 	columns.push({
@@ -332,7 +357,17 @@ export const getWorkTrackTableRowAndHeaderRow = (
 			if (record.key === 'STT') {
 				return <b>{text}</b>;
 			}
-			return text;
+			return {
+				props: {
+					onClick: () => onTargetTitleClick(record),
+					style: { cursor: 'pointer' },
+				},
+				children: (
+					<Tooltip title={text} className='text-over-flow-sm'>
+						<span>{text}</span>
+					</Tooltip>
+				),
+			};
 		},
 	});
 
@@ -345,6 +380,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 		unit: 'DVT',
 		manDay: '~ MD',
 		manDayEstimated: 'KQT MD',
+		progress: 'Tiến độ',
 		executionPlan: 'KHTT (nêu có)',
 		recentManDay: 'MD',
 		managerComment: 'Ý kiến',
