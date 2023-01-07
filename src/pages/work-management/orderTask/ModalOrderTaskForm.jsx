@@ -30,11 +30,11 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 	useEffect(() => {
 		setCurrentOrderTask(data);
 		if (data) {
-			if (data.deadline) {
-				form.setFieldsValue({ ...data, deadline: dayjs(data.deadline) });
-			} else {
-				form.setFieldsValue({ ...data, deadline: dayjs().add(1, 'day') });
-			}
+			// set default value for form and deadline field
+			const deadline = data.deadline ? dayjs(data.deadline) : dayjs().add(1, 'day');
+			const positions = data.positions.map((item) => item.id);
+			const users = data.users.map((item) => item.id);
+			form.setFieldsValue({ ...data, deadline, positions, users });
 		} else {
 			form.resetFields();
 		}
@@ -45,7 +45,7 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 			if (!currentOrderTask || !currentOrderTask.id) {
 				throw new Error('Không tìm thấy công việc');
 			}
-			const isOrder = !!currentOrderTask.user;
+			const isOrder = !!currentOrderTask.users.length > 0;
 			await updateTarget(currentOrderTask.id, values);
 			toast.success(!isOrder ? 'Giao việc thành công' : 'cập nhật nhiệm vụ thành công');
 		} catch (err) {
@@ -70,13 +70,15 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 	const listUsers = listUsersData.data;
 	const listUnits = listUnitData.data;
 	const listPositions = listPositionData.data;
-	const isOrdered = currentOrderTask && currentOrderTask.user;
+	const isOrdered = currentOrderTask && currentOrderTask.users.length > 0;
 	return (
 		<Modal
 			forceRender
 			width={800}
 			title={
-				currentOrderTask && currentOrderTask.user ? 'Chỉnh sửa nhiệm vụ' : 'Giao nhiệm vụ'
+				currentOrderTask && currentOrderTask.users.length > 0
+					? 'Chỉnh sửa nhiệm vụ'
+					: 'Giao nhiệm vụ'
 			}
 			open={open}
 			onCancel={() => onClose(false)}
@@ -105,7 +107,7 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 						</Form.Item>
 					</Col>
 					<Col span={12}>
-						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
+						<Form.Item name='positions' label='Vị trí đảm nhiệm'>
 							<Select
 								showSearch
 								placeholder='Chọn vị trí'
@@ -120,11 +122,13 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 									value: item.id,
 								}))}
 								disabled={!isOrdered}
+								mode='multiple'
+								allowClear
 							/>
 						</Form.Item>
 					</Col>
 					<Col span={12}>
-						<Form.Item name='userId' label='Người đảm nhiệm'>
+						<Form.Item name='users' label='Người đảm nhiệm'>
 							<Select
 								showSearch
 								optionFilterProp='children'
@@ -137,6 +141,8 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 									label: item.name,
 									value: item.id,
 								}))}
+								allowClear
+								mode='multiple'
 							/>
 						</Form.Item>
 					</Col>
