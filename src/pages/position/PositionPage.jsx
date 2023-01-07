@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
+// import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -82,7 +83,7 @@ const PositionPage = () => {
 		const query = {};
 		query.text = text;
 		query.page = currentPage;
-		query.limit = 10;
+		// query.limit = 10;
 		dispatch(fetchPositionList(query));
 	}, [currentPage, dispatch, text]);
 
@@ -118,47 +119,58 @@ const PositionPage = () => {
 			title: 'Tên vị trí',
 			placeholder: 'tên vị trí',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			col: 5,
 		},
 		{
 			title: 'Mã vị trí',
 			placeholder: 'mã vị trí',
 			id: 'code',
+			dataIndex: 'code',
 			key: 'code',
+			sorter: (a, b) => a.code.localeCompare(b.code),
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			col: 2,
 		},
 		{
 			title: 'Phòng ban',
 			id: 'department_id',
+			dataIndex: ['department', 'name'],
 			key: 'department_id',
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''}</span>,
+			hidden: true,
+			render: (t) => <span>{t || ''}</span>,
 			options: departments,
 			col: 5,
 		},
 		{
 			title: 'Cấp nhân sự',
 			id: 'position_levels_id',
+			dataIndex: ['positionLevel', 'name'],
 			key: 'position_levels_id',
 			type: 'singleSelect',
 			align: 'left',
+			hidden: true,
 			isShow: true,
-			render: (item) => <span>{item?.positionLevel?.name || ''}</span>,
+			render: (t) => <span>{t || ''}</span>,
 			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
 			col: 6,
 		},
 		{
 			title: 'Quản lý cấp trên',
 			id: 'manager',
+			dataIndex: 'manager',
 			key: 'manager',
 			type: 'select',
 			align: 'left',
@@ -171,6 +183,7 @@ const PositionPage = () => {
 			title: 'Địa điểm làm việc',
 			placeholder: 'địa điểm làm việc',
 			id: 'address',
+			dataIndex: 'address',
 			key: 'address',
 			type: 'text',
 			align: 'left',
@@ -180,6 +193,7 @@ const PositionPage = () => {
 			title: 'Mô tả vị trí',
 			placeholder: 'mô tả vị trí',
 			id: 'description',
+			dataIndex: 'description',
 			key: 'description',
 			type: 'textarea',
 			align: 'left',
@@ -188,6 +202,7 @@ const PositionPage = () => {
 		{
 			title: 'Yêu cầu năng lực',
 			id: 'requirements',
+			dataIndex: 'requirements',
 			key: 'requirements',
 			type: 'select',
 			align: 'left',
@@ -217,13 +232,19 @@ const PositionPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</div>
 			),
+			hidden: true,
 			isShow: false,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
@@ -245,11 +266,7 @@ const PositionPage = () => {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				const query = {};
-				query.text = text;
-				query.page = currentPage;
-				query.limit = 10;
-				dispatch(fetchPositionList(query));
+				dispatch(fetchPositionList());
 				handleCloseForm();
 			} catch (error) {
 				toast.error('Cập nhật vị trí không thành công!', {
@@ -266,11 +283,7 @@ const PositionPage = () => {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				const query = {};
-				query.text = text;
-				query.page = 1;
-				query.limit = 10;
-				dispatch(fetchPositionList(query));
+				dispatch(fetchPositionList());
 				handleCloseForm();
 			} catch (error) {
 				toast.error('Thêm vị trí không thành công!', {
@@ -337,10 +350,21 @@ const PositionPage = () => {
 													</CardActions>
 												</CardHeader>
 												<div className='p-4'>
-													<TableCommon
+													<Table
 														className='table table-modern mb-0'
-														columns={columns}
-														data={positions}
+														columns={showColumns}
+														dataSource={positions}
+														scroll={{ x: 'max-content' }}
+														pagination={{ pageSize: 10 }}
+														style={{ cursor: 'pointer' }}
+														onRow={(item) => {
+															return {
+																cursor: 'pointer',
+																onClick: () => {
+																	handleOpenForm(item);
+																},
+															};
+														}}
 														onSubmitSearch={handleSubmitSearch}
 														onChangeCurrentPage={
 															handleChangeCurrentPage

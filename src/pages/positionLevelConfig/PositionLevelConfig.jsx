@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
+import { Table } from 'antd';
 import Card, {
 	CardActions,
 	CardHeader,
@@ -16,7 +17,7 @@ import validate from './validate';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import Page from '../../layout/Page/Page';
-import TableCommon from '../common/ComponentCommon/TableCommon';
+// import TableCommon from '../common/ComponentCommon/TableCommon';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionLevelList, changeCurrentPage } from '../../redux/slice/positionLevelSlice';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -54,14 +55,17 @@ const PositionLevelConfigPage = () => {
 		{
 			title: 'Tên cấp nhân sự',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
 			type: 'text',
 			align: 'left',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			isShow: true,
 		},
 		{
 			title: 'Mã cấp nhân sự',
 			id: 'code',
+			dataIndex: 'code',
 			key: 'code',
 			type: 'text',
 			align: 'left',
@@ -88,7 +92,10 @@ const PositionLevelConfigPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</>
 			),
@@ -100,7 +107,7 @@ const PositionLevelConfigPage = () => {
 		const query = {};
 		query.text = text;
 		query.page = currentPage;
-		query.limit = 10;
+		// query.limit = 10;
 		dispatch(fetchPositionLevelList(query));
 	}, [dispatch, currentPage, text]);
 
@@ -137,7 +144,7 @@ const PositionLevelConfigPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = 1;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionLevelList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -158,7 +165,7 @@ const PositionLevelConfigPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = currentPage;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionLevelList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -227,10 +234,20 @@ const PositionLevelConfigPage = () => {
 													</CardActions>
 												</CardHeader>
 												<div className='p-4'>
-													<TableCommon
+													<Table
 														className='table table-modern mb-0'
 														columns={columns}
-														data={positionLevels}
+														dataSource={positionLevels}
+														pagination={{ pageSize: 10 }}
+														style={{ cursor: 'pointer' }}
+														onRow={(item) => {
+															return {
+																cursor: 'pointer',
+																onClick: () => {
+																	handleOpenForm(item);
+																},
+															};
+														}}
 														onSubmitSearch={handleSubmitSearch}
 														onChangeCurrentPage={
 															handleChangeCurrentPage
