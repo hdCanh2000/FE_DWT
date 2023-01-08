@@ -29,6 +29,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 	useEffect(() => {
 		setCurrentTarget(target);
 	}, [target]);
+
 	const dataToRender = useMemo(
 		() => [
 			{
@@ -55,9 +56,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 			{
 				label: 'Hạn hoàn thành',
-				value: currentTarget.deadline
-					? moment(currentTarget.deadline).format('DD/MM/YYYY')
-					: '',
+				value: currentTarget.deadline,
 			},
 			{
 				label: 'Số lượng',

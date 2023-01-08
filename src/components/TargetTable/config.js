@@ -102,56 +102,14 @@ export const getWorkTrackTableRowAndHeaderRow = (
 	filterDay,
 	onCalenderClick,
 	onTargetTitleClick,
+	columnsToShow,
 ) => {
 	if (!filterDay) filterDay = dayjs();
 	const month = filterDay.month() + 1;
 	const year = filterDay.year();
 	const totalDays = filterDay.daysInMonth();
-	const columns = [
-		{
-			key: 'STT',
-			title: 'MỤC TIÊU NHIỆM VỤ (THÁNG)',
-			colSpan: 9,
-			dataIndex: 'key',
-			fixed: 'left',
-			render: (text, record) => {
-				if (record.key === 'STT') {
-					return {
-						children: <b>{text}</b>,
-					};
-				}
-				return {
-					props: {
-						onClick: () => onTargetTitleClick(record),
-						style: { cursor: 'pointer' },
-					},
-					children: <div>{text}</div>,
-				};
-			},
-		},
-		{
-			key: 'name',
-			title: '',
-			colSpan: 0,
-			dataIndex: 'name',
-			fixed: 'left',
-			render: (text, record) => {
-				if (record.key === 'STT') {
-					return <b>{text}</b>;
-				}
-				return {
-					props: {
-						onClick: () => onTargetTitleClick(record),
-						style: { cursor: 'pointer' },
-					},
-					children: (
-						<Tooltip title={text} className='text-over-flow-sm'>
-							<span>{text}</span>
-						</Tooltip>
-					),
-				};
-			},
-		},
+	// these columns can be hide or show by user
+	const listInformationColumns = [
 		{
 			key: 'description',
 			title: '',
@@ -172,25 +130,6 @@ export const getWorkTrackTableRowAndHeaderRow = (
 							<span>{text}</span>
 						</Tooltip>
 					),
-				};
-			},
-		},
-		{
-			key: 'deadline',
-			title: '',
-			colSpan: 0,
-			fixed: 'left',
-			dataIndex: 'deadline',
-			render: (text, record) => {
-				if (record.key === 'STT') {
-					return <b>{text}</b>;
-				}
-				return {
-					props: {
-						onClick: () => onTargetTitleClick(record),
-						style: { cursor: 'pointer' },
-					},
-					children: <div>{text}</div>,
 				};
 			},
 		},
@@ -289,6 +228,83 @@ export const getWorkTrackTableRowAndHeaderRow = (
 				};
 			},
 		},
+	];
+	const userChosenColumns = listInformationColumns.filter((col) =>
+		columnsToShow.includes(col.key),
+	);
+
+	const columns = [
+		{
+			key: 'STT',
+			title: 'MỤC TIÊU NHIỆM VỤ (THÁNG)',
+			colSpan: 3 + userChosenColumns.length,
+			dataIndex: 'key',
+			fixed: 'left',
+			render: (text, record) => {
+				if (record.key === 'STT') {
+					return {
+						children: <b>{text}</b>,
+					};
+				}
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
+			},
+		},
+		{
+			key: 'name',
+			title: '',
+			colSpan: 0,
+			dataIndex: 'name',
+			fixed: 'left',
+			render: (text, record) => {
+				if (record.key === 'STT') {
+					return <b>{text}</b>;
+				}
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: (
+						<Tooltip
+							title={text}
+							className={
+								userChosenColumns.length > 2
+									? 'text-over-flow-sm'
+									: 'text-over-flow-lg'
+							}>
+							<span>{text}</span>
+						</Tooltip>
+					),
+				};
+			},
+		},
+
+		{
+			key: 'deadline',
+			title: '',
+			colSpan: 0,
+			fixed: 'left',
+			dataIndex: 'deadline',
+			render: (text, record) => {
+				if (record.key === 'STT') {
+					return <b>{text}</b>;
+				}
+				return {
+					props: {
+						onClick: () => onTargetTitleClick(record),
+						style: { cursor: 'pointer' },
+					},
+					children: <div>{text}</div>,
+				};
+			},
+		},
+		...userChosenColumns,
 		{
 			key: 'day1',
 			title: 'Nhật trình công việc',
@@ -356,3 +372,30 @@ export const getWorkTrackTableRowAndHeaderRow = (
 
 	return { columns, headerRow };
 };
+
+export const listColumnsOptions = [
+	{
+		value: 'description',
+		label: 'Diễn giải',
+	},
+	{
+		value: 'executionPlan',
+		label: 'KHTT',
+	},
+	{
+		value: 'quantity',
+		label: 'SL',
+	},
+	{
+		value: 'unit',
+		label: 'DVT',
+	},
+	{
+		value: 'manDay',
+		label: '~ MD',
+	},
+	{
+		value: 'manDayEstimated',
+		label: 'KQT MD',
+	},
+];
