@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { Col, DatePicker, Input, Row, Skeleton, Table } from 'antd';
+import { Col, DatePicker, Input, Row, Select, Skeleton, Table } from 'antd';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from 'dayjs';
 import Page from '../../layout/Page/Page';
@@ -14,6 +14,7 @@ import { getUserDetail } from './services';
 import TargetTable from '../../components/TargetTable/TargetTable';
 import DailyWorkTable from '../../components/DailyWorkTable/DailyWorkTable';
 import Button from '../../components/bootstrap/Button';
+import { listColumnsOptions } from '../../components/TargetTable/config';
 
 const DailyWorkTrackingUser = () => {
 	const params = useParams();
@@ -42,6 +43,8 @@ const DailyWorkTrackingUser = () => {
 		userId: id,
 	});
 	const [dailyWorkTableSearchKeyWord, setDailyWorkTableSearchKeyWord] = useState('');
+	const [columnsToShow, setColumnsToShow] = useState([]);
+	const [kpiEstimated, setKpiEstimated] = useState(0);
 
 	const handleChangeMonth = (updatedDate) => {
 		setDate(updatedDate);
@@ -110,10 +113,10 @@ const DailyWorkTrackingUser = () => {
 						<CardBody>
 							<div className='control-pane'>
 								<div className='control-section'>
-									<Row gutter={24} className='my-4'>
+									<Row gutter={24} className='my-4 align-items-center'>
 										<Col
 											lg={6}
-											md={12}
+											md={7}
 											sm={24}
 											className='d-flex align-items-center'>
 											<Input.Search
@@ -139,8 +142,42 @@ const DailyWorkTrackingUser = () => {
 												</Button>
 											)}
 										</Col>
+										<Col lg={14} md={7} sm={24}>
+											<div className='my-3 d-flex align-items-center w-100'>
+												<div className='mx-2'>
+													<h5>Cột hiển thị: </h5>
+												</div>
+												<Select
+													optionFilterProp='children'
+													showSearch
+													filterOption={(input, option) =>
+														(
+															option?.label.toLowerCase() ?? ''
+														).includes(input.toLowerCase())
+													}
+													options={listColumnsOptions}
+													mode='multiple'
+													allowClear
+													style={{ minWidth: 200, width: 'auto' }}
+													placeholder='Chọn cột'
+													onChange={(value) => {
+														setColumnsToShow(value);
+													}}
+													value={columnsToShow}
+												/>
+											</div>
+										</Col>
+										<Col lg={4} md={6} sm={24}>
+											<div className='w-100 text-end'>
+												<b>Tổng KPI tạm tính: {kpiEstimated}</b> KPI
+											</div>
+										</Col>
 									</Row>
-									<TargetTable dataSearch={targetSearchParams} />
+									<TargetTable
+										dataSearch={targetSearchParams}
+										setKpiEstimated={setKpiEstimated}
+										columnsToShow={columnsToShow}
+									/>
 								</div>
 								<div>
 									<Row gutter={24} className='my-4'>

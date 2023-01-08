@@ -34,6 +34,7 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 	useEffect(() => {
 		setCurrentTarget(target);
 	}, [target]);
+
 	const dataToRender = useMemo(
 		() => [
 			{
@@ -46,7 +47,13 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 			},
 			{
 				label: 'Người phụ trách',
-				value: currentTarget?.user?.name || '',
+				// hack to ensure that the value is always an array when currentTarget is null that why js sucks
+				value: (currentTarget?.users || []).map((item) => item.name).join(', '),
+			},
+			{
+				label: 'Vụ trí phụ trách',
+				// hack to ensure that the value is always an array that why js sucks
+				value: (currentTarget?.positions || []).map((item) => item.name).join(', '),
 			},
 			{
 				label: 'Ngày bắt đầu',
@@ -54,9 +61,7 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 			},
 			{
 				label: 'Hạn hoàn thành',
-				value: currentTarget.deadLine
-					? moment(currentTarget.deadLine).format('DD/MM/YYYY')
-					: '',
+				value: currentTarget.deadline,
 			},
 			{
 				label: 'Số lượng',

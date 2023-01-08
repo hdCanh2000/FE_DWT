@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { Table } from 'antd';
+import { Select, Table } from 'antd';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { getWorkTrackTableRowAndHeaderRow } from './config';
+import { getWorkTrackTableRowAndHeaderRow, listColumnsOptions } from './config';
 import moment from 'moment/moment';
 import ModalTargetLog from './ModalTargetLog';
 import ModalTargetInfo from './ModalTargetInfo';
@@ -10,7 +10,7 @@ import { useQuery } from 'react-query';
 import { getListTarget, getUserDetail } from '../../pages/dailyWorkTracking/services';
 import scrollIntoView from 'scroll-into-view';
 
-const TargetTable = ({ dataSearch }) => {
+const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 	const [isOpenTargetLogModal, setIsOpenTargetLogModal] = useState(false);
 	const [isOpenTargetInfoModal, setIsOpenTargetInfoModal] = useState(false);
 	const [canScroll, setCanScroll] = useState(true);
@@ -38,6 +38,7 @@ const TargetTable = ({ dataSearch }) => {
 		dayjs(dataSearch.start, 'M-DD-YYYY'),
 		onCalenderClick,
 		onTargetTitleClick,
+		columnsToShow,
 	);
 	const {
 		data: listTarget = [],
@@ -115,7 +116,21 @@ const TargetTable = ({ dataSearch }) => {
 		if (!tableHeader) return;
 		// reset style attribute
 		tableHeader.style = '';
-	}, [tableData, tableRef]);
+	}, [tableData, tableRef, columnsToShow]);
+
+	//set kpi estimated
+	useEffect(() => {
+		if (!tableData.length) return;
+		let totalManDayEstimated = 0;
+		tableData.forEach((item) => {
+			if (item.key === 'STT') {
+				return;
+			}
+			totalManDayEstimated += item.manDayEstimated;
+		});
+		const kpiEstimated = totalManDayEstimated * 4;
+		setKpiEstimated(kpiEstimated);
+	}, [tableData]);
 
 	return (
 		<>

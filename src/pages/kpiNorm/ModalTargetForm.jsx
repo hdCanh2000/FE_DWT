@@ -2,7 +2,6 @@
 /* eslint react/prop-types: 0 */
 /* eslint react-hooks/exhaustive-deps: 0 */
 /* eslint react/no-unstable-nested-components: 0 */
-
 import { Button, Col, Divider, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
@@ -19,7 +18,10 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 	useEffect(() => {
 		setCurrentTarget(data);
 		if (data) {
-			form.setFieldsValue(data);
+			form.setFieldsValue({
+				...data,
+				positions: data.positions.map((item) => item.id),
+			});
 		} else {
 			form.resetFields();
 		}
@@ -36,6 +38,7 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 
 	const listUnits = listUnitData.data;
 	const listPositions = listPositionData.data;
+
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
@@ -114,7 +117,7 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 						</Form.Item>
 					</Col>
 					<Col span={12}>
-						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
+						<Form.Item name='positions' label='Vị trí đảm nhiệm'>
 							<Select
 								optionFilterProp='children'
 								showSearch
@@ -127,6 +130,8 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 									label: item.name,
 									value: item.id,
 								}))}
+								mode='multiple'
+								allowClear
 							/>
 						</Form.Item>
 					</Col>
