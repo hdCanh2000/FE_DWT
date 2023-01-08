@@ -199,8 +199,6 @@ const OrderTaskPage = () => {
 
 	const [unAssignedTableParams, setUnAssignedTableParams] = useState({
 		q: '',
-		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
-		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
 	});
 	const [unAssignedTableSearch, setUnAssignedTableSearch] = useState('');
 
@@ -494,8 +492,23 @@ const OrderTaskPage = () => {
 										<DatePicker.MonthPicker
 											format='MM/YYYY'
 											locale={locale}
-											value={dayjs(unAssignedTableParams.start, 'M-DD-YYYY')}
+											value={
+												unAssignedTableParams.start
+													? dayjs(
+															unAssignedTableParams.start,
+															'M-DD-YYYY',
+													  )
+													: null
+											}
 											onChange={(updatedDate) => {
+												if (updatedDate === null) {
+													setUnAssignedTableParams({
+														...unAssignedTableParams,
+														start: null,
+														end: null,
+													});
+													return;
+												}
 												setUnAssignedTableParams({
 													...unAssignedTableParams,
 													start: `${
