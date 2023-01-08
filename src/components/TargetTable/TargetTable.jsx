@@ -64,6 +64,8 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 				deadline: item.deadline ? dayjs(item.deadline).format('DD/MM/YYYY') : '_',
 				// KQT MD: Kết quả tạm - Nhân từ số đầu việc hoàn thành nhân với MD
 				manDayEstimated: totalCompletedTasks * item.manDay,
+				// progress: totalCompletedTasks / item.quantity * 100,
+				progress: `${totalCompletedTasks} / ${item.quantity}`,
 				unit: item?.unit?.name,
 			};
 			// insert targetLogs to table
@@ -166,6 +168,7 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 				open={isOpenTargetInfoModal}
 				target={targetInfoModalData}
 				onOk={() => setIsOpenTargetInfoModal(false)}
+				reFetchListTarget={reFetchListTarget}
 			/>
 		</>
 	);
