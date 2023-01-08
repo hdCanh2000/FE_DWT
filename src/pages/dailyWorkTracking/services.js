@@ -105,6 +105,15 @@ const getListTarget = async (params) => {
 	return resp.data;
 };
 
+const exportTargets = async (params) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/targets/export`,
+		params,
+	});
+	return resp.data;
+};
+
 const getUserDetail = async (id) => {
 	const resp = await axiosClient({
 		method: 'GET',
@@ -187,4 +196,5 @@ export {
 	createDailyWorkLog,
 	createUnit,
 	deleteTargetLog,
+	exportTargets,
 };

@@ -15,6 +15,7 @@ import TargetTable from '../../components/TargetTable/TargetTable';
 import DailyWorkTable from '../../components/DailyWorkTable/DailyWorkTable';
 import Button from '../../components/bootstrap/Button';
 import { listColumnsOptions } from '../../components/TargetTable/config';
+import ExportTargetButton from "../../components/ExportTargetButton";
 
 const DailyWorkTrackingUser = () => {
 	const params = useParams();
@@ -113,6 +114,9 @@ const DailyWorkTrackingUser = () => {
 						<CardBody>
 							<div className='control-pane'>
 								<div className='control-section'>
+									<div>
+										<ExportTargetButton params={targetSearchParams} />
+									</div>
 									<Row gutter={24} className='my-4 align-items-center'>
 										<Col
 											lg={6}
