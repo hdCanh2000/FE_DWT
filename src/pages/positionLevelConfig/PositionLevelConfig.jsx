@@ -67,6 +67,7 @@ const PositionLevelConfigPage = () => {
 			id: 'code',
 			dataIndex: 'code',
 			key: 'code',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
 			align: 'left',
 			isShow: true,
