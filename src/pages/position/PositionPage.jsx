@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-// import TableCommon from '../common/ComponentCommon/TableCommon';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -46,7 +46,7 @@ const PositionPage = () => {
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const positions = useSelector((state) => state.position.positions);
-	const pagination = useSelector((state) => state.position.pagination);
+	// const pagination = useSelector((state) => state.position.pagination);
 	const loading = useSelector((state) => state.position.loading);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
@@ -104,9 +104,9 @@ const PositionPage = () => {
 		setCurrentPage(1);
 	};
 
-	const handleChangeCurrentPage = (searchValue) => {
-		setCurrentPage(searchValue.page);
-	};
+	// const handleChangeCurrentPage = (searchValue) => {
+	// 	setCurrentPage(searchValue.page);
+	// };
 
 	useEffect(() => {
 		dispatch(fetchPositionLevelList());
@@ -350,6 +350,11 @@ const PositionPage = () => {
 													</CardActions>
 												</CardHeader>
 												<div className='p-4'>
+													<TableSearchCommon
+														onSubmitSearch={handleSubmitSearch}
+														searchvalue={text}
+														isSearch
+													/>
 													<Table
 														className='table table-modern mb-0'
 														columns={showColumns}
@@ -365,16 +370,16 @@ const PositionPage = () => {
 																},
 															};
 														}}
-														onSubmitSearch={handleSubmitSearch}
-														onChangeCurrentPage={
-															handleChangeCurrentPage
-														}
-														currentPage={parseInt(currentPage, 10)}
-														totalItem={pagination?.totalRows}
-														total={pagination?.total}
-														setCurrentPage={setCurrentPage}
-														searchvalue={text}
-														isSearch
+														// onSubmitSearch={handleSubmitSearch}
+														// onChangeCurrentPage={
+														// 	handleChangeCurrentPage
+														// }
+														// currentPage={parseInt(currentPage, 10)}
+														// totalItem={pagination?.totalRows}
+														// total={pagination?.total}
+														// setCurrentPage={setCurrentPage}
+														// searchvalue={text}
+														// isSearch
 													/>
 												</div>
 											</div>

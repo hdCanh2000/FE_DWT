@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, createSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-// import TableCommon from '../common/ComponentCommon/TableCommon';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -36,9 +36,11 @@ const EmployeePage = () => {
 	const [searchParams] = useSearchParams();
 	const text = searchParams.get('text') || '';
 
+	// const [searchTable, setSearchTable] = useState('');
+
 	const dispatch = useDispatch();
-	// const navigate = useNavigate();
-	// const localtion = useLocation();
+	const navigate = useNavigate();
+	const localtion = useLocation();
 
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
@@ -80,22 +82,22 @@ const EmployeePage = () => {
 		dispatch(fetchPositionList());
 	}, [dispatch]);
 
-	// const handleSubmitSearch = (searchValue) => {
-	// 	if (searchValue.text === '') {
-	// 		searchParams.delete('text');
-	// 		navigate({
-	// 			pathname: localtion.pathname,
-	// 		});
-	// 	} else {
-	// 		navigate({
-	// 			pathname: localtion.pathname,
-	// 			search: createSearchParams({
-	// 				text: searchValue.text,
-	// 			}).toString(),
-	// 		});
-	// 	}
-	// 	// setCurrentPage(1);
-	// };
+	const handleSubmitSearch = (searchValue) => {
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		// setCurrentPage(1);
+	};
 
 	// const handleChangeCurrentPage = (searchValue) => {
 	// 	setCurrentPage(searchValue.page);
@@ -492,6 +494,11 @@ const EmployeePage = () => {
 														)}
 													</CardHeader>
 													<div className='p-4'>
+														<TableSearchCommon
+															onSubmitSearch={handleSubmitSearch}
+															searchvalue={text}
+															isSearch
+														/>
 														<Table
 															className='table table-modern mb-0'
 															columns={showColumns}
