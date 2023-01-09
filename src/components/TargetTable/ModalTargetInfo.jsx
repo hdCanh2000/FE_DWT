@@ -1,9 +1,10 @@
 /* eslint react/prop-types: 0 */
-import { Modal, Table } from 'antd';
+import { Button, Modal, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
 import _ from 'lodash';
+import ModalCommentTarget from './ModalCommentTarget';
 
 const StyledTable = styled.table`
 	width: 100%;
@@ -23,12 +24,17 @@ const StyledTable = styled.table`
 		font-weight: bold;
 	}
 `;
-const ModalTargetInfo = ({ open, onOk, target }) => {
+const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 	const [currentTarget, setCurrentTarget] = useState(target);
+	const [openCommentModal, setOpenCommentModal] = useState(false);
+	const roles = window.localStorage.getItem('roles') || "['']";
+	const roleArr = JSON.parse(roles);
+	const canComment = roleArr.includes('manager') || roleArr.includes('admin');
 
 	useEffect(() => {
 		setCurrentTarget(target);
 	}, [target]);
+
 	const dataToRender = useMemo(
 		() => [
 			{
@@ -55,9 +61,7 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			},
 			{
 				label: 'Hạn hoàn thành',
-				value: currentTarget.deadline
-					? moment(currentTarget.deadline).format('DD/MM/YYYY')
-					: '',
+				value: currentTarget.deadline,
 			},
 			{
 				label: 'Số lượng',
@@ -74,6 +78,14 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 			{
 				label: 'Kế hoạch thực hiện',
 				value: currentTarget.executionPlan,
+			},
+			{
+				label: 'Ý kiến TPB',
+				value: currentTarget.managerComment,
+			},
+			{
+				label: 'Chấm điểm',
+				value: currentTarget.recentManDay ? `${currentTarget.recentManDay} MD` : '',
 			},
 		],
 		[currentTarget],
@@ -130,37 +142,64 @@ const ModalTargetInfo = ({ open, onOk, target }) => {
 					key: item.id,
 				}));
 	return (
-		<Modal
-			forceRender
-			onOk={onOk}
-			onCancel={onOk}
-			open={open}
-			title='Thông tin nhiệm vụ'
-			width={800}>
-			<div>
-				<StyledTable>
-					<tbody>
-						{dataToRender.map((item) => (
-							<tr key={item.label}>
-								<td className='p-2'>{item.label}</td>
-								<td className='p-2'>{item.value}</td>
-							</tr>
-						))}
-					</tbody>
-				</StyledTable>
-			</div>
-			<div>
-				<h5>Danh sách báo cáo công việc</h5>
-				<Table
-					columns={columns}
-					dataSource={data}
-					bordered
-					pagination={{
-						pageSize: 3,
-					}}
-				/>
-			</div>
-		</Modal>
+		<>
+			<Modal
+				forceRender
+				onOk={onOk}
+				onCancel={onOk}
+				open={open}
+				title='Thông tin nhiệm vụ'
+				width={800}
+				footer={[
+					<Button onClick={onOk}>Đóng</Button>,
+					canComment && (
+						<Button
+							onClick={() => {
+								setOpenCommentModal(true);
+							}}
+							type='primary'>
+							Nhận xét nhiệm vụ
+						</Button>
+					),
+				]}>
+				<div style={{ height: 500, overflowY: 'scroll' }}>
+					<div>
+						<StyledTable>
+							<tbody>
+								{dataToRender.map((item) => (
+									<tr key={item.label}>
+										<td className='p-2'>{item.label}</td>
+										<td className='p-2'>{item.value}</td>
+									</tr>
+								))}
+							</tbody>
+						</StyledTable>
+					</div>
+					<div>
+						<h5>Danh sách báo cáo công việc</h5>
+						<Table
+							columns={columns}
+							dataSource={data}
+							bordered
+							pagination={{
+								pageSize: 3,
+							}}
+						/>
+					</div>
+				</div>
+			</Modal>
+			<ModalCommentTarget
+				open={openCommentModal}
+				target={currentTarget}
+				onClose={() => {
+					setOpenCommentModal(false);
+				}}
+				onSuccess={async () => {
+					await reFetchListTarget();
+					onOk();
+				}}
+			/>
+		</>
 	);
 };
 
