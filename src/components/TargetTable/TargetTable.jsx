@@ -7,7 +7,7 @@ import moment from 'moment/moment';
 import ModalTargetLog from './ModalTargetLog';
 import ModalTargetInfo from './ModalTargetInfo';
 import { useQuery } from 'react-query';
-import { getListTarget, getUserDetail } from '../../pages/dailyWorkTracking/services';
+import { getListTargetInfos } from '../../pages/dailyWorkTracking/services';
 import scrollIntoView from 'scroll-into-view';
 
 const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
@@ -45,7 +45,10 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 		isLoading: isLoadingListTarget,
 		isError: isErrorListTarget,
 		refetch: reFetchListTarget,
-	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) => getListTarget(queryKey[1]));
+	} = useQuery(['getListTargetInfos', dataSearch], ({ queryKey }) =>
+		getListTargetInfos(queryKey[1]),
+	);
+
 
 	// normalize data for table
 	const tableData = useMemo(() => {

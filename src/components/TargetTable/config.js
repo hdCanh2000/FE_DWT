@@ -328,10 +328,10 @@ export const getWorkTrackTableRowAndHeaderRow = (
 		});
 	}
 	columns.push({
-		key: 'recentManDay',
+		key: 'managerManDay',
 		title: 'Đánh giá KQ/Chấm KPI',
 		colSpan: 2,
-		dataIndex: 'recentManDay', // this should be currentManDay but it's a typo in the API
+		dataIndex: 'managerManDay', // this should be currentManDay but it's a typo in the API
 		render: (text, record) => {
 			if (record.key === 'STT') {
 				return <b>{text}</b>;
@@ -362,7 +362,7 @@ export const getWorkTrackTableRowAndHeaderRow = (
 		manDay: '~ MD',
 		manDayEstimated: 'KQT MD',
 		executionPlan: 'KHTT (nêu có)',
-		recentManDay: 'MD',
+		managerManDay: 'MD',
 		managerComment: 'Ý kiến',
 	};
 	for (let i = 0; i < totalDays; i++) {

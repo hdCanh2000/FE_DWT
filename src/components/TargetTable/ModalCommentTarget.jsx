@@ -2,7 +2,7 @@
 import { Form, Modal, Input, InputNumber, Button } from 'antd';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { updateTarget } from '../../pages/kpiNorm/services';
+import { updateTargetInfo } from '../../pages/kpiNorm/services';
 
 const ModalCommentTarget = ({ open, target, onClose, onSuccess }) => {
 	const [form] = Form.useForm();
@@ -13,16 +13,16 @@ const ModalCommentTarget = ({ open, target, onClose, onSuccess }) => {
 				managerComment: target.managerComment,
 			});
 		}
-		if (target.recentManDay) {
+		if (target.managerManDay) {
 			form.setFieldsValue({
-				recentManDay: target.recentManDay,
+				managerManDay: target.managerManDay,
 			});
 		}
 	}, [target]);
 	const handleFinishForm = async (values) => {
 		try {
 			setLoading(true);
-			await updateTarget(target.id, values);
+			await updateTargetInfo(target.id, values);
 			await onSuccess();
 			toast.success('Đã thêm nhận xét cho nhiệm vụ ' + target.name);
 			onClose();
@@ -43,7 +43,7 @@ const ModalCommentTarget = ({ open, target, onClose, onSuccess }) => {
 				<Form.Item label='Ý kiến' name='managerComment'>
 					<Input.TextArea />
 				</Form.Item>
-				<Form.Item label='Man Day' name='recentManDay'>
+				<Form.Item label='Man Day' name='managerManDay'>
 					<InputNumber min={0} />
 				</Form.Item>
 				<Button
