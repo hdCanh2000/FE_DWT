@@ -266,7 +266,11 @@ const PositionPage = () => {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				dispatch(fetchPositionList());
+				const query = {};
+				query.text = text;
+				query.page = currentPage;
+				query.limit = 10;
+				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
 				toast.error('Cập nhật vị trí không thành công!', {
@@ -283,7 +287,11 @@ const PositionPage = () => {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				dispatch(fetchPositionList());
+				const query = {};
+				query.text = text;
+				query.page = 1;
+				query.limit = 10;
+				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
 				toast.error('Thêm vị trí không thành công!', {
