@@ -1,3 +1,4 @@
+/*eslint-disable */
 import { Col, DatePicker, Input, Row, Table, Tooltip } from 'antd';
 import React, { useMemo, useState } from 'react';
 import locale from 'antd/es/date-picker/locale/vi_VN';
@@ -76,7 +77,7 @@ const columns = [
 		},
 	},
 ];
-const TableListTarget = ({onUpdateTargetInfo}) => {
+const TableListTarget = ({ onUpdateTargetInfo }) => {
 	const [dataSearch, setDataSearch] = useState({
 		q: '',
 	});
