@@ -42,22 +42,26 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 				value: currentTarget?.name,
 			},
 			{
+				label: 'Thuộc định mức lao động',
+				value: currentTarget?.Target?.name,
+			},
+			{
 				label: 'Mô tả',
 				value: currentTarget?.description,
 			},
 			{
 				label: 'Người phụ trách',
 				// hack to ensure that the value is always an array when currentTarget is null that why js sucks
-				value: (currentTarget?.users || []).map((item) => item.name).join(', '),
+				value: currentTarget?.user?.name || '',
 			},
 			{
 				label: 'Vụ trí phụ trách',
 				// hack to ensure that the value is always an array that why js sucks
-				value: (currentTarget?.positions || []).map((item) => item.name).join(', '),
+				value: currentTarget?.position?.name || '',
 			},
 			{
 				label: 'Ngày bắt đầu',
-				value: moment(currentTarget?.createdAt).format('DD/MM/YYYY'),
+				value: moment(currentTarget?.startDate).format('DD/MM/YYYY'),
 			},
 			{
 				label: 'Hạn hoàn thành',
@@ -85,7 +89,7 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 			},
 			{
 				label: 'Chấm điểm',
-				value: currentTarget.recentManDay ? `${currentTarget.recentManDay} MD` : '',
+				value: currentTarget.managerManDay ? `${currentTarget.managerManDay} MD` : '',
 			},
 		],
 		[currentTarget],

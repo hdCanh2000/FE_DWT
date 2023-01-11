@@ -51,6 +51,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			}) || {}
 		);
 	}, [target, logDay]);
+	// console.log('currentTargetLog', currentTargetLog);
 	useEffect(() => {
 		if (_.isEmpty(currentTargetLog)) {
 			form.resetFields();
@@ -73,7 +74,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			if (values.status === 'noticed') {
 				const data = {
 					...values,
-					targetId: target.id,
+					targetInfoId: target.id,
 					id: currentTargetLog?.id,
 				};
 				data.noticedDate = logDay.format('YYYY-MM-DD');
@@ -88,7 +89,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			}
 			const data = {
 				...values,
-				targetId: target.id,
+				targetInfoId: target.id,
 				id: currentTargetLog?.id,
 				reportDate: logDay.format('YYYY-MM-DD'),
 			};
