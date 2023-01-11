@@ -122,14 +122,22 @@ const DailyWorkTable = ({ dataSearch }) => {
 			{isErrorListDailyWorks ? (
 				<div>Có lỗi xảy ra</div>
 			) : (
+				<>
 				<Table
 					columns={columns}
 					dataSource={tableData}
 					bordered
 					scroll={{ x: 'max-content' }}
 					ref={tableRef}
+					pagination={(tableData.length <= 1) ? false : true}
 					loading={isLoadingListDailyWorks}
 				/>
+				{(tableData.length <= 1) 
+					? <div className='text-center'>
+						<h5 style={{color: '#adb5bd'}}>Chưa có nhiệm vụ nào</h5>
+					</div> 
+					: null}
+				</>
 			)}
 			<ModalDailyWorkLog
 				isOpen={isOpenDailyWorkLogModal}
