@@ -269,7 +269,7 @@ const PositionPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = currentPage;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -290,7 +290,7 @@ const PositionPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = 1;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
