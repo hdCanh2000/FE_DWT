@@ -28,36 +28,27 @@ const antdTableCols = [
 		key: 'key',
 	},
 	{
-		title: 'Tên nhiệm vụ',
+		title: 'Tên định mức',
 		dataIndex: 'name',
 		key: 'name',
 		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
 	},
 	{
-		title: 'Vị trí',
-		dataIndex: 'positionName',
-		key: 'position',
+		title: 'Mô tả',
+		dataIndex: 'description',
+		key: 'description',
+		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
 	},
 	{
-		title: 'Phòng ban',
-		dataIndex: 'departmentName',
-		key: 'departmentName',
+		title: 'KHTT',
+		dataIndex: 'executionPlan',
+		key: 'executionPlan',
+		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
 	},
 	{
 		title: 'Man Day',
 		dataIndex: 'manDay',
 		key: 'manday',
-	},
-
-	{
-		title: 'Số lượng',
-		dataIndex: 'quantity',
-		key: 'quantity',
-	},
-	{
-		title: 'Đơn vị',
-		dataIndex: 'unitName',
-		key: 'unit',
 	},
 ];
 
@@ -149,7 +140,7 @@ const KpiNormPage = () => {
 									<CardHeader>
 										<CardLabel icon='FormatListBulleted' iconColor='primary'>
 											<CardTitle>
-												<CardLabel>Danh sách nhiệm vụ</CardLabel>
+												<CardLabel>Danh sách định mức lao động</CardLabel>
 											</CardTitle>
 										</CardLabel>
 										{verifyPermissionHOC(
