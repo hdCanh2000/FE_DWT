@@ -33,6 +33,7 @@ export const fetchEmployeeListByDepartment = createAsyncThunk(
 		return response.data?.data?.map((item) => {
 			return {
 				...item,
+				// indexNumber: index,
 				label: item.name,
 				value: item.id,
 				text: item.name,
@@ -95,7 +96,7 @@ export const employeeSlice = createSlice({
 					},
 				};
 			});
-			state.pagination = { ...action.payload.pagination };
+			// state.pagination = { ...action.payload.pagination };
 		},
 		[fetchEmployeeList.rejected]: (state, action) => {
 			state.loading = false;

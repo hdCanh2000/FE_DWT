@@ -187,6 +187,7 @@ const OrderTaskPage = () => {
 	}, [user]);
 
 	const unAssignedTaskData = useMemo(() => {
+		console.log(unAssignedTargets)
 		return unAssignedTargets.map((item, index) => ({
 			...item,
 			key: index + 1,
