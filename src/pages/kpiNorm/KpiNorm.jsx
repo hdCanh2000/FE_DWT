@@ -31,19 +31,24 @@ const antdTableCols = [
 		title: 'Tên định mức',
 		dataIndex: 'name',
 		key: 'name',
-		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
+		render: (text) => <div className='text-over-flow-md'>{text}</div>,
 	},
 	{
 		title: 'Mô tả',
 		dataIndex: 'description',
 		key: 'description',
-		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
+		render: (text) => <div className='text-over-flow-md'>{text}</div>,
+	},
+	{
+		title: 'Vị trí',
+		dataIndex: 'positionText',
+		key: 'positionText',
 	},
 	{
 		title: 'KHTT',
 		dataIndex: 'executionPlan',
 		key: 'executionPlan',
-		render: (text) => <div className='text-over-flow-lg'>{text}</div>,
+		render: (text) => <div className='text-over-flow-md'>{text}</div>,
 	},
 	{
 		title: 'Man Day',
@@ -77,6 +82,7 @@ const KpiNormPage = () => {
 			positionName: item.position?.name,
 			departmentName: item.position?.department?.name,
 			unitName: item.unit?.name,
+			positionText: item.position?.name ?? '-',
 		}));
 	}, [listTarget]);
 	const handleExportExcel = async () => {

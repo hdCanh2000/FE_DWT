@@ -1,5 +1,5 @@
 /*eslint-disable */
-import { Col, DatePicker, Input, Row, Table, Tooltip } from 'antd';
+import {Col, DatePicker, Input, Row, Select, Table, Tooltip} from 'antd';
 import React, { useMemo, useState } from 'react';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from 'dayjs';
@@ -7,6 +7,7 @@ import { useQuery } from 'react-query';
 import Button from '../../../components/bootstrap/Button';
 import { getListTarget } from '../../dailyWorkTracking/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
+import {getAllDepartment} from "../../department/services";
 
 const columns = [
 	{
@@ -31,6 +32,12 @@ const columns = [
 		sorter: (a, b) => a.name.localeCompare(b.name),
 		sortDirections: ['descend', 'ascend', 'descend'],
 		defaultSortOrder: 'descend',
+	},
+
+	{
+		title: 'Phòng ban',
+		dataIndex: 'positionText',
+		key: 'positionText',
 	},
 
 	{
@@ -84,6 +91,7 @@ const TableListTarget = ({ onUpdateTargetInfo }) => {
 	const [search, setSearch] = useState('');
 	const [openOrderTask, setOpenOrderTask] = useState(false);
 	const [selectedTarget, setSelectedTarget] = useState(null);
+	const [departmentId, setDepartmentId] = React.useState(null);
 	const {
 		data: listTargets = [],
 		isLoading: loadingListTargets,
@@ -92,11 +100,17 @@ const TableListTarget = ({ onUpdateTargetInfo }) => {
 	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) =>
 		getListTarget({ ...queryKey[1] }),
 	);
+	const { data: listDepartmentsData = { data: { data: [] } } } = useQuery(
+		['getListDepartment2'],
+		() => getAllDepartment(),
+	);
+	const listDepartments = listDepartmentsData.data.data;
 	const tableData = useMemo(
 		() =>
 			listTargets.map((item, index) => ({
 				...item,
 				key: index + 1,
+				positionText: item.position?.name,
 			})),
 		[listTargets],
 	);
@@ -130,6 +144,40 @@ const TableListTarget = ({ onUpdateTargetInfo }) => {
 							Reset
 						</Button>
 					)}
+				</Col>
+				<Col md={8} lg={8} sm={24}>
+					<Select
+						placeholder='Chọn phòng ban'
+						value={departmentId}
+						onChange={(value) => {
+							setDepartmentId(value);
+							setDataSearch({
+								...dataSearch,
+								departmentId: value,
+							});
+						}}
+						style={{ width: '100%' }}
+						optionFilterProp='children'
+						showSearch
+						filterOption={(input, option) =>
+							(option?.label.toLowerCase() ?? '').includes(input.toLowerCase())
+						}
+						options={[
+							{
+								label: 'Chọn phòng ban',
+								value: null,
+								disabled: true,
+							},
+							{
+								label: 'Tất cả',
+								value: '',
+							},
+							...listDepartments.map((item) => ({
+								label: item.name,
+								value: item.id,
+							})),
+						]}
+					/>
 				</Col>
 
 				<Col md={8} lg={8} sm={24}>
