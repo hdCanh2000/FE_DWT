@@ -106,7 +106,7 @@ const columns = (handleClickDeleteBtn, handleRowClick) => {
 			onFilter: (value, record) => record.status === value,
 		},
 		{
-			title: 'KPI',
+			title: 'Man day',
 			dataIndex: 'kpiValue',
 			key: 'kipValue',
 			render: shareRender,
@@ -159,7 +159,7 @@ const TableListTargetInfos = ({ updateFlag }) => {
 				positionText: item?.position?.name || '',
 				deadlineText: item.deadline ? dayjs(item.deadline).format('DD/MM/YYYY') : '-',
 				statusText: item.status === 'completed' ? 'Đã hoàn thành' : 'Đang làm',
-				kpiValue: `${item.manDay} ngày`,
+				kpiValue: `${item?.manDay ?? '-'} ngày`,
 			};
 		});
 	}, [listTargetsInfos]);
