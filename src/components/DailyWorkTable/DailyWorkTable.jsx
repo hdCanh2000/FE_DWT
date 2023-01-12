@@ -134,7 +134,7 @@ const DailyWorkTable = ({ dataSearch }) => {
 				/>
 				{(tableData.length <= 1) 
 					? <div className='text-center'>
-						<h5 style={{color: '#adb5bd'}}>Chưa có nhiệm vụ nào</h5>
+						<h5 style={{color: '#adb5bd', paddingTop: '8px'}}>Chưa có tiêu chí nào</h5>
 					</div> 
 					: null}
 				</>
