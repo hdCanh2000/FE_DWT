@@ -18,44 +18,35 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
-import { getAllPositions, getAllUnits, getAllUsers, updateTarget } from '../../kpiNorm/services';
+import {
+	createTargetInfo,
+	getAllPositions,
+	getAllUnits,
+	getAllUsers,
+	updateTargetInfo,
+} from '../../kpiNorm/services';
 import ModalCreateUnit from '../../../components/ModalCreateUnit';
 
-const ModalOrderTaskForm = ({ open, onClose, data }) => {
+const ModalOrderTaskForm = ({ open, onClose, data, isCreate, onSuccess, onUpdateTargetInfo }) => {
 	const [loading, setLoading] = useState(false);
-	const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
-	const [currentOrderTask, setCurrentOrderTask] = useState(data);
+	const [formData, setFormData] = useState({});
 	const [form] = Form.useForm();
+	const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
 
 	useEffect(() => {
-		setCurrentOrderTask(data);
 		if (data) {
-			if (data.deadline) {
-				form.setFieldsValue({ ...data, deadline: dayjs(data.deadline) });
-			} else {
-				form.setFieldsValue({ ...data, deadline: dayjs().add(1, 'day') });
-			}
+			setFormData(data);
+			const startDate = data.startDate ? dayjs(data.startDate) : null;
+			const deadline = data.deadline ? dayjs(data.deadline) : null;
+			form.setFieldsValue({
+				...data,
+				targetDuration: [startDate, deadline],
+			});
 		} else {
 			form.resetFields();
 		}
 	}, [data]);
-	const handleFinish = async (values) => {
-		try {
-			setLoading(true);
-			if (!currentOrderTask || !currentOrderTask.id) {
-				throw new Error('Không tìm thấy công việc');
-			}
-			const isOrder = !!currentOrderTask.user;
-			await updateTarget(currentOrderTask.id, values);
-			toast.success(!isOrder ? 'Giao việc thành công' : 'cập nhật nhiệm vụ thành công');
-		} catch (err) {
-			toast.error('Thao tác không thành công');
-		} finally {
-			setLoading(false);
-			onClose(true);
-		}
-	};
-	const handleFinishFail = () => {};
+
 	const { data: listUnitData = { data: [] }, refetch: reFetchUnits } = useQuery(
 		'getAllUnits',
 		() => getAllUnits(),
@@ -66,18 +57,49 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 	);
 
 	const { data: listUsersData = { data: [] } } = useQuery('getAllUsers', () => getAllUsers());
-
 	const listUsers = listUsersData.data;
 	const listUnits = listUnitData.data;
 	const listPositions = listPositionData.data;
-	const isOrdered = currentOrderTask && currentOrderTask.user;
+	const handleFinish = async (values) => {
+		try {
+			setLoading(true);
+			if (isCreate) {
+				await createTargetInfo({
+					...values,
+					startDate: values.targetDuration[0],
+					deadline: values.targetDuration[1],
+					targetId: formData.id,
+				});
+				toast.success('Giao việc thành công');
+				form.resetFields();
+				if (onUpdateTargetInfo) {
+					// force update to refetch data
+					onUpdateTargetInfo(new Date().getTime());
+				}
+				onClose();
+			} else {
+				await updateTargetInfo(formData.id, {
+					...values,
+					startDate: values.targetDuration[0],
+					deadline: values.targetDuration[1],
+					targetId: formData.targetId,
+				});
+				toast.success('Cập nhật thành công');
+				form.resetFields();
+				onClose();
+			}
+		} catch (err) {
+			toast.error(err.message);
+		} finally {
+			setLoading(false);
+			await onSuccess();
+		}
+	};
 	return (
 		<Modal
 			forceRender
 			width={800}
-			title={
-				currentOrderTask && currentOrderTask.user ? 'Chỉnh sửa nhiệm vụ' : 'Giao nhiệm vụ'
-			}
+			title={isCreate ? `Giao việc cho định mức "${formData?.name}"` : `Chỉnh sửa nhiệm vụ`}
 			open={open}
 			onCancel={() => onClose(false)}
 			footer={[
@@ -89,23 +111,35 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 				</Button>,
 			]}>
 			<Form
-				name='createTarget'
+				name='createTargetInfo'
 				onFinish={handleFinish}
-				onFinishFailed={handleFinishFail}
+				onFinishFailed={() => {
+					toast.error('Thông tin không hợp lệ');
+				}}
 				layout='vertical'
 				form={form}
 				disabled={loading}>
-				<Row gutter={24}>
-					<Col span={12}>
+				<Row gutter={24} className='align-items-center'>
+					<Col span={8}>
 						<Form.Item
 							name='name'
 							label='Tên nhiệm vụ'
 							rules={[{ required: true, message: 'Vui lòng nhập tên nhiệm vụ' }]}>
-							<Input placeholder='Nhập tên nhiệm vụ' disabled={!isOrdered} />
+							<Input placeholder='Nhập tên nhiệm vụ' />
 						</Form.Item>
 					</Col>
+					<Col span={16}>
+						<div className='pt-2'>
+							{' '}
+							Thuộc định mức{' '}
+							<b>{isCreate ? formData?.name : formData?.Target?.name}</b>
+						</div>
+					</Col>
 					<Col span={12}>
-						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
+						<Form.Item
+							name='positionId'
+							label='Vị trí đảm nhiệm'
+							rules={[{ required: true, message: 'Vui chọn vị trí' }]}>
 							<Select
 								showSearch
 								placeholder='Chọn vị trí'
@@ -119,12 +153,14 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 									label: item.name,
 									value: item.id,
 								}))}
-								disabled={!isOrdered}
 							/>
 						</Form.Item>
 					</Col>
 					<Col span={12}>
-						<Form.Item name='userId' label='Người đảm nhiệm'>
+						<Form.Item
+							name='userId'
+							label='Người đảm nhiệm'
+							rules={[{ required: true, message: 'Vui lòng chọn người đảm nhiệm' }]}>
 							<Select
 								showSearch
 								optionFilterProp='children'
@@ -140,17 +176,17 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 							/>
 						</Form.Item>
 					</Col>
-					<Col span={12}>
+					<Col span={24}>
 						<Form.Item
-							name='deadline'
-							label='Hạn hoàn thành'
+							name='targetDuration'
+							label='Thời gian làm'
 							rules={[
 								{
 									required: true,
-									message: 'Vui lòng chọn hạn hoàn thành',
+									message: 'Vui lòng chọn ngày bắt đầu và deadline',
 								},
 							]}>
-							<DatePicker
+							<DatePicker.RangePicker
 								style={{ width: '100%' }}
 								placeholder='mm/dd/yyyy'
 								format='DD/MM/YYYY'
@@ -162,10 +198,7 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={24}>
 						<Form.Item name='description' label='Mô tả / diễn giải'>
-							<Input.TextArea
-								placeholder='Nhập mô tả nhiệm vụ'
-								disabled={!isOrdered}
-							/>
+							<Input.TextArea placeholder='Nhập mô tả nhiệm vụ' />
 						</Form.Item>
 					</Col>
 					<Col span={24}>
@@ -176,19 +209,24 @@ const ModalOrderTaskForm = ({ open, onClose, data }) => {
 
 					<Col span={8}>
 						<Form.Item name='manDay' label='ManDay'>
-							<InputNumber min={0} style={{ width: 200 }} disabled={!isOrdered} />
-						</Form.Item>
-					</Col>
-					<Col span={8}>
-						<Form.Item name='quantity' label='Số lượng'>
 							<InputNumber min={0} style={{ width: 200 }} />
 						</Form.Item>
 					</Col>
 					<Col span={8}>
-						<Form.Item name='unitId' label='Đơn vị'>
+						<Form.Item
+							name='quantity'
+							label='Số lượng'
+							rules={[{ required: true, message: 'Vui lòng nhập số lượng' }]}>
+							<InputNumber min={0} style={{ width: 200 }} />
+						</Form.Item>
+					</Col>
+					<Col span={8}>
+						<Form.Item
+							name='unitId'
+							label='Đơn vị'
+							rules={[{ required: true, message: 'Vui lòng chọn đơn vị' }]}>
 							<Select
 								showSearch
-								disabled={!isOrdered}
 								optionFilterProp='children'
 								filterOption={(input, option) =>
 									(option?.label.toLowerCase() ?? '').includes(

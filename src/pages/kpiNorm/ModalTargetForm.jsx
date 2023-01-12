@@ -2,17 +2,13 @@
 /* eslint react/prop-types: 0 */
 /* eslint react-hooks/exhaustive-deps: 0 */
 /* eslint react/no-unstable-nested-components: 0 */
-
-import { Button, Col, Divider, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
+import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
-import { createTarget, deleteTarget, getAllPositions, getAllUnits, updateTarget } from './services';
-import ModalCreateUnit from '../../components/ModalCreateUnit';
+import { createTarget, deleteTarget, updateTarget } from './services';
 
 const ModalTargetForm = ({ open, onClose, data }) => {
 	const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
-	const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
 	const [currentTarget, setCurrentTarget] = useState(data);
 	const [loading, setLoading] = useState(false);
 	const [form] = Form.useForm();
@@ -24,18 +20,7 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 			form.resetFields();
 		}
 	}, [data]);
-	// get list position
-	const { data: listUnitData = { data: [] }, refetch: reFetchUnits } = useQuery(
-		'getAllUnits',
-		() => getAllUnits(),
-	);
 
-	const { data: listPositionData = { data: [] } } = useQuery('getAllPositions', () =>
-		getAllPositions(),
-	);
-
-	const listUnits = listUnitData.data;
-	const listPositions = listPositionData.data;
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
@@ -75,7 +60,7 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 	return (
 		<Modal
 			forceRender
-			title={currentTarget ? 'Cập nhật nhiệm vụ' : 'Thêm mới nhiệm vụ'}
+			title={currentTarget ? 'Cập nhật định mức lao động' : 'Thêm mới định mức'}
 			onOk={() => onClose(false)}
 			onCancel={() => onClose(false)}
 			open={open}
@@ -105,29 +90,12 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 				layout='vertical'
 				form={form}>
 				<Row gutter={24}>
-					<Col span={12}>
+					<Col span={24}>
 						<Form.Item
 							name='name'
-							label='Tên nhiệm vụ'
+							label='Tên định mức'
 							rules={[{ required: true, message: 'Vui lòng nhập tên nhiệm vụ' }]}>
 							<Input placeholder='Nhập tên nhiệm vụ' />
-						</Form.Item>
-					</Col>
-					<Col span={12}>
-						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
-							<Select
-								optionFilterProp='children'
-								showSearch
-								filterOption={(input, option) =>
-									(option?.label.toLowerCase() ?? '').includes(
-										input.toLowerCase(),
-									)
-								}
-								options={listPositions.map((item) => ({
-									label: item.name,
-									value: item.id,
-								}))}
-							/>
 						</Form.Item>
 					</Col>
 
@@ -142,52 +110,9 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 						</Form.Item>
 					</Col>
 
-					<Col span={8}>
+					<Col span={24}>
 						<Form.Item name='manDay' label='ManDay'>
 							<InputNumber min={0} style={{ width: 200 }} />
-						</Form.Item>
-					</Col>
-					<Col span={8}>
-						<Form.Item name='quantity' label='Số lượng'>
-							<InputNumber min={0} style={{ width: 200 }} />
-						</Form.Item>
-					</Col>
-					<Col span={8} className='d-flex justify-content-between align-items-center'>
-						<Form.Item name='unitId' label='Đơn vị'>
-							<Select
-								style={{ width: 200 }}
-								optionFilterProp='children'
-								showSearch
-								filterOption={(input, option) =>
-									(option?.label.toLowerCase() ?? '').includes(
-										input.toLowerCase() || option.value === '',
-									)
-								}
-								options={listUnits.map((item) => ({
-									label: item.name,
-									value: item.id,
-								}))}
-								dropdownRender={(menu) => (
-									<>
-										{menu}
-										<Divider
-											style={{
-												margin: '8px 0',
-											}}
-										/>
-										<div className='p-2'>
-											<Button
-												type='primary'
-												style={{ width: '100%' }}
-												onClick={() => {
-													setOpenCreateUnitModal(true);
-												}}>
-												Thêm đơn vị
-											</Button>
-										</div>
-									</>
-								)}
-							/>
 						</Form.Item>
 					</Col>
 				</Row>
@@ -207,17 +132,6 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 				]}>
 				<p>Bạn có chắc chắn muốn xóa nhiệm vụ này ?</p>
 			</Modal>
-			<ModalCreateUnit
-				isOpen={openCreateUnitModal}
-				onClose={() => setOpenCreateUnitModal(false)}
-				onCreateSuccess={async (createdUnit) => {
-					await reFetchUnits();
-					setOpenCreateUnitModal(false);
-					form.setFieldsValue({
-						unitId: createdUnit.id,
-					});
-				}}
-			/>
 		</Modal>
 	);
 };

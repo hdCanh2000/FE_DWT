@@ -1,19 +1,20 @@
 /* eslint-disable */
-import { Table } from 'antd';
+import { Select, Table } from 'antd';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import { getWorkTrackTableRowAndHeaderRow } from './config';
+import { getWorkTrackTableRowAndHeaderRow, listColumnsOptions } from './config';
 import moment from 'moment/moment';
 import ModalTargetLog from './ModalTargetLog';
 import ModalTargetInfo from './ModalTargetInfo';
 import { useQuery } from 'react-query';
-import { getListTarget, getUserDetail } from '../../pages/dailyWorkTracking/services';
+import { getListTargetInfos } from '../../pages/dailyWorkTracking/services';
 import scrollIntoView from 'scroll-into-view';
 
-const TargetTable = ({ dataSearch }) => {
+const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 	const [isOpenTargetLogModal, setIsOpenTargetLogModal] = useState(false);
 	const [isOpenTargetInfoModal, setIsOpenTargetInfoModal] = useState(false);
 	const [canScroll, setCanScroll] = useState(true);
+
 	// set default date to today
 	const [targetLogModalData, setTargetLogModalData] = useState({ logDay: moment(), target: {} });
 	const [targetInfoModalData, setTargetInfoModalData] = useState({});
@@ -37,13 +38,17 @@ const TargetTable = ({ dataSearch }) => {
 		dayjs(dataSearch.start, 'M-DD-YYYY'),
 		onCalenderClick,
 		onTargetTitleClick,
+		columnsToShow,
 	);
 	const {
 		data: listTarget = [],
 		isLoading: isLoadingListTarget,
 		isError: isErrorListTarget,
 		refetch: reFetchListTarget,
-	} = useQuery(['getListTarget', dataSearch], ({ queryKey }) => getListTarget(queryKey[1]));
+	} = useQuery(['getListTargetInfos', dataSearch], ({ queryKey }) =>
+		getListTargetInfos(queryKey[1]),
+	);
+
 
 	// normalize data for table
 	const tableData = useMemo(() => {
@@ -62,6 +67,8 @@ const TargetTable = ({ dataSearch }) => {
 				deadline: item.deadline ? dayjs(item.deadline).format('DD/MM/YYYY') : '_',
 				// KQT MD: Kết quả tạm - Nhân từ số đầu việc hoàn thành nhân với MD
 				manDayEstimated: totalCompletedTasks * item.manDay,
+				// progress: totalCompletedTasks / item.quantity * 100,
+				progress: `${totalCompletedTasks} / ${item.quantity}`,
 				unit: item?.unit?.name,
 			};
 			// insert targetLogs to table
@@ -112,7 +119,21 @@ const TargetTable = ({ dataSearch }) => {
 		if (!tableHeader) return;
 		// reset style attribute
 		tableHeader.style = '';
-	}, [tableData, tableRef]);
+	}, [tableData, tableRef, columnsToShow]);
+
+	//set kpi estimated
+	useEffect(() => {
+		if (!tableData.length) return;
+		let totalManDayEstimated = 0;
+		tableData.forEach((item) => {
+			if (item.key === 'STT') {
+				return;
+			}
+			totalManDayEstimated += item.manDayEstimated;
+		});
+		const kpiEstimated = totalManDayEstimated * 4;
+		setKpiEstimated(kpiEstimated);
+	}, [tableData]);
 
 	return (
 		<>
@@ -150,6 +171,7 @@ const TargetTable = ({ dataSearch }) => {
 				open={isOpenTargetInfoModal}
 				target={targetInfoModalData}
 				onOk={() => setIsOpenTargetInfoModal(false)}
+				reFetchListTarget={reFetchListTarget}
 			/>
 		</>
 	);

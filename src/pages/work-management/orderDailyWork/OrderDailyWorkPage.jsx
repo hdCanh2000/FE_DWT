@@ -175,8 +175,6 @@ const OrderDailyWorkPage = () => {
 
 	const [unAssignedParams, setUnAssignedParams] = useState({
 		q: '',
-		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
-		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
 	});
 	const [unAssignedSearch, setUnAssignedSearch] = useState('');
 
@@ -212,13 +210,6 @@ const OrderDailyWorkPage = () => {
 	} = useQuery(['getListTargetUnAssign', unAssignedParams], ({ queryKey }) =>
 		getDailyWorks({ ...queryKey[1] }),
 	);
-
-	// get list departments
-	const { data: listDepartmentsData = { data: { data: [] } } } = useQuery(
-		['getListDepartment'],
-		() => getAllDepartment(),
-	);
-	const listDepartments = listDepartmentsData.data.data;
 
 	const unAssignedTaskData = useMemo(() => {
 		return unAssignedTasks.map((item, index) => ({
@@ -371,8 +362,20 @@ const OrderDailyWorkPage = () => {
 										<DatePicker.MonthPicker
 											format='MM/YYYY'
 											locale={locale}
-											value={dayjs(unAssignedParams.start, 'M-DD-YYYY')}
+											value={
+												unAssignedParams.start
+													? dayjs(unAssignedParams.start, 'M-DD-YYYY')
+													: null
+											}
 											onChange={(updatedDate) => {
+												if (updatedDate === null) {
+													setUnAssignedParams({
+														...assignedParams,
+														start: null,
+														end: null,
+													});
+													return;
+												}
 												setUnAssignedParams({
 													...assignedParams,
 													start: `${

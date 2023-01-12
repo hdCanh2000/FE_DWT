@@ -73,8 +73,18 @@ const updateTarget = async (id, data) => {
 	return resp.data;
 };
 
+const updateTargetInfo = async (id, data) => {
+	const resp = await axiosClient.put(`/api/targets/target_infos/${id}`, data);
+	return resp.data;
+};
+
 const deleteTarget = async (id) => {
 	const resp = await axiosClient.delete(`/api/targets/${id}`);
+	return resp.data;
+};
+
+const deleteTargetInfo = async (id) => {
+	const resp = await axiosClient.delete(`/api/targets/target_infos/${id}`);
 	return resp.data;
 };
 const getAllUnits = async () => {
@@ -102,6 +112,15 @@ const getAllUsers = async (params = {}) => {
 	return resp.data;
 };
 
+const createTargetInfo = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/targets/target_infos`,
+		data,
+	});
+	return resp.data;
+};
+
 export {
 	exportExcel,
 	getAllKpiNorm,
@@ -117,4 +136,7 @@ export {
 	updateTarget,
 	deleteTarget,
 	getAllUsers,
+	updateTargetInfo,
+	createTargetInfo,
+	deleteTargetInfo,
 };
