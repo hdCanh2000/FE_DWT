@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
-import moment from 'moment';
+// import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -16,7 +15,7 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
-import Popovers from '../../components/bootstrap/Popovers';
+// import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
@@ -28,6 +27,7 @@ import Loading from '../../components/Loading/Loading';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import EmployeeForm from './EmployeeForm';
+import TableCommon from '../common/ComponentCommon/TableCommon';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -54,7 +54,11 @@ const EmployeePage = () => {
 	const loading = useSelector((state) => state.employee.loading);
 
 	const fetchUser = () => {
-		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+		return users.map((item, index) => ({
+			...item,
+			code: _.isEmpty(item.code) ? '--' : item.code,
+			indexNumber: _.isEmpty(index) ? index : '--',
+		}));
 	};
 
 	const setCurrentPage = (page) => {
@@ -65,7 +69,7 @@ const EmployeePage = () => {
 		const query = {};
 		query.text = text;
 		query.page = currentPage;
-		query.limit = 10;
+		// query.limit = 10;
 		dispatch(fetchEmployeeList(query));
 	}, [dispatch, currentPage, text]);
 
@@ -94,7 +98,17 @@ const EmployeePage = () => {
 	const handleChangeCurrentPage = (searchValue) => {
 		setCurrentPage(searchValue.page);
 	};
+
 	const columns = [
+		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			align: 'center',
+			isShow: false,
+			render: (item) => <span>{item.indexNumber + 1}</span>,
+		},
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -102,7 +116,9 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			col: 6,
+			// col: 8,
+			options: users,
+			render: (item) => <span>{item.name}</span>,
 		},
 		{
 			title: 'Mã nhân sự',
@@ -111,43 +127,8 @@ const EmployeePage = () => {
 			type: 'text',
 			align: 'center',
 			isShow: true,
-			col: 6,
-		},
-		{
-			title: 'Giới tính',
-			id: 'sex',
-			key: 'sex',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: false,
-			format: (value) =>
-				// eslint-disable-next-line no-nested-ternary
-				value === 'male' ? 'Nam' : 'Nữ',
-			options: [
-				{
-					id: 1,
-					text: 'Nam',
-					label: 'Nam',
-					value: 'male',
-				},
-				{
-					id: 2,
-					text: 'Nữ',
-					label: 'Nữ',
-					value: 'female',
-				},
-			],
-			col: 6,
-		},
-		{
-			title: 'Ngày sinh',
-			id: 'dateOfBirth',
-			key: 'dateOfBirth',
-			type: 'date',
-			align: 'center',
-			isShow: false,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			col: 4,
+			// col: 6,
+			render: (item) => <span>{item.code}</span>,
 		},
 		{
 			title: 'Email liên hệ',
@@ -157,17 +138,9 @@ const EmployeePage = () => {
 			align: 'left',
 			isShow: true,
 			col: 6,
+			render: (item) => <span>{item.email}</span>,
 			// eslint-disable-next-line no-unneeded-ternary
 			isDisabled: itemEdit?.id ? true : false,
-		},
-		{
-			title: 'SĐT',
-			id: 'phone',
-			key: 'phone',
-			type: 'text',
-			align: 'center',
-			isShow: false,
-			col: 4,
 		},
 		{
 			title: 'Phòng ban công tác',
@@ -182,16 +155,6 @@ const EmployeePage = () => {
 			col: 6,
 		},
 		{
-			title: 'Ngày tham gia',
-			id: 'dateOfJoin',
-			key: 'dateOfJoin',
-			type: 'date',
-			align: 'center',
-			isShow: false,
-			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
-			col: 4,
-		},
-		{
 			title: 'Vị trí làm việc',
 			id: 'position',
 			key: 'position',
@@ -202,61 +165,6 @@ const EmployeePage = () => {
 			options: positions,
 			isMulti: false,
 			col: 6,
-		},
-		{
-			title: 'Chức vụ',
-			id: 'role',
-			key: 'role',
-			type: 'singleSelect',
-			align: 'left',
-			isShow: false,
-			format: (value) =>
-				// eslint-disable-next-line no-nested-ternary
-				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
-			options: [
-				{
-					id: 1,
-					text: 'Admin',
-					label: 'Admin',
-					value: 'admin',
-				},
-				{
-					id: 2,
-					text: 'Quản lý',
-					label: 'Quản lý',
-					value: 'manager',
-				},
-				{
-					id: 3,
-					text: 'Nhân viên',
-					label: 'Nhân viên',
-					value: 'user',
-				},
-			],
-			col: 6,
-		},
-		{
-			title: 'Địa chỉ',
-			id: 'address',
-			key: 'address',
-			type: 'textarea',
-			align: 'center',
-			isShow: false,
-			render: (item) => (
-				<Popovers desc={item?.address} trigger='hover'>
-					<div
-						style={{
-							maxWidth: 150,
-							WebkitLineClamp: '2',
-							overflow: 'hidden',
-							textOverflow: 'ellipsis',
-							display: '-webkit-box',
-							WebkitBoxOrient: 'vertical',
-						}}>
-						{item?.address}
-					</div>
-				</Popovers>
-			),
 		},
 		{
 			title: 'Hành Động',

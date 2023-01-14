@@ -1,8 +1,8 @@
 import React, { memo, useState } from 'react';
+import { Table } from 'antd';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
-import PaginationButtons from './Pagination';
 import Button from '../../../components/bootstrap/Button';
 import useDarkMode from '../../../hooks/useDarkMode';
 
@@ -23,8 +23,6 @@ const TableCommon = ({
 }) => {
 	const { darkModeStatus } = useDarkMode();
 
-	// const items = dataPagination(data, currentPage, 10);
-
 	const [textSearch, setTextSearch] = useState(searchvalue);
 
 	const handleChange = (e) => {
@@ -35,6 +33,35 @@ const TableCommon = ({
 		e.preventDefault();
 		onSubmitSearch({ text: textSearch, page: 1 });
 	};
+
+	// const handleFilter = (items) => {
+	// 	console.log('search: ', items);
+	// 	if ( items ===
+	// 		items.name
+	// 			.toUpperCase()
+	// 			.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
+	// 			.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
+	// 			.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
+	// 			.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
+	// 			.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
+	// 			.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
+	// 			.replace(/Đ/g, 'D')
+	// 			.replace(
+	// 				/!|@|%|\^|\*|\(|\)|\+|=|<|>|\?|\/|,|\.|:|;|'|"|&|#|\[|\]|~|\$|_|`|-|{|}|\||\\/g,
+	// 				' ',
+	// 			)
+	// 			.replace(/ + /g, ' ')
+	// 			.trim()
+	// 			.includes(textSearch.toUpperCase())
+	// 	) {
+	// 		console.log('search: ', items);
+	// 		return items;
+	// 	}
+	// 	if (textSearch === '') {
+	// 		return items;
+	// 	}
+	// 	return items;
+	// };
 
 	const handleChangeCurrentPage = (pageCurrent) => {
 		onChangeCurrentPage({ text: textSearch, page: pageCurrent });
@@ -67,109 +94,17 @@ const TableCommon = ({
 					</Form>
 				</div>
 			)}
-			<table className={classNames(className)} {...props}>
-				<thead>
-					<tr>
-						{columns?.map((column) => {
-							if (column?.key === 'action') {
-								return (
-									<th
-										style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
-										key={column.key}
-										className={classNames(
-											column.className,
-											`text-${column.align ? column.align : 'left'}`,
-										)}
-										align={column.align ? column.align : 'left'}>
-										{column.title}
-									</th>
-								);
-							}
-							if (column?.isShow === false) {
-								return null;
-							}
-							return (
-								<th
-									style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
-									key={column.key}
-									className={classNames(
-										column.className,
-										`text-${column.align ? column.align : 'left'}`,
-									)}
-									align={column.align ? column.align : 'left'}>
-									{column.title}
-								</th>
-							);
-						})}
-					</tr>
-				</thead>
-				<tbody>
-					{data?.map((row) => {
-						return (
-							<tr key={row.id}>
-								{columns?.map((column) => {
-									const value = row[column.id];
-									if (column?.key === 'action') {
-										if (column.render) {
-											return (
-												<td
-													key={column.key}
-													align={column.align ? column.align : 'left'}
-													className={`text-${
-														column.align ? column.align : 'left'
-													}`}
-													style={{ fontSize: 14 }}>
-													{column.render(row, value)}
-												</td>
-											);
-										}
-									}
-									if (column?.isShow === false) {
-										return null;
-									}
-									if (column.render) {
-										return (
-											<td
-												key={column.key}
-												align={column.align ? column.align : 'left'}
-												className={`text-${
-													column.align ? column.align : 'left'
-												}`}
-												style={{ fontSize: 14 }}>
-												{column.render(row, value)}
-											</td>
-										);
-									}
-									return (
-										<td
-											style={{
-												fontSize: 14,
-												minWidth: `${column.minWidth}px`,
-											}}
-											key={column.key}
-											className={classNames(
-												column.className,
-												`text-${column.align ? column.align : 'left'}`,
-											)}
-											align={column.align ? column.align : 'left'}>
-											{column.format ? column.format(value) : value}
-										</td>
-									);
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			<hr />
-			<div>
-				<PaginationButtons
-					data={data}
-					setCurrentPage={setCurrentPage}
-					currentPage={parseInt(currentPage, 10)}
+			<div className={classNames(className)} {...props}>
+				<Table
+					className='table table-modern mb-0'
+					columns={columns}
+					dataSource={data}
+					onSubmitSearch={handleSubmit}
 					onChangeCurrentPage={handleChangeCurrentPage}
-					totalItem={totalItem}
-					total={total}
+					currentPage={parseInt(currentPage, 10)}
+					setCurrentPage={setCurrentPage}
+					searchvalue={textSearch}
+					isSearch
 				/>
 			</div>
 		</div>

@@ -193,10 +193,6 @@ const TaskByUser = () => {
 													<th className='text-center'>
 														Số nhiệm vụ đang có
 													</th>
-													{/* <th className='text-center'>Tổng điểm KPI</th>
-													<th className='text-center'>
-														Điểm KPI hiện tại
-													</th> */}
 												</tr>
 											</thead>
 											<tbody>
@@ -220,34 +216,6 @@ const TaskByUser = () => {
 																	);
 																})?.length || 0}
 															</td>
-															{/* <td className='text-center'>
-																{calcTotalKPIOfWorkTrack(
-																	item.workTracks.map((wt) => ({
-																		totalKPI:
-																			calcTotalKPIOfWorkTrack(
-																				wt,
-																			),
-																		currentKPI:
-																			calcCurrentKPIOfWorkTrack(
-																				wt,
-																			),
-																	})),
-																) || 0}
-															</td>
-															<td className='text-center'>
-																{calcCurrentKPIOfWorkTrack(
-																	item.workTracks.map((wt) => ({
-																		totalKPI:
-																			calcTotalKPIOfWorkTrack(
-																				wt,
-																			),
-																		currentKPI:
-																			calcCurrentKPIOfWorkTrack(
-																				wt,
-																			),
-																	})),
-																) || 0}
-															</td> */}
 														</tr>
 													</React.Fragment>
 												))}

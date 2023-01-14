@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
+import _ from 'lodash';
 import Card, {
 	CardActions,
 	CardHeader,
@@ -42,9 +43,14 @@ const PositionLevelConfigPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const pagination = useSelector((state) => state.positionLevel.pagination);
 	const loading = useSelector((state) => state.positionLevel.loading);
-	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
+	const positionLevel = useSelector((state) => state.positionLevel.positionLevels);
 
 	const currentPage = useSelector((state) => state.positionLevel.currentPage);
+
+	const positionLevels = positionLevel.map((item, index) => ({
+		...item,
+		indexNumber: _.isEmpty(index) ? index : '--',
+	}));
 
 	const setCurrentPage = (page) => {
 		dispatch(changeCurrentPage(page));
@@ -52,12 +58,22 @@ const PositionLevelConfigPage = () => {
 
 	const columns = [
 		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			align: 'center',
+			isShow: false,
+			render: (item) => <span>{item.indexNumber + 1}</span>,
+		},
+		{
 			title: 'Tên cấp nhân sự',
 			id: 'name',
 			key: 'name',
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.name}</span>,
 		},
 		{
 			title: 'Mã cấp nhân sự',
@@ -66,6 +82,7 @@ const PositionLevelConfigPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.code}</span>,
 		},
 		{
 			title: 'Hành động',

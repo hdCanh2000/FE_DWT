@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import _ from 'lodash';
 import { toast } from 'react-toastify';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
@@ -35,7 +36,7 @@ const MissionPage = () => {
 	const text = searchParams.get('text') || '';
 
 	const dispatch = useDispatch();
-	const missions = useSelector((state) => state.mission.missions);
+	const mission = useSelector((state) => state.mission.missions);
 	const pagination = useSelector((state) => state.mission.pagination);
 	const loading = useSelector((state) => state.mission.loading);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
@@ -43,6 +44,11 @@ const MissionPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 
 	const currentPage = useSelector((state) => state.mission.currentPage);
+
+	const missions = mission.map((item, index) => ({
+		...item,
+		indexNumber: _.isEmpty(index) ? index : '--',
+	}));
 
 	useEffect(() => {
 		const query = {};
@@ -84,10 +90,19 @@ const MissionPage = () => {
 
 	const columns = [
 		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			isShow: false,
+			render: (item) => <span>{item.indexNumber + 1}</span>,
+		},
+		{
 			title: 'Tên mục tiêu',
 			id: 'name',
 			key: 'name',
 			type: 'text',
+			render: (item) => <span>{item?.name || '--'}</span>,
 		},
 		{
 			title: 'Phòng ban phụ trách',
@@ -103,15 +118,25 @@ const MissionPage = () => {
 			id: 'startTime',
 			key: 'startTime',
 			type: 'text',
-			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : '--'),
 			align: 'center',
+			render: (value) => (
+				<span>
+					{value.startTime
+						? `${moment(`${value.startTime}`).format('DD-MM-YYYY')}`
+						: '--'}
+				</span>
+			),
 		},
 		{
 			title: 'Ngày kết thúc',
 			id: 'endTime',
 			key: 'endTime',
-			format: (value) => (value ? `${moment(`${value}`).format('DD-MM-YYYY')}` : '--'),
 			align: 'center',
+			render: (value) => (
+				<span>
+					{value.endTime ? `${moment(`${value.endTime}`).format('DD-MM-YYYY')}` : '--'}
+				</span>
+			),
 		},
 		{
 			title: 'Số lượng',
@@ -120,6 +145,7 @@ const MissionPage = () => {
 			type: 'number',
 			align: 'center',
 			format: (value) => value || '--',
+			render: (item) => <span>{item?.quantity || '--'}</span>,
 		},
 		{
 			title: 'Số ngày công',
@@ -127,6 +153,7 @@ const MissionPage = () => {
 			key: 'manday',
 			type: 'number',
 			align: 'center',
+			render: (item) => <span>{item?.manday || '--'}</span>,
 		},
 		{
 			title: 'Hành động',

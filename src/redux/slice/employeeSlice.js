@@ -33,7 +33,6 @@ export const fetchEmployeeListByDepartment = createAsyncThunk(
 		return response.data?.data?.map((item) => {
 			return {
 				...item,
-				// indexNumber: index,
 				label: item.name,
 				value: item.id,
 				text: item.name,
@@ -96,7 +95,7 @@ export const employeeSlice = createSlice({
 					},
 				};
 			});
-			// state.pagination = { ...action.payload.pagination };
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchEmployeeList.rejected]: (state, action) => {
 			state.loading = false;
@@ -109,6 +108,7 @@ export const employeeSlice = createSlice({
 		[fetchEmployeeListByDepartment.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.employees = [...action.payload];
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchEmployeeListByDepartment.rejected]: (state, action) => {
 			state.loading = false;
@@ -121,6 +121,7 @@ export const employeeSlice = createSlice({
 		[fetchEmployeeById.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.employee = { ...action.payload };
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchEmployeeById.rejected]: (state, action) => {
 			state.loading = false;
@@ -133,6 +134,7 @@ export const employeeSlice = createSlice({
 		[onAddEmployee.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.employees = [...state.employees, ...action.payload];
+			state.pagination = { ...action.payload.pagination };
 		},
 		[onAddEmployee.rejected]: (state, action) => {
 			state.loading = false;
@@ -143,6 +145,7 @@ export const employeeSlice = createSlice({
 			state.loading = true;
 		},
 		[onUpdateEmployee.fulfilled]: (state, action) => {
+			state.pagination = { ...action.payload.pagination };
 			const {
 				arg: { id },
 			} = action.meta;

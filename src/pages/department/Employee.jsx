@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-// import { Button as AntButton, Row, Col, Table, Space, Modal, Input } from 'antd';
+import _ from 'lodash';
 import { Table } from 'antd';
 import {
 	fetchEmployeeList,
@@ -19,7 +19,7 @@ const EmployeePage = ({ dataDepartment }) => {
 	const positions = useSelector((state) => state.position.positions);
 
 	const userWithIndex = users.map((item, index) => {
-		return { ...item, indexNumber: index };
+		return { ...item, indexNumber: _.isEmpty(index) ? index : '--' };
 	});
 
 	const setCurrentPage = (page) => {
@@ -55,7 +55,7 @@ const EmployeePage = ({ dataDepartment }) => {
 			key: 'stt',
 			type: 'text',
 			align: 'left',
-			isShow: true,
+			isShow: false,
 			render: (item) => <span>{item.indexNumber + 1}</span>,
 		},
 		{
