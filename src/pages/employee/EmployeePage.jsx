@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo } from 'react';
+import { useSearchParams, createSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
 import { toast } from 'react-toastify';
+import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -20,7 +21,7 @@ import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchEmployeeList, changeCurrentPage } from '../../redux/slice/employeeSlice';
+import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, exportExcel, updateEmployee } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -28,11 +29,14 @@ import Loading from '../../components/Loading/Loading';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import EmployeeForm from './EmployeeForm';
+// import ModalOrderTaskForm from '../work-management/orderTask/ModalOrderTaskForm';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 	const text = searchParams.get('text') || '';
+
+	// const [searchTable, setSearchTable] = useState('');
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -49,25 +53,29 @@ const EmployeePage = () => {
 	const users = useSelector((state) => state.employee.employees);
 	const departments = useSelector((state) => state.department.departments);
 	const positions = useSelector((state) => state.position.positions);
-	const pagination = useSelector((state) => state.employee.pagination);
-	const currentPage = useSelector((state) => state.employee.currentPage);
+	// const pagination = useSelector((state) => state.employee.pagination);
+	// const currentPage = useSelector((state) => state.employee.currentPage);
 	const loading = useSelector((state) => state.employee.loading);
 
-	const fetchUser = () => {
-		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
-	};
+	// const fetchUser = () => {
+	// 	return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+	// };
 
-	const setCurrentPage = (page) => {
-		dispatch(changeCurrentPage(page));
-	};
+	const fetchUser = useMemo(() => {
+		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+	}, [users]);
+
+	// const setCurrentPage = (page) => {
+	// 	dispatch(changeCurrentPage(page));
+	// };
 
 	useEffect(() => {
 		const query = {};
 		query.text = text;
-		query.page = currentPage;
-		query.limit = 10;
+		// query.page = currentPage;
+		// query.limit = 10;
 		dispatch(fetchEmployeeList(query));
-	}, [dispatch, currentPage, text]);
+	}, [dispatch, text]);
 
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
@@ -88,34 +96,41 @@ const EmployeePage = () => {
 				}).toString(),
 			});
 		}
-		setCurrentPage(1);
+		// setCurrentPage(1);
 	};
 
-	const handleChangeCurrentPage = (searchValue) => {
-		setCurrentPage(searchValue.page);
-	};
+	// const handleChangeCurrentPage = (searchValue) => {
+	// 	setCurrentPage(searchValue.page);
+	// };
 	const columns = [
 		{
 			title: 'Họ và tên',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			col: 6,
 		},
 		{
 			title: 'Mã nhân sự',
 			id: 'code',
+			dataIndex: 'code',
 			key: 'code',
+			sorter: (a, b) => a.code.localeCompare(b.code),
 			type: 'text',
 			align: 'center',
+			hidden: true,
 			isShow: true,
 			col: 6,
 		},
 		{
 			title: 'Giới tính',
 			id: 'sex',
+			dataIndex: 'sex',
 			key: 'sex',
 			type: 'singleSelect',
 			align: 'left',
@@ -142,6 +157,7 @@ const EmployeePage = () => {
 		{
 			title: 'Ngày sinh',
 			id: 'dateOfBirth',
+			dataIndex: 'dateOfBirth',
 			key: 'dateOfBirth',
 			type: 'date',
 			align: 'center',
@@ -152,9 +168,12 @@ const EmployeePage = () => {
 		{
 			title: 'Email liên hệ',
 			id: 'email',
+			dataIndex: 'email',
 			key: 'email',
+			sorter: (a, b) => a.email.localeCompare(b.email),
 			type: 'text',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			col: 6,
 			// eslint-disable-next-line no-unneeded-ternary
@@ -163,6 +182,7 @@ const EmployeePage = () => {
 		{
 			title: 'SĐT',
 			id: 'phone',
+			dataIndex: 'phone',
 			key: 'phone',
 			type: 'text',
 			align: 'center',
@@ -172,9 +192,11 @@ const EmployeePage = () => {
 		{
 			title: 'Phòng ban công tác',
 			id: 'department',
+			dataIndex: '',
 			key: 'department',
 			type: 'select',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || ''} </span>,
 			options: departments,
@@ -184,6 +206,7 @@ const EmployeePage = () => {
 		{
 			title: 'Ngày tham gia',
 			id: 'dateOfJoin',
+			dataIndex: 'dateOfJoin',
 			key: 'dateOfJoin',
 			type: 'date',
 			align: 'center',
@@ -194,9 +217,11 @@ const EmployeePage = () => {
 		{
 			title: 'Vị trí làm việc',
 			id: 'position',
+			dataIndex: '',
 			key: 'position',
 			type: 'select',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			render: (item) => <span>{item?.position?.name || ''}</span>,
 			options: positions,
@@ -206,6 +231,7 @@ const EmployeePage = () => {
 		{
 			title: 'Chức vụ',
 			id: 'role',
+			dataIndex: 'role',
 			key: 'role',
 			type: 'singleSelect',
 			align: 'left',
@@ -238,6 +264,7 @@ const EmployeePage = () => {
 		{
 			title: 'Địa chỉ',
 			id: 'address',
+			dataIndex: 'address',
 			key: 'address',
 			type: 'textarea',
 			align: 'center',
@@ -281,16 +308,22 @@ const EmployeePage = () => {
 								isLight={darkModeStatus}
 								className='text-nowrap mx-2'
 								icon='Trash'
-								onClick={() => handleOpenFormDelete(item)}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleOpenFormDelete(item);
+								}}
 							/>
 						</div>,
 						['admin'],
 					)}
 				</>
 			),
+			hidden: true,
 			isShow: false,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
 
 	const handleDelete = async (data) => {
 		const dataSubmit = {
@@ -461,20 +494,34 @@ const EmployeePage = () => {
 														)}
 													</CardHeader>
 													<div className='p-4'>
-														<TableCommon
-															className='table table-modern mb-0'
-															columns={columns}
-															data={fetchUser()}
+														<TableSearchCommon
 															onSubmitSearch={handleSubmitSearch}
-															onChangeCurrentPage={
-																handleChangeCurrentPage
-															}
-															currentPage={parseInt(currentPage, 10)}
-															totalItem={pagination?.totalRows}
-															total={pagination?.total}
-															setCurrentPage={setCurrentPage}
 															searchvalue={text}
 															isSearch
+														/>
+														<Table
+															className='table table-modern mb-0'
+															columns={showColumns}
+															dataSource={fetchUser}
+															scroll={{ x: 'max-content' }}
+															// onSubmitSearch={handleSubmitSearch}
+															style={{ cursor: 'pointer' }}
+															onRow={(item) => {
+																return {
+																	onClick: () => {
+																		handleOpenForm(item);
+																	},
+																};
+															}}
+															// onChangeCurrentPage={
+															// 	handleChangeCurrentPage
+															// }
+															// currentPage={parseInt(currentPage, 10)}
+															// totalItem={pagination?.totalRows}
+															// total={pagination?.total}
+															// setCurrentPage={setCurrentPage}
+															// searchvalue={text}
+															// isSearch
 														/>
 													</div>
 												</div>
@@ -484,18 +531,22 @@ const EmployeePage = () => {
 									['admin', 'manager'],
 								)}
 
-								<EmployeeForm
-									size='xl'
-									show={toggleForm}
-									onClose={handleCloseForm}
-									handleSubmit={handleSubmitForm}
-									item={itemEdit}
-									label={
-										itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'
-									}
-									fields={columns}
-									validate={validate}
-								/>
+								{toggleForm && (
+									<EmployeeForm
+										size='xl'
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={itemEdit}
+										label={
+											itemEdit?.id
+												? 'Cập nhật nhân viên'
+												: 'Thêm mới nhân viên'
+										}
+										fields={columns}
+										validate={validate}
+									/>
+								)}
 								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}

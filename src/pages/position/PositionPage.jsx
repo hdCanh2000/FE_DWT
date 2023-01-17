@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -45,7 +46,7 @@ const PositionPage = () => {
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const positions = useSelector((state) => state.position.positions);
-	const pagination = useSelector((state) => state.position.pagination);
+	// const pagination = useSelector((state) => state.position.pagination);
 	const loading = useSelector((state) => state.position.loading);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
@@ -82,7 +83,7 @@ const PositionPage = () => {
 		const query = {};
 		query.text = text;
 		query.page = currentPage;
-		query.limit = 10;
+		// query.limit = 10;
 		dispatch(fetchPositionList(query));
 	}, [currentPage, dispatch, text]);
 
@@ -103,9 +104,9 @@ const PositionPage = () => {
 		setCurrentPage(1);
 	};
 
-	const handleChangeCurrentPage = (searchValue) => {
-		setCurrentPage(searchValue.page);
-	};
+	// const handleChangeCurrentPage = (searchValue) => {
+	// 	setCurrentPage(searchValue.page);
+	// };
 
 	useEffect(() => {
 		dispatch(fetchPositionLevelList());
@@ -118,47 +119,58 @@ const PositionPage = () => {
 			title: 'Tên vị trí',
 			placeholder: 'tên vị trí',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			col: 5,
 		},
 		{
 			title: 'Mã vị trí',
 			placeholder: 'mã vị trí',
 			id: 'code',
+			dataIndex: 'code',
 			key: 'code',
+			sorter: (a, b) => a.code.localeCompare(b.code),
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			col: 2,
 		},
 		{
 			title: 'Phòng ban',
 			id: 'department_id',
+			dataIndex: ['department', 'name'],
 			key: 'department_id',
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''}</span>,
+			hidden: true,
+			render: (t) => <span>{t || ''}</span>,
 			options: departments,
 			col: 5,
 		},
 		{
 			title: 'Cấp nhân sự',
 			id: 'position_levels_id',
+			dataIndex: ['positionLevel', 'name'],
 			key: 'position_levels_id',
 			type: 'singleSelect',
 			align: 'left',
+			hidden: true,
 			isShow: true,
-			render: (item) => <span>{item?.positionLevel?.name || ''}</span>,
+			render: (t) => <span>{t || ''}</span>,
 			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
 			col: 6,
 		},
 		{
 			title: 'Quản lý cấp trên',
 			id: 'manager',
+			dataIndex: 'manager',
 			key: 'manager',
 			type: 'select',
 			align: 'left',
@@ -171,6 +183,7 @@ const PositionPage = () => {
 			title: 'Địa điểm làm việc',
 			placeholder: 'địa điểm làm việc',
 			id: 'address',
+			dataIndex: 'address',
 			key: 'address',
 			type: 'text',
 			align: 'left',
@@ -180,6 +193,7 @@ const PositionPage = () => {
 			title: 'Mô tả vị trí',
 			placeholder: 'mô tả vị trí',
 			id: 'description',
+			dataIndex: 'description',
 			key: 'description',
 			type: 'textarea',
 			align: 'left',
@@ -188,6 +202,7 @@ const PositionPage = () => {
 		{
 			title: 'Yêu cầu năng lực',
 			id: 'requirements',
+			dataIndex: 'requirements',
 			key: 'requirements',
 			type: 'select',
 			align: 'left',
@@ -217,13 +232,19 @@ const PositionPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</div>
 			),
+			hidden: true,
 			isShow: false,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
@@ -248,7 +269,7 @@ const PositionPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = currentPage;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -269,7 +290,7 @@ const PositionPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = 1;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -337,20 +358,36 @@ const PositionPage = () => {
 													</CardActions>
 												</CardHeader>
 												<div className='p-4'>
-													<TableCommon
-														className='table table-modern mb-0'
-														columns={columns}
-														data={positions}
+													<TableSearchCommon
 														onSubmitSearch={handleSubmitSearch}
-														onChangeCurrentPage={
-															handleChangeCurrentPage
-														}
-														currentPage={parseInt(currentPage, 10)}
-														totalItem={pagination?.totalRows}
-														total={pagination?.total}
-														setCurrentPage={setCurrentPage}
 														searchvalue={text}
 														isSearch
+													/>
+													<Table
+														className='table table-modern mb-0'
+														columns={showColumns}
+														dataSource={positions}
+														scroll={{ x: 'max-content' }}
+														pagination={{ pageSize: 10 }}
+														style={{ cursor: 'pointer' }}
+														onRow={(item) => {
+															return {
+																cursor: 'pointer',
+																onClick: () => {
+																	handleOpenForm(item);
+																},
+															};
+														}}
+														// onSubmitSearch={handleSubmitSearch}
+														// onChangeCurrentPage={
+														// 	handleChangeCurrentPage
+														// }
+														// currentPage={parseInt(currentPage, 10)}
+														// totalItem={pagination?.totalRows}
+														// total={pagination?.total}
+														// setCurrentPage={setCurrentPage}
+														// searchvalue={text}
+														// isSearch
 													/>
 												</div>
 											</div>
