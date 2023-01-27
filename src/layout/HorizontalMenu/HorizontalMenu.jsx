@@ -11,7 +11,7 @@ const contentRoutes = [
 		label: 'Dashboard',
 		key: 'dashboard',
 		icon: <Icon className='navigation-icon' icon='Dashboard' />,
-		roles: ['admin', 'manager', 'user'],
+		roles: ['admin', 'manager'],
 		path: '/',
 	},
 	{
