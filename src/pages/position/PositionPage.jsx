@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -31,6 +31,8 @@ import { addResource, deleteResouce, getAllResource, updateResouce } from '../..
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
+
+	const [isEdit, setIsEdit] = useState(true);
 
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -144,26 +146,26 @@ const PositionPage = () => {
 		{
 			title: 'Phòng ban',
 			id: 'department_id',
-			dataIndex: ['department', 'name'],
+			dataIndex: '',
 			key: 'department_id',
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
 			hidden: true,
-			render: (t) => <span>{t || ''}</span>,
+			render: (item) => <span>{item?.department?.name || ''} </span>,
 			options: departments,
 			col: 5,
 		},
 		{
 			title: 'Cấp nhân sự',
 			id: 'position_levels_id',
-			dataIndex: ['positionLevel', 'name'],
+			dataIndex: '',
 			key: 'position_levels_id',
 			type: 'singleSelect',
 			align: 'left',
 			hidden: true,
 			isShow: true,
-			render: (t) => <span>{t || ''}</span>,
+			render: (item) => <span>{item?.positionLevel?.name || ''}</span>,
 			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
 			col: 6,
 		},
@@ -224,7 +226,11 @@ const PositionPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsEdit(true);
+							handleOpenForm(item);
+						}}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -245,6 +251,14 @@ const PositionPage = () => {
 	];
 
 	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
@@ -374,6 +388,7 @@ const PositionPage = () => {
 															return {
 																cursor: 'pointer',
 																onClick: () => {
+																	setIsEdit(false);
 																	handleOpenForm(item);
 																},
 															};
@@ -394,15 +409,17 @@ const PositionPage = () => {
 										</Card>
 									</div>
 								</div>
-								<CommonForm
-									show={toggleForm}
-									onClose={handleCloseForm}
-									handleSubmit={handleSubmitForm}
-									item={fetchRequirement(itemEdit)}
-									label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
-									fields={columns}
-									validate={validate}
-								/>
+								{toggleForm && (
+									<CommonForm
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={fetchRequirement(itemEdit)}
+										label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								)}
 								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,6 +28,9 @@ import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 const PositionLevelConfigPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
+
+	const [isEdit, setIsEdit] = useState(true);
+
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
@@ -85,7 +88,11 @@ const PositionLevelConfigPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsEdit(true);
+							handleOpenForm(item);
+						}}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -103,6 +110,14 @@ const PositionLevelConfigPage = () => {
 			isShow: false,
 		},
 	];
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	useEffect(() => {
 		const query = {};
@@ -250,6 +265,7 @@ const PositionLevelConfigPage = () => {
 															return {
 																cursor: 'pointer',
 																onClick: () => {
+																	setIsEdit(false);
 																	handleOpenForm(item);
 																},
 															};
@@ -270,19 +286,21 @@ const PositionLevelConfigPage = () => {
 										</Card>
 									</div>
 								</div>
-								<CommonForm
-									show={toggleForm}
-									onClose={handleCloseForm}
-									handleSubmit={handleSubmitForm}
-									item={itemEdit}
-									label={
-										itemEdit?.id
-											? 'Cập nhật cấp nhân sự'
-											: 'Thêm mới cấp nhân sự'
-									}
-									fields={columns}
-									validate={validate}
-								/>
+								{toggleForm && (
+									<CommonForm
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={itemEdit}
+										label={
+											itemEdit?.id
+												? 'Cập nhật cấp nhân sự'
+												: 'Thêm mới cấp nhân sự'
+										}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								)}
 								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}

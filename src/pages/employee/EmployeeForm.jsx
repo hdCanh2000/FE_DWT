@@ -78,6 +78,7 @@ const EmployeeForm = ({
 													}>
 													<FormGroup id={field.id} label={field.title}>
 														<Input
+															disabled={field?.isDisabled}
 															type={field.type || 'text'}
 															name={field.id}
 															onChange={formik.handleChange}
@@ -108,6 +109,7 @@ const EmployeeForm = ({
 													}>
 													<FormGroup id={field.id} label={field.title}>
 														<Select
+															disabled={field?.isDisabled}
 															ariaLabel={field.title || ''}
 															placeholder={`Chọn ${field.title}`}
 															list={field.options}
@@ -140,6 +142,7 @@ const EmployeeForm = ({
 													}>
 													<FormGroup id={field.id} label={field.title}>
 														<Input
+															disabled={field?.isDisabled}
 															type={field.type || 'text'}
 															name={field.id}
 															onChange={formik.handleChange}
@@ -204,6 +207,7 @@ const EmployeeForm = ({
 														id={field.id}
 														label={field.title}>
 														<CustomSelect
+															disabled={field?.isDisabled}
 															placeholder={`Chọn ${field.title}`}
 															value={formik.values[field.id]}
 															onChange={(value) => {
@@ -238,6 +242,7 @@ const EmployeeForm = ({
 														id={field.id}
 														label={field.title}>
 														<CustomSelect
+															disabled={field?.isDisabled}
 															placeholder={`Chọn ${field.title}`}
 															value={formik.values[field.id]}
 															onChange={(value) => {
@@ -270,6 +275,7 @@ const EmployeeForm = ({
 													}>
 													<FormGroup id={field.id} label={field.title}>
 														<Select
+															disabled={field?.isDisabled}
 															ariaLabel={field.title || ''}
 															placeholder={`Chọn ${field.title}`}
 															list={field.options}
@@ -366,6 +372,7 @@ const EmployeeForm = ({
 															id={field.id}
 															label={field.title}>
 															<Input
+																disabled={field?.isDisabled}
 																type={field.type || 'text'}
 																name={field.id}
 																onChange={formik.handleChange}
@@ -404,6 +411,7 @@ const EmployeeForm = ({
 															id={field.id}
 															label={field.title}>
 															<Textarea
+																disabled={field?.isDisabled}
 																rows={3}
 																ariaLabel={field.title}
 																placeholder={`${field.title}`}
@@ -440,6 +448,7 @@ const EmployeeForm = ({
 															id={field.id}
 															label={field.title}>
 															<Input
+																disabled={field?.isDisabled}
 																type={field.type || 'text'}
 																name={field.id}
 																onChange={formik.handleChange}
@@ -476,6 +485,7 @@ const EmployeeForm = ({
 															id={field.id}
 															label={field.title}>
 															<Input
+																disabled={field?.isDisabled}
 																type={field.type || 'text'}
 																name={field.id}
 																onChange={formik.handleChange}

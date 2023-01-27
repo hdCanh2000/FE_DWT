@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, createSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,6 +35,7 @@ const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 	const text = searchParams.get('text') || '';
+	const [isEdit, setIsEdit] = useState(true);
 
 	// const [searchTable, setSearchTable] = useState('');
 
@@ -300,7 +301,11 @@ const EmployeePage = () => {
 								isLight={darkModeStatus}
 								className='text-nowrap mx-1'
 								icon='Edit'
-								onClick={() => handleOpenForm(item)}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleOpenForm(item);
+									setIsEdit(true);
+								}}
 							/>
 							<Button
 								isOutline={!darkModeStatus}
@@ -324,6 +329,14 @@ const EmployeePage = () => {
 	];
 
 	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	const handleDelete = async (data) => {
 		const dataSubmit = {
@@ -499,6 +512,7 @@ const EmployeePage = () => {
 															searchvalue={text}
 															isSearch
 														/>
+
 														<Table
 															className='table table-modern mb-0'
 															columns={showColumns}
@@ -509,6 +523,7 @@ const EmployeePage = () => {
 															onRow={(item) => {
 																return {
 																	onClick: () => {
+																		setIsEdit(false);
 																		handleOpenForm(item);
 																	},
 																};
@@ -543,7 +558,7 @@ const EmployeePage = () => {
 												? 'Cập nhật nhân viên'
 												: 'Thêm mới nhân viên'
 										}
-										fields={columns}
+										fields={isEdit ? columns : columnsNoEdit}
 										validate={validate}
 									/>
 								)}
