@@ -287,6 +287,11 @@ const EmployeePage = () => {
 			),
 		},
 		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
+		},
+		{
 			title: 'Hành Động',
 			id: 'action',
 			key: 'action',
@@ -553,6 +558,7 @@ const EmployeePage = () => {
 										onClose={handleCloseForm}
 										handleSubmit={handleSubmitForm}
 										item={itemEdit}
+										disableButton
 										label={
 											itemEdit?.id
 												? 'Cập nhật nhân viên'
