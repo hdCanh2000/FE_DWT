@@ -1,11 +1,11 @@
 /* eslint no-nested-ternary: 0 */
 /* eslint react/prop-types: 0 */
 /* eslint react-hooks/exhaustive-deps: 0 */
-import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Skeleton } from 'antd';
+/* eslint react/no-unstable-nested-components: 0 */
+import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
-import { createTarget, deleteTarget, getAllPositions, getAllUnits, updateTarget } from './services';
+import { createTarget, deleteTarget, updateTarget } from './services';
 
 const ModalTargetForm = ({ open, onClose, data }) => {
 	const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
@@ -20,21 +20,7 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 			form.resetFields();
 		}
 	}, [data]);
-	// get list position
-	const {
-		data: listUnitData = { data: [] },
-		isLoading: loadingUnits,
-		isError: errorUnits,
-	} = useQuery('getAllUnits', () => getAllUnits());
 
-	const {
-		data: listPositionData = { data: [] },
-		isLoading: loadingPositions,
-		isError: errorPositions,
-	} = useQuery('getAllPositions', () => getAllPositions());
-
-	const listUnits = listUnitData.data;
-	const listPositions = listPositionData.data;
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
@@ -74,7 +60,7 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 	return (
 		<Modal
 			forceRender
-			title={currentTarget ? 'Cập nhật nhiệm vụ' : 'Thêm mới nhiệm vụ'}
+			title={currentTarget ? 'Cập nhật định mức lao động' : 'Thêm mới định mức'}
 			onOk={() => onClose(false)}
 			onCancel={() => onClose(false)}
 			open={open}
@@ -104,29 +90,12 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 				layout='vertical'
 				form={form}>
 				<Row gutter={24}>
-					<Col span={12}>
+					<Col span={24}>
 						<Form.Item
 							name='name'
-							label='Tên nhiệm vụ'
+							label='Tên định mức'
 							rules={[{ required: true, message: 'Vui lòng nhập tên nhiệm vụ' }]}>
 							<Input placeholder='Nhập tên nhiệm vụ' />
-						</Form.Item>
-					</Col>
-					<Col span={12}>
-						<Form.Item name='positionId' label='Vị trí đảm nhiệm'>
-							<Select>
-								{loadingPositions ? (
-									<Skeleton active />
-								) : errorPositions ? (
-									<p>Error</p>
-								) : (
-									listPositions.map((item) => (
-										<Select.Option value={item.id} key={item.id}>
-											{item.name}
-										</Select.Option>
-									))
-								)}
-							</Select>
 						</Form.Item>
 					</Col>
 
@@ -141,31 +110,9 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 						</Form.Item>
 					</Col>
 
-					<Col span={8}>
+					<Col span={24}>
 						<Form.Item name='manDay' label='ManDay'>
 							<InputNumber min={0} style={{ width: 200 }} />
-						</Form.Item>
-					</Col>
-					<Col span={8}>
-						<Form.Item name='quantity' label='Số lượng'>
-							<InputNumber min={0} style={{ width: 200 }} />
-						</Form.Item>
-					</Col>
-					<Col span={8}>
-						<Form.Item name='unitId' label='Đơn vị'>
-							<Select>
-								{loadingUnits ? (
-									<Skeleton />
-								) : errorUnits ? (
-									<p>Error</p>
-								) : (
-									listUnits.map((unit) => (
-										<Select.Option value={unit.id} key={unit.id}>
-											{unit.name}
-										</Select.Option>
-									))
-								)}
-							</Select>
 						</Form.Item>
 					</Col>
 				</Row>

@@ -105,6 +105,24 @@ const getListTarget = async (params) => {
 	return resp.data;
 };
 
+const getListTargetInfos = async (params) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/targets/target_infos`,
+		params,
+	});
+	return resp.data;
+};
+
+const exportTargets = async (params) => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/targets/export`,
+		params,
+	});
+	return resp.data;
+};
+
 const getUserDetail = async (id) => {
 	const resp = await axiosClient({
 		method: 'GET',
@@ -118,6 +136,14 @@ const createTargetLog = async (data) => {
 		method: 'POST',
 		url: `/api/targets/target_logs`,
 		data,
+	});
+	return resp.data;
+};
+
+const deleteTargetLog = async (id) => {
+	const resp = await axiosClient({
+		method: 'DELETE',
+		url: `/api/targets/target_logs/${id}`,
 	});
 	return resp.data;
 };
@@ -149,6 +175,14 @@ const getDailyWorks = async (params) => {
 	return resp.data;
 };
 
+const createUnit = async (data) => {
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/units`,
+		data,
+	});
+	return resp.data;
+};
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -169,4 +203,8 @@ export {
 	uploadFile,
 	getDailyWorks,
 	createDailyWorkLog,
+	createUnit,
+	deleteTargetLog,
+	exportTargets,
+	getListTargetInfos,
 };

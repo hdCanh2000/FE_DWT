@@ -1,11 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Header, { HeaderLeft } from '../../../layout/Header/Header';
 // import CommonHeaderChat from './CommonHeaderChat';
 // import Search from '../../../components/Search';
 import CommonHeaderRight from './CommonHeaderRight';
 import USERS from '../../../common/data/userDummyData';
 import Avatar from '../../../components/Avatar';
+import Logo from '../../../assets/logos/logo.png';
 
 const DashboardHeader = () => {
 	const navigate = useNavigate();
@@ -17,7 +18,11 @@ const DashboardHeader = () => {
 	return (
 		<Header>
 			<HeaderLeft>
-				<span> </span>
+				<div style={{ marginTop: '10px' }}>
+					<Link to='/'>
+						<img src={Logo} alt='logo' style={{ width: 160 }} />
+					</Link>
+				</div>
 			</HeaderLeft>
 			{/* <CommonHeaderRight afterChildren={<CommonHeaderChat />} /> */}
 			<CommonHeaderRight

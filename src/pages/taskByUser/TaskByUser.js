@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Form } from 'react-bootstrap';
 import Select from 'react-select';
 import { Link } from 'react-router-dom';
+import _ from 'lodash';
+import { Table } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../components/bootstrap/Button';
 import Card, { CardHeader, CardLabel, CardTitle } from '../../components/bootstrap/Card';
-import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
+// import PaginationButtons, { dataPagination, PER_COUNT } from '../../components/PaginationButtons';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
@@ -35,9 +37,10 @@ const TaskByUser = () => {
 	const loading = useSelector((state) => state.employee.loading);
 	const departments = useSelector((state) => state.department.departments);
 	const positions = useSelector((state) => state.position.positions);
-	const [currentPage, setCurrentPage] = useState(1);
-	const [perPage, setPerPage] = useState(PER_COUNT['10']);
-	const items = dataPagination(users, currentPage, perPage);
+	const worktracks = useSelector((state) => state.worktrack.worktracks);
+	// const [currentPage, setCurrentPage] = useState(1);
+	// const [perPage, setPerPage] = useState(PER_COUNT['10']);
+	// const items = dataPagination(users, currentPage, perPage);
 
 	const [textSearch, setTextSearch] = useState('');
 	const [searchValue, setSearchValue] = useState({
@@ -46,6 +49,10 @@ const TaskByUser = () => {
 		positionId: '',
 		role: '',
 	});
+
+	const fetchUser = useMemo(() => {
+		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+	}, [users]);
 
 	const handleChange = (e) => {
 		setTextSearch(e.target.value);
@@ -77,6 +84,74 @@ const TaskByUser = () => {
 			role: '',
 		});
 	};
+
+	const columns = [
+		{
+			title: 'Họ và tên',
+			id: 'name',
+			dataIndex: '',
+			key: 'name',
+			sorter: (a, b) => a.name.localeCompare(b.name),
+			render: (item) => {
+				return {
+					children: (
+						<Link
+							className='text-underline'
+							to={`/cong-viec-cua-nhan-vien/${item?.id}`}>
+							{item?.name}
+						</Link>
+					),
+				};
+			},
+			type: 'text',
+			align: 'left',
+			col: 6,
+		},
+		{
+			title: 'Phòng ban',
+			id: 'department',
+			dataIndex: '',
+			key: 'department',
+			type: 'select',
+			align: 'left',
+			render: (item) => <span>{item?.department?.name || ''} </span>,
+			options: departments,
+			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Vị trí',
+			id: 'position',
+			dataIndex: '',
+			key: 'position',
+			type: 'select',
+			align: 'left',
+			hidden: true,
+			isShow: true,
+			render: (item) => <span>{item?.position?.name || ''}</span>,
+			options: positions,
+			isMulti: false,
+			col: 6,
+		},
+		{
+			title: 'Số nhiệm vụ đang có',
+			id: 'workTrack',
+			dataIndex: '',
+			key: 'workTrack',
+			type: 'select',
+			align: 'center',
+			render: (item) => (
+				<span>
+					{item?.workTracks?.filter((wt) => {
+						return wt?.workTrackUsers?.isResponsible === true;
+					})?.length || 0}
+				</span>
+			),
+			options: worktracks,
+			isMulti: false,
+			col: 6,
+		},
+	];
 
 	return (
 		<PageWrapper title='Giám sát công việc nhân viên'>
@@ -184,7 +259,13 @@ const TaskByUser = () => {
 												</div>
 											</Form>
 										</div>
-										<table className='table table-modern mb-0'>
+										<Table
+											className='table table-modern mb-0'
+											columns={columns}
+											dataSource={fetchUser}
+											scroll={{ x: 'max-content' }}
+										/>
+										{/* <table className='table table-modern mb-0'>
 											<thead>
 												<tr>
 													<th>Họ và tên</th>
@@ -193,7 +274,15 @@ const TaskByUser = () => {
 													<th className='text-center'>
 														Số nhiệm vụ đang có
 													</th>
+<<<<<<< HEAD
 												</tr>
+=======
+													{/* <th className='text-center'>Tổng điểm KPI</th>
+													<th className='text-center'>
+														Điểm KPI hiện tại
+													</th> */}
+										{/* </tr>
+>>>>>>> bc31f42f6192bb04024336187420fc5650497b57
 											</thead>
 											<tbody>
 												{items?.map((item) => (
@@ -215,8 +304,41 @@ const TaskByUser = () => {
 																			?.isResponsible === true
 																	);
 																})?.length || 0}
+<<<<<<< HEAD
 															</td>
 														</tr>
+=======
+															</td> */}
+										{/* <td className='text-center'>
+																{calcTotalKPIOfWorkTrack(
+																	item.workTracks.map((wt) => ({
+																		totalKPI:
+																			calcTotalKPIOfWorkTrack(
+																				wt,
+																			),
+																		currentKPI:
+																			calcCurrentKPIOfWorkTrack(
+																				wt,
+																			),
+																	})),
+																) || 0}
+															</td>
+															<td className='text-center'>
+																{calcCurrentKPIOfWorkTrack(
+																	item.workTracks.map((wt) => ({
+																		totalKPI:
+																			calcTotalKPIOfWorkTrack(
+																				wt,
+																			),
+																		currentKPI:
+																			calcCurrentKPIOfWorkTrack(
+																				wt,
+																			),
+																	})),
+																) || 0}
+															</td> */}
+										{/* </tr>
+>>>>>>> bc31f42f6192bb04024336187420fc5650497b57
 													</React.Fragment>
 												))}
 											</tbody>
@@ -230,7 +352,7 @@ const TaskByUser = () => {
 												perPage={perPage}
 												setPerPage={setPerPage}
 											/>
-										</footer>
+										</footer> */}
 									</div>
 								</div>
 							</Card>

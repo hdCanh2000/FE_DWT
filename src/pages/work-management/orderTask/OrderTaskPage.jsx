@@ -1,9 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useMemo, useState } from 'react';
-import { Button as AntButton, Row, Col, Table, Space, Modal, Input } from 'antd';
-import moment from 'moment';
-import { useQuery } from 'react-query';
-import { toast } from 'react-toastify';
+import React, {} from 'react';
+import { Row, Col } from 'antd';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -12,121 +9,11 @@ import Card, {
 } from '../../../components/bootstrap/Card';
 import Page from '../../../layout/Page/Page';
 import PageWrapper from '../../../layout/PageWrapper/PageWrapper';
-import { getListTarget, getUserDetail } from '../../dailyWorkTracking/services';
+import TableListTarget from './TableListTarget';
+import TableListTargetInfos from './TableListTargetInfos';
 
-import { updateTarget } from '../../kpiNorm/services';
-import ModalOrderTaskForm from './ModalOrderTaskForm';
-import Button from '../../../components/bootstrap/Button';
-
-const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
-	const shareRender = (text, record) => {
-		return {
-			props: {
-				onClick: () => handleRowClick(record),
-				style: { cursor: 'pointer' },
-			},
-			children: <div>{text}</div>,
-		};
-	};
-	return [
-		{
-			title: 'STT',
-			dataIndex: 'stt',
-			key: 'key',
-			fixed: 'left',
-			render: shareRender,
-		},
-		{
-			title: 'Tên nhiệm vụ',
-			dataIndex: 'name',
-			key: 'name',
-			fixed: 'left',
-			render: (text, record) => {
-				return {
-					props: {
-						onClick: () => handleRowClick(record),
-						style: { cursor: 'pointer' },
-					},
-					children: <div className='text-over-flow-sm'>{text}</div>,
-				};
-			},
-		},
-		{
-			title: 'Người được giao',
-			dataIndex: 'userName',
-			key: 'userName',
-			render: shareRender,
-		},
-		{
-			title: 'Phòng ban',
-			dataIndex: 'positionText',
-			key: 'position',
-			render: shareRender,
-		},
-		{
-			title: 'Thời hạn',
-			dataIndex: 'deadlineText',
-			key: 'deadline',
-			render: shareRender,
-		},
-		{
-			title: 'Trạng thái',
-			dataIndex: 'statusText',
-			key: 'status',
-			render: shareRender,
-		},
-		{
-			title: 'KPI',
-			dataIndex: 'kpiValue',
-			key: 'kipValue',
-			render: shareRender,
-		},
-		{
-			title: '',
-			key: 'action',
-			render: (_, record) => (
-				<Space size='middle'>
-					<AntButton danger onClick={() => handleClickDeleteBtn(record.id)}>
-						x
-					</AntButton>
-				</Space>
-			),
-		},
-	];
-};
-const unAssignedTaskColumns = [
-	{
-		title: 'STT',
-		dataIndex: 'key',
-		key: 'key',
-		fixed: 'left',
-	},
-	{
-		title: 'Tên nhiệm vụ',
-		dataIndex: 'name',
-		key: 'name',
-		fixed: 'left',
-		render: (text) => {
-			return <div className='text-over-flow-sm'>{text}</div>;
-		},
-	},
-	{
-		title: 'Vị trí đảm nhiệm',
-		dataIndex: 'positionText',
-		key: 'position',
-	},
-	{
-		title: 'Số lượng',
-		dataIndex: 'quantity',
-		key: 'quantity',
-	},
-	{
-		title: 'Đơn vị',
-		dataIndex: 'unitText',
-		key: 'unit',
-	},
-];
 const OrderTaskPage = () => {
+	const [updateFlag, setUpdateFlag] = useState(0);
 	const [assignedTableParams, setAssignedTableParams] = useState({
 		q: '',
 	});
@@ -234,52 +121,7 @@ const OrderTaskPage = () => {
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
-								<Row gutter={24} className='mb-2'>
-									<Col
-										lg={12}
-										md={12}
-										sm={24}
-										className='d-flex align-items-center'>
-										<Input.Search
-											onSearch={handleSearchAssignedTask}
-											onChange={(e) => setAssignedTableSearch(e.target.value)}
-											value={assignedTableSearch}
-											placeholder='Tìm kiếm nhiệm vụ'
-										/>
-										{assignedTableParams.q && (
-											<Button
-												color='link'
-												className='mx-2'
-												onClick={() => {
-													setAssignedTableSearch('');
-													setAssignedTableParams({
-														...assignedTableParams,
-														q: '',
-													});
-												}}>
-												Reset
-											</Button>
-										)}
-									</Col>
-								</Row>
-								{!errorSignedTargets && (
-									<Table
-										columns={assignedTaskColumns(
-											(id) => {
-												setOpenConfirmCancelAssignTask(true);
-												setCancelAssignTaskId(id);
-											},
-											(record) => {
-												setCurrentTarget(record);
-												setOpenOrderTaskModal(true);
-											},
-										)}
-										dataSource={assignedTaskData}
-										scroll={{ x: 'max-content' }}
-										pagination={{ position: ['bottomCenter'] }}
-										loading={loadingSignedTargets}
-									/>
-								)}
+								<TableListTargetInfos updateFlag={updateFlag} />
 							</CardBody>
 						</Card>
 					</Col>
@@ -287,88 +129,16 @@ const OrderTaskPage = () => {
 						<Card>
 							<CardHeader>
 								<CardTitle>
-									<CardLabel>Danh sách nhiệm vụ</CardLabel>
+									<CardLabel>Danh sách định mức</CardLabel>
 								</CardTitle>
 							</CardHeader>
 							<CardBody>
-								<Row gutter={24} className='mb-2'>
-									<Col
-										lg={12}
-										md={12}
-										sm={24}
-										className='d-flex align-items-center'>
-										<Input.Search
-											onSearch={handleSearchUnAssignedTask}
-											onChange={(e) =>
-												setUnAssignedTableSearch(e.target.value)
-											}
-											value={unAssignedTableSearch}
-											placeholder='Tìm kiếm nhiệm vụ'
-										/>
-										{unAssignedTableParams.q && (
-											<Button
-												color='link'
-												className='mx-2'
-												onClick={() => {
-													setUnAssignedTableSearch('');
-													setUnAssignedTableParams({
-														...unAssignedTableParams,
-														q: '',
-													});
-												}}>
-												Reset
-											</Button>
-										)}
-									</Col>
-								</Row>
-								{!errorUnSignedTargets && (
-									<Table
-										columns={unAssignedTaskColumns}
-										dataSource={unAssignedTaskData}
-										scroll={{ x: 'max-content' }}
-										pagination={{ position: ['bottomCenter'] }}
-										loading={loadingUnSignedTargets}
-										onRow={(record) => {
-											return {
-												onClick: () => {
-													setCurrentTarget(record);
-													setOpenOrderTaskModal(true);
-												},
-											};
-										}}
-									/>
-								)}
+								<TableListTarget onUpdateTargetInfo={setUpdateFlag} />
 							</CardBody>
 						</Card>
 					</Col>
 				</Row>
 			</Page>
-			<Modal
-				title='Xác nhận hủy giao việc'
-				open={openConfirmCancelAssignTask}
-				onOk={() => setOpenConfirmCancelAssignTask(false)}
-				onCancel={() => setOpenConfirmCancelAssignTask(false)}
-				footer={[
-					<AntButton onClick={() => setOpenConfirmCancelAssignTask(false)} key='cancel'>
-						HỦy
-					</AntButton>,
-					<AntButton danger onClick={handleDeleteAssignedTask} key='del'>
-						Xóa
-					</AntButton>,
-				]}>
-				<p>Bạn có chắc chắn muốn hủy giao việc cho nhiệm vụ này</p>
-			</Modal>
-			<ModalOrderTaskForm
-				open={openOrderTaskModal}
-				onClose={async (isUpdate) => {
-					if (isUpdate) {
-						await refetchUnSignedTargets();
-						await refetchSignedTargets();
-					}
-					setOpenOrderTaskModal(false);
-				}}
-				data={currentTarget}
-			/>
 		</PageWrapper>
 	);
 };

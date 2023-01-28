@@ -6,6 +6,7 @@ import WrapperOverlay from './WrapperOverlay';
 import HeaderRoutes from '../Header/HeaderRoutes';
 import FooterRoutes from '../Footer/FooterRoutes';
 import ThemeContext from '../../contexts/themeContext';
+import HorizontalMenu from '../HorizontalMenu/HorizontalMenu';
 
 export const WrapperContainer = ({ children, className, ...props }) => {
 	const { rightPanel } = useContext(ThemeContext);
@@ -36,6 +37,7 @@ const Wrapper = () => {
 		<>
 			<WrapperContainer>
 				<HeaderRoutes />
+				{window.location.pathname !== '/dang-nhap' && <HorizontalMenu />}
 				<Content />
 				<FooterRoutes />
 			</WrapperContainer>

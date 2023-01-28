@@ -1,6 +1,16 @@
 /* eslint-disable */
 import Page from '../../../layout/Page/Page';
-import { Button as AntButton, Col, Input, Modal, Row, Space, Table } from 'antd';
+import {
+	Button as AntButton,
+	Col,
+	DatePicker,
+	Input,
+	Modal,
+	Row,
+	Select,
+	Space,
+	Table,
+} from 'antd';
 import Card, {
 	CardBody,
 	CardHeader,
@@ -17,6 +27,9 @@ import { updateTarget } from '../../kpiNorm/services';
 import { toast } from 'react-toastify';
 import ModalOrderDailyWork from './ModalOrderDailyWork';
 import Button from '../../../components/bootstrap/Button';
+import dayjs from 'dayjs';
+import locale from 'antd/es/date-picker/locale/vi_VN';
+import { getAllDepartment } from '../../department/services';
 
 const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 	const shareRender = (text, record) => {
@@ -33,41 +46,62 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			title: 'STT',
 			dataIndex: 'stt',
 			key: 'key',
-			fixed: 'left',
 			render: shareRender,
+			sorter: (a, b) => a.stt > b.stt,
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: 'Tên nhiệm vụ',
 			dataIndex: 'name',
 			key: 'name',
-			fixed: 'left',
 			render: (text, record) => {
 				return {
 					props: {
 						onClick: () => handleRowClick(record),
 						style: { cursor: 'pointer' },
 					},
-					children: <div className='text-over-flow-md'>{text}</div>,
+					children: <div className='text-over-flow-lg'>{text}</div>,
 				};
 			},
+			sorter: (a, b) => a.name.localeCompare(b.name),
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: 'Người được giao',
 			dataIndex: 'userName',
 			key: 'userName',
 			render: shareRender,
+			sorter: (a, b) => a.userName.localeCompare(b.userName),
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 		{
 			title: 'Trạng thái',
 			dataIndex: 'statusText',
 			key: 'status',
 			render: shareRender,
+			filters: [
+				{
+					text: 'Đã hoàn thành',
+					value: 'completed',
+				},
+				{
+					text: 'Đang làm',
+					value: 'inProgress',
+				},
+			],
+			onFilter: (value, record) => record.status === value,
 		},
 		{
 			title: 'CST',
 			dataIndex: 'monthKey',
 			key: 'monthKey',
 			render: shareRender,
+			sorter: (a, b) => a.monthKey - b.monthKey,
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 
 		{
@@ -75,6 +109,9 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			dataIndex: 'unitText',
 			key: 'unit',
 			render: shareRender,
+			sorter: (a, b) => (a?.unitText || '').localeCompare(b?.unitText || ''),
+			sortDirections: ['descend', 'ascend', 'descend'],
+			defaultSortOrder: 'descend',
 		},
 
 		{
@@ -96,31 +133,43 @@ const unAssignedTaskColumns = [
 		title: 'STT',
 		dataIndex: 'key',
 		key: 'key',
-		fixed: 'left',
+		sorter: (a, b) => a.key - b.key,
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
 	},
 	{
 		title: 'Tên tiêu chí',
 		dataIndex: 'name',
 		key: 'name',
-		fixed: 'left',
 		render: (text) => {
-			return <div className='text-over-flow-md'>{text}</div>;
+			return <div className='text-over-flow-lg'>{text}</div>;
 		},
+		sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
 	},
 	{
 		title: 'CST',
 		dataIndex: 'monthKey',
 		key: 'monthKey',
+		sorter: (a, b) => a.monthKey - b.monthKey,
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
 	},
 	{
 		title: 'Đơn vị',
 		dataIndex: 'unitText',
 		key: 'unit',
+		sorter: (a, b) => (a?.unitText || '').localeCompare(b?.unitText || ''),
+		sortDirections: ['descend', 'ascend', 'descend'],
+		defaultSortOrder: 'descend',
 	},
 ];
 const OrderDailyWorkPage = () => {
 	const [assignedParams, setAssignedParams] = useState({
 		q: '',
+		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
 	});
 	const [assignedSearch, setAssignedSearch] = useState('');
 
@@ -161,6 +210,7 @@ const OrderDailyWorkPage = () => {
 	} = useQuery(['getListTargetUnAssign', unAssignedParams], ({ queryKey }) =>
 		getDailyWorks({ ...queryKey[1] }),
 	);
+
 	const unAssignedTaskData = useMemo(() => {
 		return unAssignedTasks.map((item, index) => ({
 			...item,
@@ -225,6 +275,30 @@ const OrderDailyWorkPage = () => {
 											</Button>
 										)}
 									</Col>
+
+									<Col
+										md={12}
+										lg={12}
+										sm={24}
+										className='d-flex justify-content-end align-items-center'>
+										<span className='mx-2'>Tháng: </span>
+										<DatePicker.MonthPicker
+											format='MM/YYYY'
+											locale={locale}
+											value={dayjs(assignedParams.start, 'M-DD-YYYY')}
+											onChange={(updatedDate) => {
+												setAssignedParams({
+													...assignedParams,
+													start: `${
+														updatedDate.month() + 1
+													}-01-${updatedDate.year()}`,
+													end: `${
+														updatedDate.month() + 1
+													}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
+												});
+											}}
+										/>
+									</Col>
 								</Row>
 								{isErrorAssignedDailyWorks ? (
 									<div>không thể lấy dữ liệu</div>
@@ -278,6 +352,41 @@ const OrderDailyWorkPage = () => {
 												reset
 											</Button>
 										)}
+									</Col>
+									<Col
+										md={12}
+										lg={12}
+										sm={24}
+										className='d-flex justify-content-end align-items-center'>
+										<span className='mx-2'>Tháng: </span>
+										<DatePicker.MonthPicker
+											format='MM/YYYY'
+											locale={locale}
+											value={
+												unAssignedParams.start
+													? dayjs(unAssignedParams.start, 'M-DD-YYYY')
+													: null
+											}
+											onChange={(updatedDate) => {
+												if (updatedDate === null) {
+													setUnAssignedParams({
+														...assignedParams,
+														start: null,
+														end: null,
+													});
+													return;
+												}
+												setUnAssignedParams({
+													...assignedParams,
+													start: `${
+														updatedDate.month() + 1
+													}-01-${updatedDate.year()}`,
+													end: `${
+														updatedDate.month() + 1
+													}-${updatedDate.daysInMonth()}-${updatedDate.year()}`,
+												});
+											}}
+										/>
 									</Col>
 								</Row>
 								{isErrorUnAssignedTasks ? (

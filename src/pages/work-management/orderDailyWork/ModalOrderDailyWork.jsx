@@ -1,14 +1,16 @@
 /* eslint-disable */
 import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Input, InputNumber, Modal, Row, Select, Skeleton } from 'antd';
+import { Button, Col, Divider, Form, Input, InputNumber, Modal, Row, Select, Skeleton } from 'antd';
 import { useQuery } from 'react-query';
 import { getAllUnits, getAllUsers, updateTarget } from '../../kpiNorm/services';
 import dailyWorkApi from '../../dailyWork/services';
 import { toast } from 'react-toastify';
+import ModalCreateUnit from '../../../components/ModalCreateUnit';
 
 const ModalOrderDailyWork = ({ open, onClose, data }) => {
 	const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
 	const [currentDailyWork, setCurrentDailyWork] = useState(data);
+	const [openCreateUnitModal, setOpenCreateUnitModal] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [form] = Form.useForm();
 	useEffect(() => {
@@ -20,7 +22,10 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 		}
 	}, [data]);
 
-	const { data: listUnitData = { data: [] } } = useQuery('getAllUnits', () => getAllUnits());
+	const { data: listUnitData = { data: [] }, refetch: reFetchUnits } = useQuery(
+		'getAllUnits',
+		() => getAllUnits(),
+	);
 
 	const listUnits = listUnitData.data;
 
@@ -108,13 +113,20 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 					</Col>
 					<Col span={12}>
 						<Form.Item name='userId' label='Người đảm nhiệm'>
-							<Select>
-								{listUsers.map((item) => (
-									<Select.Option value={item.id} key={item.id}>
-										{item.name}
-									</Select.Option>
-								))}
-							</Select>
+							<Select
+								optionFilterProp='children'
+								showSearch
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								placeholder='Chọn người đảm nhiệm'
+								options={listUsers.map((user) => ({
+									label: user.name,
+									value: user.id,
+								}))}
+							/>
 						</Form.Item>
 					</Col>
 					<Col span={12}>
@@ -141,13 +153,36 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 									message: 'Vui lòng chọn đơn vị tính',
 								},
 							]}>
-							<Select disabled={!isOrdered}>
-								{listUnits.map((unit) => (
-									<Select.Option value={unit.id} key={unit.id}>
-										{unit.name}
-									</Select.Option>
-								))}
-							</Select>
+							<Select
+								disabled={!isOrdered}
+								placeholder='Chọn đơn vị tính'
+								options={listUnits.map((unit) => ({
+									label: unit.name,
+									value: unit.id,
+								}))}
+								showSearch
+								optionFilterProp='children'
+								dropdownRender={(menu) => (
+									<>
+										{menu}
+										<Divider
+											style={{
+												margin: '8px 0',
+											}}
+										/>
+										<div className='p-2'>
+											<Button
+												type='primary'
+												style={{ width: '100%' }}
+												onClick={() => {
+													setOpenCreateUnitModal(true);
+												}}>
+												Thêm đơn vị
+											</Button>
+										</div>
+									</>
+								)}
+							/>
 						</Form.Item>
 					</Col>
 				</Row>
@@ -167,6 +202,18 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 				]}>
 				<p>Bạn có chắc chắn muốn xóa tiêu chí này ?</p>
 			</Modal>
+
+			<ModalCreateUnit
+				isOpen={openCreateUnitModal}
+				onClose={() => setOpenCreateUnitModal(false)}
+				onCreateSuccess={async (createdUnit) => {
+					await reFetchUnits();
+					setOpenCreateUnitModal(false);
+					form.setFieldsValue({
+						unitId: createdUnit.id,
+					});
+				}}
+			/>
 		</Modal>
 	);
 };

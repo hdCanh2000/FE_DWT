@@ -72,7 +72,7 @@ const EmployeePage = ({ dataDepartment }) => {
 			id: 'position',
 			key: 'position',
 			type: 'select',
-			align: 'center',
+			align: 'left',
 			isShow: true,
 			render: (item) => (
 				<span>

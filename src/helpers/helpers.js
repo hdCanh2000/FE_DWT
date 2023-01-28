@@ -91,3 +91,35 @@ export const debounce = (func, wait = 1000) => {
 		timeout = setTimeout(later, wait);
 	};
 };
+
+// search recursive
+export const findPath = (arr, key) => {
+	for (let i = 0; i < arr.length; i += 1) {
+		if (arr[i].key === key) {
+			return arr[i].path;
+		}
+		if (arr[i].children) {
+			const path = findPath(arr[i].children, key);
+			if (path) {
+				return path;
+			}
+		}
+	}
+	return null;
+};
+
+// find key recusive
+export const findKey = (routes, path) => {
+	for (let i = 0; i < routes.length; i += 1) {
+		if (routes[i].path === path) {
+			return routes[i].key;
+		}
+		if (routes[i].children) {
+			const key = findKey(routes[i].children, path);
+			if (key) {
+				return key;
+			}
+		}
+	}
+	return null;
+};
