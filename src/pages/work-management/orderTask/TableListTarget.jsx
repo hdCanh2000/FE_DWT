@@ -7,6 +7,12 @@ import { useQuery } from 'react-query';
 import Button from '../../../components/bootstrap/Button';
 import { getListTarget } from '../../dailyWorkTracking/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
+import { toast } from 'react-toastify';
+
+const rolesString = window.localStorage.getItem('roles') || '[]';
+const roles = JSON.parse(rolesString);
+
+const isAdmin = roles.includes('admin') || roles.includes('manager');
 
 const columns = [
 	{
@@ -44,7 +50,7 @@ const columns = [
 				</Tooltip>
 			);
 		},
-		sorter: (a, b) => a.description.localeCompare(b.description),
+		sorter: (a, b) => a.description?.localeCompare(b.description),
 		sortDirections: ['descend', 'ascend', 'descend'],
 		defaultSortOrder: 'descend',
 	},
@@ -60,7 +66,7 @@ const columns = [
 				</Tooltip>
 			);
 		},
-		sorter: (a, b) => a.executionPlan.localeCompare(b.executionPlan),
+		sorter: (a, b) => a.executionPlan?.localeCompare(b.executionPlan),
 		sortDirections: ['descend', 'ascend', 'descend'],
 		defaultSortOrder: 'descend',
 	},
@@ -168,8 +174,12 @@ const TableListTarget = ({ onUpdateTargetInfo }) => {
 					onRow={(record) => {
 						return {
 							onClick: () => {
-								setSelectedTarget(record);
-								setOpenOrderTask(true);
+								if (isAdmin) {
+									setSelectedTarget(record);
+									setOpenOrderTask(true);
+								} else {
+									toast.warning('Không có quyền truy cập');
+								}
 							},
 							style: {
 								cursor: 'pointer',
