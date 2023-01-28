@@ -558,7 +558,6 @@ const EmployeePage = () => {
 										onClose={handleCloseForm}
 										handleSubmit={handleSubmitForm}
 										item={itemEdit}
-										disableButton
 										label={
 											itemEdit?.id
 												? 'Cập nhật nhân viên'
