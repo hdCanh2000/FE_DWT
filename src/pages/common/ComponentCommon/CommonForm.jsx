@@ -255,9 +255,22 @@ const CommonForm = ({
 					<Button size='lg' variant='secondary' onClick={onClose}>
 						Đóng
 					</Button>
-					<Button size='lg' variant='primary' type='submit' onClick={formik.handleSubmit}>
-						Xác nhận
-					</Button>
+					{
+						// eslint-disable-next-line array-callback-return, consistent-return
+						fields?.map((field) => {
+							if (field?.id === 'edit' && !field?.isDisabled) {
+								return (
+									<Button
+										size='lg'
+										variant='primary'
+										type='submit'
+										onClick={formik.handleSubmit}>
+										Xác nhận
+									</Button>
+								);
+							}
+						})
+					}
 				</Modal.Footer>
 			</Modal>
 			<NestedCommonForm

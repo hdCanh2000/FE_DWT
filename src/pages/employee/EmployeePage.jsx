@@ -287,6 +287,11 @@ const EmployeePage = () => {
 			),
 		},
 		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
+		},
+		{
 			title: 'Hành Động',
 			id: 'action',
 			key: 'action',

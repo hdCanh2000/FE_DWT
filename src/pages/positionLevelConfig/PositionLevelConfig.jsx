@@ -76,6 +76,11 @@ const PositionLevelConfigPage = () => {
 			isShow: true,
 		},
 		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',

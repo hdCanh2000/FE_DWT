@@ -214,6 +214,11 @@ const PositionPage = () => {
 			isMulti: true,
 		},
 		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
+		},
+		{
 			title: 'Hành động',
 			id: 'action',
 			key: 'action',
