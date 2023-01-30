@@ -178,7 +178,10 @@ const TableListTarget = ({ onUpdateTargetInfo }) => {
 									setSelectedTarget(record);
 									setOpenOrderTask(true);
 								} else {
-									toast.warning('Không có quyền truy cập');
+									toast.warning('Không có quyền truy cập', {
+										position: toast.POSITION.TOP_RIGHT,
+										autoClose: 2000,
+									});
 								}
 							},
 							style: {

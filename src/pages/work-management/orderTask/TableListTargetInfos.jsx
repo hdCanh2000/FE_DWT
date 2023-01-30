@@ -282,7 +282,10 @@ const TableListTargetInfos = ({ updateFlag }) => {
 								setSelectedTargetInfo(record);
 								setOpenModalTargetInfo(true);
 							} else {
-								toast.warning('Không có quyền truy cập');
+								toast.warning('Không có quyền truy cập', {
+									position: toast.POSITION.TOP_RIGHT,
+									autoClose: 2000,
+								});
 							}
 						},
 					)}
