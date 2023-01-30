@@ -26,3 +26,12 @@ export const createReport = async (data) => {
 	});
 	return res.data;
 };
+
+export const uploadFileToRemoteHost = async (data) => {
+	const res = await axiosClient({
+		method: 'POST',
+		url: `/api/upload`,
+		data,
+	});
+	return res.data;
+};

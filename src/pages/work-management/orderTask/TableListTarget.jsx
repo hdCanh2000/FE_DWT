@@ -16,7 +16,7 @@ const columns = [
 		key: 'key',
 		sorter: (a, b) => a.key - b.key,
 		sortDirections: ['descend', 'ascend', 'descend'],
-		defaultSortOrder: 'descend',
+		defaultSortOrder: 'ascend',
 	},
 	{
 		title: 'Tên định mức',

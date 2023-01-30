@@ -49,7 +49,7 @@ const assignedTaskColumns = (handleClickDeleteBtn, handleRowClick) => {
 			render: shareRender,
 			sorter: (a, b) => a.stt > b.stt,
 			sortDirections: ['descend', 'ascend', 'descend'],
-			defaultSortOrder: 'descend',
+			defaultSortOrder: 'ascend',
 		},
 		{
 			title: 'Tên nhiệm vụ',
