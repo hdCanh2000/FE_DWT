@@ -254,7 +254,10 @@ const PositionLevelConfigPage = () => {
 															color='info'
 															icon='AddCircleOutline'
 															tag='button'
-															onClick={() => handleOpenForm(null)}>
+															onClick={() => {
+																handleOpenForm(null);
+																setIsEdit(true);
+															}}>
 															Thêm mới
 														</Button>
 													</CardActions>
@@ -296,7 +299,7 @@ const PositionLevelConfigPage = () => {
 										</Card>
 									</div>
 								</div>
-								{toggleForm && (
+								{toggleForm && isEdit ? (
 									<CommonForm
 										show={toggleForm}
 										onClose={handleCloseForm}
@@ -307,6 +310,16 @@ const PositionLevelConfigPage = () => {
 												? 'Cập nhật cấp nhân sự'
 												: 'Thêm mới cấp nhân sự'
 										}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								) : (
+									<CommonForm
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={itemEdit}
+										label='Cấp nhân sự'
 										fields={isEdit ? columns : columnsNoEdit}
 										validate={validate}
 									/>

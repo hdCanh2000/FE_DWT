@@ -493,9 +493,10 @@ const EmployeePage = () => {
 																	color='info'
 																	icon='AddCircleOutline'
 																	tag='button'
-																	onClick={() =>
-																		handleOpenForm(null)
-																	}>
+																	onClick={() => {
+																		handleOpenForm(null);
+																		setIsEdit(true);
+																	}}>
 																	Thêm mới
 																</Button>
 																<Button
@@ -551,7 +552,7 @@ const EmployeePage = () => {
 									['admin', 'manager'],
 								)}
 
-								{toggleForm && (
+								{toggleForm && isEdit ? (
 									<EmployeeForm
 										size='xl'
 										show={toggleForm}
@@ -563,6 +564,17 @@ const EmployeePage = () => {
 												? 'Cập nhật nhân viên'
 												: 'Thêm mới nhân viên'
 										}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								) : (
+									<EmployeeForm
+										size='xl'
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={itemEdit}
+										label='Thông tin nhân viên'
 										fields={isEdit ? columns : columnsNoEdit}
 										validate={validate}
 									/>

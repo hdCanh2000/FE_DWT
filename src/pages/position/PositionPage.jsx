@@ -371,7 +371,10 @@ const PositionPage = () => {
 															color='info'
 															icon='AddCircleOutline'
 															tag='button'
-															onClick={() => handleOpenForm(null)}>
+															onClick={() => {
+																handleOpenForm(null);
+																setIsEdit(true);
+															}}>
 															Thêm mới
 														</Button>
 													</CardActions>
@@ -414,13 +417,23 @@ const PositionPage = () => {
 										</Card>
 									</div>
 								</div>
-								{toggleForm && (
+								{toggleForm && isEdit ? (
 									<CommonForm
 										show={toggleForm}
 										onClose={handleCloseForm}
 										handleSubmit={handleSubmitForm}
 										item={fetchRequirement(itemEdit)}
 										label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								) : (
+									<CommonForm
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={fetchRequirement(itemEdit)}
+										label='Vị trí công việc'
 										fields={isEdit ? columns : columnsNoEdit}
 										validate={validate}
 									/>
