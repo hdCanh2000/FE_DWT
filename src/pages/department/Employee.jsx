@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Table } from 'antd';
+import TableCommon from '../common/ComponentCommon/TableCommon';
 import {
 	fetchEmployeeList,
 	fetchEmployeeListByDepartment,
@@ -14,9 +14,11 @@ const EmployeePage = ({ dataDepartment }) => {
 	const dispatch = useDispatch();
 
 	const users = useSelector((state) => state.employee.employees);
+	const positions = useSelector((state) => state.position.positions);
+	console.log(users);
+	console.log(dataDepartment);
 	const currentPage = useSelector((state) => state.employee.currentPage);
 	const pagination = useSelector((state) => state.employee.pagination);
-	const positions = useSelector((state) => state.position.positions);
 
 	const userWithIndex = users.map((item, index) => {
 		return { ...item, indexNumber: _.isEmpty(index) ? index : '--' };
@@ -133,9 +135,10 @@ const EmployeePage = ({ dataDepartment }) => {
 			<div className='row mb-0'>
 				<div className='col-12'>
 					<div className='p-4 col-lg-12'>
-						<Table
+						<TableCommon
+							key={users.id}
 							columns={columns}
-							dataSource={userWithIndex}
+							data={userWithIndex}
 							pagination={{ position: ['bottomRight'] }}
 							className='table table-modern mb-0'
 							onChangeCurrentPage={handleChangeCurrentPage}

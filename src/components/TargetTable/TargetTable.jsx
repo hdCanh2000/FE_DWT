@@ -49,7 +49,6 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 		getListTargetInfos(queryKey[1]),
 	);
 
-
 	// normalize data for table
 	const tableData = useMemo(() => {
 		const rows = listTarget.map((item, index) => {
@@ -141,20 +140,23 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 				<div>Can't load data</div>
 			) : (
 				<>
-				<Table
-					columns={columns}
-					dataSource={tableData}
-					bordered
-					scroll={{ x: 'max-content' }}
-					loading={isLoadingListTarget}
-					pagination={(tableData.length <= 1) ? false : true}
-					ref={tableRef}
-				/>
-				{(tableData.length <= 1) 
-				? <div className='text-center'>
-					<h5 style={{color: '#adb5bd', paddingTop: '8px'}}>Chưa có nhiệm vụ nào</h5>
-				</div> 
-				: null}
+					<Table
+						rowKey={(item) => item.id}
+						columns={columns}
+						dataSource={tableData}
+						bordered
+						scroll={{ x: 'max-content' }}
+						loading={isLoadingListTarget}
+						pagination={tableData.length <= 1 ? false : true}
+						ref={tableRef}
+					/>
+					{tableData.length <= 1 ? (
+						<div className='text-center'>
+							<h5 style={{ color: '#adb5bd', paddingTop: '8px' }}>
+								Chưa có nhiệm vụ nào
+							</h5>
+						</div>
+					) : null}
 				</>
 			)}
 			<ModalTargetLog

@@ -34,35 +34,6 @@ const TableCommon = ({
 		onSubmitSearch({ text: textSearch, page: 1 });
 	};
 
-	// const handleFilter = (items) => {
-	// 	console.log('search: ', items);
-	// 	if ( items ===
-	// 		items.name
-	// 			.toUpperCase()
-	// 			.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, 'E')
-	// 			.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, 'A')
-	// 			.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, 'I')
-	// 			.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, 'O')
-	// 			.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, 'U')
-	// 			.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, 'Y')
-	// 			.replace(/Đ/g, 'D')
-	// 			.replace(
-	// 				/!|@|%|\^|\*|\(|\)|\+|=|<|>|\?|\/|,|\.|:|;|'|"|&|#|\[|\]|~|\$|_|`|-|{|}|\||\\/g,
-	// 				' ',
-	// 			)
-	// 			.replace(/ + /g, ' ')
-	// 			.trim()
-	// 			.includes(textSearch.toUpperCase())
-	// 	) {
-	// 		console.log('search: ', items);
-	// 		return items;
-	// 	}
-	// 	if (textSearch === '') {
-	// 		return items;
-	// 	}
-	// 	return items;
-	// };
-
 	const handleChangeCurrentPage = (pageCurrent) => {
 		onChangeCurrentPage({ text: textSearch, page: pageCurrent });
 	};
@@ -97,6 +68,7 @@ const TableCommon = ({
 			<div className={classNames(className)} {...props}>
 				<Table
 					className='table table-modern mb-0'
+					rowKey={(item) => item.id}
 					columns={columns}
 					dataSource={data}
 					onSubmitSearch={handleSubmit}
