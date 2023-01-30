@@ -26,7 +26,7 @@ export const demoPages = {
 		path: '/',
 		icon: 'Dashboard',
 		subMenu: null,
-		roles: ['admin', 'manager', 'user'],
+		roles: ['admin', 'manager'],
 	},
 	companyPage: {
 		id: 'companyPage',

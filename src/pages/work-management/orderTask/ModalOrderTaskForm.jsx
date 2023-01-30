@@ -18,6 +18,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
+import _ from 'lodash';
 import {
 	createTargetInfo,
 	getAllPositions,
@@ -57,8 +58,8 @@ const ModalOrderTaskForm = ({ open, onClose, data, isCreate, onSuccess, onUpdate
 	);
 
 	const { data: listUsersData = { data: [] } } = useQuery('getAllUsers', () => getAllUsers());
-	const listUsers = listUsersData.data;
-	const listUnits = listUnitData.data;
+	const listUsers = listUsersData?.data;
+	const listUnits = listUnitData?.data;
 	const listPositions = listPositionData.data;
 	const handleFinish = async (values) => {
 		try {
@@ -169,7 +170,7 @@ const ModalOrderTaskForm = ({ open, onClose, data, isCreate, onSuccess, onUpdate
 										input.toLowerCase(),
 									)
 								}
-								options={listUsers.map((item) => ({
+								options={_.map(listUsers, (item) => ({
 									label: item.name,
 									value: item.id,
 								}))}
