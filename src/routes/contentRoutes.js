@@ -60,6 +60,7 @@ const MISSION = {
 
 const REPORT = {
 	LIST_REPORT: lazy(() => import('../pages/report/ReportPage')),
+	UPLOAD_REPORT: lazy(() => import('../pages/report/UploadReport')),
 };
 
 const presentation = [
@@ -164,6 +165,11 @@ const presentation = [
 	{
 		path: demoPages.reportPage.subMenu.reportList.path,
 		element: <REPORT.LIST_REPORT />,
+	},
+
+	{
+		path: demoPages.reportPage.subMenu.reportUpload.path,
+		element: <REPORT.UPLOAD_REPORT />,
 	},
 
 	{
