@@ -64,6 +64,7 @@ const PositionLevelConfigPage = () => {
 			align: 'left',
 			sorter: (a, b) => a.name.localeCompare(b.name),
 			isShow: true,
+			hidden: true,
 		},
 		{
 			title: 'Mã cấp nhân sự',
@@ -74,6 +75,7 @@ const PositionLevelConfigPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 		},
 		{
 			title: 'edit',
@@ -113,8 +115,11 @@ const PositionLevelConfigPage = () => {
 				</>
 			),
 			isShow: false,
+			hidden: true,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
 
 	const columnsNoEdit = columns.map((item) => {
 		return {
@@ -262,7 +267,7 @@ const PositionLevelConfigPage = () => {
 													/>
 													<Table
 														className='table table-modern mb-0'
-														columns={columns}
+														columns={showColumns}
 														dataSource={positionLevels}
 														pagination={{ pageSize: 10 }}
 														style={{ cursor: 'pointer' }}

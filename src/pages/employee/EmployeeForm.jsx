@@ -521,24 +521,22 @@ const EmployeeForm = ({
 				<Button size='lg' variant='secondary' color='danger' onClick={onClose}>
 					Đóng
 				</Button>
-				{
-					// eslint-disable-next-line consistent-return, array-callback-return
-					fields?.map((field) => {
-						if (field?.id === 'edit' && !field?.isDisabled) {
-							return (
-								<Button
-									style={{ marginRight: '10px' }}
-									size='lg'
-									variant='primary'
-									type='submit'
-									color='primary'
-									onClick={formik.handleSubmit}>
-									Xác nhận
-								</Button>
-							);
-						}
-					})
-				}
+				{fields?.map((field) => {
+					if (field?.id === 'edit' && !field?.isDisabled) {
+						return (
+							<Button
+								style={{ marginRight: '10px' }}
+								size='lg'
+								variant='primary'
+								type='submit'
+								color='primary'
+								onClick={formik.handleSubmit}>
+								Xác nhận
+							</Button>
+						);
+					}
+					return null;
+				})}
 			</Modal.Footer>
 		</Modal>
 	);
