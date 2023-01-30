@@ -116,11 +116,12 @@ const ModalOrderDailyWork = ({ open, onClose, data }) => {
 							<Select
 								optionFilterProp='children'
 								showSearch
-								filterOption={(input, option) =>
-									(option?.label.toLowerCase() ?? '').includes(
+								filterOption={(input, option) => {
+									if (!option.label) return false;
+									return (option?.label.toLowerCase() ?? '').includes(
 										input.toLowerCase(),
-									)
-								}
+									);
+								}}
 								placeholder='Chọn người đảm nhiệm'
 								options={listUsers.map((user) => ({
 									label: user.name,

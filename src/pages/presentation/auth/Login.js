@@ -38,7 +38,11 @@ const Login = () => {
 			localStorage.setItem('name', result.data.name);
 			localStorage.setItem('userId', result.data.userId);
 			localStorage.setItem('roles', JSON.stringify(result.data.role));
-			window.location.href = '/cong-viec-cua-nhan-vien/'.concat(result.data.userId);
+			if (result.data.role.includes('user')) {
+				window.location.href = '/cong-viec-cua-nhan-vien/'.concat(result.data.userId);
+			} else {
+				window.location.href = '/nhiem-vu';
+			}
 		} catch (error) {
 			setErrorMessage('Tài khoản hoặc mật khẩu không chính xác!');
 		}

@@ -178,6 +178,12 @@ export const demoPages = {
 				path: '/mau-bao-cao',
 				roles: ['admin'],
 			},
+			reportUpload: {
+				id: 'reportUpload',
+				text: 'Biên bản họp',
+				path: '/bien-ban-hop',
+				roles: ['admin', 'manager', 'user'],
+			},
 		},
 		roles: ['admin'],
 	},
