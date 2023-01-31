@@ -32,7 +32,7 @@ const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 
-	const [isEdit, setIsEdit] = useState(true);
+	const [isDetail, setIsDetail] = useState(true);
 
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -233,7 +233,7 @@ const PositionPage = () => {
 						icon='Edit'
 						onClick={(e) => {
 							e.stopPropagation();
-							setIsEdit(true);
+							setIsDetail(true);
 							handleOpenForm(item);
 						}}
 					/>
@@ -371,7 +371,10 @@ const PositionPage = () => {
 															color='info'
 															icon='AddCircleOutline'
 															tag='button'
-															onClick={() => handleOpenForm(null)}>
+															onClick={() => {
+																handleOpenForm(null);
+																setIsDetail(true);
+															}}>
 															Thêm mới
 														</Button>
 													</CardActions>
@@ -393,7 +396,7 @@ const PositionPage = () => {
 															return {
 																cursor: 'pointer',
 																onClick: () => {
-																	setIsEdit(false);
+																	setIsDetail(false);
 																	handleOpenForm(item);
 																},
 															};
@@ -420,8 +423,15 @@ const PositionPage = () => {
 										onClose={handleCloseForm}
 										handleSubmit={handleSubmitForm}
 										item={fetchRequirement(itemEdit)}
-										label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
-										fields={isEdit ? columns : columnsNoEdit}
+										label={
+											// eslint-disable-next-line no-nested-ternary
+											!isDetail
+												? 'Vị trí công việc'
+												: itemEdit?.id
+												? 'Cập nhật vị trí'
+												: 'Thêm mới vị trí'
+										}
+										fields={isDetail ? columns : columnsNoEdit}
 										validate={validate}
 									/>
 								)}

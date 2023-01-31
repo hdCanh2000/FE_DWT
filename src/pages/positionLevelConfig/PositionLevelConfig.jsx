@@ -29,7 +29,7 @@ const PositionLevelConfigPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 
-	const [isEdit, setIsEdit] = useState(true);
+	const [isDetail, setIsDetail] = useState(true);
 
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -97,7 +97,7 @@ const PositionLevelConfigPage = () => {
 						icon='Edit'
 						onClick={(e) => {
 							e.stopPropagation();
-							setIsEdit(true);
+							setIsDetail(true);
 							handleOpenForm(item);
 						}}
 					/>
@@ -254,7 +254,10 @@ const PositionLevelConfigPage = () => {
 															color='info'
 															icon='AddCircleOutline'
 															tag='button'
-															onClick={() => handleOpenForm(null)}>
+															onClick={() => {
+																handleOpenForm(null);
+																setIsDetail(true);
+															}}>
 															Thêm mới
 														</Button>
 													</CardActions>
@@ -275,7 +278,7 @@ const PositionLevelConfigPage = () => {
 															return {
 																cursor: 'pointer',
 																onClick: () => {
-																	setIsEdit(false);
+																	setIsDetail(false);
 																	handleOpenForm(item);
 																},
 															};
@@ -303,11 +306,14 @@ const PositionLevelConfigPage = () => {
 										handleSubmit={handleSubmitForm}
 										item={itemEdit}
 										label={
-											itemEdit?.id
+											// eslint-disable-next-line no-nested-ternary
+											!isDetail
+												? 'Cấp nhân sự'
+												: itemEdit?.id
 												? 'Cập nhật cấp nhân sự'
 												: 'Thêm mới cấp nhân sự'
 										}
-										fields={isEdit ? columns : columnsNoEdit}
+										fields={isDetail ? columns : columnsNoEdit}
 										validate={validate}
 									/>
 								)}
