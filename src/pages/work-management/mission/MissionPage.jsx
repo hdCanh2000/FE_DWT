@@ -49,7 +49,7 @@ const MissionPage = () => {
 		indexNumber: _.isEmpty(index) ? index : '--',
 	}));
 
-	const [isEdit, setIsEdit] = useState(true);
+	// const [isEdit, setIsEdit] = useState(false);
 	const [formType, setFormType] = useState([]);
 
 	useEffect(() => {
@@ -104,6 +104,7 @@ const MissionPage = () => {
 			id: 'name',
 			key: 'name',
 			type: 'text',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			render: (item) => <span>{item?.name || '--'}</span>,
 		},
 		{
@@ -262,7 +263,6 @@ const MissionPage = () => {
 														onRow={(item) => {
 															return {
 																onClick: () => {
-																	setIsEdit(false);
 																	setFormType('watching');
 																	handleOpenFormEdit(item);
 																},
@@ -300,8 +300,8 @@ const MissionPage = () => {
 										show={toggleFormEdit}
 										onClose={handleCloseForm}
 										item={itemEdit}
-										fields={isEdit}
 										formType={formType}
+										disableInput={formType === 'watching'}
 									/>
 								)}
 								<AlertConfirm
