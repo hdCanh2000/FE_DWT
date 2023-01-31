@@ -13,6 +13,7 @@ import {
 	uploadFile,
 } from '../../pages/dailyWorkTracking/services';
 import axios from 'axios';
+import { uploadFileToRemoteHost } from '../../pages/report/service';
 
 // xlsx, csv, doc, docx, pdf, ai, psd, jpg, jpeg, png, txt
 const ALLOWED_TYPES = [
@@ -99,14 +100,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 					try {
 						const formData = new FormData();
 						formData.append('files', file);
-						formData.append('userId', target?.user?.id);
-						formData.append('positionId', target?.position?.id);
-						formData.append('departmentId', target?.user?.department?.id);
-						const resp = await axios.post(
-							'https://report.sweetsica.com/api/report/upload',
-							formData,
-						);
-						const respData = resp.data;
+						const respData = await uploadFileToRemoteHost(formData);
 						return respData.downloadLink;
 					} catch (error) {
 						return null;

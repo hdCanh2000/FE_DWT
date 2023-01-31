@@ -9,7 +9,7 @@ import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import { uploadFile } from '../dailyWorkTracking/services';
 import axios from 'axios';
-import { createReport } from './service';
+import {createReport, uploadFileToRemoteHost} from './service';
 
 const ALLOWED_TYPES = [
 	'image/png',
@@ -54,14 +54,8 @@ const ReportForm = ({ onSuccess }) => {
 			const formData = new FormData();
 			//only upload 1 file
 			formData.append('files', files[0]);
-			formData.append('userId', userId);
-			const resp = await axios.post(
-				'https://report.sweetsica.com/api/report/upload',
-				formData,
-			);
-			const respData = resp.data;
-			const fileLink = respData.downloadLink;
-			console.log('fileLink', fileLink);
+			const resp = await uploadFileToRemoteHost(formData)
+			const fileLink = resp.downloadLink;
 			//create report
 			await createReport({
 				...values,

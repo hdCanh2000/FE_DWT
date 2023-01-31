@@ -50,6 +50,7 @@ const UploadReport = () => {
 	const tableData = data.map((item, index) => ({
 		...item,
 		stt: index + 1,
+		key: item.id,
 	}));
 	return (
 		<PageWrapper title='Biên bản họp'>

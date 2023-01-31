@@ -32,7 +32,12 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 				toast.success('Tạo mục tiêu thành công');
 			}
 		} catch (e) {
-			toast.error('Cập nhật mục tiêu không thành công');
+			const apiErrorMsg = e?.response?.data?.message || '';
+			if (apiErrorMsg === 'Internal server error: Error: Target already exists') {
+				toast.error('Mục tiêu này đã tồn tại vui lòng thử lại');
+			} else {
+				toast.error('Cập nhật mục tiêu không thành công');
+			}
 		} finally {
 			setLoading(false);
 			onClose(true);

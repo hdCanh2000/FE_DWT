@@ -35,7 +35,7 @@ const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 	const text = searchParams.get('text') || '';
-	const [isEdit, setIsEdit] = useState(true);
+	const [isDetail, setIsDetail] = useState(true);
 
 	// const [searchTable, setSearchTable] = useState('');
 
@@ -327,7 +327,7 @@ const EmployeePage = () => {
 								onClick={(e) => {
 									e.stopPropagation();
 									handleOpenForm(item);
-									setIsEdit(true);
+									setIsDetail(true);
 								}}
 							/>
 							<Button
@@ -511,9 +511,10 @@ const EmployeePage = () => {
 																	color='info'
 																	icon='AddCircleOutline'
 																	tag='button'
-																	onClick={() =>
-																		handleOpenForm(null)
-																	}>
+																	onClick={() => {
+																		handleOpenForm(null);
+																		setIsDetail(true);
+																	}}>
 																	Thêm mới
 																</Button>
 																<Button
@@ -547,7 +548,7 @@ const EmployeePage = () => {
 															onRow={(item) => {
 																return {
 																	onClick: () => {
-																		setIsEdit(false);
+																		setIsDetail(false);
 																		handleOpenForm(item);
 																	},
 																};
@@ -578,11 +579,14 @@ const EmployeePage = () => {
 										handleSubmit={handleSubmitForm}
 										item={itemEdit}
 										label={
-											itemEdit?.id
+											// eslint-disable-next-line no-nested-ternary
+											!isDetail
+												? 'Thông tin nhân viên'
+												: itemEdit?.id
 												? 'Cập nhật nhân viên'
 												: 'Thêm mới nhân viên'
 										}
-										fields={isEdit ? columns : columnsNoEdit}
+										fields={isDetail ? columns : columnsNoEdit}
 										validate={validate}
 									/>
 								)}
