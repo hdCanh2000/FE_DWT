@@ -41,7 +41,13 @@ const ModalDailyWorkForm = ({ open, onClose, data }) => {
 				form.resetFields();
 			}
 		} catch (e) {
-			toast.error('Thao tác không thành công');
+			const apiError = e?.response?.data?.message || "";
+			if(apiError.includes("already exists")){
+				toast.error('Tiêu chí này đã tồn tại vui lòng thử lại');
+			} else {
+				toast.error('Thao tác không thành công');
+			}
+
 		} finally {
 			setLoading(false);
 			onClose(true);
