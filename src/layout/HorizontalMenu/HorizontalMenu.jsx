@@ -11,7 +11,7 @@ const contentRoutes = [
 		label: 'Dashboard',
 		key: 'dashboard',
 		icon: <Icon className='navigation-icon' icon='Dashboard' />,
-		roles: ['admin', 'manager', 'user'],
+		roles: ['admin', 'manager'],
 		path: '/',
 	},
 	{
@@ -129,12 +129,13 @@ const contentRoutes = [
 		label: 'Báo cáo',
 		key: 'report',
 		icon: <Icon className='navigation-icon' icon='CustomPages' />,
-		roles: ['admin'],
+		roles: ['admin', 'user', 'manager'],
 		children: [
 			{
 				label: 'Xuất báo cáo',
 				key: 'listReports',
 				path: '/danh-sach-bao-cao',
+				roles: ['admin', 'manager'],
 			},
 			{
 				label: 'Duyệt báo cáo',
@@ -145,6 +146,11 @@ const contentRoutes = [
 				label: 'Báo cáo lưu',
 				key: 'sampleReport',
 				path: '/mau-bao-cao',
+			},
+			{
+				label: 'Biên bản họp',
+				key: 'meetingReport',
+				path: '/bien-ban-hop',
 			},
 		],
 	},

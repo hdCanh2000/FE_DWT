@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import _ from 'lodash';
+// import _ from 'lodash';
+import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -26,11 +28,13 @@ import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 import CommonForm from '../common/ComponentCommon/CommonForm';
 import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
-import TableCommon from '../common/ComponentCommon/TableCommon';
+// import TableCommon from '../common/ComponentCommon/TableCommon';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
+
+	const [isEdit, setIsEdit] = useState(true);
 
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -45,8 +49,10 @@ const PositionPage = () => {
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-	const position = useSelector((state) => state.position.positions);
-	const pagination = useSelector((state) => state.position.pagination);
+	// const position = useSelector((state) => state.position.positions);
+	// const pagination = useSelector((state) => state.position.pagination);
+	const positions = useSelector((state) => state.position.positions);
+	// const pagination = useSelector((state) => state.position.pagination);
 	const loading = useSelector((state) => state.position.loading);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
@@ -54,10 +60,10 @@ const PositionPage = () => {
 
 	const currentPage = useSelector((state) => state.position.currentPage);
 
-	const positions = position.map((item, index) => ({
-		...item,
-		indexNumber: _.isEmpty(index) ? index : '--',
-	}));
+	// const positions = position.map((item, index) => ({
+	// 	...item,
+	// 	indexNumber: _.isEmpty(index) ? index : '--',
+	// }));
 
 	const fetchRequirement = () => {
 		const newItem = itemEdit?.requirements?.map((items) => ({
@@ -80,15 +86,15 @@ const PositionPage = () => {
 	// 	);
 	// };
 
-	useEffect(() => {
-		fetch();
-	}, []);
+	// useEffect(() => {
+	// 	fetch();
+	// }, []);
 
 	useEffect(() => {
 		const query = {};
 		query.text = text;
 		query.page = currentPage;
-		query.limit = 10;
+		// query.limit = 10;
 		dispatch(fetchPositionList(query));
 	}, [currentPage, dispatch, text]);
 
@@ -109,9 +115,9 @@ const PositionPage = () => {
 		setCurrentPage(1);
 	};
 
-	const handleChangeCurrentPage = (searchValue) => {
-		setCurrentPage(searchValue.page);
-	};
+	// const handleChangeCurrentPage = (searchValue) => {
+	// 	setCurrentPage(searchValue.page);
+	// };
 
 	useEffect(() => {
 		dispatch(fetchPositionLevelList());
@@ -133,86 +139,105 @@ const PositionPage = () => {
 			title: 'Tên vị trí',
 			placeholder: 'tên vị trí',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			col: 5,
-			render: (item) => <span>{item.name}</span>,
+			// render: (item) => <span>{item.name}</span>,
 		},
 		{
 			title: 'Mã vị trí',
 			placeholder: 'mã vị trí',
 			id: 'code',
+			dataIndex: 'code',
 			key: 'code',
+			sorter: (a, b) => a.code.localeCompare(b.code),
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			col: 2,
-			render: (item) => <span>{item.code}</span>,
+			// render: (item) => <span>{item.code}</span>,
 		},
 		{
 			title: 'Phòng ban',
 			id: 'department_id',
+			dataIndex: '',
 			key: 'department_id',
 			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.department?.name || ''}</span>,
+			hidden: true,
+			render: (item) => <span>{item?.department?.name || ''} </span>,
 			options: departments,
 			col: 5,
 		},
 		{
 			title: 'Cấp nhân sự',
 			id: 'position_levels_id',
+			dataIndex: '',
 			key: 'position_levels_id',
 			type: 'singleSelect',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			render: (item) => <span>{item?.positionLevel?.name || ''}</span>,
 			options: positionLevels && positionLevels.filter((item) => item?.name !== 'Không'),
 			col: 6,
 		},
-		// {
-		// 	title: 'Quản lý cấp trên',
-		// 	id: 'manager',
-		// 	key: 'manager',
-		// 	type: 'select',
-		// 	align: 'left',
-		// 	isShow: false,
-		// 	render: (item) => <span>{item?.positions?.name || ''}</span>,
-		// 	options: allPositions,
-		// 	col: 6,
-		// },
-		// {
-		// 	title: 'Địa điểm làm việc',
-		// 	placeholder: 'địa điểm làm việc',
-		// 	id: 'address',
-		// 	key: 'address',
-		// 	type: 'text',
-		// 	align: 'left',
-		// 	isShow: false,
-		// },
-		// {
-		// 	title: 'Mô tả vị trí',
-		// 	placeholder: 'mô tả vị trí',
-		// 	id: 'description',
-		// 	key: 'description',
-		// 	type: 'textarea',
-		// 	align: 'left',
-		// 	isShow: false,
-		// },
-		// {
-		// 	title: 'Yêu cầu năng lực',
-		// 	id: 'requirements',
-		// 	key: 'requirements',
-		// 	type: 'select',
-		// 	align: 'left',
-		// 	isShow: false,
-		// 	render: (item) => <span>{item?.requirement?.name || ''}</span>,
-		// 	options: requirements,
-		// 	isMulti: true,
-		// },
+		{
+			title: 'Quản lý cấp trên',
+			id: 'manager',
+			dataIndex: 'manager',
+			key: 'manager',
+			type: 'select',
+			align: 'left',
+			isShow: false,
+			render: (item) => <span>{item?.positions?.name || ''}</span>,
+			// options: allPositions,
+			col: 6,
+		},
+		{
+			title: 'Địa điểm làm việc',
+			placeholder: 'địa điểm làm việc',
+			id: 'address',
+			dataIndex: 'address',
+			key: 'address',
+			type: 'text',
+			align: 'left',
+			isShow: false,
+		},
+		{
+			title: 'Mô tả vị trí',
+			placeholder: 'mô tả vị trí',
+			id: 'description',
+			dataIndex: 'description',
+			key: 'description',
+			type: 'textarea',
+			align: 'left',
+			isShow: false,
+		},
+		{
+			title: 'Yêu cầu năng lực',
+			id: 'requirements',
+			dataIndex: 'requirements',
+			key: 'requirements',
+			type: 'select',
+			align: 'left',
+			isShow: false,
+			render: (item) => <span>{item?.requirement?.name || ''}</span>,
+			// options: requirements,
+			isMulti: true,
+		},
+		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
+		},
 		{
 			title: 'Hành động',
 			id: 'action',
@@ -226,7 +251,11 @@ const PositionPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsEdit(true);
+							handleOpenForm(item);
+						}}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -234,13 +263,27 @@ const PositionPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</div>
 			),
+			hidden: true,
 			isShow: false,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
@@ -265,7 +308,7 @@ const PositionPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = currentPage;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -286,7 +329,7 @@ const PositionPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = 1;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -354,35 +397,55 @@ const PositionPage = () => {
 													</CardActions>
 												</CardHeader>
 												<div className='p-4'>
-													<TableCommon
-														className='table table-modern mb-0'
-														columns={columns}
-														data={positions}
+													<TableSearchCommon
 														onSubmitSearch={handleSubmitSearch}
-														onChangeCurrentPage={
-															handleChangeCurrentPage
-														}
-														currentPage={parseInt(currentPage, 10)}
-														totalItem={pagination?.totalRows}
-														total={pagination?.total}
-														setCurrentPage={setCurrentPage}
 														searchvalue={text}
 														isSearch
+													/>
+													<Table
+														className='table table-modern mb-0'
+														rowKey={(item) => item.id}
+														columns={showColumns}
+														dataSource={positions}
+														scroll={{ x: 'max-content' }}
+														pagination={{ pageSize: 10 }}
+														style={{ cursor: 'pointer' }}
+														onRow={(item) => {
+															return {
+																cursor: 'pointer',
+																onClick: () => {
+																	setIsEdit(false);
+																	handleOpenForm(item);
+																},
+															};
+														}}
+														// onSubmitSearch={handleSubmitSearch}
+														// onChangeCurrentPage={
+														// 	handleChangeCurrentPage
+														// }
+														// currentPage={parseInt(currentPage, 10)}
+														// totalItem={pagination?.totalRows}
+														// total={pagination?.total}
+														// setCurrentPage={setCurrentPage}
+														// searchvalue={text}
+														// isSearch
 													/>
 												</div>
 											</div>
 										</Card>
 									</div>
 								</div>
-								<CommonForm
-									show={toggleForm}
-									onClose={handleCloseForm}
-									handleSubmit={handleSubmitForm}
-									item={fetchRequirement(itemEdit)}
-									label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
-									fields={columns}
-									validate={validate}
-								/>
+								{toggleForm && (
+									<CommonForm
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={fetchRequirement(itemEdit)}
+										label={itemEdit?.id ? 'Cập nhật vị trí' : 'Thêm mới vị trí'}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								)}
 								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}

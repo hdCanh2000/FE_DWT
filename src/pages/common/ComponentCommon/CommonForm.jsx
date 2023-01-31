@@ -79,7 +79,7 @@ const CommonForm = ({
 											className={field.col ? `col-${field.col}` : 'col-12'}>
 											<FormGroup id={field.id} label={field.title}>
 												<Select
-													disabled={disabled}
+													disabled={field?.isDisabled}
 													ariaLabel={field.title || ''}
 													placeholder={`${field.title}`}
 													list={field.options}
@@ -115,7 +115,7 @@ const CommonForm = ({
 													id={field.id}
 													label={field.title}>
 													<CustomSelect
-														disabled={disabled}
+														disabled={field?.isDisabled}
 														placeholder={`${field.title}`}
 														value={formik.values[field.id]}
 														onChange={(value) => {
@@ -163,7 +163,7 @@ const CommonForm = ({
 												id={field.id}
 												label={field.title}>
 												<Textarea
-													disabled={disabled}
+													disabled={field?.isDisabled}
 													rows={3}
 													ariaLabel={field.title}
 													placeholder={`${field.title}`}
@@ -197,7 +197,7 @@ const CommonForm = ({
 												id={field.id}
 												label={field.title}>
 												<Checks
-													disabled={disabled}
+													disabled={field?.isDisabled}
 													id={field.id}
 													type='switch'
 													size='lg'
@@ -255,9 +255,20 @@ const CommonForm = ({
 					<Button size='lg' variant='secondary' onClick={onClose}>
 						Đóng
 					</Button>
-					<Button size='lg' variant='primary' type='submit' onClick={formik.handleSubmit}>
-						Xác nhận
-					</Button>
+					{fields?.map((field) => {
+						if (field?.id === 'edit' && !field?.isDisabled) {
+							return (
+								<Button
+									size='lg'
+									variant='primary'
+									type='submit'
+									onClick={formik.handleSubmit}>
+									Xác nhận
+								</Button>
+							);
+						}
+						return null;
+					})}
 				</Modal.Footer>
 			</Modal>
 			<NestedCommonForm

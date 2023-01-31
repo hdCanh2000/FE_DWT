@@ -1,11 +1,14 @@
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
-// import moment from 'moment';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams, createSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
+// import TableCommon from '../common/ComponentCommon/TableCommon';
 import { toast } from 'react-toastify';
+import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -15,11 +18,11 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
-// import Popovers from '../../components/bootstrap/Popovers';
+import Popovers from '../../components/bootstrap/Popovers';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import validate from './validate';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { fetchEmployeeList, changeCurrentPage } from '../../redux/slice/employeeSlice';
+import { fetchEmployeeList } from '../../redux/slice/employeeSlice';
 import { addEmployee, exportExcel, updateEmployee } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -27,12 +30,14 @@ import Loading from '../../components/Loading/Loading';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import EmployeeForm from './EmployeeForm';
-import TableCommon from '../common/ComponentCommon/TableCommon';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 	const text = searchParams.get('text') || '';
+	const [isEdit, setIsEdit] = useState(true);
+
+	// const [searchTable, setSearchTable] = useState('');
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -49,29 +54,33 @@ const EmployeePage = () => {
 	const users = useSelector((state) => state.employee.employees);
 	const departments = useSelector((state) => state.department.departments);
 	const positions = useSelector((state) => state.position.positions);
-	const pagination = useSelector((state) => state.employee.pagination);
-	const currentPage = useSelector((state) => state.employee.currentPage);
+	// const pagination = useSelector((state) => state.employee.pagination);
+	// const currentPage = useSelector((state) => state.employee.currentPage);
 	const loading = useSelector((state) => state.employee.loading);
 
-	const fetchUser = () => {
-		return users.map((item, index) => ({
-			...item,
-			code: _.isEmpty(item.code) ? '--' : item.code,
-			indexNumber: _.isEmpty(index) ? index : '--',
-		}));
-	};
+	// const fetchUser = () => {
+	// 	return users.map((item, index) => ({
+	// 		...item,
+	// 		code: _.isEmpty(item.code) ? '--' : item.code,
+	// 		indexNumber: _.isEmpty(index) ? index : '--',
+	// 	}));
+	// };
 
-	const setCurrentPage = (page) => {
-		dispatch(changeCurrentPage(page));
-	};
+	const fetchUser = useMemo(() => {
+		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+	}, [users]);
+
+	// const setCurrentPage = (page) => {
+	// 	dispatch(changeCurrentPage(page));
+	// };
 
 	useEffect(() => {
 		const query = {};
 		query.text = text;
-		query.page = currentPage;
+		// query.page = currentPage;
 		// query.limit = 10;
 		dispatch(fetchEmployeeList(query));
-	}, [dispatch, currentPage, text]);
+	}, [dispatch, text]);
 
 	useEffect(() => {
 		dispatch(fetchDepartmentList());
@@ -92,62 +101,121 @@ const EmployeePage = () => {
 				}).toString(),
 			});
 		}
-		setCurrentPage(1);
+		// setCurrentPage(1);
 	};
 
-	const handleChangeCurrentPage = (searchValue) => {
-		setCurrentPage(searchValue.page);
-	};
+	// const handleChangeCurrentPage = (searchValue) => {
+	// 	setCurrentPage(searchValue.page);
+	// };
 
 	const columns = [
-		{
-			title: 'STT',
-			id: 'stt',
-			key: 'stt',
-			type: 'text',
-			align: 'center',
-			isShow: false,
-			render: (item) => <span>{item.indexNumber + 1}</span>,
-		},
+		// {
+		// 	title: 'STT',
+		// 	id: 'stt',
+		// 	key: 'stt',
+		// 	type: 'text',
+		// 	align: 'center',
+		// 	isShow: false,
+		// 	render: (item) => <span>{item.indexNumber + 1}</span>,
+		// },
 		{
 			title: 'Họ và tên',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
-			align: 'left',
+			align: 'center',
+			hidden: true,
 			isShow: true,
-			// col: 8,
+			col: 5,
 			options: users,
-			render: (item) => <span>{item.name}</span>,
+			// render: (item) => <span>{item.name}</span>,
 		},
 		{
 			title: 'Mã nhân sự',
 			id: 'code',
+			dataIndex: 'code',
 			key: 'code',
+			sorter: (a, b) => a.code.localeCompare(b.code),
 			type: 'text',
 			align: 'center',
+			hidden: true,
 			isShow: true,
-			// col: 6,
-			render: (item) => <span>{item.code}</span>,
+			col: 6,
+			// render: (item) => <span>{item.code}</span>,
+		},
+		{
+			title: 'Giới tính',
+			id: 'sex',
+			dataIndex: 'sex',
+			key: 'sex',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: false,
+			format: (value) =>
+				// eslint-disable-next-line no-nested-ternary
+				value === 'male' ? 'Nam' : 'Nữ',
+			options: [
+				{
+					id: 1,
+					text: 'Nam',
+					label: 'Nam',
+					value: 'male',
+				},
+				{
+					id: 2,
+					text: 'Nữ',
+					label: 'Nữ',
+					value: 'female',
+				},
+			],
+			col: 6,
+		},
+		{
+			title: 'Ngày sinh',
+			id: 'dateOfBirth',
+			dataIndex: 'dateOfBirth',
+			key: 'dateOfBirth',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 4,
 		},
 		{
 			title: 'Email liên hệ',
 			id: 'email',
+			dataIndex: 'email',
 			key: 'email',
+			sorter: (a, b) => a.email.localeCompare(b.email),
 			type: 'text',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			col: 6,
-			render: (item) => <span>{item.email}</span>,
+			// render: (item) => <span>{item.email}</span>,
 			// eslint-disable-next-line no-unneeded-ternary
 			isDisabled: itemEdit?.id ? true : false,
 		},
 		{
+			title: 'SĐT',
+			id: 'phone',
+			dataIndex: 'phone',
+			key: 'phone',
+			type: 'text',
+			align: 'center',
+			isShow: false,
+			col: 4,
+		},
+		{
 			title: 'Phòng ban công tác',
 			id: 'department',
+			dataIndex: '',
 			key: 'department',
 			type: 'select',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			render: (item) => <span>{item?.department?.name || ''} </span>,
 			options: departments,
@@ -155,16 +223,91 @@ const EmployeePage = () => {
 			col: 6,
 		},
 		{
+			title: 'Ngày tham gia',
+			id: 'dateOfJoin',
+			dataIndex: 'dateOfJoin',
+			key: 'dateOfJoin',
+			type: 'date',
+			align: 'center',
+			isShow: false,
+			format: (value) => value && `${moment(`${value}`).format('DD-MM-YYYY')}`,
+			col: 4,
+		},
+		{
 			title: 'Vị trí làm việc',
 			id: 'position',
+			dataIndex: '',
 			key: 'position',
 			type: 'select',
 			align: 'left',
+			hidden: true,
 			isShow: true,
 			render: (item) => <span>{item?.position?.name || ''}</span>,
 			options: positions,
 			isMulti: false,
 			col: 6,
+		},
+		{
+			title: 'Chức vụ',
+			id: 'role',
+			dataIndex: 'role',
+			key: 'role',
+			type: 'singleSelect',
+			align: 'left',
+			isShow: false,
+			format: (value) =>
+				// eslint-disable-next-line no-nested-ternary
+				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
+			options: [
+				{
+					id: 1,
+					text: 'Admin',
+					label: 'Admin',
+					value: 'admin',
+				},
+				{
+					id: 2,
+					text: 'Quản lý',
+					label: 'Quản lý',
+					value: 'manager',
+				},
+				{
+					id: 3,
+					text: 'Nhân viên',
+					label: 'Nhân viên',
+					value: 'user',
+				},
+			],
+			col: 6,
+		},
+		{
+			title: 'Địa chỉ',
+			id: 'address',
+			dataIndex: 'address',
+			key: 'address',
+			type: 'textarea',
+			align: 'center',
+			isShow: false,
+			render: (item) => (
+				<Popovers desc={item?.address} trigger='hover'>
+					<div
+						style={{
+							maxWidth: 150,
+							WebkitLineClamp: '2',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							display: '-webkit-box',
+							WebkitBoxOrient: 'vertical',
+						}}>
+						{item?.address}
+					</div>
+				</Popovers>
+			),
+		},
+		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
 		},
 		{
 			title: 'Hành Động',
@@ -181,7 +324,11 @@ const EmployeePage = () => {
 								isLight={darkModeStatus}
 								className='text-nowrap mx-1'
 								icon='Edit'
-								onClick={() => handleOpenForm(item)}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleOpenForm(item);
+									setIsEdit(true);
+								}}
 							/>
 							<Button
 								isOutline={!darkModeStatus}
@@ -189,16 +336,30 @@ const EmployeePage = () => {
 								isLight={darkModeStatus}
 								className='text-nowrap mx-2'
 								icon='Trash'
-								onClick={() => handleOpenFormDelete(item)}
+								onClick={(e) => {
+									e.stopPropagation();
+									handleOpenFormDelete(item);
+								}}
 							/>
 						</div>,
 						['admin'],
 					)}
 				</>
 			),
+			hidden: true,
 			isShow: false,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	const handleDelete = async (data) => {
 		const dataSubmit = {
@@ -369,20 +530,37 @@ const EmployeePage = () => {
 														)}
 													</CardHeader>
 													<div className='p-4'>
-														<TableCommon
-															className='table table-modern mb-0'
-															columns={columns}
-															data={fetchUser()}
+														<TableSearchCommon
 															onSubmitSearch={handleSubmitSearch}
-															onChangeCurrentPage={
-																handleChangeCurrentPage
-															}
-															currentPage={parseInt(currentPage, 10)}
-															totalItem={pagination?.totalRows}
-															total={pagination?.total}
-															setCurrentPage={setCurrentPage}
 															searchvalue={text}
 															isSearch
+														/>
+
+														<Table
+															className='table table-modern mb-0'
+															rowKey={(item) => item.id}
+															columns={showColumns}
+															dataSource={fetchUser}
+															scroll={{ x: 'max-content' }}
+															// onSubmitSearch={handleSubmitSearch}
+															style={{ cursor: 'pointer' }}
+															onRow={(item) => {
+																return {
+																	onClick: () => {
+																		setIsEdit(false);
+																		handleOpenForm(item);
+																	},
+																};
+															}}
+															// onChangeCurrentPage={
+															// 	handleChangeCurrentPage
+															// }
+															// currentPage={parseInt(currentPage, 10)}
+															// totalItem={pagination?.totalRows}
+															// total={pagination?.total}
+															// setCurrentPage={setCurrentPage}
+															// searchvalue={text}
+															// isSearch
 														/>
 													</div>
 												</div>
@@ -392,18 +570,22 @@ const EmployeePage = () => {
 									['admin', 'manager'],
 								)}
 
-								<EmployeeForm
-									size='xl'
-									show={toggleForm}
-									onClose={handleCloseForm}
-									handleSubmit={handleSubmitForm}
-									item={itemEdit}
-									label={
-										itemEdit?.id ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên'
-									}
-									fields={columns}
-									validate={validate}
-								/>
+								{toggleForm && (
+									<EmployeeForm
+										size='xl'
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={itemEdit}
+										label={
+											itemEdit?.id
+												? 'Cập nhật nhân viên'
+												: 'Thêm mới nhân viên'
+										}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								)}
 								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}

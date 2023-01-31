@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -15,8 +15,8 @@ import Card, {
 	CardTitle,
 } from '../../../components/bootstrap/Card';
 import Button from '../../../components/bootstrap/Button';
-import MissionFormModal from './MissionFormModal';
 import Alert from '../../../components/bootstrap/Alert';
+import MissionFormModal from './MissionFormModal';
 import useDarkMode from '../../../hooks/useDarkMode';
 import TableCommon from '../../common/ComponentCommon/TableCommon';
 import verifyPermissionHOC from '../../../HOC/verifyPermissionHOC';
@@ -40,9 +40,9 @@ const MissionPage = () => {
 	const pagination = useSelector((state) => state.mission.pagination);
 	const loading = useSelector((state) => state.mission.loading);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
+	console.log('toggleFormEdit', toggleFormEdit);
 	const confirmForm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-
 	const currentPage = useSelector((state) => state.mission.currentPage);
 
 	const missions = mission.map((item, index) => ({
@@ -50,11 +50,14 @@ const MissionPage = () => {
 		indexNumber: _.isEmpty(index) ? index : '--',
 	}));
 
+	const [isEdit, setIsEdit] = useState(true);
+	const [formType, setFormType] = useState([]);
+
 	useEffect(() => {
 		const query = {};
 		query.text = text;
 		query.page = currentPage;
-		query.limit = 10;
+		// query.limit = 10;
 		dispatch(fetchMissionList(query));
 	}, [dispatch, currentPage, text]);
 
@@ -77,7 +80,7 @@ const MissionPage = () => {
 			const query = {};
 			query.text = text;
 			query.page = currentPage;
-			query.limit = 10;
+			// query.limit = 10;
 			dispatch(fetchMissionList(query));
 		} catch (error) {
 			toast.error('Xoá mục tiêu không thành công!', {
@@ -168,7 +171,11 @@ const MissionPage = () => {
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2'
 							icon='Edit'
-							onClick={() => handleOpenFormEdit(item)}
+							onClick={(e) => {
+								e.stopPropagation();
+								setFormType('edit');
+								handleOpenFormEdit(item);
+							}}
 						/>
 						<Button
 							isOutline={!darkModeStatus}
@@ -176,7 +183,11 @@ const MissionPage = () => {
 							isLight={darkModeStatus}
 							className='text-nowrap mx-2 '
 							icon='Delete'
-							onClick={() => handleOpenFormDelete(item)}
+							onClick={(e) => {
+								e.stopPropagation();
+								setFormType('delete');
+								handleOpenFormDelete(item);
+							}}
 						/>
 					</div>,
 					['admin'],
@@ -234,9 +245,10 @@ const MissionPage = () => {
 																color='info'
 																icon='AddCircleOutline'
 																tag='button'
-																onClick={() =>
-																	handleOpenFormEdit(null)
-																}>
+																onClick={() => {
+																	setFormType('add');
+																	handleOpenFormEdit(null);
+																}}>
 																Thêm mới
 															</Button>
 														</CardActions>,
@@ -248,6 +260,16 @@ const MissionPage = () => {
 														className='table table-modern mb-0'
 														columns={columns}
 														data={missions}
+														onRow={(item) => {
+															return {
+																onClick: () => {
+																	setIsEdit(false);
+																	setFormType('watching');
+																	handleOpenFormEdit(item);
+																},
+															};
+														}}
+														style={{ cursor: 'pointer' }}
 														onSubmitSearch={handleSubmitSearch}
 														onChangeCurrentPage={
 															handleChangeCurrentPage
@@ -274,11 +296,15 @@ const MissionPage = () => {
 										</Card>
 									</div>
 								</div>
-								<MissionFormModal
-									show={toggleFormEdit}
-									onClose={handleCloseForm}
-									item={itemEdit}
-								/>
+								{toggleFormEdit && (
+									<MissionFormModal
+										show={toggleFormEdit}
+										onClose={handleCloseForm}
+										item={itemEdit}
+										fields={isEdit}
+										formType={formType}
+									/>
+								)}
 								<AlertConfirm
 									openModal={confirmForm}
 									onCloseModal={handleCloseForm}

@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
+import { Table } from 'antd';
 import Card, {
 	CardActions,
 	CardHeader,
@@ -17,7 +18,7 @@ import validate from './validate';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
 import { demoPages } from '../../menu';
 import Page from '../../layout/Page/Page';
-import TableCommon from '../common/ComponentCommon/TableCommon';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
 import { fetchPositionLevelList, changeCurrentPage } from '../../redux/slice/positionLevelSlice';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -28,6 +29,9 @@ import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 const PositionLevelConfigPage = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
+
+	const [isEdit, setIsEdit] = useState(true);
+
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
@@ -41,7 +45,7 @@ const PositionLevelConfigPage = () => {
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
-	const pagination = useSelector((state) => state.positionLevel.pagination);
+	// const pagination = useSelector((state) => state.positionLevel.pagination);
 	const loading = useSelector((state) => state.positionLevel.loading);
 	const positionLevel = useSelector((state) => state.positionLevel.positionLevels);
 
@@ -69,20 +73,31 @@ const PositionLevelConfigPage = () => {
 		{
 			title: 'Tên cấp nhân sự',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
 			type: 'text',
 			align: 'left',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			isShow: true,
-			render: (item) => <span>{item?.name}</span>,
+			// render: (item) => <span>{item?.name}</span>,
+			hidden: true,
 		},
 		{
 			title: 'Mã cấp nhân sự',
 			id: 'code',
+			dataIndex: 'code',
 			key: 'code',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
 			align: 'left',
 			isShow: true,
-			render: (item) => <span>{item?.code}</span>,
+			// render: (item) => <span>{item?.code}</span>,
+			hidden: true,
+		},
+		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
 		},
 		{
 			title: 'Hành động',
@@ -97,7 +112,11 @@ const PositionLevelConfigPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsEdit(true);
+							handleOpenForm(item);
+						}}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -105,19 +124,33 @@ const PositionLevelConfigPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</>
 			),
 			isShow: false,
+			hidden: true,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	useEffect(() => {
 		const query = {};
 		query.text = text;
 		query.page = currentPage;
-		query.limit = 10;
+		// query.limit = 10;
 		dispatch(fetchPositionLevelList(query));
 	}, [dispatch, currentPage, text]);
 
@@ -138,9 +171,9 @@ const PositionLevelConfigPage = () => {
 		setCurrentPage(1);
 	};
 
-	const handleChangeCurrentPage = (searchValue) => {
-		setCurrentPage(searchValue.page);
-	};
+	// const handleChangeCurrentPage = (searchValue) => {
+	// 	setCurrentPage(searchValue.page);
+	// };
 
 	const handleSubmitForm = async (itemSubmit) => {
 		if (!itemSubmit.id) {
@@ -154,7 +187,7 @@ const PositionLevelConfigPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = 1;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionLevelList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -175,7 +208,7 @@ const PositionLevelConfigPage = () => {
 				const query = {};
 				query.text = text;
 				query.page = currentPage;
-				query.limit = 10;
+				// query.limit = 10;
 				dispatch(fetchPositionLevelList(query));
 				handleCloseForm();
 			} catch (error) {
@@ -244,39 +277,57 @@ const PositionLevelConfigPage = () => {
 													</CardActions>
 												</CardHeader>
 												<div className='p-4'>
-													<TableCommon
-														className='table table-modern mb-0'
-														columns={columns}
-														data={positionLevels}
+													<TableSearchCommon
 														onSubmitSearch={handleSubmitSearch}
-														onChangeCurrentPage={
-															handleChangeCurrentPage
-														}
-														currentPage={parseInt(currentPage, 10)}
-														totalItem={pagination?.totalRows}
-														total={pagination?.total}
-														setCurrentPage={setCurrentPage}
 														searchvalue={text}
 														isSearch
+													/>
+													<Table
+														className='table table-modern mb-0'
+														columns={showColumns}
+														dataSource={positionLevels}
+														pagination={{ pageSize: 10 }}
+														style={{ cursor: 'pointer' }}
+														onRow={(item) => {
+															return {
+																cursor: 'pointer',
+																onClick: () => {
+																	setIsEdit(false);
+																	handleOpenForm(item);
+																},
+															};
+														}}
+														// onSubmitSearch={handleSubmitSearch}
+														// onChangeCurrentPage={
+														// 	handleChangeCurrentPage
+														// }
+														// currentPage={parseInt(currentPage, 10)}
+														// totalItem={pagination?.totalRows}
+														// total={pagination?.total}
+														// setCurrentPage={setCurrentPage}
+														// searchvalue={text}
+														// isSearch
 													/>
 												</div>
 											</div>
 										</Card>
 									</div>
 								</div>
-								<CommonForm
-									show={toggleForm}
-									onClose={handleCloseForm}
-									handleSubmit={handleSubmitForm}
-									item={itemEdit}
-									label={
-										itemEdit?.id
-											? 'Cập nhật cấp nhân sự'
-											: 'Thêm mới cấp nhân sự'
-									}
-									fields={columns}
-									validate={validate}
-								/>
+								{toggleForm && (
+									<CommonForm
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={itemEdit}
+										label={
+											itemEdit?.id
+												? 'Cập nhật cấp nhân sự'
+												: 'Thêm mới cấp nhân sự'
+										}
+										fields={isEdit ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								)}
 								<AlertConfirm
 									openModal={toggleFormDelete}
 									onCloseModal={handleCloseForm}

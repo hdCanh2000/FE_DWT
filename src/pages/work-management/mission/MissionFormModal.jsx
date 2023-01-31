@@ -20,7 +20,8 @@ const ErrorText = styled.span`
 	color: #e22828;
 	margin-top: 5px;
 `;
-const MissionFormModal = ({ show, onClose, item }) => {
+const MissionFormModal = ({ show, onClose, item, formType }) => {
+	console.log(formType);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const units = useSelector((state) => state.unit.units);
@@ -170,7 +171,14 @@ const MissionFormModal = ({ show, onClose, item }) => {
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
-				<Modal.Title>{item?.id ? 'Cập nhật mục tiêu' : 'Thêm mới mục tiêu'}</Modal.Title>
+				{((formType === 'add' || formType === 'edit') && (
+					<Modal.Title>
+						{item?.id ? 'Cập nhật mục tiêu' : 'Thêm mới mục tiêu'}
+					</Modal.Title>
+				)) ||
+					(formType === 'watching' && (
+						<Modal.Title>Thông tin chi tiết mục tiêu</Modal.Title>
+					))}
 			</Modal.Header>
 			<Modal.Body className='px-4'>
 				<div className='row'>
@@ -330,9 +338,11 @@ const MissionFormModal = ({ show, onClose, item }) => {
 				<Button variant='secondary' onClick={handleCloseForm}>
 					Đóng
 				</Button>
-				<Button variant='primary' type='submit' onClick={handleSubmitMissionForm}>
-					Lưu mục tiêu
-				</Button>
+				{(formType === 'add' || formType === 'edit') && (
+					<Button variant='primary' type='submit' onClick={handleSubmitMissionForm}>
+						Lưu mục tiêu
+					</Button>
+				)}
 			</Modal.Footer>
 		</Modal>
 	);

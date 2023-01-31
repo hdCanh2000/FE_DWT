@@ -18,6 +18,7 @@ const TableCommon = ({
 	setCurrentPage,
 	totalItem,
 	total,
+	onRow,
 	searchvalue,
 	...props
 }) => {
@@ -69,6 +70,7 @@ const TableCommon = ({
 				<Table
 					className='table table-modern mb-0'
 					rowKey={(item) => item.id}
+					onRow={onRow}
 					columns={columns}
 					dataSource={data}
 					onSubmitSearch={handleSubmit}
@@ -98,6 +100,7 @@ TableCommon.propTypes = {
 	totalItem: PropTypes.number,
 	total: PropTypes.number,
 	searchvalue: PropTypes.string,
+	onRow: PropTypes.func,
 };
 TableCommon.defaultProps = {
 	className: null,
@@ -112,6 +115,7 @@ TableCommon.defaultProps = {
 	searchvalue: '',
 	totalItem: 10,
 	total: 10,
+	onRow: null,
 };
 
 export default memo(TableCommon);

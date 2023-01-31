@@ -26,7 +26,7 @@ export const demoPages = {
 		path: '/',
 		icon: 'Dashboard',
 		subMenu: null,
-		roles: ['admin', 'manager', 'user'],
+		roles: ['admin', 'manager'],
 	},
 	companyPage: {
 		id: 'companyPage',
@@ -177,6 +177,12 @@ export const demoPages = {
 				text: 'Báo cáo lưu',
 				path: '/mau-bao-cao',
 				roles: ['admin'],
+			},
+			reportUpload: {
+				id: 'reportUpload',
+				text: 'Biên bản họp',
+				path: '/bien-ban-hop',
+				roles: ['admin', 'manager', 'user'],
 			},
 		},
 		roles: ['admin'],
