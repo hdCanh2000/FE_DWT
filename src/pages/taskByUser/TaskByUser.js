@@ -274,15 +274,11 @@ const TaskByUser = () => {
 													<th className='text-center'>
 														Số nhiệm vụ đang có
 													</th>
-<<<<<<< HEAD
-												</tr>
-=======
 													{/* <th className='text-center'>Tổng điểm KPI</th>
 													<th className='text-center'>
 														Điểm KPI hiện tại
 													</th> */}
 										{/* </tr>
->>>>>>> bc31f42f6192bb04024336187420fc5650497b57
 											</thead>
 											<tbody>
 												{items?.map((item) => (
@@ -304,10 +300,6 @@ const TaskByUser = () => {
 																			?.isResponsible === true
 																	);
 																})?.length || 0}
-<<<<<<< HEAD
-															</td>
-														</tr>
-=======
 															</td> */}
 										{/* <td className='text-center'>
 																{calcTotalKPIOfWorkTrack(
@@ -338,7 +330,6 @@ const TaskByUser = () => {
 																) || 0}
 															</td> */}
 										{/* </tr>
->>>>>>> bc31f42f6192bb04024336187420fc5650497b57
 													</React.Fragment>
 												))}
 											</tbody>

@@ -40,7 +40,6 @@ const MissionPage = () => {
 	const pagination = useSelector((state) => state.mission.pagination);
 	const loading = useSelector((state) => state.mission.loading);
 	const toggleFormEdit = useSelector((state) => state.toggleForm.open);
-	console.log('toggleFormEdit', toggleFormEdit);
 	const confirmForm = useSelector((state) => state.toggleForm.confirm);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const currentPage = useSelector((state) => state.mission.currentPage);

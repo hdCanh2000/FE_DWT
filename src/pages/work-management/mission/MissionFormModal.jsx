@@ -21,7 +21,6 @@ const ErrorText = styled.span`
 	margin-top: 5px;
 `;
 const MissionFormModal = ({ show, onClose, item, formType }) => {
-	console.log(formType);
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const units = useSelector((state) => state.unit.units);
