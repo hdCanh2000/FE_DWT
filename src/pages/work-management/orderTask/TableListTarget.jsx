@@ -1,5 +1,5 @@
 /*eslint-disable */
-import {Col, DatePicker, Input, Row, Select, Table, Tooltip} from 'antd';
+import { Col, DatePicker, Input, Row, Select, Table, Tooltip } from 'antd';
 import React, { useMemo, useState } from 'react';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from 'dayjs';
@@ -7,7 +7,7 @@ import { useQuery } from 'react-query';
 import Button from '../../../components/bootstrap/Button';
 import { getListTarget } from '../../dailyWorkTracking/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
-import {getAllDepartment} from "../../department/services";
+import { getAllDepartment } from '../../department/services';
 
 const columns = [
 	{
@@ -29,15 +29,13 @@ const columns = [
 				</Tooltip>
 			);
 		},
-		sorter: (a, b) => a.name.localeCompare(b.name),
+		sorter: (a, b) => {
+			const first = a?.name || '';
+			const second = b?.name || '';
+			return first.localeCompare(second);
+		},
 		sortDirections: ['descend', 'ascend', 'descend'],
 		defaultSortOrder: 'descend',
-	},
-
-	{
-		title: 'Phòng ban',
-		dataIndex: 'positionText',
-		key: 'positionText',
 	},
 
 	{
@@ -51,7 +49,11 @@ const columns = [
 				</Tooltip>
 			);
 		},
-		sorter: (a, b) => a.description.localeCompare(b.description),
+		sorter: (a, b) => {
+			const first = a?.description || '';
+			const second = b?.description || '';
+			return first.localeCompare(second);
+		},
 		sortDirections: ['descend', 'ascend', 'descend'],
 		defaultSortOrder: 'descend',
 	},
@@ -67,7 +69,11 @@ const columns = [
 				</Tooltip>
 			);
 		},
-		sorter: (a, b) => a.executionPlan.localeCompare(b.executionPlan),
+		sorter: (a, b) => {
+			const first = a?.executionPlan || '';
+			const second = b?.executionPlan || '';
+			return first.localeCompare(second);
+		},
 		sortDirections: ['descend', 'ascend', 'descend'],
 		defaultSortOrder: 'descend',
 	},
@@ -76,7 +82,11 @@ const columns = [
 		title: 'Man Day',
 		dataIndex: 'manDay',
 		key: 'manDay',
-		sorter: (a, b) => a.manDay - b.manDay,
+		sorter: (a, b) => {
+			const first = a.manDay || 0;
+			const second = b.manDay || 0;
+			return first - second;
+		},
 		sortDirections: ['descend', 'ascend', 'descend'],
 		defaultSortOrder: 'descend',
 		render: (text) => {
