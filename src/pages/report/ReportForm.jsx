@@ -9,7 +9,8 @@ import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import { uploadFile } from '../dailyWorkTracking/services';
 import axios from 'axios';
-import {createReport, uploadFileToRemoteHost} from './service';
+import { createReport, uploadFileToRemoteHost } from './service';
+import { removeAccents } from '../../utils/utils';
 
 const ALLOWED_TYPES = [
 	'image/png',
@@ -36,7 +37,14 @@ const ReportForm = ({ onSuccess }) => {
 		setFiles(removedFiles);
 	};
 	const handleChooseFile = ({ file }) => {
-		setFiles((prev) => [...prev, file]);
+		//replace space with _
+		const originalName = file.name;
+		const noSpaceFileName = originalName.replace(/\s/g, '_');
+		//remove accents
+		const removedAccentsFileName = removeAccents(noSpaceFileName);
+		const myNewFile = new File([file], removedAccentsFileName, { type: file.type });
+		//only upload 1 file
+		setFiles([myNewFile]);
 	};
 	const handleFinishFail = (errorInfo) => {
 		console.log('Failed:', errorInfo);
@@ -54,7 +62,7 @@ const ReportForm = ({ onSuccess }) => {
 			const formData = new FormData();
 			//only upload 1 file
 			formData.append('files', files[0]);
-			const resp = await uploadFileToRemoteHost(formData)
+			const resp = await uploadFileToRemoteHost(formData);
 			const fileLink = resp.downloadLink;
 			//create report
 			await createReport({
