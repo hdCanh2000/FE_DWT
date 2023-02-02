@@ -122,6 +122,7 @@ const MissionPage = () => {
 			key: 'startTime',
 			type: 'text',
 			align: 'center',
+			sorter: (a, b) => a.startTime.localeCompare(b.startTime),
 			render: (value) => (
 				<span>
 					{value.startTime
@@ -135,6 +136,7 @@ const MissionPage = () => {
 			id: 'endTime',
 			key: 'endTime',
 			align: 'center',
+			sorter: (a, b) => a.endTime.localeCompare(b.endTime),
 			render: (value) => (
 				<span>
 					{value.endTime ? `${moment(`${value.endTime}`).format('DD-MM-YYYY')}` : '--'}

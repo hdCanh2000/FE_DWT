@@ -67,7 +67,11 @@ const EmployeePage = () => {
 	// };
 
 	const fetchUser = useMemo(() => {
-		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+		return users.map((item, index) => ({
+			...item,
+			code: _.isEmpty(item.code) ? '--' : item.code,
+			indexNumber: _.isEmpty(index) ? index + 1 : '--',
+		}));
 	}, [users]);
 
 	// const setCurrentPage = (page) => {
@@ -109,15 +113,16 @@ const EmployeePage = () => {
 	// };
 
 	const columns = [
-		// {
-		// 	title: 'STT',
-		// 	id: 'stt',
-		// 	key: 'stt',
-		// 	type: 'text',
-		// 	align: 'center',
-		// 	isShow: false,
-		// 	render: (item) => <span>{item.indexNumber + 1}</span>,
-		// },
+		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			align: 'center',
+			isShow: true,
+			hidden: true,
+			render: (item) => <span>{item.indexNumber}</span>,
+		},
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -543,7 +548,6 @@ const EmployeePage = () => {
 															columns={showColumns}
 															dataSource={fetchUser}
 															scroll={{ x: 'max-content' }}
-															// onSubmitSearch={handleSubmitSearch}
 															style={{ cursor: 'pointer' }}
 															onRow={(item) => {
 																return {
@@ -553,6 +557,7 @@ const EmployeePage = () => {
 																	},
 																};
 															}}
+															// onSubmitSearch={handleSubmitSearch}
 															// onChangeCurrentPage={
 															// 	handleChangeCurrentPage
 															// }
