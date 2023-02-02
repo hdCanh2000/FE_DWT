@@ -60,7 +60,11 @@ const columns = (handleClickDeleteBtn, handleRowClick) => {
 					),
 				};
 			},
-			sorter: (a, b) => a.name.localeCompare(b.name),
+			sorter: (a, b) => {
+				const aName = a?.name || '';
+				const bName = b?.name || '';
+				return aName.localeCompare(bName);
+			},
 			sortDirections: ['descend', 'ascend', 'descend'],
 			defaultSortOrder: 'descend',
 		},
@@ -69,12 +73,16 @@ const columns = (handleClickDeleteBtn, handleRowClick) => {
 			dataIndex: 'userName',
 			key: 'userName',
 			render: shareRender,
-			sorter: (a, b) => a.userName.localeCompare(b.userName),
+			sorter: (a, b) => {
+				const aUserName = a?.userName || '';
+				const bUserName = b?.userName || '';
+				return aUserName.localeCompare(bUserName);
+			},
 			sortDirections: ['descend', 'ascend', 'descend'],
 			defaultSortOrder: 'descend',
 		},
 		{
-			title: 'Phòng ban',
+			title: 'Vị trí',
 			dataIndex: 'positionText',
 			key: 'position',
 			render: shareRender,
@@ -84,7 +92,11 @@ const columns = (handleClickDeleteBtn, handleRowClick) => {
 			dataIndex: 'deadlineText',
 			key: 'deadline',
 			render: shareRender,
-			sorter: (a, b) => moment(a.deadline).unix() - moment(b.deadline).unix(),
+			sorter: (a, b) => {
+				const aDeadline = a.deadline ? moment(a.deadline).unix() : 0;
+				const bDeadline = b.deadline ? moment(b.deadline).unix() : 0;
+				return aDeadline - bDeadline;
+			},
 			sortDirections: ['descend', 'ascend', 'descend'],
 			defaultSortOrder: 'descend',
 		},
