@@ -15,7 +15,6 @@ import Input from '../../components/bootstrap/forms/Input';
 import Textarea from '../../components/bootstrap/forms/Textarea';
 import FormGroup from '../../components/bootstrap/forms/FormGroup';
 import { updateDepartment } from './services';
-import UserDetailPage from './UserDetailPage';
 import validate from './validate';
 import Checks from '../../components/bootstrap/forms/Checks';
 import Select from '../../components/bootstrap/forms/Select';
@@ -117,7 +116,7 @@ const DepartmentDetail = ({ organizationLevelOptions, departmentList, initValues
 								eventKey='userDepartment'
 								title='Danh sách nhân viên'
 								className='mb-3'>
-								<UserDetailPage dataUser={initValues} />
+								{/* <UserDetailPage dataUser={initValues} /> */}
 							</Tab>
 							<Tab
 								eventKey='departmentDetail'

@@ -75,6 +75,7 @@ const Keys = () => {
 			align: 'left',
 			isShow: true,
 			col: 5,
+			render: (item) => <span>{item?.name}</span>,
 		},
 		{
 			title: 'Đơn vị',
@@ -125,6 +126,7 @@ const Keys = () => {
 			type: 'textarea',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.description}</span>,
 		},
 		{
 			title: 'Hành động',

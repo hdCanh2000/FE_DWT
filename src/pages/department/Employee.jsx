@@ -15,8 +15,6 @@ const EmployeePage = ({ dataDepartment }) => {
 
 	const users = useSelector((state) => state.employee.employees);
 	const positions = useSelector((state) => state.position.positions);
-	console.log(users);
-	console.log(dataDepartment);
 	const currentPage = useSelector((state) => state.employee.currentPage);
 	const pagination = useSelector((state) => state.employee.pagination);
 
