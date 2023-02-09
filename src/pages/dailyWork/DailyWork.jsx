@@ -113,7 +113,7 @@ const DailyWork = () => {
 													Thêm mới
 												</Button>
 											</CardActions>,
-											['admin', 'manager'],
+											['admin'],
 										)}
 									</CardHeader>
 									<CardBody>

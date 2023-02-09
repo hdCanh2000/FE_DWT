@@ -23,6 +23,11 @@ import { getListTargetInfos } from '../../dailyWorkTracking/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
 import { deleteTargetInfo } from '../../kpiNorm/services';
 
+const rolesString = window.localStorage.getItem('roles') || '[]';
+const roles = JSON.parse(rolesString);
+
+const isAdmin = roles.includes('admin') || roles.includes('manager');
+
 const columns = (handleClickDeleteBtn, handleRowClick) => {
 	const shareRender = (text, record) => {
 		return {
@@ -285,8 +290,15 @@ const TableListTargetInfos = ({ updateFlag }) => {
 							setCancelAssignTaskId(id);
 						},
 						(record) => {
-							setSelectedTargetInfo(record);
-							setOpenModalTargetInfo(true);
+							if (isAdmin) {
+								setSelectedTargetInfo(record);
+								setOpenModalTargetInfo(true);
+							} else {
+								toast.warning('Không có quyền truy cập', {
+									position: toast.POSITION.TOP_RIGHT,
+									autoClose: 2000,
+								});
+							}
 						},
 					)}
 					dataSource={tableData}
