@@ -1,6 +1,6 @@
 /* eslint react/prop-types: 0 */
 /* eslint-disable */
-import { Button, Form, Input, InputNumber, Modal, Select, Upload } from 'antd';
+import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { GrAttachment } from 'react-icons/gr';
@@ -30,10 +30,11 @@ const ALLOWED_TYPES = [
 	'.psd',
 	'.txt',
 ];
-const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }) => {
+const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, nameTable }) => {
 	const [files, setFiles] = useState([]);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [valueRadio, setValueRadio] = useState(false);
 	const [form] = Form.useForm();
 
 	const rolesString = window.localStorage.getItem('roles') || '[]';
@@ -191,6 +192,66 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 							/>
 						</Form.Item>
 					</div>
+					{nameTable === 'DailyWorkTracking' && (
+						<>
+							<div className='d-flex justify-content-between mb-2'>
+								<Form.Item name='business' label='Đạt giá trị kinh doanh'>
+									<Checkbox
+										onClick={() => {
+											setValueRadio(!valueRadio);
+										}}
+										checked={valueRadio}
+										defaultChecked
+										large
+										value={valueRadio}
+									/>
+								</Form.Item>
+							</div>
+							{valueRadio === true && (
+								<div className='d-flex justify-content-between mb-2'>
+									<Form.Item name='tieuchi' label='Tiêu chí'>
+										<Select
+											placeholder='Hãy chọn tiêu chí!'
+											// value={}
+											// onChange={(value) => {
+											// 	setDepartmentId(value);
+											// 	setTargetSearchParams({
+											// 		...targetSearchParams,
+											// 		departmentId: value,
+											// 	});
+											// }}
+											style={{ width: '100%' }}
+											optionFilterProp='children'
+											showSearch
+											filterOption={(input, option) =>
+												(option?.label.toLowerCase() ?? '').includes(
+													input.toLowerCase(),
+												)
+											}
+											options={[
+												{
+													label: 'Chọn Tiêu chí',
+													value: null,
+													disabled: true,
+												},
+												{
+													label: 'hehehe',
+													value: '',
+												},
+												// ...data.map((item) => ({
+												// 	label: item.name,
+												// 	value: item.id,
+												// })),
+											]}
+										/>
+									</Form.Item>
+									<Form.Item name='giatri' label='Giá trị'>
+										<Input style={{ width: 160 }} />
+									</Form.Item>
+								</div>
+							)}
+						</>
+					)}
 					<Upload.Dragger
 						accept={ALLOWED_TYPES.join(', ')}
 						showUploadList={false}

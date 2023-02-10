@@ -35,11 +35,12 @@ const EmployeePage = ({ dataDepartment }) => {
 	}, [dispatch]);
 
 	useEffect(() => {
+		const dataID = dataDepartment.id;
 		if (dataDepartment.id && dataDepartment.parentId !== null) {
 			const query = {};
 			query.text = '';
 			query.page = currentPage;
-			dispatch(fetchEmployeeListByDepartment(dataDepartment.id, query));
+			dispatch(fetchEmployeeListByDepartment({ dataID, query }));
 		} else {
 			const query = {};
 			query.text = '';

@@ -28,8 +28,8 @@ export const fetchEmployeeById = createAsyncThunk('employee/fetchById', async (i
 
 export const fetchEmployeeListByDepartment = createAsyncThunk(
 	'employee/fetchListByDepartment',
-	async (id, params) => {
-		const response = await getAllEmployeeByDepartment(id, params);
+	async (obj) => {
+		const response = await getAllEmployeeByDepartment(obj.dataID, obj.params);
 		return response.data?.data?.map((item) => {
 			return {
 				...item,
