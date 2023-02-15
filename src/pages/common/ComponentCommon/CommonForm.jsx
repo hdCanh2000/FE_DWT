@@ -10,7 +10,7 @@ import Checks from '../../../components/bootstrap/forms/Checks';
 import CustomSelect from '../../../components/form/CustomSelect';
 import Select from '../../../components/bootstrap/forms/Select';
 import NestedCommonForm from './NestedCommonForm';
-import Icon from '../../../components/icon/Icon';
+// import Icon from '../../../components/icon/Icon';
 
 const CommonForm = ({
 	className,
@@ -38,18 +38,18 @@ const CommonForm = ({
 	});
 
 	const [openNestedModal, setOpenNestedModal] = useState(false);
-	const [fieldsNestedModal, setFiledsNestedModal] = useState({
-		columns: [],
-		model: '',
-	});
+	// const [fieldsNestedModal, setFiledsNestedModal] = useState({
+	// 	columns: [],
+	// 	model: '',
+	// });
 
-	const onOpenNestedModal = (columns, model) => {
-		setFiledsNestedModal({
-			columns,
-			model,
-		});
-		setOpenNestedModal(true);
-	};
+	// const onOpenNestedModal = (columns, model) => {
+	// 	setFiledsNestedModal({
+	// 		columns,
+	// 		model,
+	// 	});
+	// 	setOpenNestedModal(true);
+	// };
 
 	const onCloseNestedModal = () => {
 		setOpenNestedModal(false);
@@ -125,7 +125,7 @@ const CommonForm = ({
 														options={field.options}
 													/>
 												</FormGroup>
-												{field.isShowNested && (
+												{/* {field.isShowNested && (
 													<Icon
 														color='dark'
 														icon='Add'
@@ -138,7 +138,7 @@ const CommonForm = ({
 															)
 														}
 													/>
-												)}
+												)} */}
 											</div>
 											<div className='text-danger mt-1'>
 												{formik.errors[field.id] && (
@@ -274,8 +274,8 @@ const CommonForm = ({
 			<NestedCommonForm
 				onCloseNestedModal={onCloseNestedModal}
 				openNestedModal={openNestedModal}
-				fields={fieldsNestedModal.columns}
-				model={fieldsNestedModal.model}
+				// fields={fieldsNestedModal.columns}
+				// model={fieldsNestedModal.model}
 				onSubmitNestedForm={onSubmitNestedForm}
 				label='Thêm mới'
 			/>
