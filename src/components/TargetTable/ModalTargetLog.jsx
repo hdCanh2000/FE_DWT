@@ -66,7 +66,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 	useEffect(async () => {
 		if (currentTargetLog.id) {
 			const record = await dispatch(fetchRecordById(currentTargetLog.id));
-			if (_.isEmpty(record.value) || _.isEmpty(record.keyReportId)) {
+			if (record.value || record.keyReportId) {
 				setValueRadio(true);
 				form.setFieldsValue({
 					record: record.payload.value,
