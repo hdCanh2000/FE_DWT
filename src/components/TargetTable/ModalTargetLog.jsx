@@ -8,7 +8,7 @@ import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { fetchReport } from '../../redux/slice/keyReportSlice';
+import { fetchReport, fetchRecordById } from '../../redux/slice/keyReportSlice';
 import {
 	createTargetLog,
 	deleteTargetLog,
@@ -41,16 +41,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 	const [valueRadio, setValueRadio] = useState(false);
 	const [form] = Form.useForm();
 
-	useEffect(() => {
-		dispatch(fetchReport());
-	}, []);
-
 	const dataReport = useSelector((state) => state.report.reports);
-
-	const rolesString = window.localStorage.getItem('roles') || '[]';
-	const roles = JSON.parse(rolesString);
-
-	const isAdmin = roles.includes('admin') || roles.includes('manager');
 
 	const currentTargetLog = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
@@ -64,17 +55,28 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 		);
 	}, [target, logDay]);
 
-	const currentReport = useMemo(() => {
-		const logDayFormat = logDay.format('YYYY-MM-DD');
-		return (
-			dataReport.find((item) => {
-				if (item.createdAt) {
-					return item.createdAt === logDayFormat;
-				}
-				return item.noticedDate === logDayFormat;
-			}) || {}
-		);
-	}, [dataReport, logDay]);
+	const rolesString = window.localStorage.getItem('roles') || '[]';
+	const roles = JSON.parse(rolesString);
+	const isAdmin = roles.includes('admin') || roles.includes('manager');
+
+	useEffect(() => {
+		dispatch(fetchReport());
+	}, []);
+
+	useEffect(async () => {
+		if (currentTargetLog.id) {
+			const record = await dispatch(fetchRecordById(currentTargetLog.id));
+			if (_.isEmpty(record.value) || _.isEmpty(record.keyReportId)) {
+				setValueRadio(true);
+				form.setFieldsValue({
+					record: record.payload.value,
+					report: record.payload.keyReportId,
+				});
+			} else {
+				setValueRadio(false);
+			}
+		}
+	}, [currentTargetLog]);
 
 	useEffect(() => {
 		if (_.isEmpty(currentTargetLog)) {
@@ -86,7 +88,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 				quantity: currentTargetLog.quantity,
 				status: currentTargetLog.status,
 				note: currentTargetLog.note,
-				report: currentReport.name,
 			});
 			const uploadedFilesFromApi = JSON.parse(currentTargetLog?.files || '[]');
 			setUploadedFiles(uploadedFilesFromApi);
@@ -112,17 +113,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			if (!values.quantity || !values.quantity || !values.note) {
 				throw new Error('Vui lòng nhập đầy đủ thông tin');
 			}
-			if (values) {
-				const dataRecord = {
-					keyReportId: values.report,
-					targetLogId: currentTargetLog.id,
-					value: values.record,
-				};
-				if (!values.record || !values.report) {
-					throw new Error('Vui lòng nhập đầy đủ thông tin');
-				}
-				await createRecord(dataRecord);
-			}
+
 			const data = {
 				...values,
 				targetInfoId: target.id,
@@ -144,12 +135,27 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			);
 			const listUploadedFiltered = listUploaded.filter((item) => !!item);
 			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
-			await createTargetLog(data);
+			const targetLog = await createTargetLog(data);
+			if (targetLog.id) {
+				if (!values.record || !values.report) {
+					throw new Error('Vui lòng nhập đầy đủ thông tin');
+				}
+				const dataRecord = {
+					keyReportId: values.report,
+					targetLogId: targetLog.id,
+					value: values.record,
+				};
+				await createRecord(dataRecord);
+			} else {
+				throw new Error('Vui lòng thử lại');
+			}
 			await reFetchTable();
 			onOk();
 			toast(`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} thành công`);
 		} catch (err) {
-			toast.error(err.message);
+			toast.error(
+				`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} KHÔNG thành công`,
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -226,18 +232,16 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							/>
 						</Form.Item>
 					</div>
-					{showReport === true && currentTargetLog.id && (
+					{showReport && (
 						<>
 							<div className='d-flex justify-content-between mb-2'>
-								<Form.Item label='Đạt giá trị kinh doanh'>
+								<Form.Item name='checkReport' label='Đạt giá trị kinh doanh'>
 									<Checkbox
 										onClick={() => {
 											setValueRadio(!valueRadio);
 										}}
 										checked={valueRadio}
-										defaultChecked
 										large
-										value={valueRadio}
 									/>
 								</Form.Item>
 							</div>
@@ -246,13 +250,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 									<Form.Item name='report' label='Tiêu chí'>
 										<Select
 											placeholder='Hãy chọn tiêu chí!'
-											// onChange={(value) => {
-											// 	setDepartmentId(value);
-											// 	setTargetSearchParams({
-											// 		...targetSearchParams,
-											// 		departmentId: value,
-											// 	});
-											// }}
 											style={{ width: '100%' }}
 											optionFilterProp='children'
 											showSearch
