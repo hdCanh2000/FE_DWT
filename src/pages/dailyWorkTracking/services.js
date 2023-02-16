@@ -183,6 +183,25 @@ const createUnit = async (data) => {
 	});
 	return resp.data;
 };
+
+const getAllReport = async () => {
+	const resp = await axiosClient({
+		method: 'GET',
+		url: `/api/keysReport`,
+	});
+	return resp.data;
+};
+
+const createRecord = async (data) => {
+	console.log('data', data);
+	const resp = await axiosClient({
+		method: 'POST',
+		url: `/api/keyRecords`,
+		data,
+	});
+	return resp.data;
+};
+
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -207,4 +226,6 @@ export {
 	deleteTargetLog,
 	exportTargets,
 	getListTargetInfos,
+	getAllReport,
+	createRecord,
 };

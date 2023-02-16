@@ -10,7 +10,6 @@ import TargetTable from '../../components/TargetTable/TargetTable';
 import DailyWorkTable from '../../components/DailyWorkTable/DailyWorkTable';
 import Button from '../../components/bootstrap/Button';
 import { listColumnsOptions } from '../../components/TargetTable/config';
-
 import { getAllDepartment } from '../department/services';
 import ExportTargetButton from '../../components/ExportTargetButton';
 

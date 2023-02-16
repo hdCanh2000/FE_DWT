@@ -7,6 +7,7 @@ import { kpiNormSlice } from '../slice/kpiNormSlice';
 import { positionLevelSlice } from '../slice/positionLevelSlice';
 import { keySlice } from '../slice/keySlice';
 import { worktrackSlice } from '../slice/worktrackSlice';
+import { keyReportSlice } from '../slice/keyReportSlice';
 
 const rootReducer = combineReducers({
 	employee: employeeSlice,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
 	positionLevel: positionLevelSlice,
 	key: keySlice,
 	worktrack: worktrackSlice,
+	keyReport: keyReportSlice,
 });
 
 export default rootReducer;

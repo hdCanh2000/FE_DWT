@@ -3,13 +3,16 @@
 import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { useDispatch, useSelector } from 'react-redux';
 import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
+import { fetchReport } from '../../redux/slice/keyReportSlice';
 import {
 	createTargetLog,
 	deleteTargetLog,
+	createRecord,
 	uploadFile,
 } from '../../pages/dailyWorkTracking/services';
 import axios from 'axios';
@@ -31,11 +34,20 @@ const ALLOWED_TYPES = [
 	'.txt',
 ];
 const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, nameTable }) => {
+	const dispatch = useDispatch();
 	const [files, setFiles] = useState([]);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [valueRadio, setValueRadio] = useState(false);
 	const [form] = Form.useForm();
+
+	useEffect(() => {
+		dispatch(fetchReport());
+	}, []);
+
+	const dataReport = useSelector((state) => state.report.reports);
+	// const dataRecord = useSelector((state) => state.report.records);
+	// console.log('dataReport', dataReport);
 
 	const rolesString = window.localStorage.getItem('roles') || '[]';
 	const roles = JSON.parse(rolesString);
@@ -44,6 +56,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 
 	const currentTargetLog = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
+		console.log('>>>', target);
 		return (
 			target?.TargetLogs?.find((item) => {
 				if (item.reportDate) {
@@ -53,8 +66,23 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			}) || {}
 		);
 	}, [target, logDay]);
-	// console.log('currentTargetLog', currentTargetLog);
+
+	const currentReport = useMemo(() => {
+		const logDayFormat = logDay.format('YYYY-MM-DD');
+		console.log('list report:', dataReport);
+		return (
+			dataReport.find((item) => {
+				if (item.createdAt) {
+					return item.createdAt === logDayFormat;
+				}
+				return item.noticedDate === logDayFormat;
+			}) || {}
+		);
+	}, [dataReport, logDay]);
+
 	useEffect(() => {
+		console.log('currentTargetLog', currentTargetLog);
+		console.log('currentReport', currentReport);
 		if (_.isEmpty(currentTargetLog)) {
 			form.resetFields();
 			setFiles([]);
@@ -64,6 +92,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 				quantity: currentTargetLog.quantity,
 				status: currentTargetLog.status,
 				note: currentTargetLog.note,
+				report: currentReport.name,
 			});
 			const uploadedFilesFromApi = JSON.parse(currentTargetLog?.files || '[]');
 			setUploadedFiles(uploadedFilesFromApi);
@@ -71,6 +100,8 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 	}, [currentTargetLog, form]);
 
 	const handleFinish = async (values) => {
+		console.log('form', values.status);
+		console.log('target', currentTargetLog);
 		try {
 			setLoading(true);
 			if (values.status === 'noticed') {
@@ -88,6 +119,17 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			}
 			if (!values.quantity || !values.quantity || !values.note) {
 				throw new Error('Vui lòng nhập đầy đủ thông tin');
+			}
+			if (values) {
+				const dataRecord = {
+					keyReportId: values.report,
+					targetLogId: currentTargetLog.id,
+					value: values.record,
+				};
+				if (!values.record || !values.report) {
+					throw new Error('Vui lòng nhập đầy đủ thông tin');
+				}
+				await createRecord(dataRecord);
 			}
 			const data = {
 				...values,
@@ -192,10 +234,10 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							/>
 						</Form.Item>
 					</div>
-					{nameTable === 'DailyWorkTracking' && (
+					{nameTable === 'DailyWorkTracking' && currentTargetLog.id && (
 						<>
 							<div className='d-flex justify-content-between mb-2'>
-								<Form.Item name='business' label='Đạt giá trị kinh doanh'>
+								<Form.Item label='Đạt giá trị kinh doanh'>
 									<Checkbox
 										onClick={() => {
 											setValueRadio(!valueRadio);
@@ -209,10 +251,9 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							</div>
 							{valueRadio === true && (
 								<div className='d-flex justify-content-between mb-2'>
-									<Form.Item name='tieuchi' label='Tiêu chí'>
+									<Form.Item name='report' label='Tiêu chí'>
 										<Select
 											placeholder='Hãy chọn tiêu chí!'
-											// value={}
 											// onChange={(value) => {
 											// 	setDepartmentId(value);
 											// 	setTargetSearchParams({
@@ -228,24 +269,13 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 													input.toLowerCase(),
 												)
 											}
-											options={[
-												{
-													label: 'Chọn Tiêu chí',
-													value: null,
-													disabled: true,
-												},
-												{
-													label: 'hehehe',
-													value: '',
-												},
-												// ...data.map((item) => ({
-												// 	label: item.name,
-												// 	value: item.id,
-												// })),
-											]}
+											options={_.map(dataReport, (item) => ({
+												label: item.name,
+												value: item.id,
+											}))}
 										/>
 									</Form.Item>
-									<Form.Item name='giatri' label='Giá trị'>
+									<Form.Item name='record' label='Giá trị'>
 										<Input style={{ width: 160 }} />
 									</Form.Item>
 								</div>
