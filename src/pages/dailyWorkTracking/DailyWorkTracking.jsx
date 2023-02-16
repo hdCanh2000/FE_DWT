@@ -195,7 +195,7 @@ const DailyWorkTracking = () => {
 										dataSearch={targetSearchParams}
 										columnsToShow={columnsToShow}
 										setKpiEstimated={setKpiEstimated}
-										nameTable='DailyWorkTracking'
+										showReport
 									/>
 								</div>
 								<div>

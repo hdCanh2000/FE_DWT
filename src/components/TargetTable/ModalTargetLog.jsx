@@ -33,7 +33,7 @@ const ALLOWED_TYPES = [
 	'.psd',
 	'.txt',
 ];
-const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, nameTable }) => {
+const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, showReport }) => {
 	const dispatch = useDispatch();
 	const [files, setFiles] = useState([]);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -46,8 +46,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 	}, []);
 
 	const dataReport = useSelector((state) => state.report.reports);
-	// const dataRecord = useSelector((state) => state.report.records);
-	// console.log('dataReport', dataReport);
 
 	const rolesString = window.localStorage.getItem('roles') || '[]';
 	const roles = JSON.parse(rolesString);
@@ -56,7 +54,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 
 	const currentTargetLog = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
-		console.log('>>>', target);
 		return (
 			target?.TargetLogs?.find((item) => {
 				if (item.reportDate) {
@@ -69,7 +66,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 
 	const currentReport = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
-		console.log('list report:', dataReport);
 		return (
 			dataReport.find((item) => {
 				if (item.createdAt) {
@@ -81,8 +77,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 	}, [dataReport, logDay]);
 
 	useEffect(() => {
-		console.log('currentTargetLog', currentTargetLog);
-		console.log('currentReport', currentReport);
 		if (_.isEmpty(currentTargetLog)) {
 			form.resetFields();
 			setFiles([]);
@@ -100,8 +94,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 	}, [currentTargetLog, form]);
 
 	const handleFinish = async (values) => {
-		console.log('form', values.status);
-		console.log('target', currentTargetLog);
 		try {
 			setLoading(true);
 			if (values.status === 'noticed') {
@@ -234,7 +226,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							/>
 						</Form.Item>
 					</div>
-					{nameTable === 'DailyWorkTracking' && currentTargetLog.id && (
+					{showReport === true && currentTargetLog.id && (
 						<>
 							<div className='d-flex justify-content-between mb-2'>
 								<Form.Item label='Đạt giá trị kinh doanh'>

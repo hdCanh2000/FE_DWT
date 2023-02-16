@@ -193,7 +193,6 @@ const getAllReport = async () => {
 };
 
 const createRecord = async (data) => {
-	console.log('data', data);
 	const resp = await axiosClient({
 		method: 'POST',
 		url: `/api/keyRecords`,

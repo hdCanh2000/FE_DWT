@@ -25,7 +25,6 @@ export const fetchReport = createAsyncThunk('keyReport/allReport', async () => {
 
 // export const fetchAllRecord = createAsyncThunk('keyReport/record', async (data) => {
 // 	const response = await createRecord(data);
-// 	console.log(response);
 // 	return response.data;
 // });
 
@@ -53,7 +52,6 @@ export const keyReportSlice = createSlice({
 		// },
 		// [fetchAllRecord.fulfilled]: (state, action) => {
 		// 	state.loading = false;
-		// 	console.log('action', action);
 		// 	state.records = [...state.records, ...action.payload];
 		// },
 		// [fetchAllRecord.rejected]: (state, action) => {

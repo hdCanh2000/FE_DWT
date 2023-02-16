@@ -10,7 +10,7 @@ import { useQuery } from 'react-query';
 import { getListTargetInfos } from '../../pages/dailyWorkTracking/services';
 import scrollIntoView from 'scroll-into-view';
 
-const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated, nameTable }) => {
+const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated, showReport }) => {
 	const [isOpenTargetLogModal, setIsOpenTargetLogModal] = useState(false);
 	const [isOpenTargetInfoModal, setIsOpenTargetInfoModal] = useState(false);
 	const [canScroll, setCanScroll] = useState(true);
@@ -163,7 +163,7 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated, nameTabl
 				isOpen={isOpenTargetLogModal}
 				logDay={targetLogModalData.logDay}
 				target={targetLogModalData.target}
-				nameTable={nameTable}
+				showReport={showReport}
 				onOk={() => {
 					setTargetLogModalData({ logDay: moment(), target: null });
 					setIsOpenTargetLogModal(false);
