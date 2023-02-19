@@ -90,6 +90,7 @@ const RecruitmentRequirementPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.name}</span>,
 		},
 		{
 			title: 'Mô tả',
@@ -99,6 +100,7 @@ const RecruitmentRequirementPage = () => {
 			type: 'textarea',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.description}</span>,
 		},
 		{
 			title: 'Hành Động',

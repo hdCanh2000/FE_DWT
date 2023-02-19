@@ -3,6 +3,7 @@ import { useSearchParams, createSearchParams, useNavigate, useLocation } from 'r
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import _ from 'lodash';
+// import TableCommon from '../common/ComponentCommon/TableCommon';
 import { toast } from 'react-toastify';
 import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
@@ -29,7 +30,6 @@ import Loading from '../../components/Loading/Loading';
 import { fetchPositionList } from '../../redux/slice/positionSlice';
 import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import EmployeeForm from './EmployeeForm';
-// import ModalOrderTaskForm from '../work-management/orderTask/ModalOrderTaskForm';
 
 const EmployeePage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -59,11 +59,19 @@ const EmployeePage = () => {
 	const loading = useSelector((state) => state.employee.loading);
 
 	// const fetchUser = () => {
-	// 	return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+	// 	return users.map((item, index) => ({
+	// 		...item,
+	// 		code: _.isEmpty(item.code) ? '--' : item.code,
+	// 		indexNumber: _.isEmpty(index) ? index : '--',
+	// 	}));
 	// };
 
 	const fetchUser = useMemo(() => {
-		return users.map((item) => ({ ...item, code: _.isEmpty(item.code) ? '--' : item.code }));
+		return users.map((item, index) => ({
+			...item,
+			code: _.isEmpty(item.code) ? '--' : item.code,
+			indexNumber: _.isEmpty(index) ? index + 1 : '--',
+		}));
 	}, [users]);
 
 	// const setCurrentPage = (page) => {
@@ -103,7 +111,18 @@ const EmployeePage = () => {
 	// const handleChangeCurrentPage = (searchValue) => {
 	// 	setCurrentPage(searchValue.page);
 	// };
+
 	const columns = [
+		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			align: 'center',
+			isShow: true,
+			hidden: true,
+			render: (item) => <span>{item.indexNumber}</span>,
+		},
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -111,10 +130,12 @@ const EmployeePage = () => {
 			key: 'name',
 			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
-			align: 'left',
+			align: 'center',
 			hidden: true,
 			isShow: true,
-			col: 6,
+			col: 5,
+			options: users,
+			// render: (item) => <span>{item.name}</span>,
 		},
 		{
 			title: 'Mã nhân sự',
@@ -127,6 +148,7 @@ const EmployeePage = () => {
 			hidden: true,
 			isShow: true,
 			col: 6,
+			// render: (item) => <span>{item.code}</span>,
 		},
 		{
 			title: 'Giới tính',
@@ -177,6 +199,7 @@ const EmployeePage = () => {
 			hidden: true,
 			isShow: true,
 			col: 6,
+			// render: (item) => <span>{item.email}</span>,
 			// eslint-disable-next-line no-unneeded-ternary
 			isDisabled: itemEdit?.id ? true : false,
 		},
@@ -521,10 +544,10 @@ const EmployeePage = () => {
 
 														<Table
 															className='table table-modern mb-0'
+															rowKey={(item) => item.id}
 															columns={showColumns}
 															dataSource={fetchUser}
 															scroll={{ x: 'max-content' }}
-															// onSubmitSearch={handleSubmitSearch}
 															style={{ cursor: 'pointer' }}
 															onRow={(item) => {
 																return {
@@ -534,6 +557,7 @@ const EmployeePage = () => {
 																	},
 																};
 															}}
+															// onSubmitSearch={handleSubmitSearch}
 															// onChangeCurrentPage={
 															// 	handleChangeCurrentPage
 															// }

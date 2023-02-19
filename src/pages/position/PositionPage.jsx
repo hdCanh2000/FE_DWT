@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+// import _ from 'lodash';
 import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
@@ -26,7 +27,8 @@ import { fetchRequirementList } from '../../redux/slice/requirementSlice';
 import NotPermission from '../presentation/auth/NotPermission';
 import Loading from '../../components/Loading/Loading';
 import CommonForm from '../common/ComponentCommon/CommonForm';
-import { addResource, deleteResouce, getAllResource, updateResouce } from '../../api/fetchApi';
+import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
+// import TableCommon from '../common/ComponentCommon/TableCommon';
 
 const PositionPage = () => {
 	const { darkModeStatus } = useDarkMode();
@@ -47,14 +49,21 @@ const PositionPage = () => {
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
+	// const position = useSelector((state) => state.position.positions);
+	// const pagination = useSelector((state) => state.position.pagination);
 	const positions = useSelector((state) => state.position.positions);
 	// const pagination = useSelector((state) => state.position.pagination);
 	const loading = useSelector((state) => state.position.loading);
 	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
 	const departments = useSelector((state) => state.department.departments);
-	const requirements = useSelector((state) => state.requirement.requirements);
+	// const requirements = useSelector((state) => state.requirement.requirements);
 
 	const currentPage = useSelector((state) => state.position.currentPage);
+
+	// const positions = position.map((item, index) => ({
+	// 	...item,
+	// 	indexNumber: _.isEmpty(index) ? index : '--',
+	// }));
 
 	const fetchRequirement = () => {
 		const newItem = itemEdit?.requirements?.map((items) => ({
@@ -69,17 +78,17 @@ const PositionPage = () => {
 		dispatch(changeCurrentPage(page));
 	};
 
-	const [allPositions, setAllPositions] = React.useState([]);
-	const fetch = async () => {
-		const response = await getAllResource('/api/positions');
-		setAllPositions(
-			response.data.data.map((ele) => ({ ...ele, label: ele?.name, value: ele?.id })),
-		);
-	};
+	// const [allPositions, setAllPositions] = React.useState([]);
+	// const fetch = async () => {
+	// 	const response = await getAllResource('/api/positions');
+	// 	setAllPositions(
+	// 		response.data.data.map((ele) => ({ ...ele, label: ele?.name, value: ele?.id })),
+	// 	);
+	// };
 
-	useEffect(() => {
-		fetch();
-	}, []);
+	// useEffect(() => {
+	// 	fetch();
+	// }, []);
 
 	useEffect(() => {
 		const query = {};
@@ -118,6 +127,15 @@ const PositionPage = () => {
 
 	const columns = [
 		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			align: 'center',
+			isShow: false,
+			render: (item) => <span>{item.indexNumber + 1}</span>,
+		},
+		{
 			title: 'Tên vị trí',
 			placeholder: 'tên vị trí',
 			id: 'name',
@@ -129,6 +147,7 @@ const PositionPage = () => {
 			isShow: true,
 			hidden: true,
 			col: 5,
+			// render: (item) => <span>{item.name}</span>,
 		},
 		{
 			title: 'Mã vị trí',
@@ -142,6 +161,7 @@ const PositionPage = () => {
 			isShow: true,
 			hidden: true,
 			col: 2,
+			// render: (item) => <span>{item.code}</span>,
 		},
 		{
 			title: 'Phòng ban',
@@ -178,7 +198,7 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: false,
 			render: (item) => <span>{item?.positions?.name || ''}</span>,
-			options: allPositions,
+			// options: allPositions,
 			col: 6,
 		},
 		{
@@ -210,7 +230,7 @@ const PositionPage = () => {
 			align: 'left',
 			isShow: false,
 			render: (item) => <span>{item?.requirement?.name || ''}</span>,
-			options: requirements,
+			// options: requirements,
 			isMulti: true,
 		},
 		{
@@ -387,6 +407,7 @@ const PositionPage = () => {
 													/>
 													<Table
 														className='table table-modern mb-0'
+														rowKey={(item) => item.id}
 														columns={showColumns}
 														dataSource={positions}
 														scroll={{ x: 'max-content' }}

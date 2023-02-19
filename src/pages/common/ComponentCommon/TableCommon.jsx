@@ -1,8 +1,8 @@
 import React, { memo, useState } from 'react';
+import { Table } from 'antd';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
-import PaginationButtons from './Pagination';
 import Button from '../../../components/bootstrap/Button';
 import useDarkMode from '../../../hooks/useDarkMode';
 
@@ -18,12 +18,11 @@ const TableCommon = ({
 	setCurrentPage,
 	totalItem,
 	total,
+	onRow,
 	searchvalue,
 	...props
 }) => {
 	const { darkModeStatus } = useDarkMode();
-
-	// const items = dataPagination(data, currentPage, 10);
 
 	const [textSearch, setTextSearch] = useState(searchvalue);
 
@@ -67,109 +66,19 @@ const TableCommon = ({
 					</Form>
 				</div>
 			)}
-			<table className={classNames(className)} {...props}>
-				<thead>
-					<tr>
-						{columns?.map((column) => {
-							if (column?.key === 'action') {
-								return (
-									<th
-										style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
-										key={column.key}
-										className={classNames(
-											column.className,
-											`text-${column.align ? column.align : 'left'}`,
-										)}
-										align={column.align ? column.align : 'left'}>
-										{column.title}
-									</th>
-								);
-							}
-							if (column?.isShow === false) {
-								return null;
-							}
-							return (
-								<th
-									style={{ fontSize: 14, minWidth: `${column.minWidth}px` }}
-									key={column.key}
-									className={classNames(
-										column.className,
-										`text-${column.align ? column.align : 'left'}`,
-									)}
-									align={column.align ? column.align : 'left'}>
-									{column.title}
-								</th>
-							);
-						})}
-					</tr>
-				</thead>
-				<tbody>
-					{data?.map((row) => {
-						return (
-							<tr key={row.id}>
-								{columns?.map((column) => {
-									const value = row[column.id];
-									if (column?.key === 'action') {
-										if (column.render) {
-											return (
-												<td
-													key={column.key}
-													align={column.align ? column.align : 'left'}
-													className={`text-${
-														column.align ? column.align : 'left'
-													}`}
-													style={{ fontSize: 14 }}>
-													{column.render(row, value)}
-												</td>
-											);
-										}
-									}
-									if (column?.isShow === false) {
-										return null;
-									}
-									if (column.render) {
-										return (
-											<td
-												key={column.key}
-												align={column.align ? column.align : 'left'}
-												className={`text-${
-													column.align ? column.align : 'left'
-												}`}
-												style={{ fontSize: 14 }}>
-												{column.render(row, value)}
-											</td>
-										);
-									}
-									return (
-										<td
-											style={{
-												fontSize: 14,
-												minWidth: `${column.minWidth}px`,
-											}}
-											key={column.key}
-											className={classNames(
-												column.className,
-												`text-${column.align ? column.align : 'left'}`,
-											)}
-											align={column.align ? column.align : 'left'}>
-											{column.format ? column.format(value) : value}
-										</td>
-									);
-								})}
-							</tr>
-						);
-					})}
-				</tbody>
-			</table>
-			<hr />
-			<div>
-				<PaginationButtons
-					data={data}
-					setCurrentPage={setCurrentPage}
-					currentPage={parseInt(currentPage, 10)}
+			<div className={classNames(className)} {...props}>
+				<Table
+					className='table table-modern mb-0'
+					rowKey={(item) => item.id}
+					onRow={onRow}
+					columns={columns}
+					dataSource={data}
+					onSubmitSearch={handleSubmit}
 					onChangeCurrentPage={handleChangeCurrentPage}
-					totalItem={totalItem}
-					total={total}
+					currentPage={parseInt(currentPage, 10)}
+					setCurrentPage={setCurrentPage}
+					searchvalue={textSearch}
+					isSearch
 				/>
 			</div>
 		</div>
@@ -191,6 +100,7 @@ TableCommon.propTypes = {
 	totalItem: PropTypes.number,
 	total: PropTypes.number,
 	searchvalue: PropTypes.string,
+	onRow: PropTypes.func,
 };
 TableCommon.defaultProps = {
 	className: null,
@@ -205,6 +115,7 @@ TableCommon.defaultProps = {
 	searchvalue: '',
 	totalItem: 10,
 	total: 10,
+	onRow: null,
 };
 
 export default memo(TableCommon);

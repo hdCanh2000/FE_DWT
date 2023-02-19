@@ -11,6 +11,7 @@ import { unitSlice } from '../slice/unitSlice';
 import { requirementSlice } from '../slice/requirementSlice';
 import { worktrackSlice } from '../slice/worktrackSlice';
 import { keySlice } from '../slice/keySlice';
+import { keyReportSlice } from '../slice/keyReportSlice';
 
 const reducer = combineReducers({
 	mission: missionSlice.reducer,
@@ -25,6 +26,7 @@ const reducer = combineReducers({
 	requirement: requirementSlice.reducer,
 	worktrack: worktrackSlice.reducer,
 	key: keySlice.reducer,
+	report: keyReportSlice.reducer,
 });
 
 // eslint-disable-next-line import/prefer-default-export

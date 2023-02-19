@@ -20,7 +20,7 @@ const ErrorText = styled.span`
 	color: #e22828;
 	margin-top: 5px;
 `;
-const MissionFormModal = ({ show, onClose, item }) => {
+const MissionFormModal = ({ show, onClose, item, disableInput, formType }) => {
 	const dispatch = useDispatch();
 	const departments = useSelector((state) => state.department.departments);
 	const units = useSelector((state) => state.unit.units);
@@ -35,6 +35,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 		name: { errorMsg: '' },
 		departmentOption: { errorMsg: '' },
 	});
+
 	const nameRef = useRef(null);
 	const departmentRef = useRef(null);
 
@@ -170,7 +171,14 @@ const MissionFormModal = ({ show, onClose, item }) => {
 	return (
 		<Modal show={show} onHide={handleCloseForm} size='lg' scrollable centered>
 			<Modal.Header closeButton>
-				<Modal.Title>{item?.id ? 'Cập nhật mục tiêu' : 'Thêm mới mục tiêu'}</Modal.Title>
+				{((formType === 'add' || formType === 'edit') && (
+					<Modal.Title>
+						{item?.id ? 'Cập nhật mục tiêu' : 'Thêm mới mục tiêu'}
+					</Modal.Title>
+				)) ||
+					(formType === 'watching' && (
+						<Modal.Title>Thông tin chi tiết mục tiêu</Modal.Title>
+					))}
 			</Modal.Header>
 			<Modal.Body className='px-4'>
 				<div className='row'>
@@ -185,6 +193,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 											id='name'
 											label='Tên mục tiêu'>
 											<Input
+												disabled={disableInput}
 												onChange={handleChange}
 												value={mission.name || ''}
 												name='name'
@@ -199,6 +208,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 										{/* Số lương - Đơn vị tính - Manday */}
 										<FormGroup className='col-2' id='quantity' label='Số lượng'>
 											<Input
+												disabled={disableInput}
 												type='number'
 												name='quantity'
 												onChange={handleChange}
@@ -209,6 +219,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 										</FormGroup>
 										<FormGroup className='col-3' id='unit' label='Đơn vị tính'>
 											<SelectComponent
+												isDisabled={disableInput}
 												placeholder='Đơn vị tính'
 												defaultValue={unitOption}
 												value={unitOption}
@@ -221,6 +232,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 											id='manday'
 											label='Số ngày công cần thiết'>
 											<Input
+												disabled={disableInput}
 												type='number'
 												name='manday'
 												onChange={handleChange}
@@ -235,6 +247,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 											id='kpiValue'
 											label='Giá trị KPI'>
 											<Input
+												disabled={disableInput}
 												type='number'
 												name='kpiValue'
 												onChange={handleChange}
@@ -249,6 +262,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 											id='department'
 											label='Phòng ban phụ trách'>
 											<SelectComponent
+												isDisabled={disableInput}
 												placeholder='Chọn phòng ban phụ trách'
 												defaultValue={departmentOption}
 												value={departmentOption}
@@ -265,6 +279,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 											id='departmentReplatedOption'
 											label='Phòng ban liên quan'>
 											<SelectComponent
+												isDisabled={disableInput}
 												placeholder=''
 												defaultValue={departmentReplatedOption}
 												value={departmentReplatedOption}
@@ -283,6 +298,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 												label='Ngày bắt đầu mục tiêu'
 												isFloating>
 												<Input
+													disabled={disableInput}
 													name='startTime'
 													placeholder='Ngày bắt đầu mục tiêu'
 													onChange={handleChange}
@@ -298,6 +314,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 												label='Ngày kết thúc mục tiêu'
 												isFloating>
 												<Input
+													disabled={disableInput}
 													name='endTime'
 													placeholder='Ngày kết thúc mục tiêu'
 													onChange={handleChange}
@@ -312,6 +329,7 @@ const MissionFormModal = ({ show, onClose, item }) => {
 											id='description'
 											label='Mô tả mục tiêu'>
 											<Textarea
+												disabled={disableInput}
 												name='description'
 												onChange={handleChange}
 												value={mission.description || ''}
@@ -330,9 +348,11 @@ const MissionFormModal = ({ show, onClose, item }) => {
 				<Button variant='secondary' onClick={handleCloseForm}>
 					Đóng
 				</Button>
-				<Button variant='primary' type='submit' onClick={handleSubmitMissionForm}>
-					Lưu mục tiêu
-				</Button>
+				{(formType === 'add' || formType === 'edit') && (
+					<Button variant='primary' type='submit' onClick={handleSubmitMissionForm}>
+						Lưu mục tiêu
+					</Button>
+				)}
 			</Modal.Footer>
 		</Modal>
 	);

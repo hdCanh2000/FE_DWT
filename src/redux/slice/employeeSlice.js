@@ -28,8 +28,8 @@ export const fetchEmployeeById = createAsyncThunk('employee/fetchById', async (i
 
 export const fetchEmployeeListByDepartment = createAsyncThunk(
 	'employee/fetchListByDepartment',
-	async (id, params) => {
-		const response = await getAllEmployeeByDepartment(id, params);
+	async (obj) => {
+		const response = await getAllEmployeeByDepartment(obj.dataID, obj.params);
 		return response.data?.data?.map((item) => {
 			return {
 				...item,
@@ -108,6 +108,7 @@ export const employeeSlice = createSlice({
 		[fetchEmployeeListByDepartment.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.employees = [...action.payload];
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchEmployeeListByDepartment.rejected]: (state, action) => {
 			state.loading = false;
@@ -120,6 +121,7 @@ export const employeeSlice = createSlice({
 		[fetchEmployeeById.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.employee = { ...action.payload };
+			state.pagination = { ...action.payload.pagination };
 		},
 		[fetchEmployeeById.rejected]: (state, action) => {
 			state.loading = false;
@@ -132,6 +134,7 @@ export const employeeSlice = createSlice({
 		[onAddEmployee.fulfilled]: (state, action) => {
 			state.loading = false;
 			state.employees = [...state.employees, ...action.payload];
+			state.pagination = { ...action.payload.pagination };
 		},
 		[onAddEmployee.rejected]: (state, action) => {
 			state.loading = false;
@@ -142,6 +145,7 @@ export const employeeSlice = createSlice({
 			state.loading = true;
 		},
 		[onUpdateEmployee.fulfilled]: (state, action) => {
+			state.pagination = { ...action.payload.pagination };
 			const {
 				arg: { id },
 			} = action.meta;

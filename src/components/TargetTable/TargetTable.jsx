@@ -10,7 +10,7 @@ import { useQuery } from 'react-query';
 import { getListTargetInfos } from '../../pages/dailyWorkTracking/services';
 import scrollIntoView from 'scroll-into-view';
 
-const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
+const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated, showReport }) => {
 	const [isOpenTargetLogModal, setIsOpenTargetLogModal] = useState(false);
 	const [isOpenTargetInfoModal, setIsOpenTargetInfoModal] = useState(false);
 	const [canScroll, setCanScroll] = useState(true);
@@ -48,7 +48,6 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 	} = useQuery(['getListTargetInfos', dataSearch], ({ queryKey }) =>
 		getListTargetInfos(queryKey[1]),
 	);
-
 
 	// normalize data for table
 	const tableData = useMemo(() => {
@@ -141,26 +140,30 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 				<div>Can't load data</div>
 			) : (
 				<>
-				<Table
-					columns={columns}
-					dataSource={tableData}
-					bordered
-					scroll={{ x: 'max-content' }}
-					loading={isLoadingListTarget}
-					pagination={(tableData.length <= 1) ? false : true}
-					ref={tableRef}
-				/>
-				{(tableData.length <= 1) 
-				? <div className='text-center'>
-					<h5 style={{color: '#adb5bd', paddingTop: '8px'}}>Chưa có nhiệm vụ nào</h5>
-				</div> 
-				: null}
+					<Table
+						rowKey={(item) => item.id}
+						columns={columns}
+						dataSource={tableData}
+						bordered
+						scroll={{ x: 'max-content' }}
+						loading={isLoadingListTarget}
+						pagination={tableData.length <= 1 ? false : true}
+						ref={tableRef}
+					/>
+					{tableData.length <= 1 ? (
+						<div className='text-center'>
+							<h5 style={{ color: '#adb5bd', paddingTop: '8px' }}>
+								Chưa có nhiệm vụ nào
+							</h5>
+						</div>
+					) : null}
 				</>
 			)}
 			<ModalTargetLog
 				isOpen={isOpenTargetLogModal}
 				logDay={targetLogModalData.logDay}
 				target={targetLogModalData.target}
+				showReport={showReport}
 				onOk={() => {
 					setTargetLogModalData({ logDay: moment(), target: null });
 					setIsOpenTargetLogModal(false);

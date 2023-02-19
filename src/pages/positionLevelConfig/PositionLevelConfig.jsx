@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
+import _ from 'lodash';
 import { Table } from 'antd';
 import Card, {
 	CardActions,
@@ -46,15 +47,29 @@ const PositionLevelConfigPage = () => {
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	// const pagination = useSelector((state) => state.positionLevel.pagination);
 	const loading = useSelector((state) => state.positionLevel.loading);
-	const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
+	const positionLevel = useSelector((state) => state.positionLevel.positionLevels);
 
 	const currentPage = useSelector((state) => state.positionLevel.currentPage);
+
+	const positionLevels = positionLevel.map((item, index) => ({
+		...item,
+		indexNumber: _.isEmpty(index) ? index : '--',
+	}));
 
 	const setCurrentPage = (page) => {
 		dispatch(changeCurrentPage(page));
 	};
 
 	const columns = [
+		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			align: 'center',
+			isShow: false,
+			render: (item) => <span>{item.indexNumber + 1}</span>,
+		},
 		{
 			title: 'Tên cấp nhân sự',
 			id: 'name',
@@ -64,6 +79,7 @@ const PositionLevelConfigPage = () => {
 			align: 'left',
 			sorter: (a, b) => a.name.localeCompare(b.name),
 			isShow: true,
+			// render: (item) => <span>{item?.name}</span>,
 			hidden: true,
 		},
 		{
@@ -75,6 +91,7 @@ const PositionLevelConfigPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			// render: (item) => <span>{item?.code}</span>,
 			hidden: true,
 		},
 		{

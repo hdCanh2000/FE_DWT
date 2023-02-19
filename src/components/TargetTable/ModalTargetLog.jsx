@@ -1,15 +1,18 @@
 /* eslint react/prop-types: 0 */
 /* eslint-disable */
-import { Button, Form, Input, InputNumber, Modal, Select, Upload } from 'antd';
+import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
+import { useDispatch, useSelector } from 'react-redux';
 import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
+import { fetchReport, fetchRecordById } from '../../redux/slice/keyReportSlice';
 import {
 	createTargetLog,
 	deleteTargetLog,
+	createRecord,
 	uploadFile,
 } from '../../pages/dailyWorkTracking/services';
 import axios from 'axios';
@@ -30,16 +33,15 @@ const ALLOWED_TYPES = [
 	'.psd',
 	'.txt',
 ];
-const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }) => {
+const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, showReport }) => {
+	const dispatch = useDispatch();
 	const [files, setFiles] = useState([]);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [valueRadio, setValueRadio] = useState(false);
 	const [form] = Form.useForm();
 
-	const rolesString = window.localStorage.getItem('roles') || '[]';
-	const roles = JSON.parse(rolesString);
-
-	const isAdmin = roles.includes('admin') || roles.includes('manager');
+	const dataReport = useSelector((state) => state.report.reports);
 
 	const currentTargetLog = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
@@ -52,7 +54,30 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			}) || {}
 		);
 	}, [target, logDay]);
-	// console.log('currentTargetLog', currentTargetLog);
+
+	const rolesString = window.localStorage.getItem('roles') || '[]';
+	const roles = JSON.parse(rolesString);
+	const isAdmin = roles.includes('admin') || roles.includes('manager');
+
+	useEffect(() => {
+		dispatch(fetchReport());
+	}, []);
+
+	useEffect(async () => {
+		if (currentTargetLog.id) {
+			const record = await dispatch(fetchRecordById(currentTargetLog.id));
+			if (_.isNil(record.value) || _.isNil(record.keyReportId)) {
+				setValueRadio(true);
+				form.setFieldsValue({
+					record: record.payload.value,
+					report: record.payload.keyReportId,
+				});
+			} else {
+				setValueRadio(false);
+			}
+		}
+	}, [currentTargetLog]);
+
 	useEffect(() => {
 		if (_.isEmpty(currentTargetLog)) {
 			form.resetFields();
@@ -88,6 +113,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			if (!values.quantity || !values.quantity || !values.note) {
 				throw new Error('Vui lòng nhập đầy đủ thông tin');
 			}
+
 			const data = {
 				...values,
 				targetInfoId: target.id,
@@ -109,12 +135,27 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			);
 			const listUploadedFiltered = listUploaded.filter((item) => !!item);
 			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
-			await createTargetLog(data);
+			const targetLog = await createTargetLog(data);
+			if (targetLog.id) {
+				if (!values.record || !values.report) {
+					throw new Error('Vui lòng nhập đầy đủ thông tin');
+				}
+				const dataRecord = {
+					keyReportId: values.report,
+					targetLogId: targetLog.id,
+					value: values.record,
+				};
+				await createRecord(dataRecord);
+			} else {
+				throw new Error('Vui lòng thử lại');
+			}
 			await reFetchTable();
 			onOk();
 			toast(`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} thành công`);
 		} catch (err) {
-			toast.error(err.message);
+			toast.error(
+				`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} KHÔNG thành công`,
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -191,6 +232,45 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 							/>
 						</Form.Item>
 					</div>
+					{showReport && (
+						<>
+							<div className='d-flex justify-content-between mb-2'>
+								<Form.Item name='checkReport' label='Đạt giá trị kinh doanh'>
+									<Checkbox
+										onClick={() => {
+											setValueRadio(!valueRadio);
+										}}
+										checked={valueRadio}
+										large
+									/>
+								</Form.Item>
+							</div>
+							{valueRadio === true && (
+								<div className='d-flex justify-content-between mb-2'>
+									<Form.Item name='report' label='Tiêu chí'>
+										<Select
+											placeholder='Hãy chọn tiêu chí!'
+											style={{ width: '100%' }}
+											optionFilterProp='children'
+											showSearch
+											filterOption={(input, option) =>
+												(option?.label.toLowerCase() ?? '').includes(
+													input.toLowerCase(),
+												)
+											}
+											options={_.map(dataReport, (item) => ({
+												label: item.name,
+												value: item.id,
+											}))}
+										/>
+									</Form.Item>
+									<Form.Item name='record' label='Giá trị'>
+										<Input style={{ width: 160 }} />
+									</Form.Item>
+								</div>
+							)}
+						</>
+					)}
 					<Upload.Dragger
 						accept={ALLOWED_TYPES.join(', ')}
 						showUploadList={false}

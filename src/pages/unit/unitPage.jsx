@@ -108,6 +108,7 @@ const UnitPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.name}</span>,
 		},
 		{
 			title: 'Mã đơn vị',
@@ -116,6 +117,7 @@ const UnitPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.code}</span>,
 		},
 		{
 			title: 'Hành động',

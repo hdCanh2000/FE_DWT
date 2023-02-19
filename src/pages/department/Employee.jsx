@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import TableCommon from '../common/ComponentCommon/TableCommon';
 import {
 	fetchEmployeeList,
@@ -13,9 +14,13 @@ const EmployeePage = ({ dataDepartment }) => {
 	const dispatch = useDispatch();
 
 	const users = useSelector((state) => state.employee.employees);
+	const positions = useSelector((state) => state.position.positions);
 	const currentPage = useSelector((state) => state.employee.currentPage);
 	const pagination = useSelector((state) => state.employee.pagination);
-	const positions = useSelector((state) => state.position.positions);
+
+	const userWithIndex = users.map((item, index) => {
+		return { ...item, indexNumber: _.isEmpty(index) ? index : '--' };
+	});
 
 	const setCurrentPage = (page) => {
 		dispatch(changeCurrentPage(page));
@@ -30,22 +35,30 @@ const EmployeePage = ({ dataDepartment }) => {
 	}, [dispatch]);
 
 	useEffect(() => {
+		const dataID = dataDepartment.id;
 		if (dataDepartment.id && dataDepartment.parentId !== null) {
 			const query = {};
 			query.text = '';
 			query.page = currentPage;
-			query.limit = 100;
-			dispatch(fetchEmployeeListByDepartment(dataDepartment.id, query));
+			dispatch(fetchEmployeeListByDepartment({ dataID, query }));
 		} else {
 			const query = {};
 			query.text = '';
 			query.page = currentPage;
-			query.limit = 10;
 			dispatch(fetchEmployeeList(query));
 		}
 	}, [dispatch, dataDepartment.id, dataDepartment.parentId, currentPage]);
 
 	const columns = [
+		{
+			title: 'STT',
+			id: 'stt',
+			key: 'stt',
+			type: 'text',
+			align: 'left',
+			isShow: false,
+			render: (item) => <span>{item.indexNumber + 1}</span>,
+		},
 		{
 			title: 'Họ và tên',
 			id: 'name',
@@ -53,26 +66,8 @@ const EmployeePage = ({ dataDepartment }) => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			render: (item) => <span>{item?.name ? `${item?.name}` : '--'}</span>,
 		},
-		{
-			title: 'SĐT',
-			id: 'phone',
-			key: 'phone',
-			type: 'text',
-			align: 'center',
-			isShow: false,
-		},
-		// {
-		// 	title: 'Phòng ban',
-		// 	id: 'department',
-		// 	key: 'department',
-		// 	type: 'select',
-		// 	align: 'left',
-		// 	isShow: true,
-		// 	render: (item) => <span>{item?.department?.name || ''} </span>,
-		// 	options: departments,
-		// 	isMulti: false,
-		// },
 		{
 			title: 'Vị trí làm việc',
 			id: 'position',
@@ -96,9 +91,18 @@ const EmployeePage = ({ dataDepartment }) => {
 			key: 'role',
 			type: 'singleSelect',
 			isShow: true,
-			format: (value) =>
-				// eslint-disable-next-line no-nested-ternary
-				value === 'manager' ? 'Quản lý' : value === 'user' ? 'Nhân viên' : 'Admin',
+			render: (item) => {
+				if (item?.role === 'user') {
+					return 'Nhân viên';
+				}
+				if (item?.role === 'admin') {
+					return 'Admin';
+				}
+				if (item?.role === 'manager') {
+					return 'Quản lý';
+				}
+				return <spam> --- </spam>;
+			},
 			options: [
 				{
 					id: 1,
@@ -115,7 +119,6 @@ const EmployeePage = ({ dataDepartment }) => {
 			],
 		},
 	];
-
 	return (
 		<div className='col-lg-12 col-md-6'>
 			<div className='row mb-4'>
@@ -132,9 +135,11 @@ const EmployeePage = ({ dataDepartment }) => {
 				<div className='col-12'>
 					<div className='p-4 col-lg-12'>
 						<TableCommon
-							className='table table-modern mb-0'
+							key={users.id}
 							columns={columns}
-							data={users}
+							data={userWithIndex}
+							pagination={{ position: ['bottomRight'] }}
+							className='table table-modern mb-0'
 							onChangeCurrentPage={handleChangeCurrentPage}
 							currentPage={parseInt(currentPage, 10)}
 							totalItem={pagination?.totalRows}
