@@ -288,7 +288,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 								<Form.Item name='checkReport' label='Đạt giá trị kinh doanh'>
 									<Checkbox
 										onClick={() => {
-											setValueRadio(true);
+											setValueRadio(!valueRadio);
 										}}
 										checked={valueRadio}
 										large
