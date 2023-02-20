@@ -1,6 +1,7 @@
 /* eslint react/prop-types: 0 */
 /* eslint-disable */
-import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox } from 'antd';
+import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox, Space } from 'antd';
+import { DeleteTwoTone } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
@@ -65,16 +66,37 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 
 	useEffect(async () => {
 		if (currentTargetLog.id) {
-			const record = await dispatch(fetchRecordById(currentTargetLog.id));
-			if (_.isNil(record.value) || _.isNil(record.keyReportId)) {
-				setValueRadio(true);
-				form.setFieldsValue({
-					record: record.payload.value,
-					report: record.payload.keyReportId,
-				});
-			} else {
-				setValueRadio(false);
-			}
+			const records = await dispatch(fetchRecordById(currentTargetLog.id));
+			records.payload.map((record) => {
+				if (!_.isNil(record.value) && !_.isNil(record.keyReportId)) {
+					setValueRadio(true);
+					const formValues = form.getFieldsValue();
+					const arrReportValues = _.get(formValues, 'arrReport', []);
+					let dataArrReport;
+					if (_.get(arrReportValues, '0.report') && _.get(arrReportValues, '0.report')) {
+						dataArrReport = [
+							...arrReportValues,
+							{
+								record: record.value,
+								report: record.keyReportId,
+							},
+						];
+					} else {
+						dataArrReport = [
+							{
+								record: record.value,
+								report: record.keyReportId,
+							},
+						];
+					}
+					form.setFieldsValue({
+						arrReport: dataArrReport,
+					});
+				} else {
+					// setValueRadio(false);
+					console.log('error log data');
+				}
+			});
 		}
 	}, [currentTargetLog]);
 
@@ -110,7 +132,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 				onOk();
 				return;
 			}
-			if (!values.quantity || !values.quantity || !values.note) {
+			if (!values.quantity || !values.note) {
 				throw new Error('Vui lòng nhập đầy đủ thông tin');
 			}
 
@@ -136,25 +158,40 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			const listUploadedFiltered = listUploaded.filter((item) => !!item);
 			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
 			const targetLog = await createTargetLog(data);
-			if (targetLog.id) {
-				if (!values.record || !values.report) {
-					throw new Error('Vui lòng nhập đầy đủ thông tin');
-				}
-				const dataRecord = {
-					keyReportId: values.report,
-					targetLogId: targetLog.id,
-					value: values.record,
-				};
-				await createRecord(dataRecord);
-			} else {
-				throw new Error('Vui lòng thử lại');
+
+			//Add Report + Record
+			if (targetLog.id && valueRadio === true) {
+				const records = await dispatch(fetchRecordById(currentTargetLog.id));
+				const promisesReport = values.arrReport.map(async (value) => {
+					if (_.isNil(value.record) || _.isNil(value.report)) {
+						throw new Error('Vui lòng nhập đầy đủ thông tin');
+					} else if (
+						_.some(records.payload, {
+							keyReportId: value.report,
+							value: value.record,
+						})
+					) {
+						// throw new Error('Dữ liệu trùng lặp, hãy kiểm tra lại!');
+					} else {
+						const dataRecord = {
+							keyReportId: value.report,
+							targetLogId: targetLog.id,
+							value: value.record,
+						};
+						await createRecord(dataRecord);
+					}
+				});
+				await Promise.all(promisesReport);
 			}
+
 			await reFetchTable();
 			onOk();
 			toast(`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} thành công`);
 		} catch (err) {
 			toast.error(
-				`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} KHÔNG thành công`,
+				`Cập nhật báo cáo công việc ngày ${logDay.format(
+					'DD/MM/YYYY',
+				)} KHÔNG thành công, hãy kiểm tra lại!`,
 			);
 		} finally {
 			setLoading(false);
@@ -188,8 +225,21 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			toast.error('Xóa báo cáo thất bại');
 		}
 	};
+	const disabledButtonAdd = (fields) => {
+		if (fields.length === 8) {
+			return true;
+		}
+	};
 	return (
-		<Modal forceRender open={isOpen} onOk={onOk} onCancel={onCancel} footer={null}>
+		<Modal
+			forceRender
+			open={isOpen}
+			onOk={onOk}
+			onCancel={() => {
+				onCancel();
+				setValueRadio(false);
+			}}
+			footer={null}>
 			<div className='text-center mb-4'>
 				<h4 className='my-2'>Báo cáo công việc </h4>
 				<h4>Ngày {logDay.format('DD-MM-YYYY')}</h4>
@@ -238,7 +288,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 								<Form.Item name='checkReport' label='Đạt giá trị kinh doanh'>
 									<Checkbox
 										onClick={() => {
-											setValueRadio(!valueRadio);
+											setValueRadio(true);
 										}}
 										checked={valueRadio}
 										large
@@ -246,27 +296,72 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 								</Form.Item>
 							</div>
 							{valueRadio === true && (
-								<div className='d-flex justify-content-between mb-2'>
-									<Form.Item name='report' label='Tiêu chí'>
-										<Select
-											placeholder='Hãy chọn tiêu chí!'
-											style={{ width: '100%' }}
-											optionFilterProp='children'
-											showSearch
-											filterOption={(input, option) =>
-												(option?.label.toLowerCase() ?? '').includes(
-													input.toLowerCase(),
-												)
-											}
-											options={_.map(dataReport, (item) => ({
-												label: item.name,
-												value: item.id,
-											}))}
-										/>
-									</Form.Item>
-									<Form.Item name='record' label='Giá trị'>
-										<Input style={{ width: 160 }} />
-									</Form.Item>
+								<div className='justify-content-between mb-2'>
+									<Form.List
+										name='arrReport'
+										align='baseline'
+										initialValue={[{ report: null, record: null }]}>
+										{(fields, { add, remove }) => (
+											<>
+												{fields.map((field) => {
+													return (
+														<Space key={field.key} align='baseline'>
+															<Form.Item
+																name={[field.name, 'report']}
+																label={`Tiêu chí ${field.key + 1}`}>
+																<Select
+																	placeholder='Hãy chọn tiêu chí!'
+																	style={{ minWidth: '130px' }}
+																	optionFilterProp='children'
+																	showSearch
+																	filterOption={(input, option) =>
+																		(
+																			option?.label.toLowerCase() ??
+																			''
+																		).includes(
+																			input.toLowerCase(),
+																		)
+																	}
+																	options={_.map(
+																		dataReport,
+																		(item) => ({
+																			label: item.name,
+																			value: item.id,
+																		}),
+																	)}
+																/>
+															</Form.Item>
+															<Form.Item
+																name={[field.name, 'record']}
+																label='Giá trị'>
+																<Input
+																	style={{ minWidth: '130px' }}
+																/>
+															</Form.Item>
+															{/* <DeleteTwoTone
+																onClick={() => remove(field.name)}
+															/> */}
+														</Space>
+													);
+												})}
+
+												<Form.Item>
+													<Button
+														style={{
+															maxWidth: 160,
+															float: 'right',
+														}}
+														type='dashed'
+														onClick={() => add()}
+														block
+														disabled={disabledButtonAdd(fields)}
+														align='baseline'>
+														Nhập thêm tiêu chí
+													</Button>
+												</Form.Item>
+											</>
+										)}
+									</Form.List>
 								</div>
 							)}
 						</>
@@ -326,7 +421,13 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 								Xóa báo cáo
 							</Button>
 						)}
-						<Button onClick={onOk}>Đóng</Button>
+						<Button
+							onClick={() => {
+								onOk();
+								setValueRadio(false);
+							}}>
+							Đóng
+						</Button>
 					</div>
 				</Form>
 			</div>
