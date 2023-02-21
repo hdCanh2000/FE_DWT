@@ -8,6 +8,12 @@ import Button from '../../../components/bootstrap/Button';
 import { getListTarget } from '../../dailyWorkTracking/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
 import { getAllDepartment } from '../../department/services';
+import { toast } from 'react-toastify';
+
+const rolesString = window.localStorage.getItem('roles') || '[]';
+const roles = JSON.parse(rolesString);
+
+const isAdmin = roles.includes('admin') || roles.includes('manager');
 
 const columns = [
 	{
@@ -226,8 +232,15 @@ const TableListTarget = ({ onUpdateTargetInfo }) => {
 					onRow={(record) => {
 						return {
 							onClick: () => {
-								setSelectedTarget(record);
-								setOpenOrderTask(true);
+								if (isAdmin) {
+									setSelectedTarget(record);
+									setOpenOrderTask(true);
+								} else {
+									toast.warning('Không có quyền truy cập', {
+										position: toast.POSITION.TOP_RIGHT,
+										autoClose: 2000,
+									});
+								}
 							},
 							style: {
 								cursor: 'pointer',

@@ -45,7 +45,7 @@ const ModalDailyWorkForm = ({ open, onClose, data }) => {
 			if(apiError.includes("already exists")){
 				toast.error('Tiêu chí này đã tồn tại vui lòng thử lại');
 			} else {
-				toast.error('Thao tác không thành công');
+			toast.error('Thao tác không thành công');
 			}
 
 		} finally {
@@ -80,7 +80,7 @@ const ModalDailyWorkForm = ({ open, onClose, data }) => {
 			onCancel={() => onClose(false)}
 			open={open}
 			footer={[
-				<Button key='close'>Đóng</Button>,
+				<Button key='close' onClick={() => onClose(false)}>Đóng</Button>,
 				currentDailyWork && (
 					<Button
 						danger
