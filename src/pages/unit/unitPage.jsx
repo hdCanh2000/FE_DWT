@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, createSearchParams, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -25,6 +25,8 @@ import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
 const UnitPage = () => {
+	const [isDetail, setIsDetail] = useState(true);
+
 	const { darkModeStatus } = useDarkMode();
 	const navigate = useNavigate();
 	const localtion = useLocation();
@@ -108,6 +110,7 @@ const UnitPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			render: (item) => <span>{item?.name}</span>,
 		},
 		{
@@ -117,7 +120,13 @@ const UnitPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			render: (item) => <span>{item?.code}</span>,
+		},
+		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
 		},
 		{
 			title: 'Hành động',
@@ -132,7 +141,11 @@ const UnitPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsDetail(true);
+							handleOpenForm(item);
+						}}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -140,13 +153,26 @@ const UnitPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2 '
 						icon='Delete'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</>
 			),
+			hidden: true,
 			isShow: false,
 		},
 	];
+	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
@@ -221,9 +247,10 @@ const UnitPage = () => {
 													color='info'
 													icon='AddCircleOutline'
 													tag='button'
-													onClick={() =>
-														handleOpenForm({ name: '', code: '' })
-													}>
+													onClick={() => {
+														setIsDetail(true);
+														handleOpenForm({ name: '', code: '' });
+													}}>
 													Thêm mới
 												</Button>
 											</CardActions>
@@ -231,8 +258,18 @@ const UnitPage = () => {
 										<CardBody>
 											<TableCommon
 												className='table table-modern mb-0'
-												columns={columns}
+												columns={showColumns}
 												data={units}
+												style={{ cursor: 'pointer' }}
+												onRow={(item) => {
+													return {
+														cursor: 'pointer',
+														onClick: () => {
+															setIsDetail(false);
+															handleOpenForm(item);
+														},
+													};
+												}}
 												onSubmitSearch={handleSubmitSearch}
 												onChangeCurrentPage={handleChangeCurrentPage}
 												currentPage={parseInt(currentPage, 10)}
@@ -245,27 +282,31 @@ const UnitPage = () => {
 										</CardBody>
 									</Card>
 								</div>
+								<CommonForm
+									show={toggleForm}
+									onClose={handleCloseForm}
+									handleSubmit={handleSubmitForm}
+									item={itemEdit}
+									label={
+										itemEdit?.id
+											? 'Cập nhật đơn vị tính'
+											: 'Tạo đơn vị mới tính'
+									}
+									fields={isDetail ? columns : columnsNoEdit}
+								/>
+								<AlertConfirm
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDelete(itemEdit)}
+									title='Xoá đơn vị tính'
+									content='Xác nhận xoá đơn vị tính?'
+								/>
 							</div>,
 							['admin'],
 							<NotPermission />,
 						)}
 					</div>
 				)}
-				<CommonForm
-					show={toggleForm}
-					onClose={handleCloseForm}
-					handleSubmit={handleSubmitForm}
-					item={itemEdit}
-					label={itemEdit?.id ? 'Cập nhật đơn vị tính' : 'Tạo đơn vị mới tính'}
-					fields={columns}
-				/>
-				<AlertConfirm
-					openModal={toggleFormDelete}
-					onCloseModal={handleCloseForm}
-					onConfirm={() => handleDelete(itemEdit)}
-					title='Xoá đơn vị tính'
-					content='Xác nhận xoá đơn vị tính?'
-				/>
 			</Page>
 		</PageWrapper>
 	);
