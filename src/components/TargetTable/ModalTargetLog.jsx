@@ -92,9 +92,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 					form.setFieldsValue({
 						arrReport: dataArrReport,
 					});
-				} else {
-					// setValueRadio(false);
-					console.log('error log data');
 				}
 			});
 		}
@@ -116,6 +113,27 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 		}
 	}, [currentTargetLog, form]);
 
+	const [checkMessage, setCheckMessage] = useState('');
+	useEffect(() => {
+		switch (checkMessage) {
+			case 'notExist':
+				toast.error('Không được bỏ trống');
+				break;
+			case 'success':
+				toast(`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} THÀNH CÔNG`);
+				break;
+			case 'failed':
+				toast.error(
+					`Cập nhật báo cáo công việc ngày ${logDay.format(
+						'DD/MM/YYYY',
+					)} KHÔNG thành công!`,
+				);
+				break;
+			default:
+				return null;
+		}
+	}, [checkMessage]);
+
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
@@ -135,7 +153,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			if (!values.quantity || !values.note) {
 				throw new Error('Vui lòng nhập đầy đủ thông tin');
 			}
-
 			const data = {
 				...values,
 				targetInfoId: target.id,
@@ -158,41 +175,40 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			const listUploadedFiltered = listUploaded.filter((item) => !!item);
 			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
 			const targetLog = await createTargetLog(data);
+			setCheckMessage('success');
 
 			//Add Report + Record
 			if (targetLog.id && valueRadio === true) {
-				const records = await dispatch(fetchRecordById(currentTargetLog.id));
+				const records = await dispatch(fetchRecordById(targetLog.id));
 				const promisesReport = values.arrReport.map(async (value) => {
 					if (_.isNil(value.record) || _.isNil(value.report)) {
-						throw new Error('Vui lòng nhập đầy đủ thông tin');
-					} else if (
-						_.some(records.payload, {
+						setCheckMessage('notExist');
+					}
+					if (
+						!_.some(records.payload, {
 							keyReportId: value.report,
 							value: value.record,
 						})
 					) {
-						// throw new Error('Dữ liệu trùng lặp, hãy kiểm tra lại!');
-					} else {
 						const dataRecord = {
 							keyReportId: value.report,
 							targetLogId: targetLog.id,
 							value: value.record,
 						};
-						await createRecord(dataRecord);
+						const res = await createRecord(dataRecord);
+						if (res.message === 'Successfully!') {
+							setCheckMessage('success');
+						} else {
+							setCheckMessage('failed');
+						}
 					}
 				});
 				await Promise.all(promisesReport);
 			}
-
 			await reFetchTable();
 			onOk();
-			toast(`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} thành công`);
 		} catch (err) {
-			toast.error(
-				`Cập nhật báo cáo công việc ngày ${logDay.format(
-					'DD/MM/YYYY',
-				)} KHÔNG thành công, hãy kiểm tra lại!`,
-			);
+			setCheckMessage('failed');
 		} finally {
 			setLoading(false);
 		}
@@ -413,6 +429,12 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							type='primary'
 							htmlType='submit'
 							className='mx-2'
+							onClick={() => {
+								setTimeout(() => {
+									setCheckMessage('');
+									setValueRadio(false);
+								}, 1000);
+							}}
 							disabled={loading}>
 							Lưu
 						</Button>
