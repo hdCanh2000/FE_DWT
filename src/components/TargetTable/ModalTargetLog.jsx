@@ -34,7 +34,7 @@ const ALLOWED_TYPES = [
 	'.psd',
 	'.txt',
 ];
-const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, showReport }) => {
+const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }) => {
 	const dispatch = useDispatch();
 	const [files, setFiles] = useState([]);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -298,7 +298,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							/>
 						</Form.Item>
 					</div>
-					{showReport && (
+					{isAdmin && (
 						<>
 							<div className='d-flex justify-content-between mb-2'>
 								<Form.Item name='checkReport' label='Đạt giá trị kinh doanh'>
@@ -351,6 +351,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 																name={[field.name, 'record']}
 																label='Giá trị'>
 																<Input
+																	type='number'
 																	style={{ minWidth: '130px' }}
 																/>
 															</Form.Item>

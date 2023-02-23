@@ -1,5 +1,5 @@
 /* eslint react/prop-types: 0 */
-import { Button, Modal, Table } from 'antd';
+import { Button, Modal, Table, Popover } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -94,6 +94,28 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 		],
 		[currentTarget],
 	);
+
+	const columnsRecord = [
+		{
+			key: 'createdAt',
+			title: 'Ngày tạo',
+			dataIndex: 'createdAt',
+			render: (text) => moment(text).format('DD/MM/YYYY'),
+		},
+		{
+			key: 'keyReportId',
+			title: 'Tiêu chí',
+			dataIndex: 'keyReportId',
+		},
+		{
+			key: 'value',
+			title: 'Giá trị',
+			dataIndex: 'value',
+			sorter: (a, b) => a.code.localeCompare(b.code),
+		},
+	];
+
+	// table list bao cao
 	const columns = [
 		{
 			key: 'reportDate',
@@ -135,6 +157,7 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 		},
 	];
 
+	// data table báo cáo
 	const data = _.isEmpty(currentTarget)
 		? []
 		: currentTarget?.TargetLogs.filter((x) => x.reportDate !== null)
@@ -145,6 +168,12 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 					...item,
 					key: item.id,
 				}));
+	const content = (
+		<div>
+			<p>{`Tổng tiêu chí tạm tính: `}</p>
+			<p>{`Tổng giá trị tạm tính: `}</p>
+		</div>
+	);
 	return (
 		<>
 			<Modal
@@ -178,6 +207,26 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 								))}
 							</tbody>
 						</StyledTable>
+					</div>
+					<div>
+						<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+							<h5>Danh sách tổng tiêu chí công việc</h5>
+							<Popover content={content}>
+								<Button
+									style={{ cursor: 'none', marginBottom: '10px' }}
+									type='primary'>
+									Tổng giá trị kinh doanh đạt được
+								</Button>
+							</Popover>
+						</div>
+						<Table
+							columns={columnsRecord}
+							// dataSource={dataRecord}
+							bordered
+							pagination={{
+								pageSize: 3,
+							}}
+						/>
 					</div>
 					<div>
 						<h5>Danh sách báo cáo công việc</h5>
