@@ -2,10 +2,11 @@
 /* eslint react/prop-types: 0 */
 /* eslint react-hooks/exhaustive-deps: 0 */
 /* eslint react/no-unstable-nested-components: 0 */
-import { Button, Col, Form, Input, InputNumber, Modal, Row } from 'antd';
+import { Button, Col, Form, Input, InputNumber, Modal, Row, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { createTarget, deleteTarget, updateTarget } from './services';
+import { useQuery } from 'react-query';
+import { createTarget, deleteTarget, updateTarget, getAllPositions } from './services';
 
 const ModalTargetForm = ({ open, onClose, data }) => {
 	const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
@@ -21,6 +22,10 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 		}
 	}, [data]);
 
+	const { data: listPositionData = { data: [] } } = useQuery('getAllPositions', () =>
+		getAllPositions(),
+	);
+	const listPositions = listPositionData.data;
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
@@ -114,10 +119,32 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 							<Input.TextArea placeholder='Nhập kế hoạch thực hiện' />
 						</Form.Item>
 					</Col>
-
-					<Col span={24}>
+				</Row>
+				<Row gutter={24}>
+					<Col span={8}>
 						<Form.Item name='manDay' label='ManDay'>
 							<InputNumber min={0} style={{ width: 200 }} />
+						</Form.Item>
+					</Col>
+
+					<Col span={8}>
+						<Form.Item name='positionId' label='Vị trí công việc'>
+							<Select
+								min={0}
+								style={{ width: 200 }}
+								showSearch
+								placeholder='Chọn vị trí'
+								optionFilterProp='children'
+								filterOption={(input, option) =>
+									(option?.label.toLowerCase() ?? '').includes(
+										input.toLowerCase(),
+									)
+								}
+								options={listPositions.map((item) => ({
+									label: item.name,
+									value: item.id,
+								}))}
+							/>
 						</Form.Item>
 					</Col>
 				</Row>
