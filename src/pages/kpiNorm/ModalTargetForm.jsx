@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useQuery } from 'react-query';
 import { createTarget, deleteTarget, updateTarget, getAllPositions } from './services';
+import { getUserById } from '../employee/services';
 
 const ModalTargetForm = ({ open, onClose, data }) => {
 	const [openConfirmDeleteModal, setOpenConfirmDeleteModal] = useState(false);
@@ -22,10 +23,25 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 		}
 	}, [data]);
 
+	const userString = window.localStorage.getItem('userId') || '[]';
+	const userId = JSON.parse(userString);
+
+	const rolesString = window.localStorage.getItem('roles') || '[]';
+	const roles = JSON.parse(rolesString);
+
 	const { data: listPositionData = { data: [] } } = useQuery('getAllPositions', () =>
 		getAllPositions(),
 	);
-	const listPositions = listPositionData.data;
+	const allPositions = listPositionData.data;
+
+	const { data: user = { data: [] } } = useQuery('getUserById', () => getUserById(userId));
+	const departmentId = user.data.data?.department_id;
+
+	const positionsWithDepartments = allPositions.filter(
+		(item) => item.department_id === departmentId,
+	);
+	const listPositions = roles.includes('admin') ? allPositions : positionsWithDepartments;
+
 	const handleFinish = async (values) => {
 		try {
 			setLoading(true);
