@@ -159,7 +159,7 @@ const ModalOrderTaskForm = ({ open, onClose, data, isCreate, onSuccess, onUpdate
 					</Col>
 					<Col span={12}>
 						<Form.Item
-							name='userName'
+							name='userId'
 							label='Người đảm nhiệm'
 							rules={[{ required: true, message: 'Vui lòng chọn người đảm nhiệm' }]}>
 							<Select

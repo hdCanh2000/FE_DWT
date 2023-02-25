@@ -144,7 +144,7 @@ const ModalTargetForm = ({ open, onClose, data }) => {
 					</Col>
 
 					<Col span={8}>
-						<Form.Item name='positionName' label='Vị trí công việc'>
+						<Form.Item name='positionId' label='Vị trí công việc'>
 							<Select
 								min={0}
 								style={{ width: 200 }}
