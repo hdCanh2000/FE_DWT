@@ -93,6 +93,7 @@ const RecruitmentRequirementPage = () => {
 			align: 'left',
 			isShow: true,
 			hidden: true,
+			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
 			render: (item) => <span>{item?.name}</span>,
 		},
 		{
@@ -104,6 +105,7 @@ const RecruitmentRequirementPage = () => {
 			align: 'left',
 			isShow: true,
 			hidden: true,
+			sorter: (a, b) => (a?.description || '').localeCompare(b?.description || ''),
 			render: (item) => <span>{item?.description}</span>,
 		},
 		{

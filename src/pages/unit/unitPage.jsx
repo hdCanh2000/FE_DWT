@@ -111,6 +111,7 @@ const UnitPage = () => {
 			align: 'left',
 			isShow: true,
 			hidden: true,
+			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
 			render: (item) => <span>{item?.name}</span>,
 		},
 		{
@@ -121,6 +122,7 @@ const UnitPage = () => {
 			align: 'left',
 			isShow: true,
 			hidden: true,
+			sorter: (a, b) => (a?.code || '').localeCompare(b?.code || ''),
 			render: (item) => <span>{item?.code}</span>,
 		},
 		{

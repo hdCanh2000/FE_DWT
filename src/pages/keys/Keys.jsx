@@ -78,6 +78,7 @@ const Keys = () => {
 			isShow: true,
 			hidden: true,
 			col: 5,
+			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
 			render: (item) => <span>{item?.name}</span>,
 		},
 		{
