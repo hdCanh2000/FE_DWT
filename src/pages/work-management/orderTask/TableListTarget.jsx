@@ -1,6 +1,6 @@
 /*eslint-disable */
 import { Col, DatePicker, Input, Row, Select, Table, Tooltip } from 'antd';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import dayjs from 'dayjs';
 import { useQuery } from 'react-query';
@@ -101,9 +101,21 @@ const columns = [
 	},
 ];
 const TableListTarget = ({ onUpdateTargetInfo }) => {
-	const [dataSearch, setDataSearch] = useState({
-		q: '',
-	});
+	const userString = window.localStorage.getItem('userId') || '[]';
+	const userId = JSON.parse(userString);
+
+	const { data: user = { data: [] } } = useQuery('getUserById', () => getUserById(userId));
+	const department_id = user.data.data?.department_id;
+	
+	const [dataSearch, setDataSearch] = useState({});
+
+	useEffect(() => {
+		setDataSearch({
+			q: '',
+			departmentId: department_id,
+		});
+	}, [department_id])
+
 	const [search, setSearch] = useState('');
 	const [openOrderTask, setOpenOrderTask] = useState(false);
 	const [selectedTarget, setSelectedTarget] = useState(null);
