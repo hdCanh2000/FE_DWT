@@ -1,7 +1,7 @@
 /* eslint react/prop-types: 0 */
 /* eslint-disable */
 import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox, Space } from 'antd';
-import { DeleteTwoTone } from '@ant-design/icons';
+// import { DeleteTwoTone } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,11 +9,10 @@ import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { fetchReport, fetchRecordById } from '../../redux/slice/keyReportSlice';
+import { fetchReport } from '../../redux/slice/keyReportSlice';
 import {
 	createTargetLog,
 	deleteTargetLog,
-	createRecord,
 	uploadFile,
 } from '../../pages/dailyWorkTracking/services';
 import axios from 'axios';
@@ -64,49 +63,28 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 		dispatch(fetchReport());
 	}, []);
 
-	useEffect(async () => {
-		if (currentTargetLog.id) {
-			const records = await dispatch(fetchRecordById(currentTargetLog.id));
-			records.payload.map((record) => {
-				if (!_.isNil(record.value) && !_.isNil(record.keyReportId)) {
-					setValueRadio(true);
-					const formValues = form.getFieldsValue();
-					const arrReportValues = _.get(formValues, 'arrReport', []);
-					let dataArrReport;
-					if (_.get(arrReportValues, '0.report') && _.get(arrReportValues, '0.report')) {
-						dataArrReport = [
-							...arrReportValues,
-							{
-								record: record.value,
-								report: record.keyReportId,
-							},
-						];
-					} else {
-						dataArrReport = [
-							{
-								record: record.value,
-								report: record.keyReportId,
-							},
-						];
-					}
-					form.setFieldsValue({
-						arrReport: dataArrReport,
-					});
-				}
-			});
-		}
-	}, [currentTargetLog]);
-
 	useEffect(() => {
 		if (_.isEmpty(currentTargetLog)) {
 			form.resetFields();
 			setFiles([]);
 			setUploadedFiles([]);
 		} else {
+			if (!_.isEmpty(currentTargetLog.keyReports)) {
+				setValueRadio(!valueRadio);
+			}
+			const formValues = form.getFieldsValue();
+			const arrReportValues = _.get(formValues, 'arrReport', []);
+			const dataArrReport = currentTargetLog.keyReports.map((report) => {
+				return {
+					id: report?.keyRecord ? report?.keyRecord?.keyReportId : null,
+					value: report?.keyRecord ? report?.keyRecord?.value : null,
+				};
+			});
 			form.setFieldsValue({
 				quantity: currentTargetLog.quantity,
 				status: currentTargetLog.status,
 				note: currentTargetLog.note,
+				arrReport: [...arrReportValues, ...dataArrReport],
 			});
 			const uploadedFilesFromApi = JSON.parse(currentTargetLog?.files || '[]');
 			setUploadedFiles(uploadedFilesFromApi);
@@ -142,12 +120,14 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 					...values,
 					targetInfoId: target.id,
 					id: currentTargetLog?.id,
+					keyReport_id: null,
 				};
 				data.noticedDate = logDay.format('YYYY-MM-DD');
 				data.noticedStatus = 'noticed';
 				await createTargetLog(data);
 				await reFetchTable();
 				onOk();
+				setCheckMessage('success');
 				return;
 			}
 			if (!values.quantity || !values.note) {
@@ -157,7 +137,10 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 				...values,
 				targetInfoId: target.id,
 				id: currentTargetLog?.id,
+				noticedDate: logDay.format('YYYY-MM-DD'),
+				noticedStatus: null,
 				reportDate: logDay.format('YYYY-MM-DD'),
+				keyReport_id: values.arrReport ? values.arrReport : null,
 			};
 			// upload files
 			const listUploaded = await Promise.all(
@@ -174,37 +157,8 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			);
 			const listUploadedFiltered = listUploaded.filter((item) => !!item);
 			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
-			const targetLog = await createTargetLog(data);
+			await createTargetLog(data);
 			setCheckMessage('success');
-
-			//Add Report + Record
-			if (targetLog.id && valueRadio === true) {
-				const records = await dispatch(fetchRecordById(targetLog.id));
-				const promisesReport = values.arrReport.map(async (value) => {
-					if (_.isNil(value.record) || _.isNil(value.report)) {
-						setCheckMessage('notExist');
-					}
-					if (
-						!_.some(records.payload, {
-							keyReportId: value.report,
-							value: value.record,
-						})
-					) {
-						const dataRecord = {
-							keyReportId: value.report,
-							targetLogId: targetLog.id,
-							value: value.record,
-						};
-						const res = await createRecord(dataRecord);
-						if (res.message === 'Successfully!') {
-							setCheckMessage('success');
-						} else {
-							setCheckMessage('failed');
-						}
-					}
-				});
-				await Promise.all(promisesReport);
-			}
 			await reFetchTable();
 			onOk();
 		} catch (err) {
@@ -316,14 +270,14 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 									<Form.List
 										name='arrReport'
 										align='baseline'
-										initialValue={[{ report: null, record: null }]}>
+										initialValue={[{ id: null, value: null }]}>
 										{(fields, { add, remove }) => (
 											<>
 												{fields.map((field) => {
 													return (
 														<Space key={field.key} align='baseline'>
 															<Form.Item
-																name={[field.name, 'report']}
+																name={[field.name, 'id']}
 																label={`Tiêu chí ${field.key + 1}`}>
 																<Select
 																	placeholder='Hãy chọn tiêu chí!'
@@ -348,9 +302,9 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 																/>
 															</Form.Item>
 															<Form.Item
-																name={[field.name, 'record']}
+																name={[field.name, 'value']}
 																label='Giá trị'>
-																<Input
+																<InputNumber
 																	type='number'
 																	style={{ minWidth: '130px' }}
 																/>

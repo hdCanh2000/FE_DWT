@@ -1,11 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getAllReport, getAllRecordById } from '../../pages/dailyWorkTracking/services';
+import { getAllReport } from '../../pages/dailyWorkTracking/services';
 
 const initialState = {
 	reports: [],
 	report: {},
-	records: [],
-	record: {},
 };
 
 export const fetchReport = createAsyncThunk('keyReport/allReport', async () => {
@@ -23,11 +21,6 @@ export const fetchReport = createAsyncThunk('keyReport/allReport', async () => {
 	});
 });
 
-export const fetchRecordById = createAsyncThunk('keyReport/record', async (data) => {
-	const response = await getAllRecordById(data);
-	return response.result.data;
-});
-
 // eslint-disable-next-line import/prefer-default-export
 export const keyReportSlice = createSlice({
 	name: 'keyReport',
@@ -43,18 +36,6 @@ export const keyReportSlice = createSlice({
 			state.reports = action.payload ? [...action.payload] : [];
 		},
 		[fetchReport.rejected]: (state, action) => {
-			state.loading = false;
-			state.error = action.error;
-		},
-		// fetch Record
-		[fetchRecordById.pending]: (state) => {
-			state.loading = true;
-		},
-		[fetchRecordById.fulfilled]: (state, action) => {
-			state.loading = false;
-			state.records = action.payload;
-		},
-		[fetchRecordById.rejected]: (state, action) => {
 			state.loading = false;
 			state.error = action.error;
 		},
