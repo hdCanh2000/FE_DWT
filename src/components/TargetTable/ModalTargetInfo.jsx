@@ -1,9 +1,11 @@
 /* eslint react/prop-types: 0 */
-import { Button, Modal, Table, Popover } from 'antd';
+import { Button, Modal, Table } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
+import { useSelector } from 'react-redux';
 import _ from 'lodash';
+import { CardBody, CardLabel, CardSubTitle, CardTitle } from '../bootstrap/Card';
 import ModalCommentTarget from './ModalCommentTarget';
 
 const StyledTable = styled.table`
@@ -24,12 +26,14 @@ const StyledTable = styled.table`
 		font-weight: bold;
 	}
 `;
-const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
+const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) => {
 	const [currentTarget, setCurrentTarget] = useState(target);
 	const [openCommentModal, setOpenCommentModal] = useState(false);
 	const roles = window.localStorage.getItem('roles') || "['']";
 	const roleArr = JSON.parse(roles);
 	const canComment = roleArr.includes('manager') || roleArr.includes('admin');
+
+	const dataReport = useSelector((state) => state.report.reports);
 
 	useEffect(() => {
 		setCurrentTarget(target);
@@ -95,28 +99,48 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 		[currentTarget],
 	);
 
+	// data table tiêu chí
+	const filterReport = _.isEmpty(currentTarget)
+		? []
+		: currentTarget?.TargetLogs.filter((x) => x.reportDate !== null)
+				.sort((a, b) => {
+					return moment(a.reportDate).diff(moment(b.reportDate));
+				})
+				.map((item) => ({
+					...item,
+					key: item.id,
+				}));
+	const filterRecord = filterReport.map((item) => item.keyReports);
+	const concatArrRecord = _.concat(...filterRecord);
+	const arrDataRecord = concatArrRecord.map((item) => item.keyRecord);
+
 	const columnsRecord = [
 		{
 			key: 'createdAt',
 			title: 'Ngày tạo',
 			dataIndex: 'createdAt',
+			sorter: (a, b) => (a?.createdAt || '').localeCompare(b?.createdAt || ''),
 			render: (text) => moment(text).format('DD/MM/YYYY'),
 		},
 		{
-			key: 'keyReportId',
+			key: 'name',
 			title: 'Tiêu chí',
 			dataIndex: 'keyReportId',
+			render: (keyReportId) => {
+				const foundData = dataReport.find((data) => data.id === keyReportId);
+				return foundData ? <span>{foundData.name}</span> : null;
+			},
 		},
 		{
 			key: 'value',
 			title: 'Giá trị',
 			dataIndex: 'value',
-			sorter: (a, b) => a.code.localeCompare(b.code),
+			sorter: (a, b) => a.value - b.value,
 		},
 	];
 
 	// table list bao cao
-	const columns = [
+	const columnsReport = [
 		{
 			key: 'reportDate',
 			title: 'Ngày báo cáo',
@@ -157,8 +181,7 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 		},
 	];
 
-	// data table báo cáo
-	const data = _.isEmpty(currentTarget)
+	const arrDataReport = _.isEmpty(currentTarget)
 		? []
 		: currentTarget?.TargetLogs.filter((x) => x.reportDate !== null)
 				.sort((a, b) => {
@@ -168,12 +191,21 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 					...item,
 					key: item.id,
 				}));
-	const content = (
-		<div>
-			<p>{`Tổng tiêu chí tạm tính: `}</p>
-			<p>{`Tổng giá trị tạm tính: `}</p>
-		</div>
-	);
+
+	// total content
+	const totalValue = arrDataRecord.map((item) => item.value);
+	const keyReportInMonth = arrDataRecord.map((item) => item.keyReportId);
+	const totalRecordInMonth = _.uniqWith(keyReportInMonth, _.isEqual);
+
+	const idTargetInfo = currentTarget.Target ? currentTarget.Target.id : null;
+	const getTargetInfo = listTarget.filter((item) => item.Target.id === idTargetInfo);
+	const getUserByTargetInfo = getTargetInfo.map((item) => item.user.id);
+	const totalUserByTargetInfo = _.uniqWith(getUserByTargetInfo, _.isEqual);
+	const VND = new Intl.NumberFormat('vi-VN', {
+		style: 'currency',
+		currency: 'VND',
+	});
+
 	return (
 		<>
 			<Modal
@@ -208,20 +240,34 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 							</tbody>
 						</StyledTable>
 					</div>
-					<div>
-						<div style={{ display: 'flex', justifyContent: 'space-between' }}>
-							<h5>Danh sách tổng tiêu chí công việc</h5>
-							<Popover content={content}>
-								<Button
-									style={{ cursor: 'none', marginBottom: '10px' }}
-									type='primary'>
-									Tổng giá trị kinh doanh đạt được
-								</Button>
-							</Popover>
+					<CardBody>
+						<CardLabel icon='StackedBarChart'>
+							<CardTitle tag='h4' className='h5'>
+								Tổng hợp báo cáo
+							</CardTitle>
+							<CardSubTitle>Kết quả tạm tính</CardSubTitle>
+						</CardLabel>
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								marginTop: '20px',
+							}}>
+							<div>
+								<h5>{`Số báo cáo đã lập trong tháng: ${arrDataReport.length} báo cáo`}</h5>
+								<h5>{`Số nhân sự thực hiện: ${totalUserByTargetInfo.length} nhân sự`}</h5>
+							</div>
+							<div>
+								<h5>{`Số tiêu chí đạt được trong tháng: ${totalRecordInMonth.length} tiêu chí`}</h5>
+								<h5>{`Giá trị doanh thu: ${VND.format(_.sum(totalValue))}`}</h5>
+							</div>
 						</div>
+					</CardBody>
+					<div>
+						<h5>Danh sách tiêu chí công việc</h5>
 						<Table
 							columns={columnsRecord}
-							// dataSource={dataRecord}
+							dataSource={arrDataRecord}
 							bordered
 							pagination={{
 								pageSize: 3,
@@ -231,8 +277,8 @@ const ModalTargetInfo = ({ open, onOk, target, reFetchListTarget }) => {
 					<div>
 						<h5>Danh sách báo cáo công việc</h5>
 						<Table
-							columns={columns}
-							dataSource={data}
+							columns={columnsReport}
+							dataSource={arrDataReport}
 							bordered
 							pagination={{
 								pageSize: 3,

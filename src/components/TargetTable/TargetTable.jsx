@@ -180,6 +180,7 @@ const TargetTable = ({ dataSearch, columnsToShow = [], setKpiEstimated }) => {
 			<ModalTargetInfo
 				open={isOpenTargetInfoModal}
 				target={targetInfoModalData}
+				listTarget={listTarget}
 				onOk={() => setIsOpenTargetInfoModal(false)}
 				reFetchListTarget={reFetchListTarget}
 			/>
