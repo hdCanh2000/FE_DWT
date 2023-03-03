@@ -195,7 +195,6 @@ const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) 
 	// total content
 	const totalValue = arrDataRecord.map((item) => item.value);
 	const keyReportInMonth = arrDataRecord.map((item) => item.keyReportId);
-	const fileReportInMonth = arrDataReport.map((item) => item.files);
 	const totalRecordInMonth = _.uniqWith(keyReportInMonth, _.isEqual);
 
 	const idTargetInfo = currentTarget.Target ? currentTarget.Target.id : null;
@@ -206,8 +205,6 @@ const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) 
 		style: 'currency',
 		currency: 'VND',
 	});
-
-	console.log(fileReportInMonth);
 
 	return (
 		<>

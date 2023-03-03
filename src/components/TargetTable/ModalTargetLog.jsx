@@ -79,7 +79,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			const formValues = form.getFieldsValue();
 			const arrReportValues = _.get(formValues, 'arrReport', []);
 			const dataArrReport = currentTargetLog.keyReports.map((report) => {
-				// console.log(_.isEmpty(report?.keyRecord?.keyReportId));
 				if (_.isEmpty(report?.keyRecord?.keyReportId)) {
 					setValueRadio(!valueRadio);
 				}
@@ -88,7 +87,6 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 					value: report?.keyRecord ? report?.keyRecord?.value : null,
 				};
 			});
-			// console.log(...dataArrReport);
 			form.setFieldsValue({
 				quantity: currentTargetLog.quantity,
 				status: currentTargetLog.status,
