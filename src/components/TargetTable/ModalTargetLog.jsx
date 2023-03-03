@@ -43,6 +43,13 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 
 	const dataReport = useSelector((state) => state.report.reports);
 
+	const showDataReport = useMemo(() => {
+		const showDataReport = dataReport.filter(
+			(item) => item.departmentId === target?.position?.department?.id,
+		);
+		return showDataReport;
+	}, [target?.position?.department?.id]);
+
 	const currentTargetLog = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
 		return (
@@ -69,24 +76,26 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			setFiles([]);
 			setUploadedFiles([]);
 		} else {
-			if (!_.isEmpty(currentTargetLog.keyReports)) {
-				setValueRadio(!valueRadio);
-			}
 			const formValues = form.getFieldsValue();
 			const arrReportValues = _.get(formValues, 'arrReport', []);
 			const dataArrReport = currentTargetLog.keyReports.map((report) => {
+				// console.log(_.isEmpty(report?.keyRecord?.keyReportId));
+				if (_.isEmpty(report?.keyRecord?.keyReportId)) {
+					setValueRadio(!valueRadio);
+				}
 				return {
 					id: report?.keyRecord ? report?.keyRecord?.keyReportId : null,
 					value: report?.keyRecord ? report?.keyRecord?.value : null,
 				};
 			});
+			// console.log(...dataArrReport);
 			form.setFieldsValue({
 				quantity: currentTargetLog.quantity,
 				status: currentTargetLog.status,
 				note: currentTargetLog.note,
 				arrReport: [...arrReportValues, ...dataArrReport],
 			});
-			const uploadedFilesFromApi = JSON.parse(currentTargetLog?.files || '[]');
+			const uploadedFilesFromApi = JSON.parse(currentTargetLog?.files || null);
 			setUploadedFiles(uploadedFilesFromApi);
 		}
 	}, [currentTargetLog, form]);
@@ -293,7 +302,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 																		)
 																	}
 																	options={_.map(
-																		dataReport,
+																		showDataReport,
 																		(item) => ({
 																			label: item.name,
 																			value: item.id,
@@ -327,7 +336,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 														block
 														disabled={disabledButtonAdd(fields)}
 														align='baseline'>
-														Nhập thêm tiêu chí
+														Thêm tiêu chí
 													</Button>
 												</Form.Item>
 											</>
