@@ -131,9 +131,10 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 				};
 				data.noticedDate = logDay.format('YYYY-MM-DD');
 				data.noticedStatus = 'noticed';
-				await createTargetLog(data);
-				await reFetchTable();
 				onOk();
+				await reFetchTable();
+				const checkError = await createTargetLog(data);
+				console.log(checkError);
 				setCheckMessage('success');
 				return;
 			}
@@ -165,9 +166,9 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 			const listUploadedFiltered = listUploaded.filter((item) => !!item);
 			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
 			await createTargetLog(data);
-			setCheckMessage('success');
 			await reFetchTable();
 			onOk();
+			setCheckMessage('success');
 		} catch (err) {
 			setCheckMessage('failed');
 		} finally {

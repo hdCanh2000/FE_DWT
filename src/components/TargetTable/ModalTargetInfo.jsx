@@ -197,6 +197,12 @@ const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) 
 	const keyReportInMonth = arrDataRecord.map((item) => item.keyReportId);
 	const totalRecordInMonth = _.uniqWith(keyReportInMonth, _.isEqual);
 
+	const filterFileReport = filterReport.map((item) => item.files);
+	const fileReport = filterFileReport
+		.map((item) => item.slice(1).slice(0, -1))
+		.filter((item) => item !== '')
+		.flatMap((x) => x.split(',')).length;
+
 	const idTargetInfo = currentTarget.Target ? currentTarget.Target.id : null;
 	const getTargetInfo = listTarget.filter((item) => item.Target.id === idTargetInfo);
 	const getUserByTargetInfo = getTargetInfo.map((item) => item.user.id);
@@ -254,12 +260,20 @@ const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) 
 								marginTop: '20px',
 							}}>
 							<div>
-								<h5>{`Số báo cáo đã lập trong tháng: ${arrDataReport.length} báo cáo`}</h5>
-								<h5>{`Số nhân sự thực hiện: ${totalUserByTargetInfo.length} nhân sự`}</h5>
+								<h5>{`Số báo cáo đã lập trong tháng: ${
+									fileReport || '0'
+								} file`}</h5>
+								<h5>{`Số nhân sự thực hiện: ${
+									totalUserByTargetInfo.length || 'chưa có'
+								} nhân sự`}</h5>
 							</div>
 							<div>
-								<h5>{`Số tiêu chí đạt được trong tháng: ${totalRecordInMonth.length} tiêu chí`}</h5>
-								<h5>{`Giá trị doanh thu: ${VND.format(_.sum(totalValue))}`}</h5>
+								<h5>{`Số tiêu chí đạt được trong tháng: ${
+									totalRecordInMonth.length || '0'
+								} tiêu chí`}</h5>
+								<h5>{`Giá trị doanh thu: ${VND.format(
+									_.sum(totalValue) || '0',
+								)}`}</h5>
 							</div>
 						</div>
 					</CardBody>
