@@ -192,7 +192,7 @@ const ModalOrderTaskForm = ({ open, onClose, data, isCreate, onSuccess, onUpdate
 								placeholder='mm/dd/yyyy'
 								format='DD/MM/YYYY'
 								disabledDate={(current) => {
-									return current && current < dayjs().endOf('day');
+									return current && current < dayjs().add(-2, 'month');
 								}}
 							/>
 						</Form.Item>
