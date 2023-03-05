@@ -192,23 +192,6 @@ const getAllReport = async () => {
 	return resp.data;
 };
 
-const getAllRecordById = async (id) => {
-	const resp = await axiosClient({
-		method: 'GET',
-		url: `/api/keyRecords/${id}`,
-	});
-	return resp.data;
-};
-
-const createRecord = async (data) => {
-	const resp = await axiosClient({
-		method: 'POST',
-		url: `/api/keyRecords`,
-		data,
-	});
-	return resp.data;
-};
-
 export {
 	getAllWorktrackByUserId,
 	getAllWorktrackByUser,
@@ -234,6 +217,4 @@ export {
 	exportTargets,
 	getListTargetInfos,
 	getAllReport,
-	createRecord,
-	getAllRecordById,
 };

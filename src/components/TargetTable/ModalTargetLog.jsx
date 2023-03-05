@@ -1,6 +1,7 @@
 /* eslint react/prop-types: 0 */
 /* eslint-disable */
-import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox } from 'antd';
+import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox, Space } from 'antd';
+// import { DeleteTwoTone } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,11 +9,10 @@ import { GrAttachment } from 'react-icons/gr';
 import { BsTrash } from 'react-icons/bs';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-import { fetchReport, fetchRecordById } from '../../redux/slice/keyReportSlice';
+import { fetchReport } from '../../redux/slice/keyReportSlice';
 import {
 	createTargetLog,
 	deleteTargetLog,
-	createRecord,
 	uploadFile,
 } from '../../pages/dailyWorkTracking/services';
 import axios from 'axios';
@@ -33,7 +33,7 @@ const ALLOWED_TYPES = [
 	'.psd',
 	'.txt',
 ];
-const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, showReport }) => {
+const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }) => {
 	const dispatch = useDispatch();
 	const [files, setFiles] = useState([]);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -42,6 +42,13 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 	const [form] = Form.useForm();
 
 	const dataReport = useSelector((state) => state.report.reports);
+
+	const showDataReport = useMemo(() => {
+		const showDataReport = dataReport.filter(
+			(item) => item.departmentId === target?.position?.department?.id,
+		);
+		return showDataReport;
+	}, [target?.position?.department?.id]);
 
 	const currentTargetLog = useMemo(() => {
 		const logDayFormat = logDay.format('YYYY-MM-DD');
@@ -63,36 +70,54 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 		dispatch(fetchReport());
 	}, []);
 
-	useEffect(async () => {
-		if (currentTargetLog.id) {
-			const record = await dispatch(fetchRecordById(currentTargetLog.id));
-			if (_.isNil(record.value) || _.isNil(record.keyReportId)) {
-				setValueRadio(true);
-				form.setFieldsValue({
-					record: record.payload.value,
-					report: record.payload.keyReportId,
-				});
-			} else {
-				setValueRadio(false);
-			}
-		}
-	}, [currentTargetLog]);
-
 	useEffect(() => {
 		if (_.isEmpty(currentTargetLog)) {
 			form.resetFields();
 			setFiles([]);
 			setUploadedFiles([]);
 		} else {
+			const formValues = form.getFieldsValue();
+			const arrReportValues = _.get(formValues, 'arrReport', []);
+			const dataArrReport = currentTargetLog.keyReports.map((report) => {
+				if (_.isEmpty(report?.keyRecord?.keyReportId)) {
+					setValueRadio(!valueRadio);
+				}
+				return {
+					id: report?.keyRecord ? report?.keyRecord?.keyReportId : null,
+					value: report?.keyRecord ? report?.keyRecord?.value : null,
+				};
+			});
 			form.setFieldsValue({
 				quantity: currentTargetLog.quantity,
 				status: currentTargetLog.status,
 				note: currentTargetLog.note,
+				arrReport: [...arrReportValues, ...dataArrReport],
 			});
-			const uploadedFilesFromApi = JSON.parse(currentTargetLog?.files || '[]');
+			const uploadedFilesFromApi = JSON.parse(currentTargetLog?.files || null);
 			setUploadedFiles(uploadedFilesFromApi);
 		}
 	}, [currentTargetLog, form]);
+
+	const [checkMessage, setCheckMessage] = useState('');
+	useEffect(() => {
+		switch (checkMessage) {
+			case 'notExist':
+				toast.error('Không được bỏ trống');
+				break;
+			case 'success':
+				toast(`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} THÀNH CÔNG`);
+				break;
+			case 'failed':
+				toast.error(
+					`Cập nhật báo cáo công việc ngày ${logDay.format(
+						'DD/MM/YYYY',
+					)} KHÔNG thành công!`,
+				);
+				break;
+			default:
+				return null;
+		}
+	}, [checkMessage]);
 
 	const handleFinish = async (values) => {
 		try {
@@ -102,23 +127,28 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 					...values,
 					targetInfoId: target.id,
 					id: currentTargetLog?.id,
+					keyReport_id: null,
 				};
 				data.noticedDate = logDay.format('YYYY-MM-DD');
 				data.noticedStatus = 'noticed';
-				await createTargetLog(data);
-				await reFetchTable();
 				onOk();
+				await reFetchTable();
+				const checkError = await createTargetLog(data);
+				console.log(checkError);
+				setCheckMessage('success');
 				return;
 			}
-			if (!values.quantity || !values.quantity || !values.note) {
+			if (!values.quantity || !values.note) {
 				throw new Error('Vui lòng nhập đầy đủ thông tin');
 			}
-
 			const data = {
 				...values,
 				targetInfoId: target.id,
 				id: currentTargetLog?.id,
+				noticedDate: logDay.format('YYYY-MM-DD'),
+				noticedStatus: null,
 				reportDate: logDay.format('YYYY-MM-DD'),
+				keyReport_id: values.arrReport ? values.arrReport : null,
 			};
 			// upload files
 			const listUploaded = await Promise.all(
@@ -135,27 +165,12 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			);
 			const listUploadedFiltered = listUploaded.filter((item) => !!item);
 			data.files = JSON.stringify([...uploadedFiles, ...listUploadedFiltered]);
-			const targetLog = await createTargetLog(data);
-			if (targetLog.id) {
-				if (!values.record || !values.report) {
-					throw new Error('Vui lòng nhập đầy đủ thông tin');
-				}
-				const dataRecord = {
-					keyReportId: values.report,
-					targetLogId: targetLog.id,
-					value: values.record,
-				};
-				await createRecord(dataRecord);
-			} else {
-				throw new Error('Vui lòng thử lại');
-			}
+			await createTargetLog(data);
 			await reFetchTable();
 			onOk();
-			toast(`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} thành công`);
+			setCheckMessage('success');
 		} catch (err) {
-			toast.error(
-				`Cập nhật báo cáo công việc ngày ${logDay.format('DD/MM/YYYY')} KHÔNG thành công`,
-			);
+			setCheckMessage('failed');
 		} finally {
 			setLoading(false);
 		}
@@ -188,8 +203,21 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 			toast.error('Xóa báo cáo thất bại');
 		}
 	};
+	const disabledButtonAdd = (fields) => {
+		if (fields.length === 8) {
+			return true;
+		}
+	};
 	return (
-		<Modal forceRender open={isOpen} onOk={onOk} onCancel={onCancel} footer={null}>
+		<Modal
+			forceRender
+			open={isOpen}
+			onOk={onOk}
+			onCancel={() => {
+				onCancel();
+				setValueRadio(false);
+			}}
+			footer={null}>
 			<div className='text-center mb-4'>
 				<h4 className='my-2'>Báo cáo công việc </h4>
 				<h4>Ngày {logDay.format('DD-MM-YYYY')}</h4>
@@ -232,7 +260,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							/>
 						</Form.Item>
 					</div>
-					{showReport && (
+					{isAdmin && (
 						<>
 							<div className='d-flex justify-content-between mb-2'>
 								<Form.Item name='checkReport' label='Đạt giá trị kinh doanh'>
@@ -246,27 +274,73 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 								</Form.Item>
 							</div>
 							{valueRadio === true && (
-								<div className='d-flex justify-content-between mb-2'>
-									<Form.Item name='report' label='Tiêu chí'>
-										<Select
-											placeholder='Hãy chọn tiêu chí!'
-											style={{ width: '100%' }}
-											optionFilterProp='children'
-											showSearch
-											filterOption={(input, option) =>
-												(option?.label.toLowerCase() ?? '').includes(
-													input.toLowerCase(),
-												)
-											}
-											options={_.map(dataReport, (item) => ({
-												label: item.name,
-												value: item.id,
-											}))}
-										/>
-									</Form.Item>
-									<Form.Item name='record' label='Giá trị'>
-										<Input style={{ width: 160 }} />
-									</Form.Item>
+								<div className='justify-content-between mb-2'>
+									<Form.List
+										name='arrReport'
+										align='baseline'
+										initialValue={[{ id: null, value: null }]}>
+										{(fields, { add, remove }) => (
+											<>
+												{fields.map((field) => {
+													return (
+														<Space key={field.key} align='baseline'>
+															<Form.Item
+																name={[field.name, 'id']}
+																label={`Tiêu chí ${field.key + 1}`}>
+																<Select
+																	placeholder='Hãy chọn tiêu chí!'
+																	style={{ minWidth: '130px' }}
+																	optionFilterProp='children'
+																	showSearch
+																	filterOption={(input, option) =>
+																		(
+																			option?.label.toLowerCase() ??
+																			''
+																		).includes(
+																			input.toLowerCase(),
+																		)
+																	}
+																	options={_.map(
+																		showDataReport,
+																		(item) => ({
+																			label: item.name,
+																			value: item.id,
+																		}),
+																	)}
+																/>
+															</Form.Item>
+															<Form.Item
+																name={[field.name, 'value']}
+																label='Giá trị'>
+																<InputNumber
+																	type='number'
+																	style={{ minWidth: '130px' }}
+																/>
+															</Form.Item>
+															{/* <DeleteTwoTone
+																onClick={() => remove(field.name)}
+															/> */}
+														</Space>
+													);
+												})}
+
+												<Form.Item>
+													<Button
+														style={{
+															maxWidth: 160,
+															float: 'right',
+														}}
+														type='dashed'
+														onClick={() => add()}
+														block
+														disabled={disabledButtonAdd(fields)}
+														align='baseline'>
+														Thêm tiêu chí
+													</Button>
+												</Form.Item>
+											</>
+										)}
+									</Form.List>
 								</div>
 							)}
 						</>
@@ -318,6 +392,12 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 							type='primary'
 							htmlType='submit'
 							className='mx-2'
+							onClick={() => {
+								setTimeout(() => {
+									setCheckMessage('');
+									setValueRadio(false);
+								}, 1000);
+							}}
 							disabled={loading}>
 							Lưu
 						</Button>
@@ -326,7 +406,13 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable, 
 								Xóa báo cáo
 							</Button>
 						)}
-						<Button onClick={onOk}>Đóng</Button>
+						<Button
+							onClick={() => {
+								onOk();
+								setValueRadio(false);
+							}}>
+							Đóng
+						</Button>
 					</div>
 				</Form>
 			</div>
