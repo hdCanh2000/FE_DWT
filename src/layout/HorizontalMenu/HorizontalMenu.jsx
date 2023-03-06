@@ -167,6 +167,11 @@ const contentRoutes = [
 				path: '/don-vi-tinh',
 			},
 			{
+				label: 'Tiêu chí kinh doanh',
+				key: 'keyReport',
+				path: '/tieu-chi',
+			},
+			{
 				label: 'Yêu cầu tuyển dụng',
 				key: 'recruitmentRequirements',
 				path: '/yeu-cau-tuyen-dung',
