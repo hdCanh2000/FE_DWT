@@ -19,6 +19,7 @@ import moment from 'moment/moment';
 import React, { useEffect, useMemo } from 'react';
 import Button from '../../../components/bootstrap/Button';
 import { getAllDepartment } from '../../department/services';
+import { getUserById } from '../../employee/services';
 import { getListTargetInfos } from '../../dailyWorkTracking/services';
 import ModalOrderTaskForm from './ModalOrderTaskForm';
 import { deleteTargetInfo } from '../../kpiNorm/services';
@@ -149,11 +150,23 @@ const columns = (handleClickDeleteBtn, handleRowClick) => {
 	];
 };
 const TableListTargetInfos = ({ updateFlag }) => {
-	const [params, setParams] = React.useState({
-		q: '',
-		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
-		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
-	});
+	const userString = window.localStorage.getItem('userId') || '[]';
+	const userId = JSON.parse(userString);
+
+	const { data: user = { data: [] } } = useQuery('getUserById', () => getUserById(userId));
+	const department_id = user.data.data?.department_id;
+
+	const [params, setParams] = React.useState({});
+
+	useEffect(() => {
+		setParams({
+			departmentId: department_id,
+			q: '',
+			start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+			end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
+		})
+	}, [department_id])
+
 	const [cancelAssignTaskId, setCancelAssignTaskId] = React.useState(null);
 	const [openConfirmCancelAssignTask, setOpenConfirmCancelAssignTask] = React.useState(false);
 	const [selectedTargetInfo, setSelectedTargetInfo] = React.useState(null);

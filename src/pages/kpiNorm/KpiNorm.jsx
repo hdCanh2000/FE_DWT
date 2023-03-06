@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Col, Row, Table, Input, DatePicker } from 'antd';
 import { useQuery } from 'react-query';
@@ -18,6 +18,7 @@ import Button from '../../components/bootstrap/Button';
 import { exportExcel } from './services';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 
+import { getUserById } from '../employee/services';
 import { getListTarget } from '../dailyWorkTracking/services';
 import ModalTargetForm from './ModalTargetForm';
 
@@ -58,12 +59,25 @@ const antdTableCols = [
 ];
 
 const KpiNormPage = () => {
+	const userString = window.localStorage.getItem('userId') || '[]';
+	const userId = JSON.parse(userString);
+
+	const { data: user = { data: [] } } = useQuery('getUserById', () => getUserById(userId));
+	const departmentId = user.data.data?.department_id;
+
 	const [date, setDate] = useState(dayjs());
-	const [dataSearch, setDataSearch] = React.useState({
-		q: '',
-		start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
-		end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
-	});
+
+	const [dataSearch, setDataSearch] = useState({});
+
+	useEffect(() => {
+		setDataSearch({
+			departmentId,
+			q: '',
+			start: `${dayjs().month() + 1}-01-${dayjs().year()}`,
+			end: `${dayjs().month() + 1}-${dayjs().daysInMonth()}-${dayjs().year()}`,
+		});
+	}, [departmentId]);
+
 	const [openTargetForm, setOpenTargetForm] = React.useState(false);
 	const [target, setTarget] = React.useState(null);
 	const [search, setSearch] = React.useState('');
