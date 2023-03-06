@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
@@ -25,6 +25,8 @@ import Loading from '../../components/Loading/Loading';
 import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
 const RecruitmentRequirementPage = () => {
+	const [isDetail, setIsDetail] = useState(true);
+
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
 
@@ -90,6 +92,8 @@ const RecruitmentRequirementPage = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
+			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
 			render: (item) => <span>{item?.name}</span>,
 		},
 		{
@@ -100,7 +104,14 @@ const RecruitmentRequirementPage = () => {
 			type: 'textarea',
 			align: 'left',
 			isShow: true,
+			hidden: true,
+			sorter: (a, b) => (a?.description || '').localeCompare(b?.description || ''),
 			render: (item) => <span>{item?.description}</span>,
+		},
+		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
 		},
 		{
 			title: 'Hành Động',
@@ -115,7 +126,11 @@ const RecruitmentRequirementPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() => handleOpenForm(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsDetail(true);
+							handleOpenForm(item);
+						}}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -123,13 +138,27 @@ const RecruitmentRequirementPage = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Trash'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</>
 			),
 			isShow: false,
+			hidden: true,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	const handleSubmitForm = async (data) => {
 		const dataSubmit = {
@@ -234,7 +263,10 @@ const RecruitmentRequirementPage = () => {
 															color='info'
 															icon='AddCircleOutline'
 															tag='button'
-															onClick={() => handleOpenForm(null)}>
+															onClick={() => {
+																setIsDetail(true);
+																handleOpenForm(null);
+															}}>
 															Thêm mới
 														</Button>
 													</CardActions>
@@ -242,8 +274,18 @@ const RecruitmentRequirementPage = () => {
 												<div className='p-4'>
 													<TableCommon
 														className='table table-modern mb-0'
-														columns={columns}
+														columns={showColumns}
 														data={requirements}
+														style={{ cursor: 'pointer' }}
+														onRow={(item) => {
+															return {
+																cursor: 'pointer',
+																onClick: () => {
+																	setIsDetail(false);
+																	handleOpenForm(item);
+																},
+															};
+														}}
 														onSubmitSearch={handleSubmitSearch}
 														onChangeCurrentPage={
 															handleChangeCurrentPage
@@ -270,7 +312,7 @@ const RecruitmentRequirementPage = () => {
 											? 'Cập nhật yêu cầu năng lực'
 											: 'Thêm mới yêu cầu năng lực'
 									}
-									fields={columns}
+									fields={isDetail ? columns : columnsNoEdit}
 									validate={validate}
 								/>
 								<AlertConfirm

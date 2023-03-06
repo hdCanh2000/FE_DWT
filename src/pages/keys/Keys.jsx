@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { get, isEmpty } from 'lodash';
@@ -27,6 +27,8 @@ import { fetchPositionList } from '../../redux/slice/positionSlice';
 import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
 
 const Keys = () => {
+	const [isDetail, setIsDetail] = useState(true);
+
 	const [searchParams] = useSearchParams();
 	const text = searchParams.get('text') || '';
 	const dispatch = useDispatch();
@@ -74,7 +76,9 @@ const Keys = () => {
 			type: 'text',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			col: 5,
+			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
 			render: (item) => <span>{item?.name}</span>,
 		},
 		{
@@ -84,6 +88,7 @@ const Keys = () => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			isShowNested: true,
 			render: (item) => <span>{item?.unit?.name}</span>,
 			options: units,
@@ -93,6 +98,7 @@ const Keys = () => {
 					id: 'name',
 					key: 'name',
 					isShow: true,
+					hidden: true,
 					name: 'name',
 					type: 'text',
 				},
@@ -101,6 +107,7 @@ const Keys = () => {
 					id: 'code',
 					key: 'code',
 					isShow: true,
+					hidden: true,
 					name: 'code',
 					type: 'text',
 				},
@@ -114,6 +121,7 @@ const Keys = () => {
 			type: 'select',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			options: positions,
 			render: (item) => <span>{item?.position?.name}</span>,
 			isMulti: false,
@@ -126,7 +134,13 @@ const Keys = () => {
 			type: 'textarea',
 			align: 'left',
 			isShow: true,
+			hidden: true,
 			render: (item) => <span>{item?.description}</span>,
+		},
+		{
+			title: 'edit',
+			id: 'edit',
+			key: 'edit',
 		},
 		{
 			title: 'Hành động',
@@ -141,15 +155,17 @@ const Keys = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2'
 						icon='Edit'
-						onClick={() =>
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsDetail(true);
 							handleOpenForm({
 								...item,
 								position: {
 									label: item?.position?.name,
 									value: item?.position?.id,
 								},
-							})
-						}
+							});
+						}}
 					/>
 					<Button
 						isOutline={!darkModeStatus}
@@ -157,13 +173,27 @@ const Keys = () => {
 						isLight={darkModeStatus}
 						className='text-nowrap mx-2 '
 						icon='Delete'
-						onClick={() => handleOpenFormDelete(item)}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleOpenFormDelete(item);
+						}}
 					/>
 				</>
 			),
 			isShow: false,
+			hidden: true,
 		},
 	];
+
+	const showColumns = columns.filter((item) => item.hidden);
+
+	const columnsNoEdit = columns.map((item) => {
+		return {
+			...item,
+			// eslint-disable-next-line no-unneeded-ternary
+			isDisabled: itemEdit?.id ? true : false,
+		};
+	});
 
 	const setCurrentPage = (page) => {
 		dispatch(changeCurrentPage(page));
@@ -291,7 +321,10 @@ const Keys = () => {
 												color='info'
 												icon='Add'
 												tag='button'
-												onClick={() => handleOpenForm(null)}>
+												onClick={() => {
+													setIsDetail(true);
+													handleOpenForm(null);
+												}}>
 												Thêm mới
 											</Button>
 										</CardActions>
@@ -299,8 +332,18 @@ const Keys = () => {
 									<div className='p-4'>
 										<TableCommon
 											className='table table-modern mb-0'
-											columns={columns}
+											columns={showColumns}
 											data={keys}
+											style={{ cursor: 'pointer' }}
+											onRow={(item) => {
+												return {
+													cursor: 'pointer',
+													onClick: () => {
+														setIsDetail(false);
+														handleOpenForm(item);
+													},
+												};
+											}}
 											onSubmitSearch={handleSubmitSearch}
 											onChangeCurrentPage={handleChangeCurrentPage}
 											currentPage={parseInt(currentPage, 10)}
@@ -320,7 +363,7 @@ const Keys = () => {
 							handleSubmit={handleSubmitForm}
 							item={itemEdit}
 							label={itemEdit?.id ? 'Cập nhật key' : 'Tạo key mới'}
-							fields={columns}
+							fields={isDetail ? columns : columnsNoEdit}
 							validate={validate}
 							size='lg'
 							onSubmitNestedForm={handleSubmitNestedForm}
