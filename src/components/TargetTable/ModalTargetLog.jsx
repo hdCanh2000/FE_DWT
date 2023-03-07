@@ -43,11 +43,11 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 
 	const dataReport = useSelector((state) => state.report.reports);
 
-	const showDataReport = useMemo(() => {
-		const showDataReport = dataReport.filter(
+	const showAllDataReport = useMemo(() => {
+		const showAllDataReport = dataReport.filter(
 			(item) => item.departmentId === target?.position?.department?.id,
 		);
-		return showDataReport;
+		return showAllDataReport;
 	}, [target?.position?.department?.id]);
 
 	const currentTargetLog = useMemo(() => {
@@ -204,8 +204,28 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 		}
 	};
 	const disabledButtonAdd = (fields) => {
-		if (fields.length === 8) {
+		if (fields.length === showAllDataReport.length) {
 			return true;
+		}
+	};
+	const optionKeyReport = () => {
+		const dataTargetLog = currentTargetLog.keyReports;
+		if (!_.isEmpty(dataTargetLog)) {
+			return _.map(showAllDataReport, (report) => {
+				const isDisabled = dataTargetLog.some((data) => {
+					return report.id === data.keyRecord.keyReportId;
+				});
+				return {
+					label: report.name,
+					value: report.id,
+					disabled: isDisabled,
+				};
+			});
+		} else {
+			return _.map(showAllDataReport, (itemReport) => ({
+				label: itemReport.name,
+				value: itemReport.id,
+			}));
 		}
 	};
 	return (
@@ -300,13 +320,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 																			input.toLowerCase(),
 																		)
 																	}
-																	options={_.map(
-																		showDataReport,
-																		(item) => ({
-																			label: item.name,
-																			value: item.id,
-																		}),
-																	)}
+																	options={optionKeyReport()}
 																/>
 															</Form.Item>
 															<Form.Item
@@ -327,7 +341,7 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 												<Form.Item>
 													<Button
 														style={{
-															maxWidth: 160,
+															maxWidth: 180,
 															float: 'right',
 														}}
 														type='dashed'
@@ -335,7 +349,9 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 														block
 														disabled={disabledButtonAdd(fields)}
 														align='baseline'>
-														Thêm tiêu chí
+														{fields.length === showAllDataReport.length
+															? 'Đã đạt giới hạn tiêu chí'
+															: 'Thêm tiêu chí'}
 													</Button>
 												</Form.Item>
 											</>
