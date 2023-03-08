@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import _ from 'lodash';
+import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import _ from 'lodash';
+// import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-import TableCommon from '../common/ComponentCommon/TableCommon';
+// import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -15,64 +16,96 @@ import Card, {
 } from '../../components/bootstrap/Card';
 import Button from '../../components/bootstrap/Button';
 import useDarkMode from '../../hooks/useDarkMode';
-import CommonForm from '../common/ComponentCommon/CommonForm';
-import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
-import NotPermission from '../presentation/auth/NotPermission';
-import AlertConfirm from '../common/ComponentCommon/AlertConfirm';
 import validate from './validate';
-import { fetchReport } from '../../redux/slice/keyReportSlice';
+import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
+import AlertConfirm from '../work-management/mission/AlertConfirm';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
+import { changeCurrentPage, fetchReport } from '../../redux/slice/keyReportSlice';
+import { addKeyReport, updateKeyReport, deleteKeyReport } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
-// import { changeCurrentPage, fetchKeyList } from '../../redux/slice/keySlice';
-// import { fetchPositionList } from '../../redux/slice/positionSlice';
-import { addResource, deleteResouce, updateResouce } from '../../api/fetchApi';
+import NotPermission from '../presentation/auth/NotPermission';
+import Loading from '../../components/Loading/Loading';
+import CommonForm from '../common/ComponentCommon/CommonForm';
+import TableCommon from '../common/ComponentCommon/TableCommon';
+import Alert from '../../components/bootstrap/Alert';
 
 const KeyReport = () => {
+	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
-	const text = searchParams.get('text') || '';
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
-	const localtion = useLocation();
+
 	const [isDetail, setIsDetail] = useState(true);
 
-	const { darkModeStatus } = useDarkMode();
-	// const units = useSelector((state) => state.unit.units);
-	// const positions = useSelector((state) => state.position.positions);
-	const departments = useSelector((state) => state.department.departments);
-	const keyReports = useSelector((state) => state.report.reports);
-	const currentPage = useSelector((state) => state.key.currentPage);
-	const pagination = useSelector((state) => state.key.pagination);
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
+	const text = searchParams.get('text') || '';
+
+	const localtion = useLocation();
+	const toggleForm = useSelector((state) => state.toggleForm.open);
+	const itemEdit = useSelector((state) => state.toggleForm.data);
+	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
+
+	const pagination = useSelector((state) => state.position.pagination);
+	// const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
+	// const positions = useSelector((state) => state.position.positions);
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
-	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
+	const loading = useSelector((state) => state.position.loading);
+	const departments = useSelector((state) => state.department.departments);
+	const keyReports = useSelector((state) => state.report.reports);
+	const currentPage = useSelector((state) => state.report.currentPage);
 
-	const toggleForm = useSelector((state) => state.toggleForm.open);
-	const itemEdit = useSelector((state) => state.toggleForm.data);
-
-	const dataKeyReport = keyReports.map((item, index) => ({
+	const arrKeyReports = keyReports.map((item, index) => ({
 		...item,
-		indexValue: _.isEmpty(index) ? index + 1 : '--',
+		indexNumber: _.isEmpty(index) ? index : '--',
 	}));
 
-	// const fetch = () => {
-	// 	const query = {};
-	// 	query.text = text;
-	// 	query.page = currentPage;
-	// 	query.limit = 10;
-	// 	dispatch(fetchKeyList(query));
+	// const fetchKeysReport = () => {
+	// 	const newItem = itemEdit?.requirements?.map((items) => ({
+	// 		...items,
+	// 		label: items.name,
+	// 		value: items.id,
+	// 	}));
+	// 	return { ...itemEdit, requirements: newItem };
 	// };
 
-	// useEffect(() => {
-	// 	fetch();
-	// 	// eslint-disable-next-line react-hooks/exhaustive-deps
-	// }, [dispatch, currentPage, text]);
+	const setCurrentPage = (page) => {
+		dispatch(changeCurrentPage(page));
+	};
+
+	useEffect(() => {
+		const query = {};
+		query.text = text;
+		query.page = currentPage;
+		// query.limit = 10;
+		dispatch(fetchReport(query));
+	}, [currentPage, dispatch, text]);
+
+	const handleSubmitSearch = (searchValue) => {
+		if (searchValue.text === '') {
+			searchParams.delete('text');
+			navigate({
+				pathname: localtion.pathname,
+			});
+		} else {
+			navigate({
+				pathname: localtion.pathname,
+				search: createSearchParams({
+					text: searchValue.text,
+				}).toString(),
+			});
+		}
+		setCurrentPage(1);
+	};
+
+	const handleChangeCurrentPage = (searchValue) => {
+		setCurrentPage(searchValue.page);
+	};
 
 	useEffect(() => {
 		dispatch(fetchReport());
 		dispatch(fetchDepartmentList());
-		// dispatch(fetchPositionList());
 	}, [dispatch]);
 
 	const columns = [
@@ -80,73 +113,44 @@ const KeyReport = () => {
 			title: 'STT',
 			id: 'stt',
 			key: 'stt',
-			type: 'number',
-			align: 'left',
+			type: 'text',
+			align: 'center',
 			isShow: false,
 			hidden: true,
-			col: 3,
-			render: (item) => <span>{item?.indexValue}</span>,
+			render: (item) => <span>{item.indexNumber + 1}</span>,
 		},
 		{
 			title: 'Tên tiêu chí',
+			placeholder: 'tên tiêu chí',
 			id: 'name',
+			dataIndex: 'name',
 			key: 'name',
+			sorter: (a, b) => a.name.localeCompare(b.name),
 			type: 'text',
 			align: 'left',
 			isShow: true,
 			hidden: true,
-			col: 5,
-			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
-			render: (item) => <span>{item?.name}</span>,
+			col: 6,
 		},
-		// {
-		// 	title: 'Đơn vị',
-		// 	id: 'unit',
-		// 	key: 'unit',
-		// 	type: 'select',
-		// 	align: 'left',
-		// 	isShow: true,
-		// 	isShowNested: true,
-		// 	render: (item) => <span>{item?.unit?.name}</span>,
-		// 	options: units,
-		// 	fields: [
-		// 		{
-		// 			title: 'Tên đơn vị',
-		// 			id: 'name',
-		// 			key: 'name',
-		// 			isShow: true,
-		// 			name: 'name',
-		// 			type: 'text',
-		// 		},
-		// 		{
-		// 			title: 'Mã đơn vị',
-		// 			id: 'code',
-		// 			key: 'code',
-		// 			isShow: true,
-		// 			name: 'code',
-		// 			type: 'text',
-		// 		},
-		// 	],
-		// 	col: 3,
-		// },
 		{
 			title: 'Phòng ban',
+			placeholder: 'Phòng ban',
 			id: 'departmentId',
+			dataIndex: '',
 			key: 'departmentId',
-			type: 'text',
+			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
+			type: 'singleSelect',
 			align: 'left',
 			isShow: true,
 			hidden: true,
-			sorter: (a, b) => (a?.name || '').localeCompare(b?.name || ''),
-			// options: departments,
+			col: 6,
+			options: departments,
 			render: (keyReport) => {
 				const filterDepartment = departments.find(
 					(department) => department.id === keyReport.departmentId,
 				);
 				return filterDepartment ? filterDepartment?.name : '--';
 			},
-			// isMulti: false,
-			col: 4,
 		},
 		{
 			title: 'edit',
@@ -176,8 +180,8 @@ const KeyReport = () => {
 						isOutline={!darkModeStatus}
 						color='danger'
 						isLight={darkModeStatus}
-						className='text-nowrap mx-2 '
-						icon='Delete'
+						className='text-nowrap mx-2'
+						icon='Trash'
 						onClick={(e) => {
 							e.stopPropagation();
 							handleOpenFormDelete(item);
@@ -185,8 +189,8 @@ const KeyReport = () => {
 					/>
 				</>
 			),
-			isShow: false,
 			hidden: true,
+			isShow: false,
 		},
 	];
 
@@ -200,202 +204,184 @@ const KeyReport = () => {
 		};
 	});
 
-	// const setCurrentPage = (page) => {
-	// 	dispatch(changeCurrentPage(page));
-	// };
-
-	const handleSubmitSearch = (searchValue) => {
-		if (searchValue.text === '') {
-			searchParams.delete('text');
-			navigate({
-				pathname: localtion.pathname,
-			});
-		} else {
-			navigate({
-				pathname: localtion.pathname,
-				search: createSearchParams({
-					text: searchValue.text,
-				}).toString(),
-			});
-		}
-		// setCurrentPage(1);
-	};
-
 	const handleSubmitForm = async (data) => {
-		const newValue = {
-			id: _.get(itemEdit, 'id', null),
+		const dataSubmit = {
+			id: data.id,
 			name: data?.name,
-			description: data?.description,
-			unit_id: data?.unit?.id,
-			position_id: data?.position?.id,
-			department_id: data?.position?.department?.id,
-            // departmentId: () => {
-			// 	const filterDepartment = departments.find(
-			// 		(department) => department.id === data.departmentId,
-			// 	);
-			// 	return filterDepartment ? filterDepartment?.name : '--';
-			// },
+			departmentId: data?.departmentId,
+			// dailyWorkId: data?.dailyWorkId,
 		};
-		if (_.isEmpty(itemEdit)) {
+		if (data?.id) {
 			try {
-				await addResource('/api/keys', newValue);
-				toast.success('Thêm tiêu chí kinh doanh thành công!', {
+				const response = await updateKeyReport(dataSubmit);
+				await response.data;
+				toast.success('Cập nhật tiêu chí thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				// fetch();
+				dispatch(fetchReport());
 				handleCloseForm();
 			} catch (error) {
-				toast.error('Thêm tiêu chí kinh doanh không thành công!', {
+				toast.error('Cập nhật tiêu chí không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
+				throw error;
 			}
 		} else {
 			try {
-				await updateResouce('/api/keys', newValue);
-				toast.success('Cập nhật tiêu chí kinh doanh thành công!', {
+				const response = await addKeyReport(dataSubmit);
+				await response.data;
+				toast.success('Thêm tiêu chí thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
-				// fetch();
+				dispatch(fetchReport());
 				handleCloseForm();
 			} catch (error) {
-				toast.error('Cập nhật tiêu chí kinh doanh không thành công!', {
+				toast.error('Thêm tiêu chí không thành công!', {
 					position: toast.POSITION.TOP_RIGHT,
 					autoClose: 1000,
 				});
+				throw error;
 			}
 		}
 	};
 
-	const handleDelete = async (data) => {
+	const handleDeleteKeyReport = async (valueDelete) => {
 		try {
-			await deleteResouce('/api/keys', data?.id);
-			toast.success('Xóa tiêu chí kinh doanh thành công!', {
+			await deleteKeyReport(valueDelete);
+			toast.success('Xoá tiêu chí thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
 			});
+			dispatch(fetchReport());
+			handleCloseForm();
 		} catch (error) {
-			toast.error('Xóa tiêu chí kinh doanh không thành công!', {
+			toast.error('Xoá tiêu chí không thành công!', {
 				position: toast.POSITION.TOP_RIGHT,
 				autoClose: 1000,
 			});
-		}
-		// fetch();
-		handleCloseForm();
-	};
-
-	// const handleChangeCurrentPage = (searchValue) => {
-	// 	setCurrentPage(searchValue.page);
-	// };
-
-	const handleSubmitNestedForm = async (itemSubmit, model) => {
-		switch (model) {
-			case 'unit':
-				try {
-					const response = await addResource('/api/units', itemSubmit);
-					await response.data;
-					toast.success('Thêm đơn vị thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-				} catch (error) {
-					toast.error('Thêm đơn vị không thành công!', {
-						position: toast.POSITION.TOP_RIGHT,
-						autoClose: 1000,
-					});
-					throw error;
-				}
-				break;
-			default:
-				break;
+			throw error;
 		}
 	};
 
 	return (
 		<PageWrapper title={demoPages.cauHinh.subMenu.keyReport.text}>
 			<Page container='fluid'>
-				{verifyPermissionHOC(
-					<>
-						<div className='row mb-0'>
-							<div className='col-12'>
-								<Card className='w-100'>
-									<CardHeader>
-										<CardLabel icon='ReceiptLong' iconColor='primary'>
-											<CardTitle>
-												<CardLabel>Danh sách tiêu chí kinh doanh</CardLabel>
-											</CardTitle>
-										</CardLabel>
-										<CardActions>
-											<Button
-												color='info'
-												icon='Add'
-												tag='button'
-												onClick={() => {
-													setIsDetail(true);
-													handleOpenForm(null);
-												}}>
-												Thêm mới
-											</Button>
-										</CardActions>
-									</CardHeader>
-									<div className='p-4'>
-										<TableCommon
-											className='table table-modern mb-0'
-											columns={showColumns}
-											data={dataKeyReport}
-											onSubmitSearch={handleSubmitSearch}
-											style={{ cursor: 'pointer' }}
-											onRow={(item) => {
-												return {
-													onClick: () => {
-														setIsDetail(false);
-														handleOpenForm(item);
-													},
-												};
-											}}
-											// onChangeCurrentPage={handleChangeCurrentPage}
-											currentPage={parseInt(currentPage, 10)}
-											totalItem={pagination?.totalRows}
-											total={pagination?.total}
-											// setCurrentPage={setCurrentPage}
-											searchvalue={text}
-											isSearch
-										/>
+				{loading ? (
+					<Loading />
+				) : (
+					<div>
+						{verifyPermissionHOC(
+							<>
+								<div
+									className='row mb-0'
+									style={{ maxWidth: '800px', margin: '0 auto' }}>
+									<div className='col-12'>
+										<Card className='w-100'>
+											<div style={{ margin: '24px 24px 0' }}>
+												<CardHeader>
+													<CardLabel
+														icon='Assignment'
+														iconColor='primary'>
+														<CardTitle>
+															<CardLabel>
+																Danh sách tiêu chí kinh doanh
+															</CardLabel>
+														</CardTitle>
+													</CardLabel>
+													<CardActions>
+														<Button
+															color='info'
+															icon='AddCircleOutline'
+															tag='button'
+															onClick={() => {
+																handleOpenForm(null);
+																setIsDetail(true);
+															}}>
+															Thêm mới
+														</Button>
+													</CardActions>
+												</CardHeader>
+												<div className='p-4'>
+													{/* <TableSearchCommon
+														onSubmitSearch={handleSubmitSearch}
+														searchvalue={text}
+														isSearch
+													/> */}
+													<TableCommon
+														className='table table-modern mb-0'
+														rowKey={(item) => item.id}
+														columns={showColumns}
+														data={arrKeyReports}
+														scroll={{ x: 'max-content' }}
+														pagination={{ pageSize: 10 }}
+														style={{ cursor: 'pointer' }}
+														onRow={(item) => {
+															return {
+																cursor: 'pointer',
+																onClick: () => {
+																	setIsDetail(false);
+																	handleOpenForm(item);
+																},
+															};
+														}}
+														onSubmitSearch={handleSubmitSearch}
+														onChangeCurrentPage={
+															handleChangeCurrentPage
+														}
+														currentPage={parseInt(currentPage, 10)}
+														totalItem={pagination?.totalRows}
+														total={pagination?.total}
+														setCurrentPage={setCurrentPage}
+														searchvalue={text}
+														isSearch
+													/>
+												</div>
+											</div>
+											{!keyReports?.length && (
+												<Alert
+													color='warning'
+													isLight
+													icon='Report'
+													className='mt-3'>
+													Không có tiêu chí!
+												</Alert>
+											)}
+										</Card>
 									</div>
-								</Card>
-							</div>
-						</div>
-						<CommonForm
-							// key={itemEdit?.id}
-							show={toggleForm}
-							onClose={handleCloseForm}
-							handleSubmit={handleSubmitForm}
-							item={itemEdit}
-							label={
-								// eslint-disable-next-line no-nested-ternary
-								!isDetail
-									? 'Thông tin tiêu chí kinh doanh'
-									: itemEdit?.id
-									? 'Cập nhật tiêu chí kinh doanh'
-									: 'Thêm mới tiêu chí kinh doanh'
-							}
-							fields={isDetail ? showColumns : columnsNoEdit}
-							validate={validate}
-							size='lg'
-							onSubmitNestedForm={handleSubmitNestedForm}
-						/>
-						<AlertConfirm
-							openModal={toggleFormDelete}
-							onCloseModal={handleCloseForm}
-							onConfirm={() => handleDelete(itemEdit)}
-							title='Xoá tiêu chí kinh doanh'
-							content='Xác nhận xoá tiêu chí kinh doanh?'
-						/>
-					</>,
-					['admin'],
-					<NotPermission />,
+								</div>
+								{toggleForm && (
+									<CommonForm
+										show={toggleForm}
+										onClose={handleCloseForm}
+										handleSubmit={handleSubmitForm}
+										item={itemEdit}
+										label={
+											// eslint-disable-next-line no-nested-ternary
+											!isDetail
+												? 'Thông tin tiêu chí kinh doanh'
+												: itemEdit?.id
+												? 'Cập nhật tiêu chí kinh doanh'
+												: 'Thêm mới tiêu chí kinh doanh'
+										}
+										fields={isDetail ? columns : columnsNoEdit}
+										validate={validate}
+									/>
+								)}
+								<AlertConfirm
+									openModal={toggleFormDelete}
+									onCloseModal={handleCloseForm}
+									onConfirm={() => handleDeleteKeyReport(itemEdit?.id)}
+									title='Xoá tiêu chí kinh doanh'
+									content='Xác nhận xoá tiêu chí kinh doanh?'
+								/>
+							</>,
+							['admin'],
+							<NotPermission />,
+						)}
+					</div>
 				)}
 			</Page>
 		</PageWrapper>

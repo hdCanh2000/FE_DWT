@@ -4,6 +4,7 @@ import { getAllReport } from '../../pages/dailyWorkTracking/services';
 const initialState = {
 	reports: [],
 	report: {},
+	currentPage: 1,
 };
 
 export const fetchReport = createAsyncThunk('keyReport/allReport', async () => {
@@ -25,7 +26,11 @@ export const fetchReport = createAsyncThunk('keyReport/allReport', async () => {
 export const keyReportSlice = createSlice({
 	name: 'keyReport',
 	initialState,
-	reducers: {},
+	reducers: {
+		changeCurrentPage: (state, action) => {
+			state.currentPage = action.payload;
+		},
+	},
 	extraReducers: {
 		// fetch Reports
 		[fetchReport.pending]: (state) => {
@@ -41,3 +46,5 @@ export const keyReportSlice = createSlice({
 		},
 	},
 });
+
+export const { changeCurrentPage } = keyReportSlice.actions;
