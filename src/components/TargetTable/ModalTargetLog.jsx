@@ -1,6 +1,6 @@
 /* eslint react/prop-types: 0 */
 /* eslint-disable */
-import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox, Space } from 'antd';
+import { Button, Form, Input, InputNumber, Modal, Select, Upload, Checkbox } from 'antd';
 // import { DeleteTwoTone } from '@ant-design/icons';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AiOutlineCloudUpload } from 'react-icons/ai';
@@ -303,7 +303,13 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 											<>
 												{fields.map((field) => {
 													return (
-														<Space key={field.key} align='baseline'>
+														<div
+															style={{
+																justifyContent: 'space-evenly',
+																display: 'flex',
+																alignItems: 'center',
+															}}
+															key={field.key}>
 															<Form.Item
 																name={[field.name, 'id']}
 																label={`Tiêu chí ${field.key + 1}`}>
@@ -332,9 +338,10 @@ const ModalTargetLog = ({ isOpen, onOk, onCancel, logDay, target, reFetchTable }
 																/>
 															</Form.Item>
 															{/* <DeleteTwoTone
+																style={{ marginBottom: '24px' }}
 																onClick={() => remove(field.name)}
 															/> */}
-														</Space>
+														</div>
 													);
 												})}
 
