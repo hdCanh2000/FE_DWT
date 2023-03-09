@@ -20,6 +20,7 @@ const TableCommon = ({
 	total,
 	onRow,
 	searchvalue,
+	rowKey,
 	...props
 }) => {
 	const { darkModeStatus } = useDarkMode();
@@ -69,7 +70,7 @@ const TableCommon = ({
 			<div className={classNames(className)} {...props}>
 				<Table
 					className='table table-modern mb-0'
-					rowKey={(item) => item.id}
+					rowKey={rowKey}
 					onRow={onRow}
 					columns={columns}
 					dataSource={data}
@@ -101,6 +102,7 @@ TableCommon.propTypes = {
 	total: PropTypes.number,
 	searchvalue: PropTypes.string,
 	onRow: PropTypes.func,
+	rowKey: PropTypes.func,
 };
 TableCommon.defaultProps = {
 	className: null,
@@ -116,6 +118,7 @@ TableCommon.defaultProps = {
 	totalItem: 10,
 	total: 10,
 	onRow: null,
+	rowKey: 0,
 };
 
 export default memo(TableCommon);

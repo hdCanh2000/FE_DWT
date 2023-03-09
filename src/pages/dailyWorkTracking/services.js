@@ -184,10 +184,11 @@ const createUnit = async (data) => {
 	return resp.data;
 };
 
-const getAllReport = async () => {
+const getAllReport = async (params) => {
 	const resp = await axiosClient({
 		method: 'GET',
 		url: `/api/keysReport`,
+		params,
 	});
 	return resp.data;
 };

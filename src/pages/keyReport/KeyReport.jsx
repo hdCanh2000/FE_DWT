@@ -3,10 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate, createSearchParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import _ from 'lodash';
-// import { Table } from 'antd';
 import Page from '../../layout/Page/Page';
 import PageWrapper from '../../layout/PageWrapper/PageWrapper';
-// import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
+import TableSearchCommon from '../common/ComponentCommon/TableSearchCommon';
 import { demoPages } from '../../menu';
 import Card, {
 	CardActions,
@@ -20,7 +19,7 @@ import validate from './validate';
 import verifyPermissionHOC from '../../HOC/verifyPermissionHOC';
 import AlertConfirm from '../work-management/mission/AlertConfirm';
 import { toggleFormSlice } from '../../redux/common/toggleFormSlice';
-import { changeCurrentPage, fetchReport } from '../../redux/slice/keyReportSlice';
+import { fetchReport } from '../../redux/slice/keyReportSlice';
 import { addKeyReport, updateKeyReport, deleteKeyReport } from './services';
 import { fetchDepartmentList } from '../../redux/slice/departmentSlice';
 import NotPermission from '../presentation/auth/NotPermission';
@@ -32,55 +31,33 @@ import Alert from '../../components/bootstrap/Alert';
 const KeyReport = () => {
 	const { darkModeStatus } = useDarkMode();
 	const [searchParams] = useSearchParams();
-
 	const [isDetail, setIsDetail] = useState(true);
-
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-
-	const text = searchParams.get('text') || '';
-
 	const localtion = useLocation();
 	const toggleForm = useSelector((state) => state.toggleForm.open);
 	const itemEdit = useSelector((state) => state.toggleForm.data);
 	const toggleFormDelete = useSelector((state) => state.toggleForm.confirm);
 
-	const pagination = useSelector((state) => state.position.pagination);
-	// const positionLevels = useSelector((state) => state.positionLevel.positionLevels);
-	// const positions = useSelector((state) => state.position.positions);
+	const text = searchParams.get('text') || '';
+
 	const handleOpenFormDelete = (data) => dispatch(toggleFormSlice.actions.confirmForm(data));
 	const handleOpenForm = (data) => dispatch(toggleFormSlice.actions.openForm(data));
 	const handleCloseForm = () => dispatch(toggleFormSlice.actions.closeForm());
 	const loading = useSelector((state) => state.position.loading);
 	const departments = useSelector((state) => state.department.departments);
 	const keyReports = useSelector((state) => state.report.reports);
-	const currentPage = useSelector((state) => state.report.currentPage);
 
 	const arrKeyReports = keyReports.map((item, index) => ({
 		...item,
 		indexNumber: _.isEmpty(index) ? index : '--',
 	}));
 
-	// const fetchKeysReport = () => {
-	// 	const newItem = itemEdit?.requirements?.map((items) => ({
-	// 		...items,
-	// 		label: items.name,
-	// 		value: items.id,
-	// 	}));
-	// 	return { ...itemEdit, requirements: newItem };
-	// };
-
-	const setCurrentPage = (page) => {
-		dispatch(changeCurrentPage(page));
-	};
-
 	useEffect(() => {
 		const query = {};
-		query.text = text;
-		query.page = currentPage;
-		// query.limit = 10;
+		query.name = text;
 		dispatch(fetchReport(query));
-	}, [currentPage, dispatch, text]);
+	}, [dispatch, text]);
 
 	const handleSubmitSearch = (searchValue) => {
 		if (searchValue.text === '') {
@@ -96,11 +73,6 @@ const KeyReport = () => {
 				}).toString(),
 			});
 		}
-		setCurrentPage(1);
-	};
-
-	const handleChangeCurrentPage = (searchValue) => {
-		setCurrentPage(searchValue.page);
 	};
 
 	useEffect(() => {
@@ -305,11 +277,11 @@ const KeyReport = () => {
 													</CardActions>
 												</CardHeader>
 												<div className='p-4'>
-													{/* <TableSearchCommon
+													<TableSearchCommon
 														onSubmitSearch={handleSubmitSearch}
 														searchvalue={text}
 														isSearch
-													/> */}
+													/>
 													<TableCommon
 														className='table table-modern mb-0'
 														rowKey={(item) => item.id}
@@ -327,16 +299,9 @@ const KeyReport = () => {
 																},
 															};
 														}}
-														onSubmitSearch={handleSubmitSearch}
-														onChangeCurrentPage={
-															handleChangeCurrentPage
-														}
-														currentPage={parseInt(currentPage, 10)}
-														totalItem={pagination?.totalRows}
-														total={pagination?.total}
-														setCurrentPage={setCurrentPage}
-														searchvalue={text}
-														isSearch
+														// onSubmitSearch={handleSubmitSearch}
+														// searchvalue={text}
+														// isSearch
 													/>
 												</div>
 											</div>
