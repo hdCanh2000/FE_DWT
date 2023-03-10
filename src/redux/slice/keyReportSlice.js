@@ -6,8 +6,8 @@ const initialState = {
 	report: {},
 };
 
-export const fetchReport = createAsyncThunk('keyReport/allReport', async () => {
-	const response = await getAllReport();
+export const fetchReport = createAsyncThunk('keyReport/allReport', async (params) => {
+	const response = await getAllReport(params);
 	return response.result.data.map((report) => {
 		return {
 			...report,

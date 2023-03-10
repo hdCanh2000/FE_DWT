@@ -199,6 +199,12 @@ export const demoPages = {
 				path: '/don-vi-tinh',
 				roles: ['admin'],
 			},
+			keyReport: {
+				id: 'keyReport',
+				text: 'Tiêu chí kinh doanh',
+				path: '/tieu-chi',
+				roles: ['admin'],
+			},
 			recruitmentRequirements: {
 				id: 'recruitmentRequirements',
 				text: 'Yêu cầu tuyển dụng',

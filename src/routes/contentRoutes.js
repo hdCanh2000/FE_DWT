@@ -42,6 +42,9 @@ const UNIT = {
 const KEY = {
 	KEY: lazy(() => import('../pages/keys/Keys')),
 };
+const KEYREPORT = {
+	KEYREPORT: lazy(() => import('../pages/keyReport/KeyReport')),
+};
 
 const KPINORM = {
 	KPINORM: lazy(() => import('../pages/kpiNorm/KpiNorm')),
@@ -121,6 +124,10 @@ const presentation = [
 	{
 		path: demoPages.cauHinh.subMenu.unit.path,
 		element: <UNIT.UNIT />,
+	},
+	{
+		path: demoPages.cauHinh.subMenu.keyReport.path,
+		element: <KEYREPORT.KEYREPORT />,
 	},
 	{
 		path: demoPages.cauHinh.subMenu.keys.path,
