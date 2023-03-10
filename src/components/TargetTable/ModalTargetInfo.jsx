@@ -118,9 +118,11 @@ const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) 
 		{
 			key: 'createdAt',
 			title: 'Ngày tạo',
-			dataIndex: 'createdAt',
 			sorter: (a, b) => (a?.createdAt || '').localeCompare(b?.createdAt || ''),
-			render: (text) => moment(text).format('DD/MM/YYYY'),
+			render: (text) => {
+				const findDate = filterReport.find((date) => date.id === text?.targetLogId);
+				return findDate ? moment(findDate.reportDate).format('DD/MM/YYYY') : '--';
+			},
 		},
 		{
 			key: 'name',
@@ -128,7 +130,7 @@ const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) 
 			dataIndex: 'keyReportId',
 			render: (keyReportId) => {
 				const foundData = dataReport.find((data) => data.id === keyReportId);
-				return foundData ? <span>{foundData.name}</span> : null;
+				return foundData ? foundData.name : null;
 			},
 		},
 		{
@@ -145,6 +147,7 @@ const ModalTargetInfo = ({ listTarget, open, onOk, target, reFetchListTarget }) 
 			key: 'reportDate',
 			title: 'Ngày báo cáo',
 			dataIndex: 'reportDate',
+			sorter: (a, b) => (a?.reportDate || '').localeCompare(b?.reportDate || ''),
 			render: (text) => moment(text).format('DD/MM/YYYY'),
 		},
 		{
